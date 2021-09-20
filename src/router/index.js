@@ -1,0 +1,51 @@
+import Vue from 'vue';
+import Router from 'vue-router';
+import Home from '@/components/Home';
+import MailGroup from '@/components/MailGroup';
+import SHome from '@/components/S-Home';
+
+Vue.use(Router)
+
+export default new Router({
+  mode: 'history',
+  hash: false,
+  routes: [
+    // {
+    //   path: '/',
+    //   name: 'HelloWorld',
+    //   component: HelloWorld
+    // },
+    {
+      path: "/",
+      name: 'Home',
+      component: Home,
+      redirect: '204420/mine'
+    },
+    {
+      path: '/:mailboxId',
+      name: 'mailbox',
+      component: Home,
+      redirect: '/:mailboxId/mine'
+    },
+    {
+      path: '/:mailboxId/:type',
+      name: 'type',
+      component: Home,
+    },
+    {
+      path: '/:mailboxId/:type/p/:pageNo',
+      name: 'page',
+      component: Home,
+    },
+    {
+      path: '/:mailboxId/:type/:threadId',
+      name: 'thread',
+      component: Home,
+    },
+    {
+      path: "/settings",
+      name: 'SHome',
+      component: SHome
+    }
+  ]
+})
