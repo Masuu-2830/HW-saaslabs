@@ -538,14 +538,14 @@
         @click.stop.prevent="changeStarred"
         data-original-title="Star Thread"
         class="nav-link star-current-thread"
-        :style="{color: thread.data.isStarred ? '#f4b400' : '#8392a5'}"
+        :style="{color: isStarred ? '#f4b400' : '#8392a5'}"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="18"
           height="18"
           viewBox="0 0 24 24"
-          :fill="thread.data.isStarred ? '#f4b400' : 'none'"
+          :fill="isStarred ? '#f4b400' : 'none'"
           stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
@@ -993,6 +993,11 @@ export default {
   props: {
     thread: Object,
   },
+  data() {
+    return {
+      isStarred: this.thread.data.isStarred
+    }
+  },
   methods: {
     backThread() {
       bus.$emit("broad");
@@ -1010,6 +1015,7 @@ export default {
     changeStarred() {
       // console.log(this.thread);
       bus.$emit("changeStarred", this.$route.params.threadId);
+      this.isStarred = !this.isStarred
       // bus.$emit("broad");
     },
     snoozeThread(till) {
