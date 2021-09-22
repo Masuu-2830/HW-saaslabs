@@ -23,12 +23,9 @@ export const store = new Vuex.Store({
         }
     },
     actions: {
-        async fetchPingDetails(context, mailboxId) {
-            const response = await fetch("https://app.helpwise.io/api/ping.php?mailboxID=" + mailboxId, {credentials: 'include'});
-            const data = await response.json();
-            console.log(data);
-            data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
+        async fetchPingDetails(context, data) {
             await context.commit('setState', data);
+            console.log("++2")
         }
     }
 })

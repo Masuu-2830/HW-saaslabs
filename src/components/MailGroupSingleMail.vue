@@ -178,6 +178,7 @@
             >
               <svg
                 :id="'snooze-icon-'+mail.id"
+                type="button"
                 class="dropdown-toggle"
                 data-toggle="dropdown"
                 aria-haspopup="true"
@@ -495,6 +496,7 @@ export default {
           return Promise.reject(error);
         }
         this.isStarred = !this.isStarred;
+        bus.$emit("chStarInArr", id);
       }).catch(error => {
           alert(error);
       })

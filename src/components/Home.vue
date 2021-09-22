@@ -47,8 +47,13 @@ export default {
         this.fetchMailBoxes();
         document.title = "Helpwise (" + this.mailbox.stats.mine + ")";
     },
-    async beforeMount() {
-        await this.$store.dispatch('fetchPingDetails', this.$route.params.mailboxId);
+    async beforeCreate() {
+        const response = await fetch("https://app.helpwise.io/api/ping.php?mailboxID=" + this.$route.params.mailboxId, {credentials: 'include'});
+        const data = await response.json();
+        console.log(data);
+        console.log("++");
+        data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
+        await this.$store.dispatch('fetchPingDetails', data);
     }
 }
 </script>

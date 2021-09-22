@@ -12,7 +12,7 @@
     >
       <div v-if="mails.length !== 0" id="threads-list">
         <div v-for="mail in perPageMails" :key="mail.id" :id="'thread-'+mail.id" @click="clickThread(mail.id, mail.isStarred==true)">
-          <mail-group-single-mail :class="{'active': activeId === mail.id}" :mail="mail"></mail-group-single-mail>
+          <mail-group-single-mail  :class="{'active': activeId === mail.id}" :mail="mail"></mail-group-single-mail>
           </div>
       </div>
       <div
@@ -216,6 +216,85 @@ export default {
           }).catch(error => {
             alert(error);
           })
+      });
+      bus.$on("chStarInArr", (id) => {
+          // this.perPageMails = this.perPageMails.filter(item => item.id !== id);
+          var objIndex = this.perPageMails.findIndex((obj => obj.id == id));
+          this.perPageMails[objIndex].isStarred = !this.perPageMails[objIndex].isStarred;
+          console.log(this.perPageMails[objIndex]);
+      });
+      bus.$on("assignThread", (id, userId) => {
+          let threadIds = new Array();
+          threadIds[0] = id;
+          let body;
+          if(userId == "") {
+            body = JSON.stringify({ mailboxId: this.$route.params.mailboxId, threadIds });
+          } else {
+            body = JSON.stringify({ mailboxId: this.$route.params.mailboxId, threadIds, assignedUser: userId });
+          }
+          const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: body,
+            credentials: 'include'
+          };
+          fetch(this.$apiBaseURL + "assignThreads.php", requestOptions)
+          .then(async response => { 
+            const data = await response.json();
+            if(data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            var objIndex = this.perPageMails.findIndex((obj => obj.id == id));
+            let teammate = this.$store.state.teammates.filter(obj => obj.id == userId);
+            console.log(teammate);
+            this.perPageMails[objIndex].assignedTo = teammate[0];
+            this.clickThread(id, this.perPageMails[objIndex].isStarred);
+          }).catch(error => {
+            alert(error);
+          })
+      });
+      bus.$on("toggleTags", (id, addtags, removetags) => {
+          // console.log(id, addtags, removetags, addtags.length);
+          if(addtags.length || removetags.length) {
+            let threadIds = new Array();
+            let addTags = new Array();
+            let removeTags = new Array();
+            threadIds[0] = id;
+            for(var i = 0; i< addtags.length; i++) {
+              addTags.push(addtags[i]);
+            }
+            for(var i = 0; i< removetags.length; i++) {
+              removeTags.push(removetags[i]);
+            }
+            console.log(addTags,removeTags);
+            const requestOptions = {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ mailboxId: this.$route.params.mailboxId, threadIds, addTags, removeTags }),
+              credentials: 'include',
+            };
+            fetch(this.$apiBaseURL + "tags/apply.php", requestOptions)
+            .then(async response => { 
+              const data = await response.json();
+              if(data.message !== "Tags updated.") {
+                const error = (data && data.message) || response.status;
+                return Promise.reject(error);
+              }
+              var objIndex = this.perPageMails.findIndex((obj => obj.id == id));
+              for(var i = 0; i< removetags.length; i++) {
+                this.perPageMails[objIndex].tags = this.perPageMails[objIndex].tags.filter(tag => tag.id !== removetags[i]);
+              } 
+              for(var i = 0; i< addtags.length; i++) {
+                let tag = this.$store.state.tags.filter(obj => obj.id == addtags[i]);
+                // console.log(tag);
+                this.perPageMails[objIndex].tags.push(tag[0]);
+              }
+              this.clickThread(id, this.perPageMails[objIndex].isStarred);
+            }).catch(error => {
+              alert(error);
+            })
+          }
       })
   },
   watch:{
@@ -376,7 +455,10 @@ export default {
       console.log(this.isnextPage);
 
       this.perPageMails = this.mails;
-      this.resultsPerPage = await this.$store.state.userSettings.resultsPerPage;
+      console.log("--");
+      this.resultsPerPage = this.$store.state.userSettings.resultsPerPage;
+      console.log("--2");
+      // this.resultsPerPage = 1;
       router.push({ name: 'page', params: {pageNo: this.currPage, type: this.route, mailboxId: this.$route.params.mailboxId}});
       this.startThread = ((parseInt(this.currPage) - 1)*this.resultsPerPage) + 1;
       this.endThread = parseInt(this.startThread) + parseInt(this.resultsPerPage) - 1;

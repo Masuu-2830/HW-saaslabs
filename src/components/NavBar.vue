@@ -66,7 +66,7 @@
       <!-- navbar-menu-header -->
       <ul class="nav navbar-menu" style="max-width: 100% !important">
         <li class="nav-item with-sub" :class="show && 'show'">
-          <a href="JavaScript:void(0)" @click="showNavSub" class="nav-link">Inboxes</a>
+          <a href="JavaScript:void(0)" class="nav-link">Inboxes</a>
           <ul class="navbar-menu-sub" style="padding-bottom: 0px">
             <div
               id="mailbox-list"

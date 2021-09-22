@@ -293,6 +293,7 @@
             style="max-height: 200px; overflow-y: scroll"
           >
             <div
+              @click.stop="assign('')"
               id="assignment-teammate-unassigned"
               class="
                 assignment-list-item
@@ -353,6 +354,7 @@
               </span>
             </div>
             <div
+              @click.stop="assign(userInfo.id)"
               :id="'assignment-teammate-'+userInfo.id"
               class="
                 assignment-list-item
@@ -404,6 +406,7 @@
             </div>
             <div
               v-for="teammate in teammatesNew" :key="teammate.id"
+              @click.stop="assign(teammate.id)"
               :id="'assignment-teammate-'+teammate.id"
               class="
                 assignment-list-item
@@ -625,6 +628,7 @@
             style="overflow-y: scroll; height: 200px"
           >
             <div
+              @click.stop
               v-for="tag in tags" :key="tag.id"
               class="dropdown-item mt-2 tagBtn"
               :id="'single-'+tag.id"
@@ -646,7 +650,8 @@
                     :data-tag-id="tag.id"
                     class="custom-control-input tagUntagCheckbox"
                     :id="'current-thread-tag-'+tag.id"
-                    :checked="tag.checked"
+                    :checked="thread.data.tags.length > 0 && thread.data.tags.some(el => el.id == tag.id)"
+                    @click.stop="toggleTags(tag.id, $event)"
                   />
                   <label
                     :for="'current-thread-tag-'+tag.id"
@@ -663,6 +668,7 @@
                 <div
                   class="tagClickableWrapper flex-grow-1"
                   :data-tag-id="tag.id"
+                  @click.stop="toggleTag(tag.id)"
                 >
                   <svg
                     :style="{color: tag.color}"
@@ -749,7 +755,7 @@
             </svg>
             <span class="tx-13 tx-bold ml-2">New Tag</span>
           </a>
-          <a class="dropdown-item mt-2 remove-all-tags">
+          <a class="dropdown-item mt-2 remove-all-tags" @click="clearTags">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -770,7 +776,7 @@
             </svg>
             <span class="tx-13 tx-bold ml-2">Clear Tags</span>
           </a>
-          <a class="dropdown-item mt-2 applyTags">
+          <a class="dropdown-item mt-2 applyTags" @click="applyTags">
             <!-- <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z">
                                     </path>
@@ -995,7 +1001,9 @@ export default {
   },
   data() {
     return {
-      isStarred: this.thread.data.isStarred
+      isStarred: this.thread.data.isStarred,
+      removetags: [],
+      addtags: []
     }
   },
   methods: {
@@ -1035,6 +1043,48 @@ export default {
       console.log(mom.toISOString());
       bus.$emit("snoozeThread", this.$route.params.threadId, mom);
       bus.$emit("broad");
+    },
+    assign(id) {
+      bus.$emit("assignThread", this.$route.params.threadId, id);
+    },
+    toggleTag(id) {
+      if(this.thread.data.tags.some(el => el.id == id)) {
+        this.removetags.push(id);
+      } else {
+        this.addtags.push(id);
+      }
+      bus.$emit("toggleTags", this.$route.params.threadId, this.addtags, this.removetags);
+    },
+    toggleTags(id, event) {
+      console.log(event.target.checked, id);
+      if(event.target.checked && (this.thread.data.tags.length == 0 || this.thread.data.tags.some(el => el.id !== id))) {
+        console.log("1");
+        this.addtags.push(id);
+        this.removetags = this.removetags.filter(tag => tag !== id);
+      } else if(!event.target.checked && this.thread.data.tags.some(el => el.id == id)) {
+        console.log("2");
+        this.removetags.push(id);
+        this.addtags = this.addtags.filter(tag => tag !== id);
+      } else if(event.target.checked && this.thread.data.tags.some(el => el.id == id)) {
+        console.log("3");
+        this.removetags = this.removetags.filter(tag => tag !== id);
+      } else if(!event.target.checked && this.thread.data.tags.some(el => el.id !== id)) {
+        console.log("4");
+        this.addtags = this.addtags.filter(tag => tag !== id);
+      }
+      console.log(this.addtags);
+      console.log(this.removetags);
+    },
+    applyTags() {
+      bus.$emit("toggleTags", this.$route.params.threadId, this.addtags, this.removetags);
+      console.log("applying");
+    },
+    clearTags() {
+      console.log("clearing");
+      for(var i = 0; i < this.thread.data.tags.length; i++) {
+        this.removetags.push(this.thread.data.tags[i].id);
+      }
+      bus.$emit("toggleTags", this.$route.params.threadId, this.addtags, this.removetags);
     }
   },
   computed: {
