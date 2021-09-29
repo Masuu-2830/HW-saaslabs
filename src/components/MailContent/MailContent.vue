@@ -11,18 +11,18 @@
       <mail-content-header :thread="thread"></mail-content-header>
       <mail-content-body :thread="thread"></mail-content-body>
       <!-- <chat-content-body :thread="thread"></chat-content-body> -->
-      <mail-content-add-note v-if="!loading"></mail-content-add-note>
-      <!-- <chat-content-reply></chat-content-reply> -->
+      <!-- <mail-content-add-note v-if="!loading"></mail-content-add-note> -->
+      <chat-content-reply></chat-content-reply>
     </div>
   </div>
 </template>
 
 <script>
-import { bus } from "../main";
-import ChatContentBody from './ChatContentBody.vue';
-import ChatContentReply from './ChatContentReply.vue';
+import { bus } from "../../main";
+import ChatContentBody from '../ChatContentBody.vue';
+import ChatContentReply from '../ChatContentReply.vue';
 import MailContentAddNote from './MailContentAddNote.vue';
-import MailContentBody from './MailContentBody.vue';
+import MailContentBody from './MailContentBody/MailContentBody.vue';
 import MailContentHeader from './MailContentHeader.vue';
 import MailContentInt from './MailContentInt.vue';
 export default {
@@ -58,6 +58,40 @@ export default {
           this.right = '0px';
       }
     });
+    bus.$on("changeThreadAttrs", (data) => {
+      if(data.type == "assignment") {
+        if(data.teammate == null) {
+          this.thread.data.currentAssignment.assigned = null;
+          this.thread.data.currentAssignment.me = false;
+        } else if(data.teammate[0].id == this.$store.state.userInfo.id) {
+          this.thread.data.currentAssignment.assigned = data.teammate[0];
+          this.thread.data.currentAssignment.me = true;
+        } else {
+          this.thread.data.currentAssignment.assigned = data.teammate[0];
+          this.thread.data.currentAssignment.me = false;
+        }
+        console.log(this.thread.data.currentAssignment);
+        this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
+        this.thread.data.currentAssignment.time = data.log.data.at;
+        this.thread.data.items.push(data.log);
+      } else if(data.type == "tag") {
+        if(data.toRemove.length > 0) {
+          for(let i = 0; i < data.toRemove.length; i++) {
+            this.thread.data.tags = this.thread.data.tags.filter(tag => tag.id !== data.toRemove[i]);
+          }
+        }
+        if(data.toAdd.length > 0) {
+          for(let i = 0; i < data.toAdd.length; i++) {
+            this.thread.data.tags.push(data.toAdd[i]);
+          }
+        }
+        if(data.logs.length > 0) {
+          for(let i = 0; i < data.logs.length; i++) {
+            this.thread.data.items.push(data.logs[i]);
+          }
+        }
+      }
+    })
   },
 };
 </script>

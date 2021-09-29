@@ -66,7 +66,7 @@
       <div class="pd-b-10 pd-l-10">
         <div id="nav-links-container" class="pd-r-10">
           <nav class="nav nav-sidebar tx-13" id="labels-nav">
-            <router-link :to="{ name: 'type', params: {type: 'mine', mailboxId: this.$store.state.inboxData.id}}">
+            <router-link :to="{ name: 'type', params: {type: 'mine', mailboxId: this.$route.params.mailboxId}}">
             <span
               style="cursor: pointer"
               id="mine-label"
@@ -125,7 +125,7 @@
               <span class="badge text-primary hw-count" id="mine-count">{{mailbox.stats.mine > 0 || (typeof mailbox.stats.mine) === 'string' ? mailbox.stats.mine == 0 ? '' : mailbox.stats.mine : ''}}</span
             ></span>
             </router-link>
-            <router-link :to="{ name: 'type', params: {type: 'mentions', mailboxId: this.$store.state.inboxData.id}}">
+            <router-link :to="{ name: 'type', params: {type: 'mentions', mailboxId: this.$route.params.mailboxId}}">
             <span
               style="cursor: pointer"
               id="mentions-label"
@@ -152,7 +152,7 @@
                 >{{mailbox.stats.mentions > 0 || (typeof mailbox.stats.mentions) === 'string' ? mailbox.stats.mentions == 0 ? '' : mailbox.stats.mentions : ''}}</span
               > </span
             ></router-link>
-            <router-link :to="{ name: 'type', params: {type: 'discussions', mailboxId: this.$store.state.inboxData.id}}">
+            <router-link :to="{ name: 'type', params: {type: 'discussions', mailboxId: this.$route.params.mailboxId}}">
             <span
               style="cursor: pointer"
               id="discussions-label"
@@ -182,7 +182,7 @@
               >{{mailbox.stats.discussions > 0 || (typeof mailbox.stats.discussions) === 'string' ? mailbox.stats.discussions == 0 ? '' : mailbox.stats.discussions : ''}}</span>
             </span>
             </router-link>
-            <router-link :to="{ name: 'type', params: {type: 'all', mailboxId: this.$store.state.inboxData.id}}">
+            <router-link :to="{ name: 'type', params: {type: 'all', mailboxId: this.$route.params.mailboxId}}">
             <span
               style="cursor: pointer"
               id="all-label"
@@ -212,7 +212,7 @@
               >
             </span>
             </router-link>
-            <router-link :to="{ name: 'type', params: {type: 'assigned', mailboxId: this.$store.state.inboxData.id}}">
+            <router-link :to="{ name: 'type', params: {type: 'assigned', mailboxId: this.$route.params.mailboxId}}">
             <span
               style="cursor: pointer"
               id="assigned-label"
@@ -242,7 +242,7 @@
               >
             </span>
             </router-link>
-            <router-link :to="{ name: 'type', params: {type: 'unassigned', mailboxId: this.$store.state.inboxData.id}}">
+            <router-link :to="{ name: 'type', params: {type: 'unassigned', mailboxId: this.$route.params.mailboxId}}">
             <span
               style="cursor: pointer"
               id="unassigned-label"
@@ -270,7 +270,7 @@
               > </span
             >
             </router-link>
-            <router-link :to="{ name: 'type', params: {type: 'starred', mailboxId: this.$store.state.inboxData.id}}">
+            <router-link :to="{ name: 'type', params: {type: 'starred', mailboxId: this.$route.params.mailboxId}}">
             <span
               style="cursor: pointer"
               id="starred-label"
@@ -300,7 +300,7 @@
               >{{mailbox.stats.starred > 0 || (typeof mailbox.stats.starred) === 'string' ? mailbox.stats.starred == 0 ? '' : mailbox.stats.starred : ''}}</span>
             </span>
             </router-link>
-            <router-link :to="{ name: 'type', params: {type: 'snoozed', mailboxId: this.$store.state.inboxData.id}}">
+            <router-link :to="{ name: 'type', params: {type: 'snoozed', mailboxId: this.$route.params.mailboxId}}">
             <span
               style="cursor: pointer"
               id="snoozed-label"
@@ -329,7 +329,7 @@
               >{{mailbox.stats.snoozed > 0 || (typeof mailbox.stats.snoozed) === 'string' ? mailbox.stats.snoozed == 0 ? '' : mailbox.stats.snoozed : ''}}</span>
             </span>
             </router-link>
-            <router-link :to="{ name: 'type', params: {type: 'drafts', mailboxId: this.$store.state.inboxData.id}}">
+            <router-link :to="{ name: 'type', params: {type: 'drafts', mailboxId: this.$route.params.mailboxId}}">
             <span
               style="cursor: pointer"
               id="drafts-label"
@@ -407,10 +407,12 @@
               :class="more ? '' : 'd-none'"
               style="max-height: 22vh; overflow-y: scroll"
             >
+            <router-link :to="{ name: 'type', params: {type: 'sent', mailboxId: this.$route.params.mailboxId}}">
               <span
                 style="cursor: pointer"
                 id="sent-label"
                 class="nav-link hw-label-badge"
+                :class="this.$route.params.type == 'sent' && 'active'"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -428,10 +430,13 @@
                 </svg>
                 <span>Sent Mail</span> <span class="badge"></span
               ></span>
+            </router-link>
+            <router-link :to="{ name: 'type', params: {type: 'scheduled', mailboxId: this.$route.params.mailboxId}}">
               <span
                 style="cursor: pointer"
                 id="scheduled-label"
                 class="nav-link hw-label-badge"
+                :class="this.$route.params.type == 'scheduled' && 'active'"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -449,10 +454,13 @@
                 </svg>
                 <span>Scheduled</span> <span class="badge"></span
               ></span>
+            </router-link>
+            <router-link :to="{ name: 'type', params: {type: 'closed', mailboxId: this.$route.params.mailboxId}}">
               <span
                 style="cursor: pointer"
                 id="closed-label"
                 class="nav-link hw-label-badge"
+                :class="this.$route.params.type == 'closed' && 'active'"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -470,10 +478,13 @@
                 </svg>
                 <span>Closed</span> <span class="badge"></span
               ></span>
+            </router-link>
+            <router-link :to="{ name: 'type', params: {type: 'spam', mailboxId: this.$route.params.mailboxId}}">
               <span
                 style="cursor: pointer"
                 id="spam-label"
                 class="nav-link hw-label-badge"
+                :class="this.$route.params.type == 'spam' && 'active'"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -499,10 +510,13 @@
                   id="spam-count"
                 ></span>
               </span>
+            </router-link>
+            <router-link :to="{ name: 'type', params: {type: 'trash', mailboxId: this.$route.params.mailboxId}}">
               <span
                 style="cursor: pointer"
                 id="trash-label"
                 class="nav-link hw-label-badge"
+                :class="this.$route.params.type == 'trash' && 'active'"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -523,6 +537,7 @@
                 <span>Trash</span>
                 <span class="badge"></span>
               </span>
+            </router-link>
               <a
                 v-for="tag in tags" :key="tag.id"
                 style="cursor: pointer"

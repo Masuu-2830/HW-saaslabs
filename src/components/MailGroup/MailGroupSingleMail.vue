@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100 row media m-0 hw-thread media-body" :class="[isRead ? 'read' : 'unread']">
+  <div class="w-100 row media m-0 hw-thread media-body" :class="[this.mail.isRead ? 'read' : 'unread']">
     <div class="realtimeMarker"></div>
     <div class="hw_broadThread w-100">
       <div class="row align-items-center w-100" style="padding-left: 20px">
@@ -11,6 +11,7 @@
               <input
                 type="checkbox"
                 v-model="checkAll"
+                @click="checkBox"
                 class="custom-control-input"
                 :id="'thread-' + mail.id +'-selector'"
               />
@@ -19,13 +20,13 @@
                 :for="'thread-' + mail.id +'-selector'"
               ></label>
             </div>
-            <div @click.stop="changeStarred(mail.id)" class="hw_starThread px-1 mr-1" :style="{color: isStarred ? '#f4b400' : '#8392a5'}">
+            <div @click.stop="changeStarred(mail.id)" class="hw_starThread px-1 mr-1" :style="{color: this.mail.isStarred ? '#f4b400' : '#8392a5'}">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
                 height="18"
                 viewBox="0 0 24 24"
-                :fill="isStarred ? '#f4b400' : 'none'"
+                :fill="this.mail.isStarred ? '#f4b400' : 'none'"
                 stroke="currentColor"
                 stroke-width="2"
                 stroke-linecap="round"
@@ -40,9 +41,26 @@
           </div>
           <div class="flex-grow-1 w-100 d-flex thread-addr">
             <div
+              v-if="mail.email.from == undefined"
               class="text-truncate thread-addr-main"
               style="max-width: 90%"
-              :style="{ fontWeight: isRead ? '' : '600' }"
+              :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+            >
+              (unknown sender)
+            </div>
+            <div
+              v-else-if="this.$route.params.type == 'sent'"
+              class="text-truncate thread-addr-main"
+              style="max-width: 90%"
+              :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+            >
+              To: {{ Object.values(mail.email.to).toString() }}
+            </div>
+            <div
+              v-else
+              class="text-truncate thread-addr-main"
+              style="max-width: 90%"
+              :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
             >
               {{ Object.values(mail.email.from).toString() }}
             </div>
@@ -89,7 +107,7 @@
             <div class="d-flex align-items-center">
               <span
                 class="tx-14 hw-thread-subject mr-2"
-                :style="{ fontWeight: isRead ? '' : '600' }"
+                :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
               >
                 {{ mail.email.subject }}
               </span>
@@ -116,13 +134,17 @@
                 v-html="mail.assignedTo.avatarTag"
               ></div>
             </div>
-            <div class="col-6"></div>
+            <div v-if="this.$route.params.type == 'sent' || mail.seenAt" class="col-6">
+              <div data-toggle="tooltip" :title="'Seen '+seenAt" style="color:#8392a5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye mr-2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+              </div>
+            </div>
           </div>
         </div>
         <div class="col-2 date-thread-options col-lg-1">
           <span
             class="tx-13 thread-date"
-            :style="{ fontWeight: isRead ? '' : '600' }"
+            :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
             >{{ mail.email.humanFriendlyDate }}</span
           >
           <span
@@ -133,9 +155,9 @@
               align-items-center
             "
           >
-            <span class="read-unread-thread pl-1 pr-1 pt-1" @click.stop="changeRead(mail.id)">
+            <span v-if="this.$route.params.type !== 'sent' && this.$route.params.type !== 'closed' && this.$route.params.type !== 'spam' && this.$route.params.type !== 'trash'" class="read-unread-thread pl-1 pr-1 pt-1" @click.stop="changeRead(mail.id)">
               <i
-                v-if="!isRead"
+                v-if="!this.mail.isRead"
                 class="far fa-envelope-open"
                 data-toggle="tooltip"
                 data-placement="top"
@@ -143,14 +165,14 @@
                 style="font-size: 16px"
               ></i>
               <i
-                v-if="isRead"
+                v-if="this.mail.isRead"
                 class="far fa-envelope"
                 data-toggle="tooltip"
                 data-placement="top"
                 title="Unread"
                 style="font-size: 16px"
               ></i> </span
-            ><span class="archive-thread pr-1 pl-1" @click.stop="closeThread(mail.id)">
+            ><span v-if="this.$route.params.type !== 'closed' && this.$route.params.type !== 'trash'" class="archive-thread pr-1 pl-1" @click.stop="closeThread(mail.id)">
               <svg
                 data-toggle="tooltip"
                 data-placement="top"
@@ -168,9 +190,10 @@
               >
                 <polyline points="20 6 9 17 4 12"></polyline>
               </svg> </span
-            ><span @click.stop
+            >
+            <span @click.stop="showSnooze"
               class="snooze-thread pr-1 pl-1 dropright"
-          
+              :class="show && 'show'"
               data-toggle="tooltip"
               data-placement="top"
               title="Snooze"
@@ -182,7 +205,7 @@
                 class="dropdown-toggle"
                 data-toggle="dropdown"
                 aria-haspopup="true"
-                aria-expanded="false"
+                :aria-expanded="show ? 'true' : 'false'"
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
                 height="16"
@@ -198,6 +221,7 @@
               </svg>
               <div
                 class="dropdown-menu snooze-options"
+                :class="show && 'show'"
                 :aria-labelledby="'snooze-icon-'+mail.id"
                 :id="'append-snooze-'+mail.id"
                 style="
@@ -207,6 +231,7 @@
                   left: 0px;
                   will-change: transform;
                   z-index: 9999;
+                  display: block
                 "
               >
                 <button
@@ -284,6 +309,12 @@
                 </div>
               </div>
             </span>
+            <span v-if="this.$route.params.type == 'closed' || this.$route.params.type == 'spam' || this.$route.params.type == 'trash'" class="restore-thread pr-1 pl-1" @click.stop="restoreThread(mail.id)">
+              <svg data-toggle="tooltip" data-placement="top" title="Move To Inbox" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-original-title="Move to Inbox">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z">
+              </path></svg>
+            </span>
           </span>
         </div>
       </div>
@@ -322,9 +353,26 @@
           "
           ><div class="flex-grow-1 w-100 d-flex thread-addr">
             <div
+              v-if="mail.email.from == undefined"
               class="text-truncate thread-addr-main"
               style="max-width: 90%"
-              :style="{ fontWeight: isRead ? '' : '600' }"
+              :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+            >
+              (unknown sender)
+            </div>
+            <div
+              v-else-if="this.$route.params.type == 'sent'"
+              class="text-truncate thread-addr-main"
+              style="max-width: 90%"
+              :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+            >
+              To: {{ Object.values(mail.email.to).toString() }}
+            </div>
+            <div
+              v-else
+              class="text-truncate thread-addr-main"
+              style="max-width: 90%"
+              :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
             >
               {{ Object.values(mail.email.from).toString() }}
             </div>
@@ -343,7 +391,7 @@
             </div>
           </div></span
         >
-        <span class="tx-11 thread-date" :style="{ fontWeight: isRead ? '' : '600' }">{{
+        <span class="tx-11 thread-date" :style="{ fontWeight: this.mail.isRead ? '' : '600' }">{{
           mail.email.humanFriendlyDate
         }}</span>
       </div>
@@ -355,7 +403,7 @@
           overflow: hidden !important;
           text-overflow: ellipsis;
         "
-        :style="{ fontWeight: isRead ? '' : '600' }"
+        :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
       >
         {{ mail.email.subject }}
       </div>
@@ -385,7 +433,7 @@
 </template>
 
 <script>
-import { bus } from "../main";
+import { bus } from "../../main";
 export default {
   name: "MailGroupSingleMail",
   props: {
@@ -394,115 +442,94 @@ export default {
   data() {
     return {
       checkAll: false,
-      isRead: this.mail.isRead,
-      isStarred: this.mail.isStarred
+      // isRead: this.mail.isRead,
+      // isStarred: this.mail.isStarred,
+      show: false
     };
   },
   created() {
-    bus.$on("checkAll", () => {
-      this.checkAll = true;
-    });
-    bus.$on("unCheckAll", () => {
-      this.checkAll = false;
-    });
-    bus.$on("changeStarred", (id) => {
-      if(this.mail.id == id) {
-        this.changeStarred(id);
+    bus.$on("check", (id, check) => {
+      if(check == true && (id == 1 || id == this.mail.id)) {
+        // console.log(data);
+        this.checkAll = true;
+      } else if(check == false && (id == 1 || id == this.mail.id)) {
+        // console.log(data);
+        this.checkAll = false
       }
     });
-    bus.$on("read", (data) => {
-      // console.log(data);
-      if(this.mail.id == data) {
-        if(!this.isRead) {
-          let threadIDs = new Array();
-          threadIDs[0] = data;
-          const requestOptions = {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mailboxID: this.$route.params.mailboxId, threadIDs }),
-            credentials: 'include'
-          };
-          fetch(this.$apiBaseURL + "read-thread.php", requestOptions)
-          .then(response => response.json())
-          .then(data => (console.log(data)));
-          this.isRead = !this.isRead
-        }
-      }
-    });
-    bus.$on("unread", (data) => {
-      console.log(data);
-      if(this.mail.id == data) {
-        if(this.isRead) {
-          let threadIDs = new Array();
-          threadIDs[0] = data;
-          const requestOptions = {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mailboxID: this.$route.params.mailboxId, threadIDs }),
-            credentials: 'include'
-          };
-          fetch(this.$apiBaseURL + "unread-thread.php", requestOptions)
-          .then(response => response.json())
-          .then(data => (console.log(data)));
-          this.isRead = !this.isRead
-        }
-      }
-    });
+    // bus.$on("changeStarred", (id) => {
+    //   if(this.mail.id == id) {
+    //     this.changeStarred(id);
+    //   }
+    // });
+    // bus.$on("read", (data) => {
+    //   // console.log(data);
+    //   if(this.mail.id == data) {
+    //     if(!this.isRead) {
+    //       let threadIDs = new Array();
+    //       threadIDs[0] = data;
+    //       const requestOptions = {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify({ mailboxID: this.$route.params.mailboxId, threadIDs }),
+    //         credentials: 'include'
+    //       };
+    //       fetch(this.$apiBaseURL + "read-thread.php", requestOptions)
+    //       .then(response => response.json())
+    //       .then(data => (console.log(data)));
+    //       this.isRead = !this.isRead
+    //     }
+    //   }
+    // });
+    // bus.$on("unread", (data) => {
+    //   console.log(data);
+    //   if(this.mail.id == data) {
+    //     if(this.isRead) {
+    //       let threadIDs = new Array();
+    //       threadIDs[0] = data;
+    //       const requestOptions = {
+    //         method: "POST",
+    //         headers: { "Content-Type": "application/json" },
+    //         body: JSON.stringify({ mailboxID: this.$route.params.mailboxId, threadIDs }),
+    //         credentials: 'include'
+    //       };
+    //       fetch(this.$apiBaseURL + "unread-thread.php", requestOptions)
+    //       .then(response => response.json())
+    //       .then(data => (console.log(data)));
+    //       this.isRead = !this.isRead
+    //     }
+    //   }
+    // });
+  },
+  computed: {
+    seenAt() {
+      console.log(this.mail.seenAt);
+      return moment(this.mail.seenAt).fromNow();
+    }
   },
   methods: {
-    changeRead(id) {
-      let threadIDs = new Array();
-      threadIDs[0] = id;
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mailboxID: this.$route.params.mailboxId, threadIDs }),
-        credentials: 'include'
-      };
-      console.log(requestOptions.body);
-      if(this.isRead) {
-        fetch(this.$apiBaseURL + "unread-thread.php", requestOptions)
-        .then(response => response.json())
-        .then(data => (console.log(data)));
+    checkBox() {
+      this.checkAll = !this.checkAll;
+      if(this.checkAll == true) {
+        bus.$emit('check', this.mail.id, true);
       } else {
-        fetch(this.$apiBaseURL + "read-thread.php", requestOptions)
-        .then(response => response.json())
-        .then(data => (console.log(data)));
+        bus.$emit('check', this.mail.id, false);
       }
-      this.isRead = !this.isRead;
-      this.mail.isStarred = !this.mail.isStarred;
+    },
+    showSnooze() {
+      this.show = !this.show;
+    },
+    changeRead(id) {
+      bus.$emit("changeRead", id);
     },
     changeStarred(id) {
-      let threadIds = new Array();
-      threadIds[0] = id;
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mailboxId: this.$route.params.mailboxId, threadIds }),
-        credentials: 'include'
-      };
-      console.log(requestOptions.body);
-      let url = '';
-      if(this.isStarred) {
-        url = this.$apiBaseURL + "unstarThreads.php";
-      } else {
-        url = this.$apiBaseURL + "starThreads.php"
-      }
-      fetch(url, requestOptions)
-      .then(async response => { 
-        const data = await response.json();
-        if(data.status !== "success") {
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
-        this.isStarred = !this.isStarred;
-        bus.$emit("chStarInArr", id);
-      }).catch(error => {
-          alert(error);
-      })
+      bus.$emit("changeStarred", id);
     },
     closeThread(id) {
       bus.$emit('closeThread', id);
+    },
+    restoreThread(id) {
+      bus.$emit('restoreThreads', id);
     }
   }
 };

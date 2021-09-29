@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from '@/components/Home';
-import MailGroup from '@/components/MailGroup';
-import SHome from '@/components/S-Home';
+// import MailGroup from '@/components/MailGroup/MailGroup.vue';
+import SHome from '@/components/Settings/S-Home';
 
 Vue.use(Router)
 

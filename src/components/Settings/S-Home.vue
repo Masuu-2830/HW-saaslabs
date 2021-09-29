@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import NavBar from './NavBar.vue';
+import NavBar from '../NavBar.vue';
 import SideBar from './S-SideBar.vue';
 import Content from './S-Content.vue'
 export default {

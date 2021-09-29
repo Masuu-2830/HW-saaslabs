@@ -6,7 +6,8 @@ import router from './router'
 import VueFroala from "vue-froala-wysiwyg";
 import $ from "jquery";
 import { store } from "./store/store";
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue';
+import { BootstrapVue, IconsPlugin,LayoutPlugin } from 'bootstrap-vue';
+Vue.use(LayoutPlugin);
 
 import "font-awesome/css/font-awesome.min.css";
 // import 'bootstrap/dist/css/bootstrap.css'

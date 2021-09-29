@@ -4,7 +4,7 @@
         <span class="sr-only">Loading...</span>
     </div>
     <mails-header-search-box></mails-header-search-box>
-    <mails-header-select-all :mailbox="mailbox" :startThread="startThread" :endThread="endThread" :currPage="currPage" :isnextPage="isnextPage" :mailsnum="mails.length"></mails-header-select-all>
+    <mails-header-select-all :selectedIds="selectedIds" :mailbox="mailbox" :startThread="startThread" :endThread="endThread" :currPage="currPage" :isnextPage="isnextPage" :mailsnum="mails.length"></mails-header-select-all>
     <div
       v-if="!loading"
       class="mail-group-body bd-y"
@@ -96,8 +96,8 @@
 </template>
 
 <script>
-import { bus } from '../main';
-import router from '../router';
+import { bus } from '../../main';
+import router from '../../router';
 import MailGroupSingleMail from './MailGroupSingleMail.vue';
 import MailsHeaderSearchBox from './MailsHeaderSearchBox.vue';
 import MailsHeaderSelectAll from './MailsHeaderSelectAll.vue';
@@ -124,10 +124,35 @@ export default {
       order: '',
       loading: false,
       squery: "",
-      resultsPerPage: 5
+      resultsPerPage: 20,
+      selectedIds: []
     }
   },
   created() {
+      bus.$on('check', (id, check) => {
+        // console.log(id);
+        // console.log(check);
+        if(id == 1) {
+          if(check == true) {
+            this.selectedIds = [];
+            for(let i = 0; i < this.perPageMails.length; i++) {
+              this.selectedIds.push(this.perPageMails[i].id);
+            }
+            console.log(this.selectedIds);
+          } else {
+            this.selectedIds = [];
+            console.log(this.selectedIds);
+          }
+        } else {
+          if(check == true) {
+            this.selectedIds.push(id);
+            console.log(this.selectedIds);
+          } else {
+            this.selectedIds = this.selectedIds.filter(i => i !== id);
+            console.log(this.selectedIds);
+          }
+        }
+      }),
       bus.$on('broad', () => {
           this.isCompact = false,
           this.activeId = '',
@@ -157,19 +182,191 @@ export default {
           this.currPage = 1;
           this.fetchThreads();
       });
+      bus.$on("changeRead", (id, read) => {
+        console.log(read);
+        var objIndex = this.perPageMails.findIndex((obj => obj.id == id));
+        let threadIDs = new Array();
+        threadIDs[0] = id;
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mailboxID: this.$route.params.mailboxId, threadIDs }),
+          credentials: 'include'
+        };
+        console.log(requestOptions.body);
+        let url;
+        if(this.perPageMails[objIndex].isRead && read !== 1) {
+          url = this.$apiBaseURL + "unread-thread.php";
+        } else {
+          url = this.$apiBaseURL + "read-thread.php";
+        }
+        fetch(url, requestOptions)
+        .then(async response => { 
+            const data = await response.json();
+            if(data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            if(read == 1) {
+              this.perPageMails[objIndex].isRead = true;
+            } else {
+              this.perPageMails[objIndex].isRead = !this.perPageMails[objIndex].isRead;
+            }
+          }).catch(error => {
+          alert(error);
+        })
+      })
+      bus.$on("bulkRead", (read) => {
+        console.log(read);
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mailboxID: this.$route.params.mailboxId, threadIDs: this.selectedIds }),
+          credentials: 'include'
+        };
+        console.log(requestOptions.body);
+        let url;
+        if(!read) {
+          url = this.$apiBaseURL + "unread-thread.php";
+        } else {
+          url = this.$apiBaseURL + "read-thread.php";
+        }
+        fetch(url, requestOptions)
+        .then(async response => { 
+            const data = await response.json();
+            if(data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            for(let i = 0; i < this.selectedIds.length; i++) {
+              var objIndex = this.perPageMails.findIndex((obj => obj.id == this.selectedIds[i]));
+              if(!read) {
+                this.perPageMails[objIndex].isRead = false;
+              } else {
+                this.perPageMails[objIndex].isRead = true;
+              }
+            }
+          }).catch(error => {
+          alert(error);
+        })
+      });
+      bus.$on('changeStarred', (id) => {
+        var objIndex = this.perPageMails.findIndex((obj => obj.id == id));
+        let threadIds = new Array();
+        threadIds[0] = id;
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mailboxId: this.$route.params.mailboxId, threadIds }),
+          credentials: 'include'
+        };
+        console.log(requestOptions.body);
+        let url = '';
+        if(this.perPageMails[objIndex].isStarred) {
+          url = this.$apiBaseURL + "unstarThreads.php";
+        } else {
+          url = this.$apiBaseURL + "starThreads.php"
+        }
+        fetch(url, requestOptions)
+        .then(async response => { 
+          const data = await response.json();
+          if(data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          this.perPageMails[objIndex].isStarred = !this.perPageMails[objIndex].isStarred;
+          // bus.$emit("chStarInArr", id);
+        }).catch(error => {
+            alert(error);
+        })
+      })
+      bus.$on("bulkStar", () => {
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mailboxId: this.$route.params.mailboxId, threadIds: this.selectedIds }),
+          credentials: 'include'
+        };
+        console.log(requestOptions.body);
+        fetch(this.$apiBaseURL + "starThreads.php", requestOptions)
+        .then(async response => { 
+            const data = await response.json();
+            if(data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            for(let i = 0; i < this.selectedIds.length; i++) {
+              var objIndex = this.perPageMails.findIndex((obj => obj.id == this.selectedIds[i]));
+              this.perPageMails[objIndex].isStarred = true;
+            }
+          }).catch(error => {
+          alert(error);
+        })
+      });
       bus.$on('closeThread', (id) => {
         let threadIDs = new Array();
+        if(typeof id == 'number') {
           threadIDs[0] = id;
+        } else if(typeof id == 'object') {
+          threadIDs = id;
+        }
+        console.log(threadIDs);
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mailboxID: this.$route.params.mailboxId, threadIDs }),
+          credentials: 'include'
+        };
+        fetch(this.$apiBaseURL + "archiveThreads.php", requestOptions)
+        .then(async response => { 
+          const data = await response.json();
+          if(data.message !== "thread archived") {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          for(let i = 0; i< threadIDs.length; i++) {
+            this.perPageMails = this.perPageMails.filter(item => item.id !== threadIDs[i]);
+          }
+          const limit = threadIDs.length;
+          const offset = this.$store.state.userSettings.resultsPerPage - threadIDs.length;
+          let url;
+          if(offset == 0) {
+            url = this.$apiBaseURL + "get-threads.php?mailboxID=" + this.$route.params.mailboxId + "&labelID=" + this.labelId + "&limit=" + limit + "&consistent=true";
+          } else {
+            url = this.$apiBaseURL + "get-threads.php?mailboxID=" + this.$route.params.mailboxId + "&labelID=" + this.labelId + "&limit=" + limit + "&offset=" + offset + "&consistent=true";
+          }
+          fetch(url, {credentials: 'include'})
+          .then(async response => {
+            const data = await response.json();
+            if(data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            for(let i = 0; i < data.data.threads.length; i++) {
+              this.perPageMails.push(data.data.threads[i]);
+            }
+          })
+        }).catch(error => {
+          alert(error);
+        })
+      });
+      bus.$on('restoreThreads', (id) => {
+          let threadIDs = new Array();
+          threadIDs[0] = id;
+          let unspam = false;
+          if(this.labelId == 8) {
+            unspam = true;
+          }
           const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ mailboxID: this.$route.params.mailboxId, threadIDs }),
+            body: JSON.stringify({ mailboxID: this.$route.params.mailboxId, threadIDs, unspam }),
             credentials: 'include'
           };
-          fetch(this.$apiBaseURL + "archiveThreads.php", requestOptions)
+          fetch(this.$apiBaseURL + "restoreThreads.php", requestOptions)
           .then(async response => { 
             const data = await response.json();
-            if(data.message !== "thread archived") {
+            if(data.message !== "thread restored") {
               const error = (data && data.message) || response.status;
               return Promise.reject(error);
             }
@@ -187,9 +384,59 @@ export default {
             alert(error);
           })
       });
+      bus.$on('spamThreads', (id) => {
+        let threadIDs = new Array();
+        if(typeof id == 'number') {
+          threadIDs[0] = id;
+        } else if(typeof id == 'object') {
+          threadIDs = id;
+        }
+          const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mailboxID: this.$route.params.mailboxId, threadIDs }),
+            credentials: 'include'
+          };
+          fetch(this.$apiBaseURL + "spamThreads.php", requestOptions)
+          .then(async response => { 
+            const data = await response.json();
+            if(data.message !== "thread marked as spam") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            for(let i = 0; i< threadIDs.length; i++) {
+              this.perPageMails = this.perPageMails.filter(item => item.id !== threadIDs[i]);
+            }
+            const limit = threadIDs.length;
+            const offset = this.$store.state.userSettings.resultsPerPage - threadIDs.length;
+            let url;
+            if(offset == 0) {
+              url = this.$apiBaseURL + "get-threads.php?mailboxID=" + this.$route.params.mailboxId + "&labelID=" + this.labelId + "&limit=" + limit + "&consistent=true";
+            } else {
+              url = this.$apiBaseURL + "get-threads.php?mailboxID=" + this.$route.params.mailboxId + "&labelID=" + this.labelId + "&limit=" + limit + "&offset=" + offset + "&consistent=true";
+            }
+            fetch(url, {credentials: 'include'})
+            .then(async response => {
+              const data = await response.json();
+              if(data.status !== "success") {
+                const error = (data && data.message) || response.status;
+                return Promise.reject(error);
+              }
+              for(let i = 0; i < data.data.threads.length; i++) {
+                this.perPageMails.push(data.data.threads[i]);
+              }
+            })
+          }).catch(error => {
+            alert(error);
+          })
+      });
       bus.$on('snoozeThread', (id, till) => {
         let threadIDs = new Array();
+        if(typeof id == 'number') {
           threadIDs[0] = id;
+        } else if(typeof id == 'object') {
+          threadIDs = id;
+        }
           const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -203,29 +450,39 @@ export default {
               const error = (data && data.message) || response.status;
               return Promise.reject(error);
             }
-            this.perPageMails = this.perPageMails.filter(item => item.id !== id);
-            fetch(this.$apiBaseURL + "get-threads.php?mailboxID=" + this.$route.params.mailboxId + "&labelID=" + this.labelId + "&limit=1&offset=19&consistent=true", {credentials: 'include'})
+            for(let i = 0; i< threadIDs.length; i++) {
+              this.perPageMails = this.perPageMails.filter(item => item.id !== threadIDs[i]);
+            }
+            const limit = threadIDs.length;
+            const offset = this.$store.state.userSettings.resultsPerPage - threadIDs.length;
+            let url;
+            if(offset == 0) {
+              url = this.$apiBaseURL + "get-threads.php?mailboxID=" + this.$route.params.mailboxId + "&labelID=" + this.labelId + "&limit=" + limit + "&consistent=true";
+            } else {
+              url = this.$apiBaseURL + "get-threads.php?mailboxID=" + this.$route.params.mailboxId + "&labelID=" + this.labelId + "&limit=" + limit + "&offset=" + offset + "&consistent=true";
+            }
+            fetch(url, {credentials: 'include'})
             .then(async response => {
               const data = await response.json();
               if(data.status !== "success") {
                 const error = (data && data.message) || response.status;
                 return Promise.reject(error);
               }
-              this.perPageMails.push(data.data.threads[0]);
+              for(let i = 0; i < data.data.threads.length; i++) {
+                this.perPageMails.push(data.data.threads[i]);
+              }
             })
           }).catch(error => {
             alert(error);
           })
       });
-      bus.$on("chStarInArr", (id) => {
-          // this.perPageMails = this.perPageMails.filter(item => item.id !== id);
-          var objIndex = this.perPageMails.findIndex((obj => obj.id == id));
-          this.perPageMails[objIndex].isStarred = !this.perPageMails[objIndex].isStarred;
-          console.log(this.perPageMails[objIndex]);
-      });
       bus.$on("assignThread", (id, userId) => {
           let threadIds = new Array();
-          threadIds[0] = id;
+          if(typeof id == 'number') {
+            threadIds[0] = id;
+          } else if(typeof id == 'object') {
+            threadIds = id;
+          }
           let body;
           if(userId == "") {
             body = JSON.stringify({ mailboxId: this.$route.params.mailboxId, threadIds });
@@ -245,17 +502,47 @@ export default {
               const error = (data && data.message) || response.status;
               return Promise.reject(error);
             }
-            var objIndex = this.perPageMails.findIndex((obj => obj.id == id));
-            let teammate = this.$store.state.teammates.filter(obj => obj.id == userId);
-            console.log(teammate);
-            this.perPageMails[objIndex].assignedTo = teammate[0];
-            this.clickThread(id, this.perPageMails[objIndex].isStarred);
+            for(let i = 0; i < threadIds.length; i++) {
+              var objIndex = this.perPageMails.findIndex((obj => obj.id == threadIds[i]));
+              let teammate;
+              let body;
+              if(userId == "") {
+                this.perPageMails[objIndex].assignedTo = null;
+                body = `${this.$store.state.userInfo.firstname} ${this.$store.state.userInfo.lastname} unassigned the conversation`;
+              } else {
+                teammate = this.$store.state.teammates.filter(obj => obj.id == userId);
+                this.perPageMails[objIndex].assignedTo = teammate[0];
+                console.log(teammate);
+                body = `${this.$store.state.userInfo.firstname} ${this.$store.state.userInfo.lastname} assigned the conversation to ${teammate[0].name}`;
+                if(this.$store.state.userInfo.id == teammate[0].id) {
+                  body = `${this.$store.state.userInfo.firstname} ${this.$store.state.userInfo.lastname} assigned the conversation to themselves`;         
+                }
+              }
+              let data1 = {
+                data: {
+                  body: body,
+                  at: new Date().toISOString(),
+                  type: "assignment"
+                },
+                timestamp: Date.now(),
+                type: "log"
+              }
+              let payload = {
+                log: data1,
+                teammate,
+                type: "assignment"
+              }
+              console.log(data1);
+              if(this.isCompact) {
+                bus.$emit("changeThreadAttrs", payload);
+              }
+            }
           }).catch(error => {
             alert(error);
           })
       });
       bus.$on("toggleTags", (id, addtags, removetags) => {
-          // console.log(id, addtags, removetags, addtags.length);
+          console.log(id, addtags, removetags, addtags.length);
           if(addtags.length || removetags.length) {
             let threadIds = new Array();
             let addTags = new Array();
@@ -267,6 +554,7 @@ export default {
             for(var i = 0; i< removetags.length; i++) {
               removeTags.push(removetags[i]);
             }
+            console.log(addtags,removetags);
             console.log(addTags,removeTags);
             const requestOptions = {
               method: "POST",
@@ -282,15 +570,43 @@ export default {
                 return Promise.reject(error);
               }
               var objIndex = this.perPageMails.findIndex((obj => obj.id == id));
+              let toAdd = new Array();
+              let logs = new Array();
               for(var i = 0; i< removetags.length; i++) {
+                let tag = this.$store.state.tags.filter(obj => obj.id == removetags[i]);
                 this.perPageMails[objIndex].tags = this.perPageMails[objIndex].tags.filter(tag => tag.id !== removetags[i]);
+                logs.push({
+                  data: {
+                    body: `${this.$store.state.userInfo.firstname} ${this.$store.state.userInfo.lastname} removed the tag ${tag[0].name}`,
+                    at: new Date().toISOString(),
+                    type: "tag"
+                  },
+                  timestamp: Date.now(),
+                  type: "log"
+                })
               } 
               for(var i = 0; i< addtags.length; i++) {
                 let tag = this.$store.state.tags.filter(obj => obj.id == addtags[i]);
-                // console.log(tag);
                 this.perPageMails[objIndex].tags.push(tag[0]);
+                logs.push({
+                  data: {
+                    body: `${this.$store.state.userInfo.firstname} ${this.$store.state.userInfo.lastname} added the tag ${tag[0].name}`,
+                    at: new Date().toISOString(),
+                    type: "tag"
+                  },
+                  timestamp: Date.now(),
+                  type: "log"
+                })
+                toAdd.push(tag[0]);
               }
-              this.clickThread(id, this.perPageMails[objIndex].isStarred);
+              let payload = {
+                logs,
+                toRemove: removeTags,
+                toAdd,
+                type: "tag"
+              };
+              console.log(payload);
+              bus.$emit("changeThreadAttrs", payload);
             }).catch(error => {
               alert(error);
             })
@@ -384,6 +700,51 @@ export default {
           this.personId = 0;
           this.order = '';
           this.squery = "";
+        } else if(to.params.type == 'sent') {
+          this.labelId = 1;
+          this.route = to.params.type;
+          this.currPage = 1;
+          this.startThread = 1;
+          this.endThread = 1;
+          this.personId = 0;
+          this.order = '';
+          this.squery = "";
+        } else if(to.params.type == 'scheduled') {
+          this.labelId = 6;
+          this.route = to.params.type;
+          this.currPage = 1;
+          this.startThread = 1;
+          this.endThread = 1;
+          this.personId = 0;
+          this.order = '';
+          this.squery = "";
+        } else if(to.params.type == 'closed') {
+          this.labelId = 7;
+          this.route = to.params.type;
+          this.currPage = 1;
+          this.startThread = 1;
+          this.endThread = 1;
+          this.personId = 0;
+          this.order = '';
+          this.squery = "";
+        } else if(to.params.type == 'spam') {
+          this.labelId = 8;
+          this.route = to.params.type;
+          this.currPage = 1;
+          this.startThread = 1;
+          this.endThread = 1;
+          this.personId = 0;
+          this.order = '';
+          this.squery = "";
+        } else if(to.params.type == 'trash') {
+          this.labelId = 5;
+          this.route = to.params.type;
+          this.currPage = 1;
+          this.startThread = 1;
+          this.endThread = 1;
+          this.personId = 0;
+          this.order = '';
+          this.squery = "";
         }
         this.fetchThreads();
         }
@@ -397,7 +758,7 @@ export default {
   },
   methods: {
     async clickThread(id, isstarred) {
-      bus.$emit('read', id);
+      bus.$emit('changeRead', id, 1);
       this.activeId = id;
       this.isCompact = true;
       let data = null;

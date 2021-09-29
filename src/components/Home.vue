@@ -11,9 +11,9 @@
 
 <script>
 import NavBar from './NavBar.vue';
-import MailGroup from './MailGroup.vue';
+import MailGroup from './MailGroup/MailGroup.vue';
 import SideBar from './SideBar.vue';
-import MailContent from './MailContent.vue'
+import MailContent from './MailContent/MailContent.vue'
 export default {
     name: 'Home',
     components: {
@@ -26,6 +26,14 @@ export default {
         return {
             mailbox: {},
             mailboxes: [],
+        }
+    },
+     watch:{
+        $route (to, from) {
+            if(to.params.mailboxId !== from.params.mailboxId) {
+                this.fetchMailBoxData();
+                this.fetchSidebarStats();
+            }
         }
     },
     methods: {
@@ -41,6 +49,14 @@ export default {
             console.log(data);
             this.mailboxes = data.data.mailboxes;
         },
+        async fetchMailBoxData() {
+            const response = await fetch("https://app.helpwise.io/api/ping.php?mailboxID=" + this.$route.params.mailboxId, {credentials: 'include'});
+            const data = await response.json();
+            console.log(data);
+            console.log("++");
+            data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
+            await this.$store.dispatch('fetchPingDetails', data);
+        }
     },
     async mounted() {
         await this.fetchSidebarStats();
@@ -49,11 +65,11 @@ export default {
     },
     async beforeCreate() {
         const response = await fetch("https://app.helpwise.io/api/ping.php?mailboxID=" + this.$route.params.mailboxId, {credentials: 'include'});
-        const data = await response.json();
-        console.log(data);
-        console.log("++");
-        data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
-        await this.$store.dispatch('fetchPingDetails', data);
+            const data = await response.json();
+            console.log(data);
+            console.log("++");
+            data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
+            await this.$store.dispatch('fetchPingDetails', data);
     }
 }
 </script>
