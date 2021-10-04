@@ -1557,7 +1557,7 @@
           <polyline points="12 5 19 12 12 19"></polyline>
         </svg>
       </a>
-      <b-modal id="move-thread-modal" title="Select Inbox">
+      <b-modal ref="move-thread-modal" id="move-thread-modal" title="Select Inbox">
         <div class="modal-body">
           Chose the Inbox you want to move these conversations to.
           <!-- <div class="form-group">
@@ -1651,7 +1651,7 @@
             <b-form-select-option selected="true" value="b"
               >Please select an option</b-form-select-option
             >
-            <!-- <b-form-select-option value="a">Option A</b-form-select-option> -->
+            <b-form-select-option v-for="mailbox in mailboxes" :key="mailbox.id" :value="mailbox.id">{{mailbox.displayName}} ({{mailbox.externalAddress}})</b-form-select-option>
           </b-form-select>
         </div>
         <template
@@ -1666,7 +1666,7 @@
             </b-col>
             <!-- Button with custom close trigger value -->
             <b-col class="float-right">
-              <b-button size="xs" variant="primary"> Move </b-button>
+              <b-button @click="moveToInbox" size="xs" variant="primary"> Move </b-button>
             </b-col>
           </b-row>
         </template>
@@ -1784,6 +1784,7 @@ export default {
       // isStarred: this.thread.data.isStarred,
       removetags: [],
       addtags: [],
+      inboxSelected: this.$route.params.mailboxId
     };
   },
   // created() {
@@ -1817,6 +1818,12 @@ export default {
       bus.$emit("changeStarred", this.$route.params.threadId);
       this.thread.data.isStarred = !this.thread.data.isStarred;
       // bus.$emit("broad");
+    },
+    moveToInbox() {
+      console.log(this.inboxSelected);
+      bus.$emit('moveToInbox', this.$route.params.threadId, this.inboxSelected);
+      this.$refs['move-thread-modal'].hide()
+      bus.$emit("broad");
     },
     snoozeThread(till) {
       console.log(till);
@@ -1852,6 +1859,8 @@ export default {
       bus.$emit("assignThread", this.$route.params.threadId, id);
     },
     toggleTag(id) {
+      this.removetags = [];
+      this.addtags = [];
       if (this.thread.data.tags.some((el) => el.id == id)) {
         this.removetags.push(id);
       } else {
@@ -1932,6 +1941,9 @@ export default {
     },
     teammates() {
       return this.$store.state.teammates;
+    },
+    mailboxes() {
+      return this.$store.state.mailboxes;
     },
     teammatesNew: function () {
       return this.teammates.filter((item) => item.id !== this.userInfo.id);

@@ -64,12 +64,19 @@ export default {
         document.title = "Helpwise (" + this.mailbox.stats.mine + ")";
     },
     async beforeCreate() {
-        const response = await fetch("https://app.helpwise.io/api/ping.php?mailboxID=" + this.$route.params.mailboxId, {credentials: 'include'});
-            const data = await response.json();
-            console.log(data);
-            console.log("++");
-            data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
-            await this.$store.dispatch('fetchPingDetails', data);
+        const response1 = await fetch("https://app.helpwise.io/api/ping.php?mailboxID=" + this.$route.params.mailboxId, {credentials: 'include'});
+        const data1 = await response1.json();
+        console.log(data1);
+        console.log("++");
+        data1.data.tags = data1.data.tags.sort((b,a) => b.name-a.name);
+        await this.$store.dispatch('fetchPingDetails', data1);
+
+        const response2 = await fetch("https://app.helpwise.io/api/getAccountMailboxes.php", {credentials: 'include'});
+        const data2 = await response2.json();
+        console.log(data2);
+        // console.log("++");
+        // data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
+        await this.$store.dispatch('fetchMailBoxes', data2);
     }
 }
 </script>

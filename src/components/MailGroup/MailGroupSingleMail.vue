@@ -221,7 +221,7 @@
               </svg>
               <div
                 class="dropdown-menu snooze-options"
-                :class="show && 'show'"
+                 :style="{ display: show ? 'block' : 'none', transform: show && 'translate3d(-217px, 31px, 0px)' }"
                 :aria-labelledby="'snooze-icon-'+mail.id"
                 :id="'append-snooze-'+mail.id"
                 style="
@@ -242,6 +242,7 @@
                 >
                   <div
                     class="d-flex align-items-center justify-content-between"
+                    @click.stop="snoozeThread('later today', mail.id)"
                   >
                     <span>Later today</span>
                     <span class="snooze-later-today">In 3 hour</span>
@@ -255,9 +256,10 @@
                 >
                   <div
                     class="d-flex align-items-center justify-content-between"
+                    @click.stop="snoozeThread('tommorrow', mail.id)"
                   >
                     <span>Tomorrow</span>
-                    <span class="snooze-tomorrow">2:00PM</span>
+                    <span class="snooze-tomorrow">{{ new Date() | moment("add", "1 day", "ddd") }} 9 am</span>
                   </div>
                 </button>
                 <button
@@ -268,6 +270,7 @@
                 >
                   <div
                     class="d-flex align-items-center justify-content-between"
+                    @click.stop="snoozeThread('nextMon', mail.id)"
                   >
                     <span>Next Monday</span>
                     <span class="snooze-monday">9 am</span>
@@ -281,9 +284,12 @@
                 >
                   <div
                     class="d-flex align-items-center justify-content-between"
+                    @click.stop="snoozeThread('oneWeek', mail.id)"
                   >
                     <span>One Week</span>
-                    <span class="snooze-week">Thu 9 am</span>
+                    <span class="snooze-week">{{
+                      new Date() | moment("add", "1 week", "ddd h a")
+                    }}</span>
                   </div>
                 </button>
 
@@ -295,18 +301,423 @@
                 >
                   <div
                     class="d-flex align-items-center justify-content-between"
+                    @click.stop="snoozeThread('oneMonth', mail.id)"
                   >
                     <span>One month</span>
-                    <span class="snooze-month">2:00PM</span>
+                    <span class="snooze-month">{{
+                      new Date() | moment("add", "1 month", "DD MMM")
+                    }}</span>
                   </div>
                 </button>
 
                 <div
+                v-b-modal.snooze-thread-modal
                   class="dropdown-item snooze-drop-down show-snooze-modal"
-                  id="snooze-modal-thread-13627145"
+                  :id="'snooze-modal-thread-'+mail.id"
                 >
                   <span>Pick date &amp; time</span>
                 </div>
+                <b-modal
+            id="snooze-thread-modal"
+            size="md"
+            title="Pick Date & Time"
+            hide-footer="true"
+          >
+            <div class="modal-body">
+              <div
+                class="dropdown-menu datepicker-menu show"
+                style="display: contents"
+                aria-labelledby="dropdownMenuButton"
+              >
+                <div
+                  class="
+                    d-flex
+                    align-item-center
+                    justify-content-center
+                    datepicker1
+                  "
+                >
+                  <div class="datepicker datepicker-inline">
+                    <div class="datepicker-days" style="">
+                      <table class="table-condensed">
+                        <thead>
+                          <tr>
+                            <th
+                              colspan="7"
+                              class="datepicker-title"
+                              style="display: none"
+                            ></th>
+                          </tr>
+                          <tr>
+                            <th class="prev">«</th>
+                            <th colspan="5" class="datepicker-switch">
+                              September 2021
+                            </th>
+                            <th class="next">»</th>
+                          </tr>
+                          <tr>
+                            <th class="dow">Su</th>
+                            <th class="dow">Mo</th>
+                            <th class="dow">Tu</th>
+                            <th class="dow">We</th>
+                            <th class="dow">Th</th>
+                            <th class="dow">Fr</th>
+                            <th class="dow">Sa</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td
+                              class="old disabled day"
+                              data-date="1630195200000"
+                            >
+                              29
+                            </td>
+                            <td
+                              class="old disabled day"
+                              data-date="1630281600000"
+                            >
+                              30
+                            </td>
+                            <td
+                              class="old disabled day"
+                              data-date="1630368000000"
+                            >
+                              31
+                            </td>
+                            <td class="disabled day" data-date="1630454400000">
+                              1
+                            </td>
+                            <td class="disabled day" data-date="1630540800000">
+                              2
+                            </td>
+                            <td class="disabled day" data-date="1630627200000">
+                              3
+                            </td>
+                            <td class="disabled day" data-date="1630713600000">
+                              4
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="disabled day" data-date="1630800000000">
+                              5
+                            </td>
+                            <td class="disabled day" data-date="1630886400000">
+                              6
+                            </td>
+                            <td class="disabled day" data-date="1630972800000">
+                              7
+                            </td>
+                            <td class="disabled day" data-date="1631059200000">
+                              8
+                            </td>
+                            <td class="disabled day" data-date="1631145600000">
+                              9
+                            </td>
+                            <td class="disabled day" data-date="1631232000000">
+                              10
+                            </td>
+                            <td class="disabled day" data-date="1631318400000">
+                              11
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="disabled day" data-date="1631404800000">
+                              12
+                            </td>
+                            <td class="disabled day" data-date="1631491200000">
+                              13
+                            </td>
+                            <td class="disabled day" data-date="1631577600000">
+                              14
+                            </td>
+                            <td class="disabled day" data-date="1631664000000">
+                              15
+                            </td>
+                            <td class="disabled day" data-date="1631750400000">
+                              16
+                            </td>
+                            <td class="disabled day" data-date="1631836800000">
+                              17
+                            </td>
+                            <td class="disabled day" data-date="1631923200000">
+                              18
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="disabled day" data-date="1632009600000">
+                              19
+                            </td>
+                            <td class="disabled day" data-date="1632096000000">
+                              20
+                            </td>
+                            <td class="disabled day" data-date="1632182400000">
+                              21
+                            </td>
+                            <td class="disabled day" data-date="1632268800000">
+                              22
+                            </td>
+                            <td class="disabled day" data-date="1632355200000">
+                              23
+                            </td>
+                            <td class="disabled day" data-date="1632441600000">
+                              24
+                            </td>
+                            <td class="disabled day" data-date="1632528000000">
+                              25
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="disabled day" data-date="1632614400000">
+                              26
+                            </td>
+                            <td class="day" data-date="1632700800000">27</td>
+                            <td class="day" data-date="1632787200000">28</td>
+                            <td class="day" data-date="1632873600000">29</td>
+                            <td class="day" data-date="1632960000000">30</td>
+                            <td class="new day" data-date="1633046400000">1</td>
+                            <td class="new day" data-date="1633132800000">2</td>
+                          </tr>
+                          <tr>
+                            <td class="new day" data-date="1633219200000">3</td>
+                            <td class="new day" data-date="1633305600000">4</td>
+                            <td class="new day" data-date="1633392000000">5</td>
+                            <td class="new day" data-date="1633478400000">6</td>
+                            <td class="new day" data-date="1633564800000">7</td>
+                            <td class="new day" data-date="1633651200000">8</td>
+                            <td class="new day" data-date="1633737600000">9</td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <th colspan="7" class="today" style="display: none">
+                              Today
+                            </th>
+                          </tr>
+                          <tr>
+                            <th colspan="7" class="clear" style="display: none">
+                              Clear
+                            </th>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <div class="datepicker-months" style="display: none">
+                      <table class="table-condensed">
+                        <thead>
+                          <tr>
+                            <th
+                              colspan="7"
+                              class="datepicker-title"
+                              style="display: none"
+                            ></th>
+                          </tr>
+                          <tr>
+                            <th class="prev">«</th>
+                            <th colspan="5" class="datepicker-switch">2021</th>
+                            <th class="next">»</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td colspan="7">
+                              <span class="month disabled">Jan</span
+                              ><span class="month disabled">Feb</span
+                              ><span class="month disabled">Mar</span
+                              ><span class="month disabled">Apr</span
+                              ><span class="month disabled">May</span
+                              ><span class="month disabled">Jun</span
+                              ><span class="month disabled">Jul</span
+                              ><span class="month disabled">Aug</span
+                              ><span class="month focused">Sep</span
+                              ><span class="month">Oct</span
+                              ><span class="month">Nov</span
+                              ><span class="month">Dec</span>
+                            </td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <th colspan="7" class="today" style="display: none">
+                              Today
+                            </th>
+                          </tr>
+                          <tr>
+                            <th colspan="7" class="clear" style="display: none">
+                              Clear
+                            </th>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <div class="datepicker-years" style="display: none">
+                      <table class="table-condensed">
+                        <thead>
+                          <tr>
+                            <th
+                              colspan="7"
+                              class="datepicker-title"
+                              style="display: none"
+                            ></th>
+                          </tr>
+                          <tr>
+                            <th class="prev">«</th>
+                            <th colspan="5" class="datepicker-switch">
+                              2020-2029
+                            </th>
+                            <th class="next">»</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td colspan="7">
+                              <span class="year old disabled">2019</span
+                              ><span class="year disabled">2020</span
+                              ><span class="year focused">2021</span
+                              ><span class="year">2022</span
+                              ><span class="year">2023</span
+                              ><span class="year">2024</span
+                              ><span class="year">2025</span
+                              ><span class="year">2026</span
+                              ><span class="year">2027</span
+                              ><span class="year">2028</span
+                              ><span class="year">2029</span
+                              ><span class="year new">2030</span>
+                            </td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <th colspan="7" class="today" style="display: none">
+                              Today
+                            </th>
+                          </tr>
+                          <tr>
+                            <th colspan="7" class="clear" style="display: none">
+                              Clear
+                            </th>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <div class="datepicker-decades" style="display: none">
+                      <table class="table-condensed">
+                        <thead>
+                          <tr>
+                            <th
+                              colspan="7"
+                              class="datepicker-title"
+                              style="display: none"
+                            ></th>
+                          </tr>
+                          <tr>
+                            <th class="prev">«</th>
+                            <th colspan="5" class="datepicker-switch">
+                              2000-2090
+                            </th>
+                            <th class="next">»</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td colspan="7">
+                              <span class="decade old disabled">1990</span
+                              ><span class="decade disabled">2000</span
+                              ><span class="decade disabled">2010</span
+                              ><span class="decade disabled focused">2020</span
+                              ><span class="decade">2030</span
+                              ><span class="decade">2040</span
+                              ><span class="decade">2050</span
+                              ><span class="decade">2060</span
+                              ><span class="decade">2070</span
+                              ><span class="decade">2080</span
+                              ><span class="decade">2090</span
+                              ><span class="decade new">2100</span>
+                            </td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <th colspan="7" class="today" style="display: none">
+                              Today
+                            </th>
+                          </tr>
+                          <tr>
+                            <th colspan="7" class="clear" style="display: none">
+                              Clear
+                            </th>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                    <div class="datepicker-centuries" style="display: none">
+                      <table class="table-condensed">
+                        <thead>
+                          <tr>
+                            <th
+                              colspan="7"
+                              class="datepicker-title"
+                              style="display: none"
+                            ></th>
+                          </tr>
+                          <tr>
+                            <th class="prev">«</th>
+                            <th colspan="5" class="datepicker-switch">
+                              2000-2900
+                            </th>
+                            <th class="next">»</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td colspan="7">
+                              <span class="century old disabled">1900</span
+                              ><span class="century disabled focused">2000</span
+                              ><span class="century">2100</span
+                              ><span class="century">2200</span
+                              ><span class="century">2300</span
+                              ><span class="century">2400</span
+                              ><span class="century">2500</span
+                              ><span class="century">2600</span
+                              ><span class="century">2700</span
+                              ><span class="century">2800</span
+                              ><span class="century">2900</span
+                              ><span class="century new">3000</span>
+                            </td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr>
+                            <th colspan="7" class="today" style="display: none">
+                              Today
+                            </th>
+                          </tr>
+                          <tr>
+                            <th colspan="7" class="clear" style="display: none">
+                              Clear
+                            </th>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                <select class="custom-select select-time"></select>
+                <div
+                  class="d-flex align-items-center justify-content-center"
+                  style="margin-top: 10px"
+                >
+                  <button
+                    type="button"
+                    class="btn btn-xs btn-primary select-snooze-btn"
+                    disabled="true"
+                  >
+                    Snooze
+                  </button>
+                </div>
+              </div>
+            </div>
+          </b-modal>
               </div>
             </span>
             <span v-if="this.$route.params.type == 'closed' || this.$route.params.type == 'spam' || this.$route.params.type == 'trash'" class="restore-thread pr-1 pl-1" @click.stop="restoreThread(mail.id)">
@@ -518,6 +929,36 @@ export default {
     },
     showSnooze() {
       this.show = !this.show;
+    },
+    snoozeThread(till, id) {
+      console.log(till);
+      var mom;
+      if (till == "later today") {
+        mom = moment(
+          moment().add(3, "hours").format("YYYY-MM-DD hh:mm A"),
+          "YYYY-MM-DD hh:mm A"
+        );
+      } else if (till == "tommorrow") {
+        mom = moment(
+          `${moment().add(1, "day").format("YYYY-MM-DD")} 09:00 am`,
+          "YYYY-MM-DD hh:mm A"
+        );
+      } else if (till == "nextMon") {
+        mom = moment(
+          `${moment().day(8).format("YYYY-MM-DD ")} 09:00 am`,
+          "YYYY-MM-DD hh:mm A"
+        );
+      } else if (till == "oneWeek") {
+        mom = moment().add(1, "week").minutes(0);
+      } else if (till == "oneMonth") {
+        mom = moment(
+          moment().add(1, "month").format("YYYY-MM-DD hh:mm"),
+          "YYYY-MM-DD hh:mm A"
+        );
+      }
+      console.log(mom.toISOString());
+      bus.$emit("snoozeThread", id, mom);
+      // bus.$emit("broad");
     },
     changeRead(id) {
       bus.$emit("changeRead", id);

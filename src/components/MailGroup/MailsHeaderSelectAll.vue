@@ -268,7 +268,7 @@
                   id="snooze-thread-modal"
                   size="md"
                   title="Pick Date & Time"
-                  hide-footer="true"
+                  hide-footer
                 >
                   <div class="modal-body">
                     <div
@@ -821,6 +821,7 @@
             </span>
 
             <span
+              @click.stop.prevent="bulkDelete"
               id="bulk-trash"
               data-toggle="tooltip"
               title="Delete"
@@ -1034,6 +1035,7 @@
                   style="overflow-y: scroll; height: 200px"
                 >
                   <div
+                  @click.stop
                     v-for="tag in tags"
                     :key="tag.id"
                     class="dropdown-item mt-2 tagBtn"
@@ -1056,6 +1058,9 @@
                           :data-tag-id="tag.id"
                           class="custom-control-input tagUntagCheckbox"
                           :id="'bulk-thread-tag-' + tag.id"
+                          :checked="tagsInAll.some(t => t === tag.id)"
+                          :indeterminate.prop="tagsPartial.some(t => t === tag.id)"
+                          @click.stop="toggleTags(tag.id, $event)"
                         />
                         <label
                           :for="'bulk-thread-tag-' + tag.id"
@@ -1072,6 +1077,7 @@
                       <div
                         class="tagClickableWrapper flex-grow-1"
                         :data-tag-id="tag.id"
+                        @click="toggleTag(tag.id)"
                       >
                         <svg
                           :style="{ color: tag.color }"
@@ -1102,12 +1108,12 @@
                     </div>
                   </div>
                 </div>
-                <a
+                <!-- <a
                   class="dropdown-item mt-2 load-more-btn text-center"
                   style=""
                 >
                   <span class="tx-13 tx-bold ml-2">Load more</span>
-                </a>
+                </a> -->
                 <a
                   class="dropdown-item mt-2 quick-tag-btn"
                   style="display: none"
@@ -1327,7 +1333,7 @@
               </template>
             </b-modal>
                 
-                <a class="dropdown-item mt-2 remove-all-tags">
+                <a class="dropdown-item mt-2 remove-all-tags" @click="clearTags">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -1348,7 +1354,7 @@
                   </svg>
                   <span class="tx-13 tx-bold ml-2">Clear Tags</span>
                 </a>
-                <a class="dropdown-item mt-2 applyTags">
+                <a class="dropdown-item mt-2 applyTags" @click="applyTags">
                   <span class="tx-13 tx-bold ml-2">Apply</span>
                 </a>
               </div>
@@ -1396,7 +1402,7 @@
                 <line x1="4" y1="4" x2="9" y2="9"></line>
               </svg>
             </span>
-            <b-modal id="bulk-merge-modal" title="Attention Required!">
+            <b-modal ref="bulk-merge-modal" id="bulk-merge-modal" title="Attention Required!">
               <div class="modal-body">
                   Are you sure you want to merge these conversations? This action can't be undone
               </div>
@@ -1411,7 +1417,7 @@
                   </b-col>
                   <!-- Button with custom close trigger value -->
                   <b-col class="float-right">
-                    <b-button size="xs" variant="primary">Yes</b-button>
+                    <b-button @click="bulkMerge" size="xs" variant="primary">Yes</b-button>
                   </b-col>
                 </b-row>
               </template>
@@ -1439,7 +1445,7 @@
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
             </span>
-            <b-modal id="bulk-move-modal" title="Select Inbox">
+            <b-modal ref="move-thread-modal" id="bulk-move-modal" title="Select Inbox">
               <div class="modal-body">
                 Chose the Inbox you want to move these conversations to.
                 <!-- <div class="form-group">
@@ -1533,7 +1539,7 @@
                   <b-form-select-option selected="true" value="b"
                     >Please select an option</b-form-select-option
                   >
-                  <!-- <b-form-select-option value="a">Option A</b-form-select-option> -->
+                  <b-form-select-option v-for="mailbox in mailboxes" :key="mailbox.id" :value="mailbox.id">{{mailbox.displayName}} ({{mailbox.externalAddress}})</b-form-select-option>
                 </b-form-select>
               </div>
               <template
@@ -1548,7 +1554,7 @@
                   </b-col>
                   <!-- Button with custom close trigger value -->
                   <b-col class="float-right">
-                    <b-button size="xs" variant="primary"> Move </b-button>
+                    <b-button @click="moveToInbox" size="xs" variant="primary"> Move </b-button>
                   </b-col>
                 </b-row>
               </template>
@@ -2116,6 +2122,8 @@ export default {
     currPage: Number,
     mailbox: Object,
     selectedIds: Array,
+    tagsInAll: Array,
+    tagsPartial: Array,
   },
   data() {
     return {
@@ -2123,14 +2131,110 @@ export default {
       currId: 0,
       currName: "",
       order: "Newest",
+      inboxSelected: this.$route.params.mailboxId,
+      addtags: [],
+      removetags: []
     };
   },
+  // watch: {
+  //   deep: true,
+  //   selectedIds(val, oldVal) {
+  //     // console.log(val, oldVal);
+  //     if(val !== oldVal) {
+  //       this.addtags = [];
+  //       this.removetags = [];
+  //     }
+  //     console.log(this.addtags, this.removetags);
+  //   },
+  // },
   created() {
     bus.$on("changeType", () => {
       (this.currName = ""), (this.order = "Newest"), (this.checkAll = false);
     });
   },
   methods: {
+    toggleTag(id) {
+      this.removetags = [];
+      this.addtags = [];
+      if (this.tagsInAll.some((el) => el == id)) {
+        this.removetags.push(id);
+      } else if(!this.tagsPartial.some((el) => el == id)) {
+        this.addtags.push(id);
+      }
+      bus.$emit(
+        "toggleTags",
+        this.selectedIds,
+        this.addtags,
+        this.removetags
+      );
+    },
+    toggleTags(id, event) {
+      console.log(event.target.checked, id);
+      if(event.target.checked) {
+        if(!this.addtags.some(i => i == id)) {
+          this.addtags.push(id);
+        }
+        this.removetags = this.removetags.filter((tag) => tag !== id);
+      }
+      if(!event.target.checked) {
+        if(!this.removetags.some(i => i == id)) {
+          this.removetags.push(id);
+        }
+        this.addtags = this.addtags.filter((tag) => tag !== id);
+      }
+      // if (
+      //   event.target.checked &&
+      //   (this.thread.data.tags.length == 0 ||
+      //     this.thread.data.tags.some((el) => el.id !== id))
+      // ) {
+      //   console.log("1");
+      //   this.addtags.push(id);
+      //   this.removetags = this.removetags.filter((tag) => tag !== id);
+      // } else if (
+      //   !event.target.checked &&
+      //   this.thread.data.tags.some((el) => el.id == id)
+      // ) {
+      //   console.log("2");
+      //   this.removetags.push(id);
+      //   this.addtags = this.addtags.filter((tag) => tag !== id);
+      // } else if (
+      //   event.target.checked &&
+      //   this.thread.data.tags.some((el) => el.id == id)
+      // ) {
+      //   console.log("3");
+      //   this.removetags = this.removetags.filter((tag) => tag !== id);
+      // } else if (
+      //   !event.target.checked &&
+      //   this.thread.data.tags.some((el) => el.id !== id)
+      // ) {
+      //   console.log("4");
+      //   this.addtags = this.addtags.filter((tag) => tag !== id);
+      // }
+      console.log(this.addtags);
+      console.log(this.removetags);
+    },
+    applyTags() {
+      bus.$emit(
+        "toggleTags",
+        this.selectedIds,
+        this.addtags,
+        this.removetags
+      );
+      console.log("applying");
+    },
+    clearTags() {
+      console.log("clearing");
+      this.removetags = this.tagsInAll;
+      this.addtags = [];
+      console.log(this.tagsInAll);
+      console.log(this.removetags);
+      bus.$emit(
+        "toggleTags",
+        this.selectedIds,
+        this.addtags,
+        this.removetags
+      );
+    },
     checkAllBoxes() {
       this.checkAll = !this.checkAll;
       if (this.checkAll == true) {
@@ -2152,11 +2256,22 @@ export default {
     bulkSpam() {
       bus.$emit("spamThreads", this.selectedIds);
     },
+    bulkDelete() {
+      bus.$emit("deleteThreads", this.selectedIds);
+    },
     bulkClose() {
       bus.$emit("closeThread", this.selectedIds);
     },
     bulkAssign(id) {
       bus.$emit("assignThread", this.selectedIds, id);
+    },
+    moveToInbox() {
+      bus.$emit('moveToInbox', this.selectedIds, this.inboxSelected);
+      this.$refs['move-thread-modal'].hide()
+    },
+    bulkMerge() {
+      bus.$emit('bulkMerge', this.selectedIds);
+      this.$refs['bulk-merge-modal'].hide()
     },
     bulkSnooze(till) {
       console.log(till);
@@ -2209,6 +2324,10 @@ export default {
     },
     tags() {
       return this.$store.state.tags;
+    },
+
+    mailboxes() {
+      return this.$store.state.mailboxes;
     },
     teammates() {
       return this.$store.state.teammates;
