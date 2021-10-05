@@ -221,7 +221,7 @@
               </svg>
               <div
                 class="dropdown-menu snooze-options"
-                :class="show && 'show'"
+                 :style="{ display: show ? 'block' : 'none', transform: show && 'translate3d(-217px, 31px, 0px)' }"
                 :aria-labelledby="'snooze-icon-'+mail.id"
                 :id="'append-snooze-'+mail.id"
                 style="
@@ -242,6 +242,7 @@
                 >
                   <div
                     class="d-flex align-items-center justify-content-between"
+                    @click.stop="snoozeThread('later today', mail.id)"
                   >
                     <span>Later today</span>
                     <span class="snooze-later-today">In 3 hour</span>
@@ -255,9 +256,10 @@
                 >
                   <div
                     class="d-flex align-items-center justify-content-between"
+                    @click.stop="snoozeThread('tommorrow', mail.id)"
                   >
                     <span>Tomorrow</span>
-                    <span class="snooze-tomorrow">2:00PM</span>
+                    <span class="snooze-tomorrow">{{ new Date() | moment("add", "1 day", "ddd") }} 9 am</span>
                   </div>
                 </button>
                 <button
@@ -268,6 +270,7 @@
                 >
                   <div
                     class="d-flex align-items-center justify-content-between"
+                    @click.stop="snoozeThread('nextMon', mail.id)"
                   >
                     <span>Next Monday</span>
                     <span class="snooze-monday">9 am</span>
@@ -281,9 +284,12 @@
                 >
                   <div
                     class="d-flex align-items-center justify-content-between"
+                    @click.stop="snoozeThread('oneWeek', mail.id)"
                   >
                     <span>One Week</span>
-                    <span class="snooze-week">Thu 9 am</span>
+                    <span class="snooze-week">{{
+                      new Date() | moment("add", "1 week", "ddd h a")
+                    }}</span>
                   </div>
                 </button>
 
@@ -295,18 +301,38 @@
                 >
                   <div
                     class="d-flex align-items-center justify-content-between"
+                    @click.stop="snoozeThread('oneMonth', mail.id)"
                   >
                     <span>One month</span>
-                    <span class="snooze-month">2:00PM</span>
+                    <span class="snooze-month">{{
+                      new Date() | moment("add", "1 month", "DD MMM")
+                    }}</span>
                   </div>
                 </button>
 
                 <div
+                v-b-modal="'snooze-thread-modal' + mail.id"
                   class="dropdown-item snooze-drop-down show-snooze-modal"
-                  id="snooze-modal-thread-13627145"
+                  :id="'snooze-modal-thread-'+mail.id"
                 >
                   <span>Pick date &amp; time</span>
                 </div>
+                <b-modal
+                  :id="'snooze-thread-modal' + mail.id"
+                  :ref="'snooze-thread-modal' + mail.id"
+                  size="sm"
+                  title="Pick Date & Time"
+                  hide-footer="true"
+                >
+                  <div class="modal-body">
+                          <div class="d-flex align-items-center justify-content-center">
+                            <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="30" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
+                          </div>
+                          <div class="d-flex align-items-center justify-content-center" style="margin-top:10px;">
+                              <button type="button" @click.stop.prevent="snoozeThread('newDate', mail.id)" class="btn btn-xs btn-primary bulk-select-snooze-btn" :disabled="datetime == '' && true">Snooze</button>
+                          </div>
+                        </div>
+                </b-modal>
               </div>
             </span>
             <span v-if="this.$route.params.type == 'closed' || this.$route.params.type == 'spam' || this.$route.params.type == 'trash'" class="restore-thread pr-1 pl-1" @click.stop="restoreThread(mail.id)">
@@ -434,8 +460,11 @@
 
 <script>
 import { bus } from "../../main";
+import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
 export default {
   name: "MailGroupSingleMail",
+  components: {DatePicker},
   props: {
     mail: Object,
   },
@@ -444,7 +473,9 @@ export default {
       checkAll: false,
       // isRead: this.mail.isRead,
       // isStarred: this.mail.isStarred,
-      show: false
+      show: false,
+      datetime: "",
+      newDateOpen: false
     };
   },
   created() {
@@ -516,8 +547,55 @@ export default {
         bus.$emit('check', this.mail.id, false);
       }
     },
+    handleChange(value, type) {
+      if (type === 'minute') {
+        this.newDateOpen = false;
+      }
+    },
+    notBeforeToday(date) {
+      return date < new Date(new Date().setHours(0, 0, 0, 0));
+    },
+    notBeforeNow(date) {
+      return date < new Date(new Date().setHours(new Date().getHours() + 1, 0, 0, 0));
+    },
     showSnooze() {
       this.show = !this.show;
+    },
+    snoozeThread(till, id) {
+      console.log(till);
+      var mom;
+      if (till == "later today") {
+        mom = moment(
+          moment().add(3, "hours").format("YYYY-MM-DD hh:mm A"),
+          "YYYY-MM-DD hh:mm A"
+        );
+      } else if (till == "tommorrow") {
+        mom = moment(
+          `${moment().add(1, "day").format("YYYY-MM-DD")} 09:00 am`,
+          "YYYY-MM-DD hh:mm A"
+        );
+      } else if (till == "nextMon") {
+        mom = moment(
+          `${moment().day(8).format("YYYY-MM-DD ")} 09:00 am`,
+          "YYYY-MM-DD hh:mm A"
+        );
+      } else if (till == "oneWeek") {
+        mom = moment().add(1, "week").minutes(0);
+      } else if (till == "oneMonth") {
+        mom = moment(
+          moment().add(1, "month").format("YYYY-MM-DD hh:mm"),
+          "YYYY-MM-DD hh:mm A"
+        );
+      } else if (till == "newDate") {
+        console.log(this.datetime);
+        mom = new Date(this.datetime);
+        this.datetime = "";
+        let ref = "snooze-thread-modal" + this.mail.id;
+        this.$refs[ref].hide();
+      }
+      console.log(mom.toISOString());
+      bus.$emit("snoozeThread", id, mom);
+      // bus.$emit("broad");
     },
     changeRead(id) {
       bus.$emit("changeRead", id);

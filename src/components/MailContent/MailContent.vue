@@ -82,6 +82,7 @@ export default {
         }
         if(data.toAdd.length > 0) {
           for(let i = 0; i < data.toAdd.length; i++) {
+            if(!this.thread.data.tags.some(el => el.id === data.toAdd[i].id))
             this.thread.data.tags.push(data.toAdd[i]);
           }
         }
@@ -90,6 +91,8 @@ export default {
             this.thread.data.items.push(data.logs[i]);
           }
         }
+      } else if(data.type == "moveConv") {
+        this.thread.data.items = this.thread.data.items.filter(item => item.data.id !== data.id);
       }
     })
   },

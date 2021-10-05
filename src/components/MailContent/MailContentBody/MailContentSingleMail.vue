@@ -82,8 +82,36 @@
                   </svg>
                 </div>
                 <div class="mg-b-0 tx-color-03">
-                  To:
-                  <span class="tx-color-01">{{
+                  To: <span v-for="(value, key, index) in item.data.to" :key="index"><span class="tx-color-01">{{ value }}</span><span class="addr-hideable copyable" :style="{ display: showEmailAddresses ? '' : 'none' }">
+                    &lt;{{key}}&gt;
+                    <svg
+                      :data-clipboard-text="key"
+                      :style="{ display: showEmailAddresses ? '' : 'none' }"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="addr-hideable addr-copy-btn feather feather-copy"
+                      @click.stop.prevent="copyTestingCode(key)"
+                    >
+                      <rect
+                        x="9"
+                        y="9"
+                        width="13"
+                        height="13"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <path
+                        d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                      ></path></svg></span
+                  ><span v-if="(index+1) != Object.keys(item.data.to).length">,&nbsp;</span></span>
+                  <!-- <span class="tx-color-01">{{
                     Object.values(item.data.to).toString()
                   }}</span
                   ><span
@@ -117,7 +145,7 @@
                       <path
                         d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
                       ></path></svg
-                  ></span>
+                  ></span> -->
                 </div>
                 <div class="mg-b-0 tx-color-03"
                   :class="item.data.cc.length == 0 ? 'd-none' : ''"
@@ -155,7 +183,7 @@
                 <div
                   class="mg-b-0 tx-color-03 addr-hideable"
                   :class="item.data.replyTo == null ? 'd-none' : ''"
-                  v-if="item.data.replyTo !== null"
+                  v-if="item.data.replyTo !== null && item.data.replyTo.length > 0"
                   :style="{ display: showEmailAddresses ? '' : 'none' }"
                 >
                   Reply To:
@@ -220,7 +248,7 @@
               >
               <div class="dropdown">
                 <span
-                  @click.stop.prevent
+                  @click.stop.prevent="showDD"
                   class="three-dot"
                   type="button"
                   data-toggle="dropdown"
@@ -250,7 +278,7 @@
                     <circle cx="12" cy="19" r="1"></circle></svg
                 ></span>
 
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <div :style="{ display: showdd ? 'block' : 'none', transform: showdd && 'translate3d(-217px, 31px, 0px)' }" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                   <button type="button" class="dropdown-item reply-btn">
                     Reply
                   </button>
@@ -261,11 +289,36 @@
                     Forward
                   </button>
                   <button
+                    @click.stop
+                    v-b-modal="'move-new-modal' + item.data.id"
                     type="button"
                     class="dropdown-item moveToNewConversationBtn"
                   >
                     Move to a new Conversation
                   </button>
+                  <b-modal ref="move-new-modal" :id="'move-new-modal' + item.data.id" title="Are you sure you want to move this message to a new conversation? This action can't be undone.">
+                    <div class="modal-body">
+                        <div class="form-group">
+                          <label for="moveToNewSubject">New Topic:</label>
+                          <input :value="subject" type="text" class="form-control moveToNewSubject" name="moveToNewSubject">
+                      </div>
+                    </div>
+                    <template
+                      #modal-footer="{ cancel }"
+                    >
+                      <b-row class="text-center" align-v="center">
+                        <b-col class="float-left">
+                          <b-button size="xs" variant="secondary" @click="cancel()">
+                            No
+                          </b-button>
+                        </b-col>
+                        <!-- Button with custom close trigger value -->
+                        <b-col class="float-right">
+                          <b-button @click="moveConv" size="xs" variant="primary">Yes</b-button>
+                        </b-col>
+                      </b-row>
+                    </template>
+                  </b-modal>
                   <a
                     href="/original-message/204420/23153177"
                     target="_blank"
@@ -371,15 +424,29 @@ export default {
   name: "MailContentSingleMail",
   props: {
     item: Object,
-    isCollapsed: Boolean
+    isCollapsed: Boolean,
+    subject: String
   },
   data() {
     return {
       isMailCollapsed: this.isCollapsed,
       showEmailAddresses: false,
+      showdd: false
     };
   },
   methods: {
+    showDD() {
+      this.showdd = !this.showdd;
+      if(this.showdd) {
+        console.log("show DD");
+      } else {
+        console.log("hide");
+      }
+    },
+    moveConv() {
+      bus.$emit('moveConv', this.item.data.id, this.subject, this.$route.params.threadId);
+      this.$refs['move-new-modal'].hide()
+    },
     reply(e) {
       bus.$emit("replyy");
       e.cancelBubble = true;

@@ -265,555 +265,18 @@
                   <span>Pick date &amp; time</span>
                 </div>
                 <b-modal
+                ref="snooze-thread-modal"
                   id="snooze-thread-modal"
-                  size="md"
+                  size="sm"
                   title="Pick Date & Time"
-                  hide-footer="true"
+                  hide-footer
                 >
                   <div class="modal-body">
-                    <div
-                      class="dropdown-menu datepicker-menu show"
-                      style="display: contents"
-                      aria-labelledby="dropdownMenuButton"
-                    >
-                      <div
-                        class="
-                          d-flex
-                          align-item-center
-                          justify-content-center
-                          datepicker1
-                        "
-                      >
-                        <div class="datepicker datepicker-inline">
-                          <div class="datepicker-days" style="">
-                            <table class="table-condensed">
-                              <thead>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="datepicker-title"
-                                    style="display: none"
-                                  ></th>
-                                </tr>
-                                <tr>
-                                  <th class="prev">«</th>
-                                  <th colspan="5" class="datepicker-switch">
-                                    September 2021
-                                  </th>
-                                  <th class="next">»</th>
-                                </tr>
-                                <tr>
-                                  <th class="dow">Su</th>
-                                  <th class="dow">Mo</th>
-                                  <th class="dow">Tu</th>
-                                  <th class="dow">We</th>
-                                  <th class="dow">Th</th>
-                                  <th class="dow">Fr</th>
-                                  <th class="dow">Sa</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td
-                                    class="old disabled day"
-                                    data-date="1630195200000"
-                                  >
-                                    29
-                                  </td>
-                                  <td
-                                    class="old disabled day"
-                                    data-date="1630281600000"
-                                  >
-                                    30
-                                  </td>
-                                  <td
-                                    class="old disabled day"
-                                    data-date="1630368000000"
-                                  >
-                                    31
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1630454400000"
-                                  >
-                                    1
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1630540800000"
-                                  >
-                                    2
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1630627200000"
-                                  >
-                                    3
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1630713600000"
-                                  >
-                                    4
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1630800000000"
-                                  >
-                                    5
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1630886400000"
-                                  >
-                                    6
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1630972800000"
-                                  >
-                                    7
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1631059200000"
-                                  >
-                                    8
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1631145600000"
-                                  >
-                                    9
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1631232000000"
-                                  >
-                                    10
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1631318400000"
-                                  >
-                                    11
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1631404800000"
-                                  >
-                                    12
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1631491200000"
-                                  >
-                                    13
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1631577600000"
-                                  >
-                                    14
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1631664000000"
-                                  >
-                                    15
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1631750400000"
-                                  >
-                                    16
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1631836800000"
-                                  >
-                                    17
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1631923200000"
-                                  >
-                                    18
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1632009600000"
-                                  >
-                                    19
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1632096000000"
-                                  >
-                                    20
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1632182400000"
-                                  >
-                                    21
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1632268800000"
-                                  >
-                                    22
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1632355200000"
-                                  >
-                                    23
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1632441600000"
-                                  >
-                                    24
-                                  </td>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1632528000000"
-                                  >
-                                    25
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td
-                                    class="disabled day"
-                                    data-date="1632614400000"
-                                  >
-                                    26
-                                  </td>
-                                  <td class="day" data-date="1632700800000">
-                                    27
-                                  </td>
-                                  <td class="day" data-date="1632787200000">
-                                    28
-                                  </td>
-                                  <td class="day" data-date="1632873600000">
-                                    29
-                                  </td>
-                                  <td class="day" data-date="1632960000000">
-                                    30
-                                  </td>
-                                  <td class="new day" data-date="1633046400000">
-                                    1
-                                  </td>
-                                  <td class="new day" data-date="1633132800000">
-                                    2
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td class="new day" data-date="1633219200000">
-                                    3
-                                  </td>
-                                  <td class="new day" data-date="1633305600000">
-                                    4
-                                  </td>
-                                  <td class="new day" data-date="1633392000000">
-                                    5
-                                  </td>
-                                  <td class="new day" data-date="1633478400000">
-                                    6
-                                  </td>
-                                  <td class="new day" data-date="1633564800000">
-                                    7
-                                  </td>
-                                  <td class="new day" data-date="1633651200000">
-                                    8
-                                  </td>
-                                  <td class="new day" data-date="1633737600000">
-                                    9
-                                  </td>
-                                </tr>
-                              </tbody>
-                              <tfoot>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="today"
-                                    style="display: none"
-                                  >
-                                    Today
-                                  </th>
-                                </tr>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="clear"
-                                    style="display: none"
-                                  >
-                                    Clear
-                                  </th>
-                                </tr>
-                              </tfoot>
-                            </table>
-                          </div>
-                          <div class="datepicker-months" style="display: none">
-                            <table class="table-condensed">
-                              <thead>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="datepicker-title"
-                                    style="display: none"
-                                  ></th>
-                                </tr>
-                                <tr>
-                                  <th class="prev">«</th>
-                                  <th colspan="5" class="datepicker-switch">
-                                    2021
-                                  </th>
-                                  <th class="next">»</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td colspan="7">
-                                    <span class="month disabled">Jan</span
-                                    ><span class="month disabled">Feb</span
-                                    ><span class="month disabled">Mar</span
-                                    ><span class="month disabled">Apr</span
-                                    ><span class="month disabled">May</span
-                                    ><span class="month disabled">Jun</span
-                                    ><span class="month disabled">Jul</span
-                                    ><span class="month disabled">Aug</span
-                                    ><span class="month focused">Sep</span
-                                    ><span class="month">Oct</span
-                                    ><span class="month">Nov</span
-                                    ><span class="month">Dec</span>
-                                  </td>
-                                </tr>
-                              </tbody>
-                              <tfoot>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="today"
-                                    style="display: none"
-                                  >
-                                    Today
-                                  </th>
-                                </tr>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="clear"
-                                    style="display: none"
-                                  >
-                                    Clear
-                                  </th>
-                                </tr>
-                              </tfoot>
-                            </table>
-                          </div>
-                          <div class="datepicker-years" style="display: none">
-                            <table class="table-condensed">
-                              <thead>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="datepicker-title"
-                                    style="display: none"
-                                  ></th>
-                                </tr>
-                                <tr>
-                                  <th class="prev">«</th>
-                                  <th colspan="5" class="datepicker-switch">
-                                    2020-2029
-                                  </th>
-                                  <th class="next">»</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td colspan="7">
-                                    <span class="year old disabled">2019</span
-                                    ><span class="year disabled">2020</span
-                                    ><span class="year focused">2021</span
-                                    ><span class="year">2022</span
-                                    ><span class="year">2023</span
-                                    ><span class="year">2024</span
-                                    ><span class="year">2025</span
-                                    ><span class="year">2026</span
-                                    ><span class="year">2027</span
-                                    ><span class="year">2028</span
-                                    ><span class="year">2029</span
-                                    ><span class="year new">2030</span>
-                                  </td>
-                                </tr>
-                              </tbody>
-                              <tfoot>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="today"
-                                    style="display: none"
-                                  >
-                                    Today
-                                  </th>
-                                </tr>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="clear"
-                                    style="display: none"
-                                  >
-                                    Clear
-                                  </th>
-                                </tr>
-                              </tfoot>
-                            </table>
-                          </div>
-                          <div class="datepicker-decades" style="display: none">
-                            <table class="table-condensed">
-                              <thead>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="datepicker-title"
-                                    style="display: none"
-                                  ></th>
-                                </tr>
-                                <tr>
-                                  <th class="prev">«</th>
-                                  <th colspan="5" class="datepicker-switch">
-                                    2000-2090
-                                  </th>
-                                  <th class="next">»</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td colspan="7">
-                                    <span class="decade old disabled">1990</span
-                                    ><span class="decade disabled">2000</span
-                                    ><span class="decade disabled">2010</span
-                                    ><span class="decade disabled focused"
-                                      >2020</span
-                                    ><span class="decade">2030</span
-                                    ><span class="decade">2040</span
-                                    ><span class="decade">2050</span
-                                    ><span class="decade">2060</span
-                                    ><span class="decade">2070</span
-                                    ><span class="decade">2080</span
-                                    ><span class="decade">2090</span
-                                    ><span class="decade new">2100</span>
-                                  </td>
-                                </tr>
-                              </tbody>
-                              <tfoot>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="today"
-                                    style="display: none"
-                                  >
-                                    Today
-                                  </th>
-                                </tr>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="clear"
-                                    style="display: none"
-                                  >
-                                    Clear
-                                  </th>
-                                </tr>
-                              </tfoot>
-                            </table>
-                          </div>
-                          <div
-                            class="datepicker-centuries"
-                            style="display: none"
-                          >
-                            <table class="table-condensed">
-                              <thead>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="datepicker-title"
-                                    style="display: none"
-                                  ></th>
-                                </tr>
-                                <tr>
-                                  <th class="prev">«</th>
-                                  <th colspan="5" class="datepicker-switch">
-                                    2000-2900
-                                  </th>
-                                  <th class="next">»</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td colspan="7">
-                                    <span class="century old disabled"
-                                      >1900</span
-                                    ><span class="century disabled focused"
-                                      >2000</span
-                                    ><span class="century">2100</span
-                                    ><span class="century">2200</span
-                                    ><span class="century">2300</span
-                                    ><span class="century">2400</span
-                                    ><span class="century">2500</span
-                                    ><span class="century">2600</span
-                                    ><span class="century">2700</span
-                                    ><span class="century">2800</span
-                                    ><span class="century">2900</span
-                                    ><span class="century new">3000</span>
-                                  </td>
-                                </tr>
-                              </tbody>
-                              <tfoot>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="today"
-                                    style="display: none"
-                                  >
-                                    Today
-                                  </th>
-                                </tr>
-                                <tr>
-                                  <th
-                                    colspan="7"
-                                    class="clear"
-                                    style="display: none"
-                                  >
-                                    Clear
-                                  </th>
-                                </tr>
-                              </tfoot>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-                      <select class="custom-select select-time"></select>
-                      <div
-                        class="d-flex align-items-center justify-content-center"
-                        style="margin-top: 10px"
-                      >
-                        <button
-                          type="button"
-                          class="btn btn-xs btn-primary select-snooze-btn"
-                          disabled="true"
-                        >
-                          Snooze
-                        </button>
-                      </div>
+                    <div class="d-flex align-items-center justify-content-center">
+                      <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="30" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center" style="margin-top:10px;">
+                        <button type="button" @click.stop.prevent="bulkSnooze('newDate')" class="btn btn-xs btn-primary bulk-select-snooze-btn" :disabled="datetime == '' && true">Snooze</button>
                     </div>
                   </div>
                 </b-modal>
@@ -821,6 +284,7 @@
             </span>
 
             <span
+              @click.stop.prevent="bulkDelete"
               id="bulk-trash"
               data-toggle="tooltip"
               title="Delete"
@@ -1034,6 +498,7 @@
                   style="overflow-y: scroll; height: 200px"
                 >
                   <div
+                  @click.stop
                     v-for="tag in tags"
                     :key="tag.id"
                     class="dropdown-item mt-2 tagBtn"
@@ -1056,6 +521,9 @@
                           :data-tag-id="tag.id"
                           class="custom-control-input tagUntagCheckbox"
                           :id="'bulk-thread-tag-' + tag.id"
+                          :checked="tagsInAll.some(t => t === tag.id)"
+                          :indeterminate.prop="tagsPartial.some(t => t === tag.id)"
+                          @click.stop="toggleTags(tag.id, $event)"
                         />
                         <label
                           :for="'bulk-thread-tag-' + tag.id"
@@ -1072,6 +540,7 @@
                       <div
                         class="tagClickableWrapper flex-grow-1"
                         :data-tag-id="tag.id"
+                        @click="toggleTag(tag.id)"
                       >
                         <svg
                           :style="{ color: tag.color }"
@@ -1102,12 +571,12 @@
                     </div>
                   </div>
                 </div>
-                <a
+                <!-- <a
                   class="dropdown-item mt-2 load-more-btn text-center"
                   style=""
                 >
                   <span class="tx-13 tx-bold ml-2">Load more</span>
-                </a>
+                </a> -->
                 <a
                   class="dropdown-item mt-2 quick-tag-btn"
                   style="display: none"
@@ -1166,7 +635,7 @@
                   </svg>
                   <span class="tx-13 tx-bold ml-2">New Tag</span>
                   </a>
-                  <b-modal id="bulk-newtag-modal" title="Create Tag">
+                  <b-modal ref="bulk-newtag-modal" id="bulk-newtag-modal" title="Create Tag">
               <div class="modal-body">
                 <div class="form-group">
                   <label for="formGroupExampleInput" class="d-block"
@@ -1177,6 +646,7 @@
                     class="form-control form-control-sm"
                     id="tag-name-inputbox"
                     autofocus=""
+                    v-model="tagName"
                   />
                   <div class="invalid-feedback" id="tag-msg"></div>
                 </div>
@@ -1187,6 +657,7 @@
                       class="custom-control-input"
                       id="createTagPinned"
                       name="createTagPinned"
+                      v-model="tagPinned"
                     />
                     <label class="custom-control-label" for="createTagPinned"
                       >Show Tag as a Folder</label
@@ -1208,98 +679,98 @@
                         justify-content-center
                         align-items-center
                       "
+                      @click.stop.prevent="changeTagColor('#7fc7af')"
                       style="background-color: #7fc7af"
-                    ></div>
-                    <div
-                      class="
-                        square
-                        d-flex
-                        justify-content-center
-                        align-items-center
-                      "
-                      style="background-color: #9b59b6"
-                    ></div>
-                    <div
-                      class="
-                        square
-                        d-flex
-                        justify-content-center
-                        align-items-center
-                      "
-                      style="background-color: #f1c40f"
-                    ></div>
-                    <div
-                      class="
-                        square
-                        d-flex
-                        justify-content-center
-                        align-items-center
-                      "
-                      style="background-color: #e74c3c"
-                    ></div>
-                    <div
-                      class="
-                        square
-                        d-flex
-                        justify-content-center
-                        align-items-center
-                      "
-                      style="background-color: #00ff41"
-                    ></div>
-                    <div
-                      class="
-                        square
-                        d-flex
-                        justify-content-center
-                        align-items-center
-                      "
-                      style="background-color: #2aaccf"
-                    ></div>
-                    <div
-                      class="
-                        square
-                        d-flex
-                        justify-content-center
-                        align-items-center
-                      "
-                      style="background-color: #d0d7d8"
-                    ></div>
-                    <div
-                      class="
-                        square
-                        d-flex
-                        justify-content-center
-                        align-items-center
-                      "
-                      style="background-color: #ff3d7f"
-                    ></div>
-                    <div
-                      class="
-                        square
-                        d-flex
-                        justify-content-center
-                        align-items-center
-                      "
-                      style="background-color: #f7bd80"
-                    ></div>
-                  </div>
-                  <div class="d-flex align-items-end">
-                    <div class="pickr">
-                      <button
-                        type="button"
-                        class="pcr-button"
-                        role="button"
-                        aria-label="toggle color picker dialog"
-                        style="color: rgb(0, 123, 255)"
-                      ></button>
-                    </div>
-                    <label
-                      for="color-picker-3"
-                      id="color-pick-value"
-                      data-dirty="false"
-                      style="padding-left: 15px; margin-bottom: 0px"
-                      >Custom</label
                     >
+                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#7fc7af'"></i></div>
+                    <div
+                      class="
+                        square
+                        d-flex
+                        justify-content-center
+                        align-items-center
+                      "
+                      @click.stop.prevent="changeTagColor('#9b59b6')"
+                      style="background-color: #9b59b6"
+                    >
+                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#9b59b6'"></i></div>
+                    <div
+                      class="
+                        square
+                        d-flex
+                        justify-content-center
+                        align-items-center
+                      "
+                      @click.stop.prevent="changeTagColor('#f1c40f')"
+                      style="background-color: #f1c40f"
+                    >
+                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#f1c40f'"></i></div>
+                    <div
+                      class="
+                        square
+                        d-flex
+                        justify-content-center
+                        align-items-center
+                      "
+                      @click.stop.prevent="changeTagColor('#e74c3c')"
+                      style="background-color: #e74c3c"
+                    >
+                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#e74c3c'"></i></div>
+                    <div
+                      class="
+                        square
+                        d-flex
+                        justify-content-center
+                        align-items-center
+                      "
+                      @click.stop.prevent="changeTagColor('#00ff41')"
+                      style="background-color: #00ff41"
+                    >
+                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#00ff41'"></i></div>
+                    <div
+                      class="
+                        square
+                        d-flex
+                        justify-content-center
+                        align-items-center
+                      "
+                      @click.stop.prevent="changeTagColor('#2aaccf')"
+                      style="background-color: #2aaccf"
+                    >
+                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#2aaccf'"></i></div>
+                    <div
+                      class="
+                        square
+                        d-flex
+                        justify-content-center
+                        align-items-center
+                      "
+                      @click.stop.prevent="changeTagColor('#d0d7d8')"
+                      style="background-color: #d0d7d8"
+                    >
+                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#d0d7d8'"></i></div>
+                    <div
+                      class="
+                        square
+                        d-flex
+                        justify-content-center
+                        align-items-center
+                      "
+                      @click.stop.prevent="changeTagColor('#ff3d7f')"
+                      style="background-color: #ff3d7f"
+                    >
+                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#ff3d7f'"></i></div>
+                    <div
+                      class="
+                        square
+                        d-flex
+                        justify-content-center
+                        align-items-center
+                      "
+                      @click.stop.prevent="changeTagColor('#f7bd80')"
+                      style="background-color: #f7bd80"
+                    >
+                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#f7bd80'"></i></div>
                   </div>
                   <p id="tag-color-error-msg" style="color: red"></p>
                 </div>
@@ -1312,14 +783,14 @@
                   <b-col class="float-left">
                     <b-button
                       size="xs"
-                      variant="outline-danger"
+                      variant="outline-secondary"
                       @click="cancel()"
                     >
                       Cancel
                     </b-button>
                   </b-col>
                   <b-col class="float-right">
-                    <b-button size="xs" variant="outline-secondary">
+                    <b-button @click.stop="createTag" size="xs" variant="outline-primary">
                       Create
                     </b-button>
                   </b-col>
@@ -1327,7 +798,7 @@
               </template>
             </b-modal>
                 
-                <a class="dropdown-item mt-2 remove-all-tags">
+                <a class="dropdown-item mt-2 remove-all-tags" @click="clearTags">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -1348,7 +819,7 @@
                   </svg>
                   <span class="tx-13 tx-bold ml-2">Clear Tags</span>
                 </a>
-                <a class="dropdown-item mt-2 applyTags">
+                <a class="dropdown-item mt-2 applyTags" @click="applyTags">
                   <span class="tx-13 tx-bold ml-2">Apply</span>
                 </a>
               </div>
@@ -1396,7 +867,7 @@
                 <line x1="4" y1="4" x2="9" y2="9"></line>
               </svg>
             </span>
-            <b-modal id="bulk-merge-modal" title="Attention Required!">
+            <b-modal ref="bulk-merge-modal" id="bulk-merge-modal" title="Attention Required!">
               <div class="modal-body">
                   Are you sure you want to merge these conversations? This action can't be undone
               </div>
@@ -1411,7 +882,7 @@
                   </b-col>
                   <!-- Button with custom close trigger value -->
                   <b-col class="float-right">
-                    <b-button size="xs" variant="primary">Yes</b-button>
+                    <b-button @click="bulkMerge" size="xs" variant="primary">Yes</b-button>
                   </b-col>
                 </b-row>
               </template>
@@ -1439,7 +910,7 @@
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
             </span>
-            <b-modal id="bulk-move-modal" title="Select Inbox">
+            <b-modal ref="move-thread-modal" id="bulk-move-modal" title="Select Inbox">
               <div class="modal-body">
                 Chose the Inbox you want to move these conversations to.
                 <!-- <div class="form-group">
@@ -1533,7 +1004,7 @@
                   <b-form-select-option selected="true" value="b"
                     >Please select an option</b-form-select-option
                   >
-                  <!-- <b-form-select-option value="a">Option A</b-form-select-option> -->
+                  <b-form-select-option v-for="mailbox in mailboxes" :key="mailbox.id" :value="mailbox.id">{{mailbox.displayName}} ({{mailbox.externalAddress}})</b-form-select-option>
                 </b-form-select>
               </div>
               <template
@@ -1548,7 +1019,7 @@
                   </b-col>
                   <!-- Button with custom close trigger value -->
                   <b-col class="float-right">
-                    <b-button size="xs" variant="primary"> Move </b-button>
+                    <b-button @click="moveToInbox" size="xs" variant="primary"> Move </b-button>
                   </b-col>
                 </b-row>
               </template>
@@ -2106,8 +1577,11 @@
 
 <script>
 import { bus } from "../../main";
+import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
 export default {
   name: "MailsHeaderSelectAll",
+  components: { DatePicker },
   props: {
     mailsnum: Number,
     startThread: Number,
@@ -2116,6 +1590,8 @@ export default {
     currPage: Number,
     mailbox: Object,
     selectedIds: Array,
+    tagsInAll: Array,
+    tagsPartial: Array,
   },
   data() {
     return {
@@ -2123,14 +1599,163 @@ export default {
       currId: 0,
       currName: "",
       order: "Newest",
+      inboxSelected: this.$route.params.mailboxId,
+      addtags: [],
+      removetags: [],
+      tagPinned: false,
+      tagName: "",
+      tagColor: "",
+      datetime: "",
+      newDateOpen: false
     };
   },
+  // watch: {
+  //   deep: true,
+  //   selectedIds(val, oldVal) {
+  //     // console.log(val, oldVal);
+  //     if(val !== oldVal) {
+  //       this.addtags = [];
+  //       this.removetags = [];
+  //     }
+  //     console.log(this.addtags, this.removetags);
+  //   },
+  // },
   created() {
     bus.$on("changeType", () => {
       (this.currName = ""), (this.order = "Newest"), (this.checkAll = false);
     });
   },
   methods: {
+    handleChange(value, type) {
+      if (type === 'minute') {
+        this.newDateOpen = false;
+      }
+    },
+    notBeforeToday(date) {
+      return date < new Date(new Date().setHours(0, 0, 0, 0));
+    },
+    notBeforeNow(date) {
+      return date < new Date(new Date().setHours(new Date().getHours() + 1, 0, 0, 0));
+    },
+    changeTagColor(color) {
+      this.tagColor = color
+    },
+    createTag() {
+      this.removetags = [];
+      this.addtags = [];
+      console.log(this.tagName, this.tagPinned, this.tagColor);
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mailboxId: this.$route.params.mailboxId, color: this.tagColor, folder: this.tagPinned, name: this.tagName, threadIds: this.selectedIds }),
+        credentials: 'include'
+      };
+      // console.log(requestOptions);
+      fetch(this.$apiBaseURL + "/tags/create.php", requestOptions)
+      .then(async response => { 
+        const data = await response.json();
+        if(data.status !== "success") {
+          const error = (data && data.message) || response.status;
+          return Promise.reject(error);
+        }
+        this.addtags.push(data.data.id);
+        bus.$emit(
+          "toggleTags",
+          data.data.threadIds,
+          this.addtags,
+          this.removetags,
+          data.data
+        );
+        this.$refs['bulk-newtag-modal'].hide();
+        this.tagName = "";
+        this.tagColor = "";
+        this.tagPinned = false;
+      }).catch(error => {
+        alert(error);
+      })
+    },
+    toggleTag(id) {
+      this.removetags = [];
+      this.addtags = [];
+      if (this.tagsInAll.some((el) => el == id)) {
+        this.removetags.push(id);
+      } else if(!this.tagsPartial.some((el) => el == id)) {
+        this.addtags.push(id);
+      }
+      bus.$emit(
+        "toggleTags",
+        this.selectedIds,
+        this.addtags,
+        this.removetags
+      );
+    },
+    toggleTags(id, event) {
+      console.log(event.target.checked, id);
+      if(event.target.checked) {
+        if(!this.addtags.some(i => i == id)) {
+          this.addtags.push(id);
+        }
+        this.removetags = this.removetags.filter((tag) => tag !== id);
+      }
+      if(!event.target.checked) {
+        if(!this.removetags.some(i => i == id)) {
+          this.removetags.push(id);
+        }
+        this.addtags = this.addtags.filter((tag) => tag !== id);
+      }
+      // if (
+      //   event.target.checked &&
+      //   (this.thread.data.tags.length == 0 ||
+      //     this.thread.data.tags.some((el) => el.id !== id))
+      // ) {
+      //   console.log("1");
+      //   this.addtags.push(id);
+      //   this.removetags = this.removetags.filter((tag) => tag !== id);
+      // } else if (
+      //   !event.target.checked &&
+      //   this.thread.data.tags.some((el) => el.id == id)
+      // ) {
+      //   console.log("2");
+      //   this.removetags.push(id);
+      //   this.addtags = this.addtags.filter((tag) => tag !== id);
+      // } else if (
+      //   event.target.checked &&
+      //   this.thread.data.tags.some((el) => el.id == id)
+      // ) {
+      //   console.log("3");
+      //   this.removetags = this.removetags.filter((tag) => tag !== id);
+      // } else if (
+      //   !event.target.checked &&
+      //   this.thread.data.tags.some((el) => el.id !== id)
+      // ) {
+      //   console.log("4");
+      //   this.addtags = this.addtags.filter((tag) => tag !== id);
+      // }
+      console.log(this.addtags);
+      console.log(this.removetags);
+    },
+    applyTags() {
+      bus.$emit(
+        "toggleTags",
+        this.selectedIds,
+        this.addtags,
+        this.removetags
+      );
+      console.log("applying");
+    },
+    clearTags() {
+      console.log("clearing");
+      this.removetags = this.tagsInAll;
+      this.addtags = [];
+      console.log(this.tagsInAll);
+      console.log(this.removetags);
+      bus.$emit(
+        "toggleTags",
+        this.selectedIds,
+        this.addtags,
+        this.removetags
+      );
+    },
     checkAllBoxes() {
       this.checkAll = !this.checkAll;
       if (this.checkAll == true) {
@@ -2152,11 +1777,22 @@ export default {
     bulkSpam() {
       bus.$emit("spamThreads", this.selectedIds);
     },
+    bulkDelete() {
+      bus.$emit("deleteThreads", this.selectedIds);
+    },
     bulkClose() {
       bus.$emit("closeThread", this.selectedIds);
     },
     bulkAssign(id) {
       bus.$emit("assignThread", this.selectedIds, id);
+    },
+    moveToInbox() {
+      bus.$emit('moveToInbox', this.selectedIds, this.inboxSelected);
+      this.$refs['move-thread-modal'].hide()
+    },
+    bulkMerge() {
+      bus.$emit('bulkMerge', this.selectedIds);
+      this.$refs['bulk-merge-modal'].hide()
     },
     bulkSnooze(till) {
       console.log(till);
@@ -2183,6 +1819,11 @@ export default {
           moment().add(1, "month").format("YYYY-MM-DD hh:mm"),
           "YYYY-MM-DD hh:mm A"
         );
+      } else if (till == "newDate") {
+        console.log(this.datetime);
+        mom = new Date(this.datetime);
+        this.datetime = "";
+        this.$refs["snooze-thread-modal"].hide();
       }
       console.log(mom.toISOString());
       bus.$emit("snoozeThread", this.selectedIds, mom);
@@ -2209,6 +1850,10 @@ export default {
     },
     tags() {
       return this.$store.state.tags;
+    },
+
+    mailboxes() {
+      return this.$store.state.mailboxes;
     },
     teammates() {
       return this.$store.state.teammates;
