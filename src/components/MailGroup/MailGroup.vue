@@ -764,7 +764,7 @@ export default {
           alert(error);
         })
       });
-      bus.$on("toggleTags", (id, addtags, removetags) => {
+      bus.$on("toggleTags", (id, addtags, removetags, newTag) => {
           console.log(id, addtags, removetags, addtags.length);
           if(addtags.length || removetags.length) {
             let threadIds = new Array();
@@ -815,23 +815,35 @@ export default {
                   })
                 } 
                 for(var i = 0; i< addtags.length; i++) {
+                  let tag;
                   if(!this.tagsInAll.some(tag => tag == addtags[i])) {
                     this.tagsInAll.push(addtags[i]);
                   }
-                  let tag = this.$store.state.tags.filter(obj => obj.id == addtags[i]);
-                  if(!this.perPageMails[objIndex].tags.some(tag => tag.id == addtags[i])) {
-                    this.perPageMails[objIndex].tags.push(tag[0]);
+                  if(newTag !== undefined) {
+                    this.perPageMails[objIndex].tags.push(newTag);
+                  } else {
+                    tag = this.$store.state.tags.filter(obj => obj.id == addtags[i]);
+                    if(!this.perPageMails[objIndex].tags.some(tag => tag.id == addtags[i])) {
+                      this.perPageMails[objIndex].tags.push(tag[0]);
+                    }
+                  }
+                  let body;
+                  if(newTag !== undefined) {
+                    toAdd.push(newTag);
+                    body = `${this.$store.state.userInfo.firstname} ${this.$store.state.userInfo.lastname} added the tag ${newTag.name}`;
+                  } else {
+                    toAdd.push(tag[0]);
+                    body = `${this.$store.state.userInfo.firstname} ${this.$store.state.userInfo.lastname} added the tag ${tag[0].name}`;
                   }
                   logs.push({
                     data: {
-                      body: `${this.$store.state.userInfo.firstname} ${this.$store.state.userInfo.lastname} added the tag ${tag[0].name}`,
+                      body,
                       at: new Date().toISOString(),
                       type: "tag"
                     },
                     timestamp: Date.now(),
                     type: "log"
-                  })
-                  toAdd.push(tag[0]);
+                  });
                 }
                 let payload = {
                   logs,
