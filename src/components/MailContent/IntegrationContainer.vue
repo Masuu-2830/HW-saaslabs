@@ -1,19 +1,5 @@
 <template>
     <div class="integrationContainer">
-<<<<<<< HEAD
-        <Integration
-            v-for= "(integration, index) in integrations"
-            :key= "index"
-            :integration= "integration"
-            @openInt = "openIntegartion"
-        />
-
-
-        <IntegrationSidebar
-            :data="sidebarData"
-            v-if="isSidebarActive"
-        />
-=======
         <IntegrationData
             v-for= "(integration, index) in integrations"
             :key= "index"
@@ -26,18 +12,12 @@
             :data="sidebarData"
             v-if="isSidebarActive"
         /> -->
->>>>>>> aa72655f2716937588d4dc7acfc453b58ac5d35e
     </div>
 </template>
 
 <script>
-<<<<<<< HEAD
-
-    import Integration from 'Integration.vue';
-=======
     import { bus } from "../../main";
     import IntegrationData from './IntegrationData.vue';
->>>>>>> aa72655f2716937588d4dc7acfc453b58ac5d35e
     export default {
         data(){
             return {
@@ -46,28 +26,6 @@
                 sidebarData: []
             }
         },
-<<<<<<< HEAD
-        components:{Integration},
-        methods: {
-            openIntegartion(name){
-                // api hit get search data: {name: name, email: "", phone: ""}
-                let data = []; //api se ayga data
-                isSidebarActive = isSidebarActive ? false: true;
-                this.sidebarData = data; //api wala data
-            },
-            async getIntegrationsData(){
-                try {
-                    let response = await fetch("https://app.helpwise.io/api/active_integrations_v2.php");
-                    console.log("response",response);
-                    this.integrations = await response.data;
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-        },
-        created() {
-            this.getIntegrationsData();
-=======
         components:{IntegrationData},
         methods: {
             openIntegration(name){
@@ -106,7 +64,6 @@
                 this.errorMessage = error;
                 console.error("There was an error!", error);
             });
->>>>>>> aa72655f2716937588d4dc7acfc453b58ac5d35e
         }
     }
 </script>
