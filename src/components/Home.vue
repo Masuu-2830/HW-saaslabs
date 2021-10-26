@@ -28,7 +28,7 @@ export default {
             mailboxes: [],
         }
     },
-     watch:{
+    watch:{
         $route (to, from) {
             if(to.params.mailboxId !== from.params.mailboxId) {
                 this.fetchMailBoxData();
@@ -58,7 +58,7 @@ export default {
             await this.$store.dispatch('fetchPingDetails', data);
         }
     },
-    async mounted() {
+    async beforeMount() {
         await this.fetchSidebarStats();
         this.fetchMailBoxes();
         document.title = "Helpwise (" + this.mailbox.stats.mine + ")";

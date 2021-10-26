@@ -15,6 +15,9 @@ import "font-awesome/css/font-awesome.min.css";
 import "froala-editor/css/froala_style.min.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
 import "froala-editor/js/froala_editor.pkgd.min.js";
+import 'froala-editor/js/plugins.pkgd.min' // all plugins
+
+
 import 'tributejs/dist/tribute.css';
 // import 'bootstrap/dist/css/bootstrap.css'
 window.$ = $;
