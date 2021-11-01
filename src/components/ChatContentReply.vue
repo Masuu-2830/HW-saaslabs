@@ -12,7 +12,7 @@
 
         <div class="tab-content" id="myTabContent">
           <div class="tab-pane fade show active" id="editorReplyTab" role="tabpanel" aria-labelledby="reply-tab">
-            <froala :tag="'textarea'" :config="replyEditorConfig"></froala>
+            <froala :tag="'textarea'" :config="replyEditorConfig" @deleteAttachment="temp"></froala>
             <input type='file' style='display: none' name='files[]' @change="uploadAttachment" id='editor-uploadAttachment' multiple>
           </div>
           <div class="tab-pane fade" id="editorNotesTab" role="tabpanel" aria-labelledby="notes-tab">
@@ -27,6 +27,10 @@
   import FroalaEditor from 'froala-editor';
   // import VueTribute from "vue-tribute";
   import Tribute from "tributejs";
+  import AttachmentComp from './AttachmentComp.vue';
+  import Vue from 'vue';
+  import { bus } from "../main";
+  const axios = require('axios').default;
 
   export default {
     name: "ChatContentReply",
@@ -38,8 +42,41 @@
       const self = this;
       return {
         current: 'reply',
+        tempData:['a', 'b', 'v'],
         replyEditorInstance: null,
         noteEditorInstance: null,
+        attachments: {
+          // "17866678" : {
+          //   id: "17866678",
+          //   extension: "png",
+          //   filehash: "33ae9688627a1e0fc4829ac06ba70242617bbe3ea79341635499582",
+          //   filename: "file 1",
+          //   filesize: 19812,
+          //   mimeType: "image/png",
+          //   progress: 0,
+          //   isUploaded: false
+          // },
+          // "17866679" : {
+          //   id: "17866679",
+          //   extension: "png",
+          //   filehash: "33ae9688627a1e0fc4829ac06ba70242617bbe3ea79341635499582",
+          //   filename: "file 2",
+          //   filesize: 19812,
+          //   mimeType: "image/png",
+          //   progress: 100,
+          //   isUploaded: true
+          // },
+          // "17866680" : {
+          //   id: "17866680",
+          //   extension: "png",
+          //   filehash: "33ae9688627a1e0fc4829ac06ba70242617bbe3ea79341635499582",
+          //   filename: "file 4",
+          //   filesize: 19812,
+          //   mimeType: "image/png",
+          //   progress: 100,
+          //   isUploaded: true
+          // }
+        },
         replyEditorConfig: {
           events: {
             initialized: async function() {
@@ -55,9 +92,17 @@
                 }
               }, true);
 
-              replyFroala.$wp.append('<div class="row w-100 mx-0" id = "reply-attachment-list"></div>');
-              // replyFroala.$wp.append(`<input type='file' style='display: none' name='files[]' @change="uploadAttachment(this.files)" class='reply-uploadAttachment' multiple>`);
+              let attchComp = Vue.extend(AttachmentComp);
+              let replyAttachmentList = new attchComp({
+                propsData:{
+                  attachments: self.attachments
+                }
+              }).$mount();
+              
+              replyFroala.$wp.append(replyAttachmentList.$el);
 
+
+              // replyFroala.$wp.append(`<input type='file' style='display: none' name='files[]' @change="uploadAttachment" id='editor-uploadAttachment' multiple>`);
             },
             focus: async function() {
               // const froala = this;
@@ -111,10 +156,6 @@
             moreRich: {
               buttons: ['hcArticle', 'savedReply', 'attach']
             },
-            // moreMisc: {
-            //   buttons: ['moreBtn', 'discardComposeDraft'],
-            //   buttonsVisible: 2,
-            // }
           },
         },
         noteEditorConfig: {
@@ -131,7 +172,10 @@
                 }
               }, true);
 
-              noteFroala.$wp.append('<div class="row w-100 mx-0 d-none" id="notes-attachment-list"></div>');
+              let attchComp = Vue.extend(AttachmentComp);
+              let notesAttachmentList = new attchComp().$mount();
+              noteFroala.$wp.append(notesAttachmentList.$el);
+              // noteFroala.$wp.append('<div class="row w-100 mx-0 d-none" id="notes-attachment-list"></div>');
               // noteFroala.$wp.append(`<input type='file' style='display: none' name='files[]' class='notes-uploadAttachment' multiple @click="uploadAttachment()">`);
 
             },
@@ -300,15 +344,79 @@
         FroalaEditor.RegisterShortcut(13, 'send', 'send', 'Enter', false, false);
       },
       uploadAttachment(event){
-        const files = event.target.files;
+        const selectedFiles = event.target.files;
+        console.log(selectedFiles);
+        const vueThis = this;
+        for (let i = 0; i < selectedFiles.length; i++) {
+          let selectedFile = selectedFiles[i];
+          let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
+          var formData = new FormData();
+          formData.append('files[]', selectedFile);
+          formData.append('mailboxID', vueThis.$route.params.mailboxId);
+          const attachmentURL = `${vueThis.$apiBaseURL}/uploadAttachment`;
+          let attachmentObject = {
+            filename: selectedFile["name"],
+            filesize: selectedFile["size"],
+            progress: 0,
+            isUploaded: false
+          }
 
+          vueThis.attachments[hash] = attachmentObject;
+          Vue.delete(vueThis.attachments, hash);
+          vueThis.attachments[hash] = attachmentObject;
+          // fetch(attachmentURL,{
+          //   method: 'POST',
+          //   body: formData,
+          //   credentials: 'include'
+          // }).then(response => {
+          //   console.log(response);
+          // })
+          axios.request({
+            method: "post",
+            url: "https://app.helpwise.io/api/uploadAttachment.php",
+            data: formData,
+            withCredentials: true,
+            onUploadProgress: function(p){
+              let percentage = (p.loaded / p.total) * 100;
+              console.log(percentage);
+              console.log(hash);
+              vueThis.attachments[hash]["progress"] = percentage;
+              // $(`#progress-compose-${hash}`).css("width", `${percentage}%`);
+            }.bind(this)
+          }).then((response)=>{
+            //get the attachment id
+            console.log(response);
+            console.log(hash);
+
+            let attachData = response.data.data.files[0];
+            let attachID = attachData["id"];
+
+            vueThis.attachments[attachID] = vueThis.attachments[hash];
+            Vue.delete(vueThis.attachments, hash);
+            vueThis.attachments[attachID]["isUploaded"] = true;
+            vueThis.attachments[attachID]["progress"] = 100;
+            vueThis.attachments[attachID]["filehash"] = attachData["filehash"];
+            vueThis.attachments[attachID]["filename"] = attachData["filename"];
+            vueThis.attachments[attachID]["filesize"] = attachData["filesize"];
+            vueThis.attachments[attachID]["mimeType"] = attachData["mimeType"];
+            vueThis.attachments[attachID]["extension"] = attachData["extension"];
+            vueThis.attachments[attachID]["id"] = attachID;
+          })
+        }
+      },
+      runFunc(){
+        console.log("kjfhksadjhfjshadjklfh")
       }
     },
     beforeMount() {
       this.prepareFroalaButtons()
     },
-    beforeCreate() {
-
+    created(){
+      bus.$off("deleteAttachmentUpload");
+      bus.$on("deleteAttachmentUpload", (id) => {
+        console.log("event listened", id);
+        Vue.delete(this.attachments, id);
+      });
     }
   };
 </script>
