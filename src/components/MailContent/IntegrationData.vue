@@ -1,21 +1,7 @@
 <template>
-    <div class="df-settings sidebar-integration  d-none d-md-block integrations-settings-sidebar-btn" :class="isOpen && 'show'">
-        <a :class="[ 'df-settings-link-' + integration_data.lname , 'df-' + integration_data.lname + '-settings  all_icon integrations-settings-sidebar']" @click="openInt" data-toggle="tooltip" :title="integration_data.name" style="left: -44px; background: transparent; border-right: none; display: flex;" :style="'top:'+ integration_data.pixel +'px !important;'">
-            <img :src="integration_data.icon" width="30" height="30" />
-        </a>
-        <div class="df-settings-body pd-l-10 pd-r-15" :class="[integration_data.lname + '-integrations-width', isOpen && 'open']" :id="integration_data.lname + '-scrolling'">
-            <div class="pd-t-20">
-                <label class="tx-sans tx-10 tx-uppercase tx-bold tx-spacing-1 tx-color-02 mg-b-15">{{ integration_data.name }}</label>
-                <!-- <div class="d-flex align-items-start" :id="integration_data.lname + '-loading-window'">
-                    <div class="spinner-border spinner-border-sm mg-r-10" role="status"></div>
-                    <p :class="integration_data.lname + '_main_loading'" style="color: grey">Data Loading...</p>
-                </div> -->
-                <p :class="integration_data.lname + '_main_loading'" style="display: none;color: grey">Loading...</p>
-            </div>
-            <div :id="integration_data.lname + '-data'">
-            </div>
-        </div>
-    </div>
+    <a :class="[ 'df-settings-link-' + integration_data.lname , 'df-' + integration_data.lname + '-settings  all_icon integrations-settings-sidebar']" @click="openInt" data-toggle="tooltip" :title="integration_data.name" style="left: -44px; background: transparent; border-right: none; display: flex;" :style="'top:'+ integration_data.pixel +'px !important;'">
+        <img :src="integration_data.icon" width="30" height="30" />
+    </a>
 </template>
 
 <script>
@@ -29,7 +15,7 @@
         methods: {
             openInt(){
                 this.isOpen = !this.isOpen;
-                this.$emit("openInt", this.integration_data.name);
+                this.$emit("openInt", this.integration_data);
             },
             // changePixels(){
             //     console.log("pixels",this.pixel);
@@ -82,9 +68,9 @@
         box-shadow: none;
     } 
     .integrations-settings-sidebar {
-        position: absolute;
-        top: 98px;
-        left: -44px;
+        /* position: absolute; */
+        /* top: 98px; */
+        /* left: -44px; */
         width: 45px;
         height: 45px;
         background-color: #fff;
@@ -126,9 +112,9 @@
         width: 300px !important;
     } */
 
-    .df-settings.show.integrations-settings-sidebar-btn {
+    /* .df-settings.show.integrations-settings-sidebar-btn {
         right: 300px;
-    }
+    } */
     body > div.datepicker.datepicker-dropdown.dropdown-menu.datepicker-orient-right.datepicker-orient-bottom{
         width: 200px !important;
         left: 1219px;
