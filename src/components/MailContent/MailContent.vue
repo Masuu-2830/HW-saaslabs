@@ -12,8 +12,8 @@
       <mail-content-header :thread="thread"></mail-content-header>
       <mail-content-body :thread="thread"></mail-content-body>
       <!-- <chat-content-body :thread="thread"></chat-content-body> -->
-      <!-- <mail-content-add-note v-if="!loading"></mail-content-add-note> -->
-      <chat-content-reply></chat-content-reply>
+      <mail-content-add-note v-if="!loading"></mail-content-add-note>
+      <!-- <chat-content-reply></chat-content-reply> -->
     </div>
   </div>
 </template>

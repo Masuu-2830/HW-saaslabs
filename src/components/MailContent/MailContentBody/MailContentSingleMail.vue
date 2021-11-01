@@ -54,7 +54,9 @@
                     ></strong
                   >
                   <svg
-                    :data-clipboard-text="Object.keys(item.data.from).toString()"
+                    :data-clipboard-text="
+                      Object.keys(item.data.from).toString()
+                    "
                     :style="{ display: showEmailAddresses ? '' : 'none' }"
                     xmlns="http://www.w3.org/2000/svg"
                     width="12"
@@ -66,7 +68,9 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     class="addr-hideable addr-copy-btn feather feather-copy"
-                    @click.stop.prevent="copyTestingCode(Object.keys(item.data.from).toString())"
+                    @click.stop.prevent="
+                      copyTestingCode(Object.keys(item.data.from).toString())
+                    "
                   >
                     <rect
                       x="9"
@@ -82,35 +86,44 @@
                   </svg>
                 </div>
                 <div class="mg-b-0 tx-color-03">
-                  To: <span v-for="(value, key, index) in item.data.to" :key="index"><span class="tx-color-01">{{ value }}</span><span class="addr-hideable copyable" :style="{ display: showEmailAddresses ? '' : 'none' }">
-                    &lt;{{key}}&gt;
-                    <svg
-                      :data-clipboard-text="key"
+                  To:
+                  <span v-for="(value, key, index) in item.data.to" :key="index"
+                    ><span class="tx-color-01">{{ value }}</span
+                    ><span
+                      class="addr-hideable copyable"
                       :style="{ display: showEmailAddresses ? '' : 'none' }"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="addr-hideable addr-copy-btn feather feather-copy"
-                      @click.stop.prevent="copyTestingCode(key)"
                     >
-                      <rect
-                        x="9"
-                        y="9"
-                        width="13"
-                        height="13"
-                        rx="2"
-                        ry="2"
-                      ></rect>
-                      <path
-                        d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-                      ></path></svg></span
-                  ><span v-if="(index+1) != Object.keys(item.data.to).length">,&nbsp;</span></span>
+                      &lt;{{ key }}&gt;
+                      <svg
+                        :data-clipboard-text="key"
+                        :style="{ display: showEmailAddresses ? '' : 'none' }"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="addr-hideable addr-copy-btn feather feather-copy"
+                        @click.stop.prevent="copyTestingCode(key)"
+                      >
+                        <rect
+                          x="9"
+                          y="9"
+                          width="13"
+                          height="13"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <path
+                          d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                        ></path></svg></span
+                    ><span v-if="index + 1 != Object.keys(item.data.to).length"
+                      >,&nbsp;</span
+                    ></span
+                  >
                   <!-- <span class="tx-color-01">{{
                     Object.values(item.data.to).toString()
                   }}</span
@@ -147,43 +160,56 @@
                       ></path></svg
                   ></span> -->
                 </div>
-                <div class="mg-b-0 tx-color-03"
+                <div
+                  class="mg-b-0 tx-color-03"
                   :class="item.data.cc.length == 0 ? 'd-none' : ''"
-                  v-if="item.data.cc.length !== 0">
-                  Cc: <span v-for="(value, key, index) in item.data.cc" :key="index"><span class="tx-color-01">{{ value }}</span><span class="addr-hideable copyable" :style="{ display: showEmailAddresses ? '' : 'none' }">
-                    &lt;{{key}}&gt;
-                    <svg
-                      :data-clipboard-text="key"
+                  v-if="item.data.cc.length !== 0"
+                >
+                  Cc:
+                  <span v-for="(value, key, index) in item.data.cc" :key="index"
+                    ><span class="tx-color-01">{{ value }}</span
+                    ><span
+                      class="addr-hideable copyable"
                       :style="{ display: showEmailAddresses ? '' : 'none' }"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      class="addr-hideable addr-copy-btn feather feather-copy"
-                      @click.stop.prevent="copyTestingCode(key)"
                     >
-                      <rect
-                        x="9"
-                        y="9"
-                        width="13"
-                        height="13"
-                        rx="2"
-                        ry="2"
-                      ></rect>
-                      <path
-                        d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-                      ></path></svg></span
-                  ><span v-if="(index+1) != Object.keys(item.data.cc).length">,&nbsp;</span></span>
+                      &lt;{{ key }}&gt;
+                      <svg
+                        :data-clipboard-text="key"
+                        :style="{ display: showEmailAddresses ? '' : 'none' }"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="addr-hideable addr-copy-btn feather feather-copy"
+                        @click.stop.prevent="copyTestingCode(key)"
+                      >
+                        <rect
+                          x="9"
+                          y="9"
+                          width="13"
+                          height="13"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <path
+                          d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                        ></path></svg></span
+                    ><span v-if="index + 1 != Object.keys(item.data.cc).length"
+                      >,&nbsp;</span
+                    ></span
+                  >
                 </div>
                 <div
                   class="mg-b-0 tx-color-03 addr-hideable"
                   :class="item.data.replyTo == null ? 'd-none' : ''"
-                  v-if="item.data.replyTo !== null && item.data.replyTo.length > 0"
+                  v-if="
+                    item.data.replyTo !== null && item.data.replyTo.length > 0
+                  "
                   :style="{ display: showEmailAddresses ? '' : 'none' }"
                 >
                   Reply To:
@@ -193,7 +219,9 @@
                   ><span class="copyable">
                     &lt;{{ Object.keys(item.data.replyTo).toString() }}&gt;
                     <svg
-                      :data-clipboard-text="Object.keys(item.data.replyTo).toString()"
+                      :data-clipboard-text="
+                        Object.keys(item.data.replyTo).toString()
+                      "
                       :style="{ display: showEmailAddresses ? '' : 'none' }"
                       xmlns="http://www.w3.org/2000/svg"
                       width="12"
@@ -205,7 +233,11 @@
                       stroke-linecap="round"
                       stroke-linejoin="round"
                       class="addr-hideable addr-copy-btn feather feather-copy"
-                      @click.stop.prevent="copyTestingCode(Object.keys(item.data.replyTo).toString())"
+                      @click.stop.prevent="
+                        copyTestingCode(
+                          Object.keys(item.data.replyTo).toString()
+                        )
+                      "
                     >
                       <rect
                         x="9"
@@ -236,10 +268,28 @@
             class="email-time-seen d-flex align-items-center"
             style="padding: 8px"
           >
-          <div class="replyIconsContainer align-items-center" style="margin-right: 20px;">
-            <button class="reply-btn btn replyIconBtn px-1" data-toggle="tooltip" title="" data-original-title="Reply" @click="reply"><i class="fas fa-reply"></i></button>
-            <button v-if="item.data.cc.length !== 0" class="reply-all-btn btn replyIconBtn px-1" data-toggle="tooltip" title="Reply All"><i class="fas fa-reply-all"></i></button>
-          </div>
+            <div
+              class="replyIconsContainer align-items-center"
+              style="margin-right: 20px"
+            >
+              <button
+                class="reply-btn btn replyIconBtn px-1"
+                data-toggle="tooltip"
+                title=""
+                data-original-title="Reply"
+                @click="reply"
+              >
+                <i class="fas fa-reply"></i>
+              </button>
+              <button
+                v-if="item.data.cc.length !== 0"
+                class="reply-all-btn btn replyIconBtn px-1"
+                data-toggle="tooltip"
+                title="Reply All"
+              >
+                <i class="fas fa-reply-all"></i>
+              </button>
+            </div>
             <div class="email-time d-flex align-items-center">
               <span class="tx-12 tx-color-03" style="float: right"
                 >{{ item.timestamp | moment("MMM D, h:mm a") }} ({{
@@ -278,7 +328,14 @@
                     <circle cx="12" cy="19" r="1"></circle></svg
                 ></span>
 
-                <div :style="{ display: showdd ? 'block' : 'none', transform: showdd && 'translate3d(-217px, 31px, 0px)' }" class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <div
+                  :style="{
+                    display: showdd ? 'block' : 'none',
+                    transform: showdd && 'translate3d(-217px, 31px, 0px)',
+                  }"
+                  class="dropdown-menu"
+                  aria-labelledby="dropdownMenuLink"
+                >
                   <button type="button" class="dropdown-item reply-btn">
                     Reply
                   </button>
@@ -296,25 +353,41 @@
                   >
                     Move to a new Conversation
                   </button>
-                  <b-modal ref="move-new-modal" :id="'move-new-modal' + item.data.id" title="Are you sure you want to move this message to a new conversation? This action can't be undone.">
+                  <b-modal
+                    ref="move-new-modal"
+                    :id="'move-new-modal' + item.data.id"
+                    title="Are you sure you want to move this message to a new conversation? This action can't be undone."
+                  >
                     <div class="modal-body">
-                        <div class="form-group">
-                          <label for="moveToNewSubject">New Topic:</label>
-                          <input :value="subject" type="text" class="form-control moveToNewSubject" name="moveToNewSubject">
+                      <div class="form-group">
+                        <label for="moveToNewSubject">New Topic:</label>
+                        <input
+                          :value="subject"
+                          type="text"
+                          class="form-control moveToNewSubject"
+                          name="moveToNewSubject"
+                        />
                       </div>
                     </div>
-                    <template
-                      #modal-footer="{ cancel }"
-                    >
+                    <template #modal-footer="{ cancel }">
                       <b-row class="text-center" align-v="center">
                         <b-col class="float-left">
-                          <b-button size="xs" variant="secondary" @click="cancel()">
+                          <b-button
+                            size="xs"
+                            variant="secondary"
+                            @click="cancel()"
+                          >
                             No
                           </b-button>
                         </b-col>
                         <!-- Button with custom close trigger value -->
                         <b-col class="float-right">
-                          <b-button @click="moveConv" size="xs" variant="primary">Yes</b-button>
+                          <b-button
+                            @click="moveConv"
+                            size="xs"
+                            variant="primary"
+                            >Yes</b-button
+                          >
                         </b-col>
                       </b-row>
                     </template>
@@ -353,7 +426,38 @@
             Download all Attachments
           </button>
         </div>
-        <div class="d-flex flex-row attachment-list m-1 flex-wrap"></div>
+        <div class="d-flex flex-row attachment-list m-1 flex-wrap">
+          <div v-for="file in item.data.attachments" :key="file.id"
+            style="padding: 0px 5px 0px 5px; height: 30px; max-width: 33.33%"
+            class="
+              hw-attachment
+              d-flex
+              align-items-center
+              justify-content-start
+              mr-1
+              p-2
+              rounded
+            "
+          >
+          <span v-html="getFileIcon(file.extension, file.filesize)"></span>
+          
+            <a
+              style="font-size: 11px; max-width: 90%"
+              class="remove-a-style openAttachment mg-l-10 text-truncate"
+              target="_blank"
+              :href='"https://app.helpwise.io/attachments/" + file.id'
+              >{{file.filename}}</a
+            >
+            <a
+              class="remove-a-style downloadAttachment mg-l-10"
+              style="font-size: 11px"
+              target="_blank"
+              :href='"https://app.helpwise.io/attachments/" + file.id + "?d=1"'
+            >
+              <i class="fas fa-download"></i>
+            </a>
+          </div>
+        </div>
         <div class="d-flex flex-row m-1 reply-row">
           <button
             type="button"
@@ -385,7 +489,18 @@
             <i class="fas fa-share mr-1"></i>
             <span class="ml-1">Forward</span>
           </button>
-          <button v-if="item.data.cc.length !== 0" type="button" class="reply-all-btn btn btn-xs btn-outline-primary rounded-pill d-flex align-items-center" @click="reply">
+          <button
+            v-if="item.data.cc.length !== 0"
+            type="button"
+            class="
+              reply-all-btn
+              btn btn-xs btn-outline-primary
+              rounded-pill
+              d-flex
+              align-items-center
+            "
+            @click="reply"
+          >
             <i class="fas fa-reply-all mr-1"></i>
             <span class="ml-1"> Reply All </span>
           </button>
@@ -425,30 +540,44 @@ export default {
   props: {
     item: Object,
     isCollapsed: Boolean,
-    subject: String
+    subject: String,
   },
   data() {
     return {
       isMailCollapsed: this.isCollapsed,
       showEmailAddresses: false,
-      showdd: false
+      showdd: false,
     };
   },
   methods: {
+    getFileIcon(extension, size) {
+        let iconStyle = '';
+        if (size) {
+            iconStyle = `style="height:${size}px;width:${size}px;"`;
+        }
+
+        let ext = extension.toString().toLowerCase();
+        return `<span ${iconStyle} class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
+    },
     showDD() {
       this.showdd = !this.showdd;
-      if(this.showdd) {
+      if (this.showdd) {
         console.log("show DD");
       } else {
         console.log("hide");
       }
     },
     moveConv() {
-      bus.$emit('moveConv', this.item.data.id, this.subject, this.$route.params.threadId);
-      this.$refs['move-new-modal'].hide()
+      bus.$emit(
+        "moveConv",
+        this.item.data.id,
+        this.subject,
+        this.$route.params.threadId
+      );
+      this.$refs["move-new-modal"].hide();
     },
     reply(e) {
-      bus.$emit("replyy");
+      bus.$emit("replyy", this.item.data.id);
       e.cancelBubble = true;
     },
     changeCollapseState() {
@@ -458,7 +587,7 @@ export default {
       this.showEmailAddresses = !this.showEmailAddresses;
       e.cancelBubble = true;
     },
-    fallbackCopyTestingCode (text) {
+    fallbackCopyTestingCode(text) {
       var textArea = document.createElement("textarea");
       textArea.value = text;
       document.body.appendChild(textArea);
@@ -481,14 +610,14 @@ export default {
         return;
       }
       navigator.clipboard.writeText(text).then(
-        function() {
+        function () {
           console.log("Async: Copying to clipboard was successful!");
         },
-        function(err) {
+        function (err) {
           console.error("Async: Could not copy text: ", err);
         }
       );
-    }
+    },
   },
 };
 </script>

@@ -29,7 +29,7 @@
           class="d-flex flex-column justify-content-center"
         >
           <h6 class="tx-15 mb-1 mt-2" id="thread-subject" style="width: 100%">
-            {{ thread.data.subject }}
+            {{ thread.data.subject ? thread.data.subject : '(no subject)' }}
           </h6>
           <span
             id="tagsTicketContainer"
@@ -1177,93 +1177,6 @@
       <b-modal ref="move-thread-modal" id="move-thread-modal" title="Select Inbox">
         <div class="modal-body">
           Chose the Inbox you want to move these conversations to.
-          <!-- <div class="form-group">
-            <select
-              id="moveToInbox"
-              data-select2-id="moveToInbox"
-              tabindex="-1"
-              class="select2-hidden-accessible"
-              aria-hidden="true"
-            >
-              <option value="204420" data-select2-id="22">
-                Helpwise Support (vibhor@saaslabs.co)
-              </option>
-              <option value="204794" data-select2-id="23">
-                My Mailbox (hello@helpwise.io)
-              </option>
-              <option value="204912" data-select2-id="25">
-                Testing Stuff (tst@helpwise.io)
-              </option>
-              <option value="204940" data-select2-id="27">
-                Vibhor (vibhor350a@gmail.com)
-              </option>
-              <option value="205077" data-select2-id="29">
-                My Mailbox2 (test18@helpwisemail.com)
-              </option>
-              <option value="205166" data-select2-id="31">
-                hello123 (hello123@helpwise.io)
-              </option>
-              <option value="205167" data-select2-id="33">
-                asjaskjjka (asjaskjjka@akjskasj.com)
-              </option>
-              <option value="205216" data-select2-id="35">
-                Demo Mailbox (helpscoutmailbox.demo+107987@example.net)
-              </option>
-              <option value="205217" data-select2-id="37">
-                Rishabh Mailbox (rishicentury@gmail.com)
-              </option>
-              <option value="206800" data-select2-id="39">
-                Christel Rojo (christel@helpwise.io)
-              </option>
-              <option value="210248" data-select2-id="41">
-                Claudia Keen (vibhor1997a@protonmail.com)
-              </option>
-              <option value="210359" data-select2-id="43">
-                Mayank Banga (mayank.banga1996@gmail.com)
-              </option>
-              <option value="211276" data-select2-id="45">
-                Outlook_69CB7129AD598D06 (outlook_69cb7129ad598d06@outlook.com)
-              </option>
-              <option value="211336" data-select2-id="47">
-                Test1023 (test1023@helpwise.io)
-              </option>
-              <option value="212339" data-select2-id="49">
-                Helpwise.dev (helpwise.dev@helpwise.io)
-              </option>
-              <option value="212794" data-select2-id="51">
-                Outlook Dev (helpwise.dev@outlook.com)
-              </option>
-              <option value="213545" data-select2-id="53">
-                harit test (harit@justcall.io)
-              </option>
-              <option value="215050" data-select2-id="55">
-                Tushar Gmail (tushar@justcall.io)
-              </option></select
-            ><span
-              class="select2 select2-container select2-container--default"
-              dir="ltr"
-              data-select2-id="56"
-              style="width: 100%"
-              ><span class="selection"
-                ><span
-                  class="select2-selection select2-selection--single"
-                  role="combobox"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                  tabindex="0"
-                  aria-labelledby="select2-moveToInbox-container"
-                  ><span
-                    class="select2-selection__rendered"
-                    id="select2-moveToInbox-container"
-                    role="textbox"
-                    aria-readonly="true"
-                    title="Helpwise Support (vibhor@saaslabs.co)"
-                    >Helpwise Support (vibhor@saaslabs.co)</span
-                  ><span class="select2-selection__arrow" role="presentation"
-                    ><b role="presentation"></b></span></span></span
-              ><span class="dropdown-wrapper" aria-hidden="true"></span
-            ></span>
-          </div> -->
           <b-form-select v-model="inboxSelected" class="mb-3">
             <b-form-select-option selected="true" value="b"
               >Please select an option</b-form-select-option
