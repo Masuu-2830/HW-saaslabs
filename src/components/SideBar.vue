@@ -31,6 +31,7 @@
         </div>
         <div role="group" class="btn-group btn-block">
           <button
+            @click="openCompose"
             class="
               tx-uppercase
               mailComposeBtn
@@ -587,6 +588,7 @@
 </template>
 
 <script>
+import { bus } from "../main";
 export default {
   name:'SideBar',
   props: {
@@ -605,6 +607,10 @@ export default {
   methods: {
     expandMore() {
       this.more = !this.more;
+    },
+    openCompose() {
+      console.log("open")
+      bus.$emit("openCompose");
     }
   }
 };

@@ -5,6 +5,7 @@
             <SideBar :mailbox="mailbox" />
             <MailGroup :mailbox="mailbox" />
             <MailContent />
+            <compose></compose>
         </div>
     </div>
 </template>
@@ -14,13 +15,15 @@ import NavBar from './NavBar.vue';
 import MailGroup from './MailGroup/MailGroup.vue';
 import SideBar from './SideBar.vue';
 import MailContent from './MailContent/MailContent.vue'
+import Compose from './Compose.vue';
 export default {
     name: 'Home',
     components: {
         NavBar,
         SideBar,
         MailGroup,
-        MailContent
+        MailContent,
+        Compose
     },
     data() {
         return {
@@ -49,6 +52,12 @@ export default {
             console.log(data);
             this.mailboxes = data.data.mailboxes;
         },
+        async fetchContacts() {
+            const response = await fetch(this.$apiBaseURL + "contacts.php", {credentials: 'include'});
+            const data = await response.json();
+            console.log(data);
+            // this.mailboxes = data.data.mailboxes;
+        },
         async fetchMailBoxData() {
             const response = await fetch("https://app.helpwise.io/api/ping.php?mailboxID=" + this.$route.params.mailboxId, {credentials: 'include'});
             const data = await response.json();
@@ -56,11 +65,50 @@ export default {
             console.log("++");
             data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
             await this.$store.dispatch('fetchPingDetails', data);
+        },
+        async fetchAliases() {
+            const response = await fetch(this.$apiBaseURL + "getFromAddresses.php?mailboxId=" + this.$route.params.mailboxId, {credentials: 'include'});
+            const data = await response.json();
+            console.log(data);
+            await this.$store.dispatch('fetchAliases', data.data);
+        },
+        fetchUserSignature() {
+            fetch(this.$apiBaseURL + "signatures/list.php?mailboxId=" + this.$route.params.mailboxId, {credentials: "include"})
+            .then(async response => { 
+                const data = await response.json();
+                if(data.status !== "success") {
+                    const error = (data && data.message) || response.status;
+                    return Promise.reject(error);
+                }
+                console.log(data);
+                let signatureId = data.data[0] && data.data[0].id;
+                if (signatureId) {
+                    fetch(this.$apiBaseURL + "signatures/get.php?id=" + signatureId, {credentials: "include"})
+                    .then(async response => { 
+                        const data = await response.json();
+                        if(data.status !== "success") {
+                        const error = (data && data.message) || response.status;
+                        return Promise.reject(error);
+                        }
+                        console.log(data);
+                        let signature = data.data.signature;
+                        console.log(signature);
+                        await this.$store.dispatch('fetchUserSignature', signature);
+                    }).catch(error => {
+                    alert(error);
+                    })
+                }
+                }).catch(error => {
+                alert(error);
+            })
         }
     },
     async beforeMount() {
         await this.fetchSidebarStats();
         this.fetchMailBoxes();
+        this.fetchAliases();
+        this.fetchUserSignature();
+        // this.fetchContacts();
         document.title = "Helpwise (" + this.mailbox.stats.mine + ")";
     },
     async beforeCreate() {

@@ -10,13 +10,14 @@
       class="mail-group-body bd-y"
       style="overflow-y: auto; overflow-x: hidden; background-color: white"
     >
-      <div v-if="mails.length !== 0" id="threads-list">
+      <div v-if="perPageMails.length !== 0" id="threads-list">
         <div v-for="mail in perPageMails" :key="mail.id" @click="clickThread(mail.id, mail.isStarred==true)">
-          <mail-group-single-mail :id="'thread-'+mail.id" :class="{'active': activeId === mail.id}" :mail="mail"></mail-group-single-mail>
+          <mail-group-single-mail :id="'thread-'+mail.id" :class="{'active': activeId === mail.id}" :compact="isCompact" :mail="mail"></mail-group-single-mail>
           </div>
       </div>
+      <div v-if="isThreadRefresh" id="view-all-threads" class="d-flex justify-content-center align-items-center"><button @click.stop.prevent="fetchThreads" class="btn btn-link">View All Conversations</button></div>
       <div
-        v-if="mails.length == 0"
+        v-if="perPageMails.length == 0"
         class="flex-row justify-content-center w-100"
         id="no-mails-container"
         style="position: absolute; top: 30%"
@@ -113,6 +114,7 @@ export default {
       mails: [],
       perPageMails: [],
       currPage: 1,
+      isThreadRefresh: false,
       isnextPage: false,
       noOfPages: 1,
       startThread: 1,
@@ -206,9 +208,14 @@ export default {
         }
       }),
       bus.$on('broad', () => {
-          this.isCompact = false,
-          this.activeId = '',
-          router.push({ name: 'page', params: {pageNo: this.currPage, type: this.route, mailboxId: this.$store.state.inboxData.id}});
+          this.isCompact = false;
+          this.activeId = '';
+          if(this.isThreadRefresh) {
+            router.push({ name: 'type', params: {type: this.route, mailboxId: this.$store.state.inboxData.id}});
+            this.isThreadRefresh = false;
+          } else {
+            router.push({ name: 'page', params: {pageNo: this.currPage, type: this.route, mailboxId: this.$store.state.inboxData.id}});
+          }
       });
       bus.$on('prevPage', () => {
           this.prevPage();
@@ -1007,13 +1014,19 @@ export default {
   },
   methods: {
     async clickThread(id, isstarred) {
-      bus.$emit('changeRead', id, 1);
+      if(this.isThreadRefresh == false) {
+        bus.$emit('changeRead', id, 1);
+      }
       this.activeId = id;
       this.isCompact = true;
       let data = null;
       bus.$emit('compact', data);
       data = await this.fetchThread(id, isstarred);
       console.log(data);
+      if(this.isThreadRefresh) {
+        this.perPageMails.push(data.data);
+      }
+      console.log(this.perPageMails);
       bus.$emit('compact', data);
     },
     async fetchThreads() {
@@ -1211,8 +1224,22 @@ export default {
       return data;
     }
   },
-  mounted() {
-    this.fetchThreads();
+  async mounted() {
+    console.log(1);
+    if(this.$route.params.pageNo !== undefined) {
+      console.log(2);
+      this.currPage = this.$route.params.pageNo;
+      await this.fetchThreads();
+    } else {
+      if(this.$route.params.threadId !== undefined) {
+        this.isThreadRefresh = true;
+        // var objIndex = this.perPageMails.findIndex((obj => obj.id == this.$route.params.pageNo.threadId));
+        this.clickThread(this.$route.params.threadId);
+        console.log(3);
+      } else {
+        this.currPage = 1;
+      }
+    }
   },
   beforeMount() {
     if(this.$route.params.type == 'assigned') {
@@ -1247,7 +1274,7 @@ export default {
     if(this.$route.params.pageNo !== undefined) {
       this.currPage = this.$route.params.pageNo;
     } else {
-      this.currPage = 1;
+        this.currPage = 1;
     }
   }
 };

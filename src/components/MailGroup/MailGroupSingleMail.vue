@@ -1,26 +1,37 @@
 <template>
-  <div class="w-100 row media m-0 hw-thread media-body" :class="[this.mail.isRead ? 'read' : 'unread']">
+  <div
+    class="w-100 row media m-0 hw-thread media-body"
+    :class="[this.mail.isRead ? 'read' : 'unread']"
+    style="border-bottom: 1px solid #e5e9f2"
+  >
     <div class="realtimeMarker"></div>
-    <div class="hw_broadThread w-100">
+    <div class="hw_broadThread w-100" :style="{display: !isCompact && block}">
       <div class="row align-items-center w-100" style="padding-left: 20px">
         <div
           class="col-3 d-flex justify-content-between align-items-center pl-0"
         >
           <div class="d-flex align-items-center">
-            <div @click.stop class="custom-control hw_thread-selector custom-checkbox">
+            <div
+              @click.stop
+              class="custom-control hw_thread-selector custom-checkbox"
+            >
               <input
                 type="checkbox"
                 v-model="checkAll"
                 @click="checkBox"
                 class="custom-control-input"
-                :id="'thread-' + mail.id +'-selector'"
+                :id="'thread-' + mail.id + '-selector'"
               />
               <label
                 class="custom-control-label"
-                :for="'thread-' + mail.id +'-selector'"
+                :for="'thread-' + mail.id + '-selector'"
               ></label>
             </div>
-            <div @click.stop="changeStarred(mail.id)" class="hw_starThread px-1 mr-1" :style="{color: this.mail.isStarred ? '#f4b400' : '#8392a5'}">
+            <div
+              @click.stop="changeStarred(mail.id)"
+              class="hw_starThread px-1 mr-1"
+              :style="{ color: this.mail.isStarred ? '#f4b400' : '#8392a5' }"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
@@ -109,7 +120,7 @@
                 class="tx-14 hw-thread-subject mr-2"
                 :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
               >
-                {{ mail.email.subject }}
+                {{ mail.email.subject ? mail.email.subject : "(no subject)" }}
               </span>
               <span
                 v-if="mail.snippetType == 'note'"
@@ -127,16 +138,37 @@
           <div class="row">
             <div class="col-6 user-avatar">
               <div
-               v-if="mail.assignedTo !== null"
+                v-if="mail.assignedTo !== null"
                 class="avatar avatar-xs mr-1"
                 data-toggle="tooltip"
                 :title="mail.assignedTo.firstname"
                 v-html="mail.assignedTo.avatarTag"
               ></div>
             </div>
-            <div v-if="this.$route.params.type == 'sent' || mail.seenAt" class="col-6">
-              <div data-toggle="tooltip" :title="'Seen '+seenAt" style="color:#8392a5">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye mr-2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <div
+              v-if="this.$route.params.type == 'sent' || mail.seenAt"
+              class="col-6"
+            >
+              <div
+                data-toggle="tooltip"
+                :title="'Seen ' + seenAt"
+                style="color: #8392a5"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="feather feather-eye mr-2"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
               </div>
             </div>
           </div>
@@ -155,7 +187,16 @@
               align-items-center
             "
           >
-            <span v-if="this.$route.params.type !== 'sent' && this.$route.params.type !== 'closed' && this.$route.params.type !== 'spam' && this.$route.params.type !== 'trash'" class="read-unread-thread pl-1 pr-1 pt-1" @click.stop="changeRead(mail.id)">
+            <span
+              v-if="
+                this.$route.params.type !== 'sent' &&
+                this.$route.params.type !== 'closed' &&
+                this.$route.params.type !== 'spam' &&
+                this.$route.params.type !== 'trash'
+              "
+              class="read-unread-thread pl-1 pr-1 pt-1"
+              @click.stop="changeRead(mail.id)"
+            >
               <i
                 v-if="!this.mail.isRead"
                 class="far fa-envelope-open"
@@ -172,7 +213,14 @@
                 title="Unread"
                 style="font-size: 16px"
               ></i> </span
-            ><span v-if="this.$route.params.type !== 'closed' && this.$route.params.type !== 'trash'" class="archive-thread pr-1 pl-1" @click.stop="closeThread(mail.id)">
+            ><span
+              v-if="
+                this.$route.params.type !== 'closed' &&
+                this.$route.params.type !== 'trash'
+              "
+              class="archive-thread pr-1 pl-1"
+              @click.stop="closeThread(mail.id)"
+            >
               <svg
                 data-toggle="tooltip"
                 data-placement="top"
@@ -189,9 +237,10 @@
                 class="feather feather-check"
               >
                 <polyline points="20 6 9 17 4 12"></polyline>
-              </svg> </span
-            >
-            <span @click.stop="showSnooze"
+              </svg>
+            </span>
+            <span
+              @click.stop="showSnooze"
               class="snooze-thread pr-1 pl-1 dropright"
               :class="show && 'show'"
               data-toggle="tooltip"
@@ -200,7 +249,7 @@
               data-original-title="Snooze"
             >
               <svg
-                :id="'snooze-icon-'+mail.id"
+                :id="'snooze-icon-' + mail.id"
                 type="button"
                 class="dropdown-toggle"
                 data-toggle="dropdown"
@@ -221,9 +270,12 @@
               </svg>
               <div
                 class="dropdown-menu snooze-options"
-                 :style="{ display: show ? 'block' : 'none', transform: show && 'translate3d(-217px, 31px, 0px)' }"
-                :aria-labelledby="'snooze-icon-'+mail.id"
-                :id="'append-snooze-'+mail.id"
+                :style="{
+                  display: show ? 'block' : 'none',
+                  transform: show && 'translate3d(-217px, 31px, 0px)',
+                }"
+                :aria-labelledby="'snooze-icon-' + mail.id"
+                :id="'append-snooze-' + mail.id"
                 style="
                   position: absolute;
                   transform: translate3d(111px, 0px, 0px);
@@ -231,7 +283,7 @@
                   left: 0px;
                   will-change: transform;
                   z-index: 9999;
-                  display: block
+                  display: block;
                 "
               >
                 <button
@@ -259,7 +311,10 @@
                     @click.stop="snoozeThread('tommorrow', mail.id)"
                   >
                     <span>Tomorrow</span>
-                    <span class="snooze-tomorrow">{{ new Date() | moment("add", "1 day", "ddd") }} 9 am</span>
+                    <span class="snooze-tomorrow"
+                      >{{ new Date() | moment("add", "1 day", "ddd") }} 9
+                      am</span
+                    >
                   </div>
                 </button>
                 <button
@@ -311,9 +366,9 @@
                 </button>
 
                 <div
-                v-b-modal="'snooze-thread-modal' + mail.id"
+                  v-b-modal="'snooze-thread-modal' + mail.id"
                   class="dropdown-item snooze-drop-down show-snooze-modal"
-                  :id="'snooze-modal-thread-'+mail.id"
+                  :id="'snooze-modal-thread-' + mail.id"
                 >
                   <span>Pick date &amp; time</span>
                 </div>
@@ -325,45 +380,110 @@
                   hide-footer="true"
                 >
                   <div class="modal-body">
-                          <div class="d-flex align-items-center justify-content-center">
-                            <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="30" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
-                          </div>
-                          <div class="d-flex align-items-center justify-content-center" style="margin-top:10px;">
-                              <button type="button" @click.stop.prevent="snoozeThread('newDate', mail.id)" class="btn btn-xs btn-primary bulk-select-snooze-btn" :disabled="datetime == '' && true">Snooze</button>
-                          </div>
-                        </div>
+                    <div
+                      class="d-flex align-items-center justify-content-center"
+                    >
+                      <date-picker
+                        :open.sync="newDateOpen"
+                        @change="handleChange"
+                        type="datetime"
+                        v-model="datetime"
+                        value-type="timestamp"
+                        :minute-step="30"
+                        :showSecond="false"
+                        :default-value="
+                          new Date().setHours(
+                            new Date().getHours() + 1,
+                            0,
+                            0,
+                            0
+                          )
+                        "
+                        :disabled-date="notBeforeToday"
+                        :disabled-time="notBeforeNow"
+                        placeholder="Select Date & Time"
+                        :clearable="false"
+                      ></date-picker>
+                    </div>
+                    <div
+                      class="d-flex align-items-center justify-content-center"
+                      style="margin-top: 10px"
+                    >
+                      <button
+                        type="button"
+                        @click.stop.prevent="snoozeThread('newDate', mail.id)"
+                        class="btn btn-xs btn-primary bulk-select-snooze-btn"
+                        :disabled="datetime == '' && true"
+                      >
+                        Snooze
+                      </button>
+                    </div>
+                  </div>
                 </b-modal>
               </div>
             </span>
-            <span v-if="this.$route.params.type == 'closed' || this.$route.params.type == 'spam' || this.$route.params.type == 'trash'" class="restore-thread pr-1 pl-1" @click.stop="restoreThread(mail.id)">
-              <svg data-toggle="tooltip" data-placement="top" title="Move To Inbox" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-original-title="Move to Inbox">
-              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
-              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z">
-              </path></svg>
+            <span
+              v-if="
+                this.$route.params.type == 'closed' ||
+                this.$route.params.type == 'spam' ||
+                this.$route.params.type == 'trash'
+              "
+              class="restore-thread pr-1 pl-1"
+              @click.stop="restoreThread(mail.id)"
+            >
+              <svg
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Move To Inbox"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                data-original-title="Move to Inbox"
+              >
+                <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                <path
+                  d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+                ></path>
+              </svg>
             </span>
           </span>
         </div>
       </div>
-      <div class="row" style="padding-left: 20px">
-        <div class="offset-lg-3 col-7 thread-attachments-list"></div>
+      <div class="row" style="padding-left: 20px" v-if="mail.email.attachments.length > 0">
+        <div class="offset-lg-3 col-7 thread-attachments-list">
+          <a v-for="file in mail.email.attachments" :key="file.id"
+            target="_blank"
+            :href='"https://app.helpwise.io/attachments/" + file.id'
+            class="hw-thread-attachment ml-1 mr-1"
+            onclick="event.stopPropagation()"
+            ><div class="d-flex w-100 justify-content-start align-items-center">
+              <span v-html="getFileIcon(file.extension, file.filesize)"></span>
+              <div class="mg-l-10 text-truncate" style="width: 90%">
+                {{file.filename}}
+              </div>
+            </div></a
+          >
+        </div>
       </div>
     </div>
-    <div class="hw_compactThread w-100" style="color: #001737;">
+    <div class="hw_compactThread w-100" style="color: #001737">
       <div class="hw-tags-list mr-2">
         <span
-                v-for="tag in mail.tags"
-                :key="tag.id"
-                style="
-                  color: white;
-                  margin-left: 0.125rem;
-                  margin-right: 0.125rem;
-                "
-                :style="{ backgroundColor: tag.color }"
-                class="badge hw-tag badge-pill hw-tag-204484"
-                :data-tag_id="tag.id"
-                data-mailbox_id="204420"
-                >{{ tag.name }}</span
-              >
+          v-for="tag in mail.tags"
+          :key="tag.id"
+          style="color: white; margin-left: 0.125rem; margin-right: 0.125rem"
+          :style="{ backgroundColor: tag.color }"
+          class="badge hw-tag badge-pill hw-tag-204484"
+          :data-tag_id="tag.id"
+          data-mailbox_id="204420"
+          >{{ tag.name }}</span
+        >
       </div>
       <div
         class="d-flex align-items-center justify-content-between mg-b-2 w-100"
@@ -417,9 +537,11 @@
             </div>
           </div></span
         >
-        <span class="tx-11 thread-date" :style="{ fontWeight: this.mail.isRead ? '' : '600' }">{{
-          mail.email.humanFriendlyDate
-        }}</span>
+        <span
+          class="tx-11 thread-date"
+          :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+          >{{ mail.email.humanFriendlyDate }}</span
+        >
       </div>
       <div
         class="tx-13 hw-thread-subject"
@@ -460,13 +582,14 @@
 
 <script>
 import { bus } from "../../main";
-import DatePicker from 'vue2-datepicker';
-import 'vue2-datepicker/index.css';
+import DatePicker from "vue2-datepicker";
+import "vue2-datepicker/index.css";
 export default {
   name: "MailGroupSingleMail",
-  components: {DatePicker},
+  components: { DatePicker },
   props: {
     mail: Object,
+    isCompact: Boolean
   },
   data() {
     return {
@@ -475,17 +598,17 @@ export default {
       // isStarred: this.mail.isStarred,
       show: false,
       datetime: "",
-      newDateOpen: false
+      newDateOpen: false,
     };
   },
   created() {
     bus.$on("check", (id, check) => {
-      if(check == true && (id == 1 || id == this.mail.id)) {
+      if (check == true && (id == 1 || id == this.mail.id)) {
         // console.log(data);
         this.checkAll = true;
-      } else if(check == false && (id == 1 || id == this.mail.id)) {
+      } else if (check == false && (id == 1 || id == this.mail.id)) {
         // console.log(data);
-        this.checkAll = false
+        this.checkAll = false;
       }
     });
     // bus.$on("changeStarred", (id) => {
@@ -536,19 +659,28 @@ export default {
     seenAt() {
       console.log(this.mail.seenAt);
       return moment(this.mail.seenAt).fromNow();
-    }
+    },
   },
   methods: {
+    getFileIcon(extension, size) {
+        let iconStyle = '';
+        if (size) {
+            iconStyle = `style="height:${size}px;width:${size}px;"`;
+        }
+
+        let ext = extension.toString().toLowerCase();
+        return `<span ${iconStyle} class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
+    },
     checkBox() {
       this.checkAll = !this.checkAll;
-      if(this.checkAll == true) {
-        bus.$emit('check', this.mail.id, true);
+      if (this.checkAll == true) {
+        bus.$emit("check", this.mail.id, true);
       } else {
-        bus.$emit('check', this.mail.id, false);
+        bus.$emit("check", this.mail.id, false);
       }
     },
     handleChange(value, type) {
-      if (type === 'minute') {
+      if (type === "minute") {
         this.newDateOpen = false;
       }
     },
@@ -556,7 +688,9 @@ export default {
       return date < new Date(new Date().setHours(0, 0, 0, 0));
     },
     notBeforeNow(date) {
-      return date < new Date(new Date().setHours(new Date().getHours() + 1, 0, 0, 0));
+      return (
+        date < new Date(new Date().setHours(new Date().getHours() + 1, 0, 0, 0))
+      );
     },
     showSnooze() {
       this.show = !this.show;
@@ -604,12 +738,12 @@ export default {
       bus.$emit("changeStarred", id);
     },
     closeThread(id) {
-      bus.$emit('closeThread', id);
+      bus.$emit("closeThread", id);
     },
     restoreThread(id) {
-      bus.$emit('restoreThreads', id);
-    }
-  }
+      bus.$emit("restoreThreads", id);
+    },
+  },
 };
 </script>
 

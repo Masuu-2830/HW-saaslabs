@@ -26,7 +26,7 @@
     >
       <span class="sr-only">Loading...</span>
     </div>
-    <mail-content-reply></mail-content-reply>
+    <mail-content-reply :thread="thread"></mail-content-reply>
   </div>
 </template>
 

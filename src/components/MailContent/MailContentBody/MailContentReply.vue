@@ -79,7 +79,12 @@
                   >
                     <span class="hw-addr-label">From:&nbsp;</span>
                     <div class="email-from-container">
-                      <select
+                      <b-form-select v-model="fromSelected" class="mb-3">
+                        <!-- <b-form-select-option value="vibhor@saaslabs.co">Masood &lt;vibhor@saaslabs.co&gt;</b-form-select-option>
+                        <b-form-select-option value="vibhor@helpwise.io">Vibhor Agrawal &lt;vibhor@helpwise.io&gt;</b-form-select-option> -->
+                        <b-form-select-option v-for="fromOption in fromOptions" :key="fromOption.id" :value="fromOption">{{fromOption.name}} &lt;{{fromOption.email}}&gt;</b-form-select-option>
+                      </b-form-select>
+                      <!-- <select
                         class="email-from select2-hidden-accessible"
                         data-select2-id="89"
                         tabindex="-1"
@@ -137,7 +142,8 @@
                     </div>
                     <span class="reply-email-from" style="display: none"
                       >vibhor@saaslabs.co</span
-                    >
+                    > -->
+                  </div>
                   </div>
                   <div
                     class="
@@ -151,7 +157,7 @@
                   >
                     <span class="hw-addr-label">To&nbsp;</span>
                     <div class="reply-email-to w-100">
-                      <div class="bootstrap-tagsinput">
+                      <!-- <div class="bootstrap-tagsinput">
                         <span
                           class="
                             tag
@@ -231,7 +237,27 @@
                               class="tt-dataset tt-dataset-contacts"
                             ></div></div
                         ></span>
-                      </div>
+                      </div> -->
+                      <vue-tags-input
+                        v-model="tagTo"
+                        :tags="tagsTo"
+                        :autocomplete-items="autocompleteItemsTo"
+                        :add-only-from-autocomplete="false"
+                        :validation="validation"
+                        :is-draggable="true"
+                        @tag-order-changed="newTags => tagsTo = newTags"
+                        @tags-changed="updateTo"
+                        placeholder=""
+                      >
+                        <div
+                          slot="autocomplete-item"
+                          slot-scope="props"
+                          class="my-item"
+                          @click="props.performAdd(props.item)"
+                        >
+                          <div v-html="props.item.icon"></div>
+                        </div>
+                      </vue-tags-input>
                       <input
                         type="text"
                         class="form-control"
@@ -240,10 +266,11 @@
                     </div>
                   </div>
                   <div
+                    v-if="isCC"
                     class="
                       mg-b-0
                       tx-13 tx-color-03
-                      d-none
+                      
                       flex-row
                       justify-content-start
                       align-items-center
@@ -251,7 +278,7 @@
                   >
                     <span class="hw-addr-label">Cc&nbsp;</span>
                     <div class="reply-email-cc w-100">
-                      <div class="bootstrap-tagsinput">
+                      <!-- <div class="bootstrap-tagsinput">
                         <span
                           class="twitter-typeahead"
                           style="position: relative; display: inline-block"
@@ -316,7 +343,28 @@
                               class="tt-dataset tt-dataset-contacts"
                             ></div></div
                         ></span>
-                      </div>
+                      </div> -->
+                      <vue-tags-input
+                        v-model="tagCC"
+                        :tags="tagsCC"
+                        :autocomplete-items="autocompleteItemsCC"
+                        :add-only-from-autocomplete="false"
+                        :validation="validation"
+                        :is-draggable="true"
+                        @tag-order-changed="newTags => tagsCC = newTags"
+                        @tags-changed="updateCC"
+                        placeholder=""
+                        style="z-index: 0"
+                      >
+                        <div
+                          slot="autocomplete-item"
+                          slot-scope="props"
+                          class="my-item"
+                          @click="props.performAdd(props.item)"
+                        >
+                          <div v-html="props.item.icon"></div>
+                        </div>
+                      </vue-tags-input>
                       <input
                         type="text"
                         class="form-control"
@@ -325,10 +373,11 @@
                     </div>
                   </div>
                   <div
+                    v-if="isBCC"
                     class="
                       mg-b-0
                       tx-13 tx-color-03
-                      d-none
+                      
                       flex-row
                       justify-content-start
                       align-items-center
@@ -336,7 +385,7 @@
                   >
                     <span class="hw-addr-label">Bcc&nbsp;</span>
                     <div class="reply-email-bcc w-100">
-                      <div class="bootstrap-tagsinput">
+                      <!-- <div class="bootstrap-tagsinput">
                         <span
                           class="twitter-typeahead"
                           style="position: relative; display: inline-block"
@@ -401,7 +450,28 @@
                               class="tt-dataset tt-dataset-contacts"
                             ></div></div
                         ></span>
-                      </div>
+                      </div> -->
+                      <vue-tags-input
+                        v-model="tagBCC"
+                        :tags="tagsBCC"
+                        :autocomplete-items="autocompleteItemsBCC"
+                        :add-only-from-autocomplete="false"
+                        :validation="validation"
+                        :is-draggable="true"
+                        @tag-order-changed="newTags => tagsBCC = newTags"
+                        @tags-changed="updateBCC"
+                        placeholder=""
+                        style="z-index: 0"
+                      >
+                        <div
+                          slot="autocomplete-item"
+                          slot-scope="props"
+                          class="my-item"
+                          @click="props.performAdd(props.item)"
+                        >
+                          <div v-html="props.item.icon"></div>
+                        </div>
+                      </vue-tags-input>
                       <input
                         type="text"
                         class="form-control"
@@ -423,6 +493,7 @@
                     <span class="tx-color-01 flex-grow-1"
                       ><input
                         type="text"
+                         @blur="saveDraft" v-model="subject"
                         class="form-control-plaintext reply-email-subject p-0"
                         value=""
                         style="outline: none"
@@ -437,10 +508,10 @@
                 class="d-flex justify-content-start align-items-start p-2"
                 style="padding-right: 0rem !important"
               >
-                <button tabindex="-1" class="btn btn-link p-1 reply-show-cc">
+                <button tabindex="-1" v-if="!isCC" @click.stop.prevent="showCC" class="btn btn-link p-1 reply-show-cc">
                   Cc
                 </button>
-                <button tabindex="-1" class="btn btn-link p-1 reply-show-bcc">
+                <button tabindex="-1" v-if="!isBCC" @click.stop.prevent="showBCC" class="btn btn-link p-1 reply-show-bcc">
                   Bcc
                 </button>
                 <button
@@ -470,9 +541,9 @@
                 </button>
               </div>
             </div>
-            <hr style="margin-top: 15px" />
+            <hr />
             <div class="reply-editor-wrapper">
-              <div
+              <!-- <div
                 class="mg-t-15 reply-email-editor fr-box fr-basic fr-bottom"
                 role="application"
                 style="z-index: 1000"
@@ -4945,7 +5016,12 @@
                     </button>
                   </div>
                 </div>
-              </div>
+              </div> -->
+              <form class="form">
+                  <froala :tag="'textarea'" :config="config" v-model="mail_body" name="mail_body"></froala>
+                  <button @click.stop.prevent="sendMail" class="btnn btn btn-sm btn-primary fr-bt" type="submit">Send</button>
+                  <!-- <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:30px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="reply-push-btn">Send</button> -->
+              </form>
             </div>
             <input
               type="file"
@@ -4965,14 +5041,14 @@
             ></div>
           </div>
           <div class="reply-attachment-list"></div>
-          <div class="replyPoppedOutWrapper tx-12">
+          <!-- <div class="replyPoppedOutWrapper tx-12">
             You're editing this draft somewhere else.
             <br />
             Open
             <span
               ><button class="px-0 btn-link btn popinReply">here</button></span
             >
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -4980,22 +5056,368 @@
 
 <script>
 import { bus } from "../../../main";
+import FroalaEditor from 'froala-editor';
+import VueTagsInput from '@vojtechlanka/vue-tags-input';
+import axios from 'axios';
+import _ from 'underscore'
 export default {
     name: 'MailContentReply',
+    components: {VueTagsInput, FroalaEditor},
     data() {
+        const self = this;
         return {
             display: 'none',
+            fromOptions: [
+              {id: 1, name: "Masood", email: "vibhor@saaslabs.co"},
+              {id: 2, name: "Vibhor Agrawal", email: "vibhor@helpwise.io"}
+            ],
+            fromSelected: {id: 1, name: "Masood", email: "vibhor@saaslabs.co"},
+            tagTo: '',
+            tagsTo: [],
+            autocompleteItemsTo: [],
+            tagCC: '',
+            tagsCC: [],
+            autocompleteItemsCC: [],
+            tagBCC: '',
+            tagsBCC: [],
+            autocompleteItemsBCC: [],
+            validation: [{
+              classes: 'invalid-email',
+              rule: tag => this.check(tag) 
+            }],
+            debounce: null,
+            message: "New Message",
+            subject: "",
+            mail_body: "",
+            noTo: false,
+            toNotValid: false,
+            ccNotValid: false,
+            bccNotValid: false,
+            isCC: false,
+            isBCC: false,
+            draftID: null,
+            threadID: null,
+            editorInstance: null,
+            config: {
+              events: {
+                initialized: async function() {
+                  var editor = this;
+                  self.editorInstance = this;
+                  console.log('initialized');
+                },
+              },
+              enter: FroalaEditor.ENTER_DIV,
+              placeholderText: "Type something",
+              charCounterCount: false,
+              toolbarBottom: true,
+              height: '320px',
+              toolbarButtons: [['bold', 'italic', 'underline', 'strikeThrough', 'insertHR'], ['undo', 'redo', 'selectAll']],
+            },
         };
     },
+    props: {
+      thread: Object
+    },
+    watch: {
+        'tagTo': 'initItemsTo',
+        'tagCC': 'initItemsCC',
+        'tagBCC': 'initItemsBCC',
+        'tagsTo': 'saveDraft',
+        'tagsCC': 'saveDraft',
+        'tagsBCC': 'saveDraft',
+        'fromSelected': 'saveDraft',
+        mail_body: function () {
+          var self = this;
+          clearTimeout(this.myGreeting);
+          this.myGreeting = setTimeout(this.saveDraft, 2000); 
+        },
+    },
     created() {
-        bus.$on('replyy', () => {
+        bus.$on('replyy', (data) => {
             this.display = 'block';
         });
     },
     methods: {
         cancelReply() {
             this.display = 'none';
+            this.isCC = false;
+            this.isBCC = false;
+            this.tagTo = '';
+            this.tagCC = '';
+            this.tagBCC = '';
+            this.tagsTo = [];
+            this.tagsCC = [];
+            this.tagsBCC = [];
+            this.autocompleteItemsTo = [];
+            this.autocompleteItemsCC = [];
+            this.autocompleteItemsBCC = [];
+            this.toNotValid = false;
+            this.ccNotValid = false;
+            this.bccNotValid = false;
+            this.subject = "";
+            this.threadID = null;
+            this.draftID = null;
+            this.message = "New Message";
+            this.mail_body = "";
+            this.fromSelected = {id: 1, name: "Masood", email: "vibhor@saaslabs.co"};
         },
+        myGreeting() {
+          setTimeout(this.saveDraft, this.doneTypingInterval);
+        },
+        createBody(prop) {
+          let from = {};
+          from[this.fromSelected.email] = this.fromSelected.name;
+          let to = {};
+          let bcc = {};
+          let cc = {};
+          let files = [];
+          for(let i = 0; i < this.tagsTo.length; i++) {
+            if(this.tagsTo[i].name == undefined) {
+              to[this.tagsTo[i].email] = this.tagsTo[i].email;
+            } else {
+              to[this.tagsTo[i].email] = this.tagsTo[i].name;
+            }
+          }
+          for(let i = 0; i < this.tagsBCC.length; i++) {
+            if(this.tagsBCC[i].name == undefined) {
+              bcc[this.tagsBCC[i].email] = this.tagsBCC[i].email;
+            } else {
+              bcc[this.tagsBCC[i].email] = this.tagsBCC[i].name;
+            }
+          }
+          for(let i = 0; i < this.tagsCC.length; i++) {
+            if(this.tagsCC[i].name == undefined) {
+              cc[this.tagsCC[i].email] = this.tagsCC[i].email;
+            } else {
+              cc[this.tagsCC[i].email] = this.tagsCC[i].name;
+            }
+          }
+          let html = this.mail_body;
+          var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g"); //匹配html标签的正则表达式，"g"是搜索匹配多个符合的内容
+          html = html.replace(re1, ""); //执行替换成空字符
+          let body;
+          if(this.threadID == null) {
+            body = {
+              mailboxID: this.$route.params.mailboxId, 
+              bcc, 
+              cc, 
+              files, 
+              from, 
+              subject: this.subject, 
+              to,
+            }
+          } else {
+            body = {
+              mailboxID: this.$route.params.mailboxId, 
+              bcc, 
+              cc, 
+              files, 
+              from, 
+              subject: this.subject, 
+              to,
+              threadID: this.threadID,
+              draftID: this.draftID
+            }
+          }
+          let text = html.replace(/(<([^>]+)>)/gi, "");
+          console.log(text);
+          html && (body.html = `<div class=\"hwEmailWrapper\" style=\"font-family:sans-serif;font-size:0.875rem;color:#001737\">${html}</div>`);
+          text && (body.text = text);
+          if(prop == "send") {
+            body.archive = false;
+          }
+          const requestOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+            credentials: 'include'
+          };
+          console.log(requestOptions.body);
+          return requestOptions;
+        },
+        saveDraft() {
+          
+          if(this.tagsTo.length > 0 || this.tagsCC.length > 0 || this.tagsBCC.length > 0 || this.subject || this.mail_body) {
+            this.message = "Saving Draft"
+            let requestOptions = this.createBody("draft");
+            fetch(this.$apiBaseURL + "saveDraft.php", requestOptions)
+          .then(async response => { 
+              const data = await response.json();
+              if(data.status !== "success") {
+                const error = (data && data.message) || response.status;
+                return Promise.reject(error);
+              }
+              this.draftID = data.data.draftID;
+              this.threadID = data.data.threadID;
+              if(this.subject !== "") {
+                this.message = this.subject;
+              } else {
+                this.message = "Draft Saved";
+              }
+            }).catch(error => {
+            alert(error);
+          })
+          }
+          
+        },
+        showCC() {
+          this.isCC = true
+        },
+        showBCC() {
+          this.isBCC = true
+        },
+        check(tag) {
+          console.log(tag);
+          if(tag.email == undefined) {
+            return !(/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/).test(tag.text);
+          } else {
+            return !(/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/).test(tag.email);
+          }
+        },
+        updateTo(newTags) {
+          console.log(newTags);
+          this.autocompleteItemsTo = [];
+          for(let i = 0; i < newTags.length; i++) {
+            if(newTags[i].email == undefined) {
+              newTags[i].email = newTags[i].text;
+            }
+          }
+          this.tagsTo = newTags;
+          this.noTo = false;
+          this.toNotValid = false;
+          console.log(this.tagsTo);
+        },
+        updateCC(newTags) {
+          this.autocompleteItemsCC = [];
+          for(let i = 0; i < newTags.length; i++) {
+            if(newTags[i].email == undefined) {
+              newTags[i].email = newTags[i].text;
+            }
+          }
+          this.tagsCC = newTags;
+          this.ccNotValid = false;
+          console.log(this.tagsCC);
+        },
+        updateBCC(newTags) {
+          this.autocompleteItemsBCC = [];
+          for(let i = 0; i < newTags.length; i++) {
+            if(newTags[i].email == undefined) {
+              newTags[i].email = newTags[i].text;
+            }
+          }
+          this.tagsBCC = newTags;
+          this.bccNotValid = false;
+          console.log(this.tagsBCC);
+        },
+        initItemsTo() {
+          if (this.tagTo.length < 2) return;
+          const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagTo}`;
+          console.log("starting");
+          clearTimeout(this.debounce);
+          this.debounce = setTimeout(() => {
+            axios.get(url, {withCredentials: true}).then(response => {
+              console.log(response.data.data.contacts);
+              this.autocompleteItemsTo = response.data.data.contacts.map(a => {
+                let icon = `<div class="d-flex align-items-center justify-content-start">
+                            <div class="avatar avatar-xs">
+                                ${a.avatarTag}
+                            </div>
+                            <div class="ml-2">
+                                <div style="font-weight:500">${a.name}</div>
+                                <div>${a.email}</div>
+                            </div>
+                        </div>`
+                return { text: a.name + " (" + a.email + ")", id: a.id, email: a.email, name: a.name !== "" ? a.name : a.email, icon: icon };
+              });
+            }).catch(() => console.warn('Oh. Something went wrong'));
+          }, 600);
+        },
+        initItemsCC() {
+          if (this.tagCC.length < 2) return;
+          const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagCC}`;
+          console.log("starting");
+          clearTimeout(this.debounce);
+          this.debounce = setTimeout(() => {
+            axios.get(url, {withCredentials: true}).then(response => {
+              console.log(response.data.data.contacts);
+              this.autocompleteItemsCC = response.data.data.contacts.map(a => {
+                let icon = `<div class="d-flex align-items-center justify-content-start">
+                            <div class="avatar avatar-xs">
+                                ${a.avatarTag}
+                            </div>
+                            <div class="ml-2">
+                                <div style="font-weight:500">${a.name}</div>
+                                <div>${a.email}</div>
+                            </div>
+                        </div>`
+                return { text: a.name + " " + a.email, id: a.id, email: a.email, name: a.name, icon: icon };
+              });
+            }).catch(() => console.warn('Oh. Something went wrong'));
+          }, 600);
+        },
+        initItemsBCC() {
+          if (this.tagBCC.length < 2) return;
+          const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagBCC}`;
+          console.log("starting");
+          clearTimeout(this.debounce);
+          this.debounce = setTimeout(() => {
+            axios.get(url, {withCredentials: true}).then(response => {
+              console.log(response.data.data.contacts);
+              this.autocompleteItemsBCC = response.data.data.contacts.map(a => {
+                let icon = `<div class="d-flex align-items-center justify-content-start">
+                            <div class="avatar avatar-xs">
+                                ${a.avatarTag}
+                            </div>
+                            <div class="ml-2">
+                                <div style="font-weight:500">${a.name}</div>
+                                <div>${a.email}</div>
+                            </div>
+                        </div>`
+                return { text: a.name + " " + a.email, id: a.id, email: a.email, name: a.name, icon: icon };
+              });
+            }).catch(() => console.warn('Oh. Something went wrong'));
+          }, 600);
+        },
+        sendMail() {
+          console.log("sendin");
+          if(this.tagsTo.length == 0) {
+            this.noTo = true;
+            return;
+          }
+          for(let i = 0; i < this.tagsTo.length; i++) {
+            if(this.tagsTo[i].tiClasses.includes("ti-invalid")) {
+              this.noTo = false;
+              this.toNotValid = true;
+              break;
+            }
+          }
+          for(let i = 0; i < this.tagsCC.length; i++) {
+            if(this.tagsCC[i].tiClasses.includes("ti-invalid")) {
+              this.ccNotValid = true;
+              break;
+            }
+          }
+          for(let i = 0; i < this.tagsBCC.length; i++) {
+            if(this.tagsBCC[i].tiClasses.includes("ti-invalid")) {
+              this.bccNotValid = true;
+              break;
+            }
+          }
+          if(this.toNotValid || this.ccNotValid || this.bccNotValid) return;
+          let requestOptions = this.createBody("send");
+          console.log(requestOptions.body);
+          fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
+          .then(async response => { 
+              const data = await response.json();
+              if(data.status !== "success") {
+                const error = (data && data.message) || response.status;
+                return Promise.reject(error);
+              }
+              this.closeCompose();
+            }).catch(error => {
+            alert(error);
+          })
+        }
     },
 }
 </script>
