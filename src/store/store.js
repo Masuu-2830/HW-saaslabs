@@ -11,7 +11,9 @@ export const store = new Vuex.Store({
         tags: [],
         teammates: [],
         views: [],
-        mailboxes: []
+        mailboxes: [],
+        userSignature: {},
+        aliases: {}
     },
     mutations: {
         setState: (state, data) => {
@@ -25,6 +27,14 @@ export const store = new Vuex.Store({
         setStateMailBoxes: (state, data) => {
             console.log(data.data)
             state.mailboxes = data.data;
+        },
+        setUserSignature: (state, data) => {
+            console.log(data)
+            state.userSignature = data;
+        },
+        setAliases: (state, data) => {
+            console.log(data)
+            state.aliases = data;
         }
     },
     actions: {
@@ -34,6 +44,14 @@ export const store = new Vuex.Store({
         },
         async fetchMailBoxes(context, data) {
             await context.commit('setStateMailBoxes', data);
+            // console.log("++2")
+        },
+        async fetchUserSignature(context, data) {
+            await context.commit('setUserSignature', data);
+            // console.log("++2")
+        },
+        async fetchAliases(context, data) {
+            await context.commit('setAliases', data);
             // console.log("++2")
         }
     }
