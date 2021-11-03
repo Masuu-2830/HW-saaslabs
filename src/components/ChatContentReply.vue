@@ -382,7 +382,7 @@
               console.log(hash);
               vueThis.attachments[hash]["progress"] = percentage;
               // $(`#progress-compose-${hash}`).css("width", `${percentage}%`);
-            }.bind(this)
+            }
           }).then((response)=>{
             //get the attachment id
             console.log(response);
