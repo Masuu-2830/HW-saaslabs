@@ -13,8 +13,12 @@
             <IntegrationSidebar
                 :sidebarData = "sidebarData"
                 :integrationName = "integrationName"
+                :integrationID = "integrationID" 
                 v-if = "sidebarOpen"
                 :datastatus= "datastatus"
+                :openCreateFormArray= "openCreateFormArray"
+                :openUpdateFormArray= "openUpdateFormArray"
+                @postData= "postData"
             />
         </div>
     </div>
@@ -30,7 +34,10 @@
                 isSidebarActive: false,
                 sidebarData: [],
                 integrationName: '',
-                datastatus: false
+                integrationID: '',
+                datastatus: false,
+                openCreateFormArray: {},
+                openUpdateFormArray: {}
             }
         },
         props: ["sidebarOpen"],
@@ -41,16 +48,22 @@
                 console.log("this sidebar",this.sidebarOpen);
                 this.$emit("openInt", integrationData.id);
                 this.integrationName = integrationData.lname;
+                this.integrationID = integrationData.id;
                 if(this.sidebarOpen == false){
-                    fetch("https://app.helpwise.io/api/integration-vue/hubspot.php?mailbox_id=" + this.$route.params.mailboxId + "&email=tushar@justcall.io&integration_name=hubspot&inbox_type=mail&integration_id=" + integrationData.id, {credentials: 'include'})
+                    fetch("https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=tushar@justcall.io&inbox_type=mail&integration_id=" + integrationData.id, {credentials: 'include'})
                     .then(async response => {
                         const integrationData = await response.json();
-                        console.log("what's this response", response);
-                        console.log("kuch integration ka data",integrationData.data);
                         let integrationData2 = integrationData.data;
                         this.sidebarData = integrationData2;
-                        console.log("bhaiya",this.sidebarData);
                         this.datastatus = true;
+                        for(const key in this.sidebarData.create){
+                            this.openCreateFormArray[key] = false;
+                        }
+                        for(const key in this.sidebarData.update){
+                            this.openUpdateFormArray[key] = false;
+                        }
+                        console.log("openCreateArray", this.openCreateFormArray);
+                        console.log("openUpdateArray", this.openUpdateFormArray);
                         // check for error response
                         if (!response.status) {
                             // get error message from body or default to response statusText
@@ -71,6 +84,36 @@
                 // let data = []; //api se ayga data
                 // isSidebarActive = isSidebarActive ? false: true;
                 // this.sidebarData = data; //api wala data
+            },
+            postData(integration_name){
+                // setTimeout(function () {
+                //     console.log("wait");
+                // }, 500);
+                    fetch("https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=tushar@justcall.io&inbox_type=mail&integration_id=" + this.integrationID, {
+                        method: 'GET', 
+                        credentials: 'include',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(async response => {
+                        const updateResponse = await response.json();
+                        console.log("updateResponse",updateResponse);
+                        this.sidebarData = [];
+                        this.sidebarData = updateResponse.data;
+                        console.log("sidebar ka data",this.sidebarData);
+                        // check for error response
+                        if (!response.status) {
+                            // get error message from body or default to response statusText
+                            const error = (updateResponse && updateResponse.message) || response.status;
+                            return Promise.reject(error);
+                        }
+                    })
+                    .catch(error => {
+                        this.errorMessage = error;
+                        console.error("There was an error!", error);
+                    });
+                
             }
         },
         created() {

@@ -24,22 +24,22 @@
                                 <div class="col-8">
                                     <p class="pd-l-13 pd-t-15">
                                         {{ sidebar.title }}
-                                        <i v-if="sidebar.update==1" class="fas fa-xs fa-pen" :class="integrationName + sidebar.class + 'edit_button'" @click="openUpdateForm(sidebar.class)"></i>
+                                        <i v-if="sidebar.update==1" class="fas fa-xs fa-pen" :class="integrationName + '_' + sidebar.class + '_edit_button'" @click="openUpdateForm(sidebar.class, sidebar.components[0], integrationName)"></i>
                                     </p>  
                                 </div>
-                                <div class="col-4 pd-t-15">
+                                <div class="col-4 pd-t-15" @click="collapseHeader('.' + sidebar.class + '_integration_collapsible')">
                                     <p class="integration_collapse_header pd-r-10 text-right">
-                                        <i class="fas fa-caret-down" style="color: silver;border-radius:5px;"></i>
+                                        <i class="fas fa-caret-up" :class="sidebar.class + '_integration_collapsible_caret'" style="color: silver;border-radius:5px;"></i>
                                     </p>
                                 </div>
                             </div>
-                            <div class="integration_collapsible collapse pd-b-1 show" style="word-wrap: break-word;line-height: 1.50;">
-                                <div class="col s12 integration_component_details" v-if="updateshowForm == true && sidebar.update==1">
+                            <div class="collapse pd-b-1 show" :class="sidebar.class + '_integration_collapsible'"  style="word-wrap: break-word;line-height: 1.50;">
+                                <div class="col s12 integration_component_details">
                                     <p v-for= "(component, index) in sidebar.components[0]"
                                         :key = "index"
                                     >
-                                        <span v-if="component.type=='text' && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="component.type=='text' && component.show == 1">
-                                        <span v-if="component.type=='text' && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="(component.type=='text' || component.type=='dropdown') && component.show == 1">
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown') && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
                                         <span v-else-if="component.type=='link' && component.show == 1">
                                             <a :href="component.value" target="_blank">{{component.label}}
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -51,8 +51,8 @@
                                         </span>
                                     </p>                  
                                 </div>
-                                <div class="col s12 integration_component_details pd-x-0" :class="'edit-'+sidebar.class+'-form'" v-else-if="updateshowForm == false && sidebar.update==1">
-                                    <form :class="'update_'+sidebar.class+'_form_field'">
+                                <div class="col s12 integration_component_details pd-x-0" :class="'edit-'+sidebar.class+'-form'" v-if="openUpdateFormArrayInternal[sidebar.class] && sidebar.update==1">
+                                    <form :class="'edit_'+sidebar.class+'_form_field'">
                                         <fieldset class="form-fieldset pd-x-10" style="border: none;">
 
                                             <div v-for = "(updateComponent, index) in sidebarData.update[sidebar.class].components"
@@ -60,8 +60,8 @@
                                                 class="form-group">
                                                 <label class="d-block">{{ updateComponent.label }}</label>
                                                 <input v-if="updateComponent.type == 'text'" type="text" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class"
-                                                :placeholder="updateComponent.placeholder">
-                                                <select v-if="updateComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_edit_' + sidebar.class + '_stage'">
+                                                :placeholder="updateComponent.placeholder" :value="formData[sidebar.class][updateComponent.label]">
+                                                <select v-if="updateComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class">
                                                     <option v-for= "(option, index) in updateComponent.dropdown"
                                                     :key= "index"
                                                     :value="option.value">{{ option.label }}
@@ -72,10 +72,10 @@
                                             
                                             <div :class="integrationName + '-edit-' + sidebar.class + '-btn-progress'" style="display: flex; justify-content: space-between;">
                                                 <button type="button"
-                                                    class="btn btn-xs btn-primary" @click="updateData(sidebar.class)">Save
+                                                    class="btn btn-xs btn-primary" @click="updateData(sidebar.class, sidebarData.update[sidebar.class].components, integrationName, integrationID)">Save
                                                 </button>
                                                 <button type="button"
-                                                    class="btn btn-xs btn-secondary" @click="openUpdateForm(sidebar.class)">Cancel
+                                                    class="btn btn-xs btn-secondary" @click="openUpdateForm(sidebar.class, [], integrationName)">Cancel
                                                 </button>
                                             </div>
                                             <div class="alert alert-danger alert-dismissible fade" role="alert" id="buttonAlert"
@@ -102,27 +102,26 @@
                                         {{ sidebar.title }}
                                     </p>
                                 </div>
-                                <div class="col-4 pd-t-15" data-toggle="collapse" aria-expanded="false" aria-controls="integration_details">
-                                    <p class="integration_collapse_header pd-r-10 text-right show">
-                                        <i class="fas fa-caret-down" style="color: silver;border-radius:5px;"></i>
+                                <div class="col-4 pd-t-15" @click="collapseHeader('.' + sidebar.class + '_integration_collapsible')">
+                                    <p class="integration_collapse_header pd-r-10 text-right">
+                                        <i class="fas fa-caret-up" :class="sidebar.class + '_integration_collapsible_caret'" style="color: silver;border-radius:5px;"></i>
                                     </p>
                                 </div>
                             </div>
-                            <div class="pd-l-0 pd-b-1 collapse show" style="word-wrap: break-word;line-height: 1.5;">
+                            <div class="pd-l-0 pd-b-1 collapse show" :class="sidebar.class + '_integration_collapsible'" style="word-wrap: break-word;line-height: 1.5;">
                                 <div class="pd-5">
 
                                     <div class="card rounded mg-b-10" v-for= "(component, index) in sidebar.components"
                                         :key= "index"
                                     >
-                                        <div class="d-flex align-items-center justify-content-between bg-gray-100"
-                                            style="padding: 15px;">
+                                        <div class="d-flex align-items-center justify-content-between bg-gray-100" style="padding: 15px;">
                                             <span style="font-size:13px;">{{ component[1].value }}</span>    
                                             <div>
-                                                <span style="cursor:pointer;" :class="integrationName + '_edit_' + sidebar.class + '_button'" class="mg-r-10" v-if="sidebar.update == 1" @click="openMultiUpdateForm(sidebar.class, component, integrationName)"><i class="fas fa-pen fa-xs"></i></span>
-                                                <span style="cursor:pointer;"><i class="fas fa-caret-down" style="color: silver;border-radius:5px;"></i></span>
+                                                <span style="cursor:pointer;" :class="integrationName + '_edit_' + sidebar.class + '_button'" class="mg-r-10" v-if="sidebar.update == 1" @click="openUpdateForm(sidebar.class, component, integrationName)"><i class="fas fa-pen fa-xs"></i></span>
+                                                <span style="cursor:pointer;" @click="collapseHeader('.' + integrationName + '_' + sidebar.class + '_' + component[0].value)"><i class="fas fa-caret-down" :class="integrationName + '_' + sidebar.class + '_' + component[0].value + '_caret'" style="color: silver;border-radius:5px;"></i></span>
                                             </div>
                                         </div>
-                                        <div class="mg-l-10 mg-r-10 collapse">
+                                        <div class="mg-l-10 mg-r-10 collapse" :class="integrationName + '_' + sidebar.class + '_' + component[0].value">
                                             <p v-for= "(com, index) in component"
                                                 :key = "index"
                                             >   
@@ -141,12 +140,12 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col s12 mg-b-10" v-if="sidebarData.create[sidebar.class] && showForm == true" style="text-align: center;">
-                                    <button type="button" :class="integrationName + '_add_' + sidebar.class + '_btn'" class="btn btn-xs btn-secondary" @click="openMultiIntegrationForm(sidebar.class)">New
+                                <div class="col s12 mg-b-10" v-if="sidebarData.create[sidebar.class]" style="text-align: center;">
+                                    <button type="button" :class="integrationName + '_add_' + sidebar.class + '_btn'" class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">New
                                         {{ capitalizeFirstLetter(sidebar.class) }}
                                     </button>
                                 </div>
-                                <div class="col s12 pd-x-0" :class="integrationName + '_create_' + sidebar.class + '_form'" v-else-if="sidebarData.create[sidebar.class] && showForm == false">
+                                <div class="col s12 pd-x-0" :class="integrationName + '_create_' + sidebar.class + '_form'" v-if="sidebarData.create[sidebar.class] && openCreateFormArrayInternal[sidebar.class]">
                                     <form :class="'create_'+sidebar.class+'_form_field'">
                                         <fieldset class="form-fieldset pd-x-10" style="border: none;">
 
@@ -156,7 +155,7 @@
                                                 <label class="d-block">{{ createComponent.label }}</label>
                                                 <input v-if="createComponent.type == 'text'" type="text" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
                                                 :placeholder="createComponent.placeholder">
-                                                <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_stage'">
+                                                <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class">
                                                     <option v-for= "(option, index) in createComponent.dropdown"
                                                     :key= "index"
                                                     :value="option.value">{{ option.label }}
@@ -167,10 +166,10 @@
                                             
                                             <div :class="integrationName + '-create-' + sidebar.class + '-btn-progress'" style="display: flex; justify-content: space-between;">
                                                 <button type="button"
-                                                    class="btn btn-xs btn-primary" @click="createData(sidebar.class)">Create {{sidebar.class}}
+                                                    class="btn btn-xs btn-primary" @click="createData(sidebar.class, sidebarData.create[sidebar.class].components, integrationName, integrationID)">Create {{sidebar.class}}
                                                 </button>
                                                 <button type="button"
-                                                    class="btn btn-xs btn-secondary" @click="openMultiIntegrationForm(sidebar.class)">Cancel
+                                                    class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">Cancel
                                                 </button>
                                             </div>
                                             <div class="alert alert-danger alert-dismissible fade" role="alert" id="buttonAlert"
@@ -183,7 +182,7 @@
                                         </fieldset>
                                     </form>
                                 </div>
-                                <div class="col s12 pd-x-0" :class="integrationName + '_edit_' + sidebar.class + '_form'" v-if="sidebarData.update[sidebar.class] && updateMultishowForm == false">
+                                <div class="col s12 pd-x-0" :class="integrationName + '_edit_' + sidebar.class + '_form'" v-if="openUpdateFormArrayInternal[sidebar.class] && sidebar.update==1">
                                     <form :class="'edit_'+sidebar.class+'_form_field'">
                                         <fieldset class="form-fieldset pd-x-10" style="border: none;">
 
@@ -192,8 +191,8 @@
                                                 class="form-group">
                                                 <label class="d-block">{{ updateComponent.label }}</label>
                                                 <input v-if="updateComponent.type == 'text'" type="text" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class"
-                                                :placeholder="updateComponent.placeholder">
-                                                <select v-if="updateComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_edit_' + sidebar.class + '_stage'">
+                                                :placeholder="updateComponent.placeholder" :value="formData[sidebar.class][updateComponent.label]">
+                                                <select v-if="updateComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class">
                                                     <option v-for= "(option, index) in updateComponent.dropdown"
                                                     :key= "index"
                                                     :value="option.value">{{ option.label }}
@@ -204,10 +203,10 @@
                                             
                                             <div :class="integrationName + '-edit-' + sidebar.class + '-btn-progress'" style="display: flex; justify-content: space-between;">
                                                 <button type="button"
-                                                    class="btn btn-xs btn-primary" @click="updateData(sidebar.class)">Save
+                                                    class="btn btn-xs btn-primary" @click="updateData(sidebar.class, sidebarData.update[sidebar.class].components, integrationName, integrationID)">Save
                                                 </button>
                                                 <button type="button"
-                                                    class="btn btn-xs btn-secondary" @click="openMultiUpdateForm(sidebar.class, [], integrationName)">Cancel
+                                                    class="btn btn-xs btn-secondary" @click="openUpdateForm(sidebar.class, [], integrationName)">Cancel
                                                 </button>
                                             </div>
                                             <div class="alert alert-danger alert-dismissible fade" role="alert" id="buttonAlert"
@@ -233,18 +232,18 @@
                                         {{ sidebar.title }}
                                     </p>  
                                 </div>
-                                <div class="col-4 pd-t-15">
+                                <div class="col-4 pd-t-15" @click="collapseHeader('.' + sidebar.class + '_integration_collapsible')">
                                     <p class="integration_collapse_header pd-r-10 text-right">
-                                        <i class="fas fa-caret-down" style="color: silver;border-radius:5px;"></i>
+                                        <i class="fas fa-caret-up" :class="sidebar.class + '_integration_collapsible_caret'" style="color: silver;border-radius:5px;"></i>
                                     </p>
                                 </div>
                             </div>
-                            <div class="integration_collapsible collapse pd-b-1 show" style="word-wrap: break-word;line-height: 1.50;">
-                                <div class="col s12 integration_component_details" :class="'no_' + sidebar.class + '_component'" v-if="showText == true">
+                            <div class="collapse pd-b-1 show" :class="sidebar.class + '_integration_collapsible'" style="word-wrap: break-word;line-height: 1.50;">
+                                <div class="col s12 integration_component_details" :class="'no_' + sidebar.class + '_component'" v-if="sidebarData.create[sidebar.class] && !openCreateFormArrayInternal[sidebar.class]">
                                     <p style="color:#4f5d6b;">{{ sidebar.text }}</p>
-                                    <p style="color:#0168fa; cursor:pointer;" @click="openSingleIntegrationForm(sidebar.class)">Create new {{ sidebar.class }}</p>
+                                    <p style="color:#0168fa; cursor:pointer;" @click="openCreateForm(sidebar.class)">Create new {{ sidebar.class }}</p>
                                 </div>
-                                <div class="col s12 integration_component_details pd-x-0" :class="'create-'+sidebar.class+'-form'" v-else>
+                                <div class="col s12 integration_component_details pd-x-0" :class="'create-'+sidebar.class+'-form'" v-if="sidebarData.create[sidebar.class] && openCreateFormArrayInternal[sidebar.class]">
                                     <form :class="'create_'+sidebar.class+'_form_field'">
                                         <fieldset class="form-fieldset pd-x-10" style="border: none;">
 
@@ -254,7 +253,7 @@
                                                 <label class="d-block">{{ createComponent.label }}</label>
                                                 <input v-if="createComponent.type == 'text'" type="text" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
                                                 :placeholder="createComponent.placeholder">
-                                                <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_stage'">
+                                                <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'+ createComponent.class">
                                                     <option v-for= "(option, index) in createComponent.dropdown"
                                                     :key= "index"
                                                     :value="option.value">{{ option.label }}
@@ -265,10 +264,10 @@
                                             
                                             <div :class="integrationName + '-create-' + sidebar.class + '-btn-progress'" style="display: flex; justify-content: space-between;">
                                                 <button type="button"
-                                                    class="btn btn-xs btn-primary" @click="createData(sidebar.class)">Create {{sidebar.class}}
+                                                    class="btn btn-xs btn-primary" @click="createData(sidebar.class, sidebarData.create[sidebar.class].components, integrationName, integrationID)">Create {{sidebar.class}}
                                                 </button>
                                                 <button type="button"
-                                                    class="btn btn-xs btn-secondary" @click="openSingleIntegrationForm(sidebar.class)">Cancel
+                                                    class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">Cancel
                                                 </button>
                                             </div>
                                             <div class="alert alert-danger alert-dismissible fade" role="alert" id="buttonAlert"
@@ -296,49 +295,158 @@
 </template>
 
 <script>
-import { component } from 'vue/types/umd';
+// import { component } from 'vue/types/umd';
 export default {
-    props: ["sidebarData", "integrationName", "datastatus"],
+    props: ["sidebarData", "integrationName", "datastatus","openCreateFormArray","openUpdateFormArray", "integrationID"],
     data(){
         return {
-            isOpen: false,
-            showText: true,
-            showForm: true,
-            updateshowForm: true,
-            updateMultishowForm: true
+           formData: {},
+           openCreateFormArrayInternal: {},
+           openUpdateFormArrayInternal: {}
         }
     },
     methods: {
-        openSingleIntegrationForm(classname){
-            console.log("classname",classname);
-            this.showText=!this.showText;
+        collapseHeader(selectorName){
+            console.log('selectorName',selectorName);
+            if($(`${selectorName}`).hasClass('show')){
+                $(`${selectorName}`).removeClass('show');
+                $(`${selectorName}_caret`).removeClass('fa-caret-up').addClass('fa-caret-down');
+            }else{
+                $(`${selectorName}`).addClass('show');
+                $(`${selectorName}_caret`).addClass('fa-caret-up').removeClass('fa-caret-down');
+            }
         },
-        openMultiIntegrationForm(classname){
-            console.log("classname",classname);
-            this.showForm=!this.showForm;
-        },
-        openUpdateForm(classname){
-            this.updateshowForm=!this.updateshowForm;
-        },
-        openMultiUpdateForm(classname, components, int_name){
-            console.log("component dhikhao", component);
+        createData(className, components, int_name, int_id){
+            console.log("components dhikhado",components);
+            let createFormData = {};
+            let flag=0;
             components.forEach(component => {
-                console.log("element dhikhana",component);
+                let identifier = component.class;
+                let identifier_value = $(`.${int_name}_create_${className}_${identifier}`).val();
+                let identifier_label = component.label;
+                if(component.required == 1 && identifier_value == ''){
+                    $(`.${int_name}_create_${className}_${identifier}`).removeClass('is-valid').addClass('is-invalid');
+                    $(`.${int_name}-create-${className}-${identifier}-error`).text(`${identifier_label} cannot be empty`);
+                    flag=1;
+                }else{
+                    $(`.${int_name}_create_${className}_${identifier}`).removeClass('is-invalid');
+                    $(`.${int_name}-create-${className}-${identifier}-error`).text('');
+                }
+                createFormData[identifier] = identifier_value;
+            });
+            if(flag == 0){
+                createFormData['integration_id'] = int_id;
+                if(this.sidebarData.fetch[0]['associated_id'] && this.sidebarData.fetch[0]['associated_id']!=''){
+                    createFormData['associated_id'] = this.sidebarData.fetch[0]['associated_id'];
+                }
+                fetch("https://app.helpwise.io/api/integration-vue/"+int_name+"/create_"+className+".php", {
+                    method: 'POST', 
+                    credentials: 'include',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(createFormData)
+                })
+                .then(async response => {
+                    const createResponse = await response.json();
+                    if (!response.status) {
+                        const error = (createResponse && createResponse.message) || response.status;
+                        return Promise.reject(error);
+                    }
+                })
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.error("There was an error!", error);
+                });
+                this.openCreateFormArrayInternal[className] = false;
+                console.log("397",this.openCreateFormArrayInternal);
+                this.$emit("postData", int_name);
+            }
+        },
+        updateData(className, components, int_name, int_id){
+            console.log("components dhikhado",components);
+            let updateFormData = {};
+            let flag=0;
+            components.forEach(component => {
+                let identifier = component.class;
+                let identifier_value = $(`.${int_name}_edit_${className}_${identifier}`).val();
+                let identifier_label = component.label;
+                if(component.required == 1 && identifier_value == ''){
+                    $(`.${int_name}_edit_${className}_${identifier}`).removeClass('is-valid').addClass('is-invalid');
+                    $(`.${int_name}-edit-${className}-${identifier}-error`).text(`${identifier_label} cannot be empty`);
+                    flag=1;
+                }else{
+                    $(`.${int_name}_edit_${className}_${identifier}`).removeClass('is-invalid');
+                    $(`.${int_name}-edit-${className}-${identifier}-error`).text('');
+                }
+                updateFormData[identifier] = identifier_value;
+            });
+            if(flag == 0){
+                updateFormData['id'] = this.formData[className]['id'];
+                updateFormData['integration_id'] = int_id;
+                if(this.sidebarData.fetch[0]['associated_id'] && this.sidebarData.fetch[0]['associated_id']!=''){
+                    updateFormData['associated_id'] = this.sidebarData.fetch[0]['associated_id'];
+                }
+                fetch("https://app.helpwise.io/api/integration-vue/"+int_name+"/update_"+className+".php", {
+                    method: 'POST', 
+                    credentials: 'include',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateFormData)
+                })
+                .then(async response => {
+                    const updateResponse = await response.json();
+                    if (!response.status) {
+                        const error = (updateResponse && updateResponse.message) || response.status;
+                        return Promise.reject(error);
+                    }
+                })
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.error("There was an error!", error);
+                });
+                this.openUpdateFormArrayInternal[className] = false;
+                console.log("397",this.openUpdateFormArrayInternal);
+                this.$emit("postData", int_name);
+            }
+        },
+        openCreateForm(className){
+            console.log("heyyyy");
+            if(!this.openCreateFormArrayInternal[className] || this.openCreateFormArrayInternal[className] == false){
+                this.openCreateFormArrayInternal[className] = true;
+            }else{
+                this.openCreateFormArrayInternal[className] = false;
+            }
+        },
+        openUpdateForm(className, components, int_name){
+            if(!this.openUpdateFormArrayInternal[className] || this.openUpdateFormArrayInternal[className] == false || components.length != 0){
+                this.openUpdateFormArrayInternal[className] = true;
+            }else{
+                this.openUpdateFormArrayInternal[className] = false;
+            }
+            this.formData = {};
+            this.formData[className] = {};
+            components.forEach(component => {
                 let identifier = component.class; 
                 let identifier_value = component.value;
-                console.log("identifier",identifier);
-                console.log("identifier_value",identifier_value);
-                document.getElementsByClassName(int_name+'_edit_'+classname+'_'+identifier).value=identifier_value;
+                let identifier_label = component.label;
+                if(component.type == 'dropdown'){
+                    identifier_value = component.dropdown_value;
+                    console.log("dropdown_value",identifier_value);
+                }
+                this.formData[className][identifier_label] = identifier_value;
+                $(`.${int_name}_edit_${className}_${identifier}`).val(identifier_value);
             });
-            this.updateMultishowForm=!this.updateMultishowForm;
+            console.log("FormData",this.formData);  
         },
         capitalizeFirstLetter(string){
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
     },
-    created() {
-        console.log("integration name bhi", this.integrationName);
-        console.log("data dhikahao",this.sidebarData);
+    beforeMount() {
+        this.openUpdateFormArrayInternal = {...this.openUpdateFormArray};
+        this.openCreateFormArrayInternal = {...this.openCreateFormArray};
     }
 }
 </script>
