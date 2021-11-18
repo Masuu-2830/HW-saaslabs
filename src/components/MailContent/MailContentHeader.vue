@@ -97,11 +97,6 @@
               class="avatar avatar-xxs"
               style="margin-right: -3px"
             >
-              <!-- <span
-                class="avatar-initial rounded-circle"
-                style="background-color: hsl(125, 32%, 64%)"
-                >MM</span
-              > -->
             </div>
           </div>
           <div class="p-1">
@@ -157,11 +152,6 @@
                 style="width: 55%"
               >
                 <div v-html="userInfo.avatarTag" class="avatar avatar-xxs mr-1">
-                  <!-- <span
-                    class="avatar-initial rounded-circle"
-                    style="background-color: hsl(125, 32%, 64%)"
-                    >MM</span
-                  > -->
                 </div>
                 <span
                   class="tx-13 ml-1"
@@ -195,11 +185,6 @@
                 style="width: 55%"
               >
                 <div v-html="teammate.avatarTag" class="avatar avatar-xxs mr-1">
-                  <!-- <span
-                    class="avatar-initial rounded-circle"
-                    style="background-color: hsl(297, 32%, 64%)"
-                    >HD</span
-                  > -->
                 </div>
                 <span
                   class="tx-13 ml-1"
@@ -402,11 +387,6 @@
                 class="d-flex align-items-center justify-content-start w-100"
               >
                 <div v-html="userInfo.avatarTag" class="avatar avatar-xxs mr-1">
-                  <!-- <span
-                    class="avatar-initial rounded-circle"
-                    style="background-color: hsl(125, 32%, 64%)"
-                    >MM</span
-                  > -->
                 </div>
                 <span
                   class="tx-13 ml-1 tx-color-02 display-name"
@@ -461,11 +441,6 @@
                 class="d-flex align-items-center justify-content-start w-100"
               >
                 <div v-html="teammate.avatarTag" class="avatar avatar-xxs mr-1">
-                  <!-- <span
-                    class="avatar-initial rounded-circle"
-                    style="background-color: hsl(53, 32%, 64%)"
-                    >AR</span
-                  > -->
                 </div>
                 <span
                   class="tx-13 ml-1 tx-color-02 display-name"

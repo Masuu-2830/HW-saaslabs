@@ -5,8 +5,11 @@
             <SideBar :mailbox="mailbox" />
             <MailGroup :mailbox="mailbox" />
             <MailContent />
-            <compose></compose>
+            <Compose></Compose>
         </div>
+
+        <HcArticles/>
+        <SavedReply/>
     </div>
 </template>
 
@@ -16,15 +19,19 @@ import MailGroup from './MailGroup/MailGroup.vue';
 import SideBar from './SideBar.vue';
 import MailContent from './MailContent/MailContent.vue'
 import Compose from './Compose.vue';
+import HcArticles from './modals/HcArticles.vue';
+import SavedReply from './modals/SavedReply.vue';
 export default {
     name: 'Home',
     components: {
-        NavBar,
-        SideBar,
-        MailGroup,
-        MailContent,
-        Compose
-    },
+    NavBar,
+    SideBar,
+    MailGroup,
+    MailContent,
+    Compose,
+    HcArticles,
+    SavedReply
+},
     data() {
         return {
             mailbox: {},
