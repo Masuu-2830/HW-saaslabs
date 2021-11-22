@@ -336,10 +336,11 @@ export default {
             });
             if(flag == 0){
                 createFormData['integration_id'] = int_id;
+                createFormData['functionality'] = 'create_' + className;
                 if(this.sidebarData.fetch[0]['associated_id'] && this.sidebarData.fetch[0]['associated_id']!=''){
                     createFormData['associated_id'] = this.sidebarData.fetch[0]['associated_id'];
                 }
-                fetch("https://app.helpwise.io/api/integration-vue/"+int_name+"/create_"+className+".php", {
+                fetch("https://app.helpwise.io/api/integration-vue/"+int_name+"/post.php", {
                     method: 'POST', 
                     credentials: 'include',
                     headers: {
@@ -383,11 +384,12 @@ export default {
             });
             if(flag == 0){
                 updateFormData['id'] = this.formData[className]['id'];
+                updateFormData['functionality'] = 'update_' + className;
                 updateFormData['integration_id'] = int_id;
                 if(this.sidebarData.fetch[0]['associated_id'] && this.sidebarData.fetch[0]['associated_id']!=''){
                     updateFormData['associated_id'] = this.sidebarData.fetch[0]['associated_id'];
                 }
-                fetch("https://app.helpwise.io/api/integration-vue/"+int_name+"/update_"+className+".php", {
+                fetch("https://app.helpwise.io/api/integration-vue/"+int_name+"/post.php", {
                     method: 'POST', 
                     credentials: 'include',
                     headers: {
