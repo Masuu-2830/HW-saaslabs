@@ -76,10 +76,6 @@
                 }else{
                     this.sidebarData = [];
                 }
-                // api hit get search data: {name: name, email: "", phone: ""}
-                // let data = []; //api se ayga data
-                // isSidebarActive = isSidebarActive ? false: true;
-                // this.sidebarData = data; //api wala data
             },
             postData(integration_name){
                 // setTimeout(function () {
