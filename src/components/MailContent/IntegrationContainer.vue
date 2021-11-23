@@ -15,7 +15,7 @@
                 :integrationName = "integrationName"
                 :integrationID = "integrationID" 
                 v-if = "sidebarOpen"
-                :datastatus= "datastatus"
+                :dataStatus= "dataStatus"
                 :openCreateFormArray= "openCreateFormArray"
                 :openUpdateFormArray= "openUpdateFormArray"
                 @postData= "postData"
@@ -35,7 +35,7 @@
                 sidebarData: [],
                 integrationName: '',
                 integrationID: '',
-                datastatus: false,
+                dataStatus: false,
                 openCreateFormArray: {},
                 openUpdateFormArray: {}
             }
@@ -44,8 +44,6 @@
         components:{IntegrationData, IntegrationSidebar},
         methods: {
             openIntegration(integrationData){
-                console.log("integration", integrationData.lname);
-                console.log("this sidebar",this.sidebarOpen);
                 this.$emit("openInt", integrationData.id);
                 this.integrationName = integrationData.lname;
                 this.integrationID = integrationData.id;
@@ -55,27 +53,25 @@
                         const integrationData = await response.json();
                         let integrationData2 = integrationData.data;
                         this.sidebarData = integrationData2;
-                        this.datastatus = true;
+                        this.dataStatus = true;
                         for(const key in this.sidebarData.create){
                             this.openCreateFormArray[key] = false;
                         }
                         for(const key in this.sidebarData.update){
                             this.openUpdateFormArray[key] = false;
                         }
-                        console.log("openCreateArray", this.openCreateFormArray);
-                        console.log("openUpdateArray", this.openUpdateFormArray);
                         // check for error response
                         if (!response.status) {
                             // get error message from body or default to response statusText
                             const error = (integrationData && integrationData.message) || response.status;
-                            this.datastatus = false;
+                            this.dataStatus = false;
                             return Promise.reject(error);
                         }
                     })
                     .catch(error => {
                         this.errorMessage = error;
                         console.error("There was an error!", error);
-                        this.datastatus = false;
+                        this.dataStatus = false;
                     });
                 }else{
                     this.sidebarData = [];
@@ -98,10 +94,8 @@
                     })
                     .then(async response => {
                         const updateResponse = await response.json();
-                        console.log("updateResponse",updateResponse);
                         this.sidebarData = [];
                         this.sidebarData = updateResponse.data;
-                        console.log("sidebar ka data",this.sidebarData);
                         // check for error response
                         if (!response.status) {
                             // get error message from body or default to response statusText
@@ -120,12 +114,9 @@
             fetch("https://app.helpwise.io/api/connected_integrations.php?mailbox_id=" + this.$route.params.mailboxId, {credentials: 'include'})
             .then(async response => {
                 const data = await response.json();
-                console.log("integrations response", response);
-                console.log("integrations data",data.data);
                 // console.log("data parsed",JSON.parse(data));
                 let data2 = data.data;
                 this.integrations = data2;
-                console.log("okay",this.integrations);
                 // check for error response
                 if (!response.status) {
                     // get error message from body or default to response statusText

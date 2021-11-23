@@ -16,13 +16,7 @@
             openInt(){
                 this.isOpen = !this.isOpen;
                 this.$emit("openInt", this.integration_data);
-            },
-            // changePixels(){
-            //     console.log("pixels",this.pixel);
-            //     let changedpixel = this.pixel + 50;
-            //     this.pixel = changedpixel;
-            //     return changedpixel;
-            // }
+            }
         },
         computed: {
             // settingsStyleShow: function () {

@@ -9,7 +9,7 @@
             <p class="integration_main_loading" style="display: none;color: grey">Loading...</p>
         </div>
         <div class="integration-data">
-            <div v-if="!datastatus">
+            <div v-if="!dataStatus">
                 <p style="padding:5px;color:#4f5d6b;">Uh oh, something went wrong.<br>
                 </p> 
             </div>
@@ -297,7 +297,7 @@
 <script>
 // import { component } from 'vue/types/umd';
 export default {
-    props: ["sidebarData", "integrationName", "datastatus","openCreateFormArray","openUpdateFormArray", "integrationID"],
+    props: ["sidebarData", "integrationName", "dataStatus","openCreateFormArray","openUpdateFormArray", "integrationID"],
     data(){
         return {
            formData: {},
@@ -307,7 +307,6 @@ export default {
     },
     methods: {
         collapseHeader(selectorName){
-            console.log('selectorName',selectorName);
             if($(`${selectorName}`).hasClass('show')){
                 $(`${selectorName}`).removeClass('show');
                 $(`${selectorName}_caret`).removeClass('fa-caret-up').addClass('fa-caret-down');
@@ -317,7 +316,6 @@ export default {
             }
         },
         createData(className, components, int_name, int_id){
-            console.log("components dhikhado",components);
             let createFormData = {};
             let flag=0;
             components.forEach(component => {
@@ -360,12 +358,10 @@ export default {
                     console.error("There was an error!", error);
                 });
                 this.openCreateFormArrayInternal[className] = false;
-                console.log("397",this.openCreateFormArrayInternal);
                 this.$emit("postData", int_name);
             }
         },
         updateData(className, components, int_name, int_id){
-            console.log("components dhikhado",components);
             let updateFormData = {};
             let flag=0;
             components.forEach(component => {
@@ -409,12 +405,10 @@ export default {
                     console.error("There was an error!", error);
                 });
                 this.openUpdateFormArrayInternal[className] = false;
-                console.log("397",this.openUpdateFormArrayInternal);
                 this.$emit("postData", int_name);
             }
         },
         openCreateForm(className){
-            console.log("heyyyy");
             if(!this.openCreateFormArrayInternal[className] || this.openCreateFormArrayInternal[className] == false){
                 this.openCreateFormArrayInternal[className] = true;
             }else{
@@ -435,12 +429,10 @@ export default {
                 let identifier_label = component.label;
                 if(component.type == 'dropdown'){
                     identifier_value = component.dropdown_value;
-                    console.log("dropdown_value",identifier_value);
                 }
                 this.formData[className][identifier_label] = identifier_value;
                 $(`.${int_name}_edit_${className}_${identifier}`).val(identifier_value);
-            });
-            console.log("FormData",this.formData);  
+            }); 
         },
         capitalizeFirstLetter(string){
             return string.charAt(0).toUpperCase() + string.slice(1);
