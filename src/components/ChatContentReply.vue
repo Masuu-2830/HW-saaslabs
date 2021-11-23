@@ -479,6 +479,9 @@
       bus.$off("modal.savedReplyInsert.click");
       bus.$on("modal.savedReplyInsert.click", function(id){
         let editorInstance = vueThis.current == "reply" ? vueThis.replyEditorInstance : vueThis.noteEditorInstance;
+
+        console.log("Thread data", $(`#thread-${vueThis.$route.params.threadId}`).data(), vueThis.$route.params.threadId);
+
         fetch(
           `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$route.params.mailboxId}&savedReplyID=${id}`,
           {credentials: 'include'}

@@ -12,7 +12,7 @@
     >
       <div v-if="perPageMails.length !== 0" id="threads-list">
         <div v-for="mail in perPageMails" :key="mail.id" @click="clickThread(mail.id, mail.isStarred==true)">
-          <mail-group-single-mail :id="'thread-'+mail.id" :class="{'active': activeId === mail.id}" :compact="isCompact" :mail="mail"></mail-group-single-mail>
+          <mail-group-single-mail :id="'thread-'+mail.id" :class="{'active': activeId === mail.id}" :compact="isCompact" :data-thread="mail" :mail="mail"></mail-group-single-mail>
           </div>
       </div>
       <div v-if="isThreadRefresh" id="view-all-threads" class="d-flex justify-content-center align-items-center"><button @click.stop.prevent="fetchThreads" class="btn btn-link">View All Conversations</button></div>
