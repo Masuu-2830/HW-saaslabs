@@ -30,6 +30,7 @@
     "vue-froala-wysiwyg": "^4.0.4",
     "vue-moment": "^4.1.0",
     "vue-router": "^3.0.1",
+    "vue-toastification": "^1.7.14",
     "vue-tribute": "^1.0.7",
     "vue2-datepicker": "^3.10.2",
     "vuejs-autocomplete": "^0.1.1",

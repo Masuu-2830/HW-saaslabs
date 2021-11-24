@@ -30,7 +30,7 @@
   import AttachmentComp from './AttachmentComp.vue';
   // import HcArticles from './modals/HcArticles.vue';
   import Vue from 'vue';
-  import { bus } from "../main";
+  import { bus, triggerPromptNotif } from "../main";
   const axios = require('axios').default;
 
   export default {
@@ -481,6 +481,7 @@
         let editorInstance = vueThis.current == "reply" ? vueThis.replyEditorInstance : vueThis.noteEditorInstance;
 
         console.log("Thread data", $(`#thread-${vueThis.$route.params.threadId}`).data(), vueThis.$route.params.threadId);
+        triggerPromptNotif("Fetching saved reply data");
 
         fetch(
           `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$route.params.mailboxId}&savedReplyID=${id}`,
@@ -489,6 +490,7 @@
         .then(response => {
           if(response.status == "success"){
             editorInstance.html.insert(response.data.savedReply.content);
+            triggerPromptNotif("Saved Reply Inserted", "success", 1000);
           }
         })
       })

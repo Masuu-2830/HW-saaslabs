@@ -19,12 +19,21 @@ import 'froala-editor/js/plugins.pkgd.min' // all plugins
 
 
 import 'tributejs/dist/tribute.css';
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
+
 // import 'bootstrap/dist/css/bootstrap.css'
 window.$ = $;
 Vue.use(require('vue-moment'));
 Vue.use(VueFroala);
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
+
+Vue.use(Toast, {
+  transition: "Vue-Toastification__fade",
+  maxToasts: 20,
+  newestOnTop: true
+});
 
 Vue.config.productionTip = false;
 Vue.prototype.$apiBaseURL = 'https://app.helpwise.io/api/';
@@ -38,5 +47,43 @@ new Vue({
   components: { App },
   template: '<App/>'
 })
+
+export const triggerPromptNotif = (component, type = "", timeout=3000) => {
+  // const triggerNotifToast = type == "" || type == "default" ? this.$toast : this.$toast[type];
+  // const triggerNotifToast = this._vm.$toast;
+  if(type == "" || type == "default"){
+    Vue.$toast(component, {
+      position: "top-right",
+      timeout: timeout,
+      closeOnClick: true,
+      pauseOnFocusLoss: true,
+      pauseOnHover: true,
+      draggable: true,
+      draggablePercent: 0.6,
+      showCloseButtonOnHover: false,
+      hideProgressBar: false,
+      closeButton: "button",
+      icon: true,
+      rtl: false
+    });
+
+    return;
+  }
+
+  Vue.$toast[type](component, {
+    position: "top-right",
+    timeout: timeout,
+    closeOnClick: true,
+    pauseOnFocusLoss: true,
+    pauseOnHover: true,
+    draggable: true,
+    draggablePercent: 0.6,
+    showCloseButtonOnHover: false,
+    hideProgressBar: false,
+    closeButton: "button",
+    icon: true,
+    rtl: false
+  });
+}
 
 // xwuFgeqrSRKZTucFBGmh
