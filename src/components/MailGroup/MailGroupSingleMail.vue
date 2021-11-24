@@ -5,7 +5,7 @@
     style="border-bottom: 1px solid #e5e9f2"
   >
     <div class="realtimeMarker"></div>
-    <div class="hw_broadThread w-100" :style="{display: !isCompact && block}">
+    <div class="hw_broadThread w-100" :style="{display: !isCompact ? block : none}">
       <div class="row align-items-center w-100" style="padding-left: 20px">
         <div
           class="col-3 d-flex justify-content-between align-items-center pl-0"
@@ -52,7 +52,15 @@
           </div>
           <div class="flex-grow-1 w-100 d-flex thread-addr">
             <div
-              v-if="mail.email.from == undefined"
+              v-if="mail.email.to !== undefined"
+              class="text-truncate thread-addr-main"
+              style="max-width: 90%"
+              :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+            >
+              To: {{ Object.keys(mail.email.to).length !== 0 ? Object.values(mail.email.to).toString() : '(no recipient)'}}
+            </div>
+            <div
+              v-else-if="mail.email.from == undefined"
               class="text-truncate thread-addr-main"
               style="max-width: 90%"
               :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
@@ -553,7 +561,7 @@
         "
         :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
       >
-        {{ mail.email.subject }}
+        {{ mail.email.subject ? mail.email.subject : "(no subject)" }}
       </div>
       <div
         class="d-flex align-items-center justify-content-between mg-b-2 w-100"
@@ -575,6 +583,8 @@
           >
           {{ mail.email.snippet }}
         </p>
+        <span v-if="mail.email.attachments.length > 0"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-paperclip"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg><span>
+        </span></span>
       </div>
     </div>
   </div>

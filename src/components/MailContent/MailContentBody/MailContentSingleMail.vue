@@ -577,8 +577,10 @@ export default {
       this.$refs["move-new-modal"].hide();
     },
     reply(e) {
-      bus.$emit("replyy", this.item.data.id);
       e.cancelBubble = true;
+      console.log("open reply")
+      let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
+      bus.$emit("openReply", hash, this.item.data);
     },
     changeCollapseState() {
       this.isMailCollapsed = !this.isMailCollapsed;

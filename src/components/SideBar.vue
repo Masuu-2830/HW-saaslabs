@@ -589,6 +589,8 @@
 
 <script>
 import { bus } from "../main";
+import Compose from "./Compose.vue";
+import Vue from 'vue';
 export default {
   name:'SideBar',
   props: {
@@ -596,7 +598,8 @@ export default {
   },
   data() {
     return {
-      more: false
+      more: false,
+      // compose: {}
     }
   },
   computed: {
@@ -610,7 +613,10 @@ export default {
     },
     openCompose() {
       console.log("open")
-      bus.$emit("openCompose");
+      let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
+      // this.$set(this.compose, hash, { id: hash });
+      bus.$emit("openCompose", hash);
+      // console.log(this.compose);
     }
   }
 };

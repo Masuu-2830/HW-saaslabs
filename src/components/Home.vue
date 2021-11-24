@@ -5,7 +5,7 @@
             <SideBar :mailbox="mailbox" />
             <MailGroup :mailbox="mailbox" />
             <MailContent />
-            <compose></compose>
+            <compose-wrapper></compose-wrapper>
         </div>
     </div>
 </template>
@@ -16,6 +16,7 @@ import MailGroup from './MailGroup/MailGroup.vue';
 import SideBar from './SideBar.vue';
 import MailContent from './MailContent/MailContent.vue'
 import Compose from './Compose.vue';
+import ComposeWrapper from './ComposeWrapper.vue';
 export default {
     name: 'Home',
     components: {
@@ -23,10 +24,11 @@ export default {
         SideBar,
         MailGroup,
         MailContent,
-        Compose
+        Compose,
+        ComposeWrapper
     },
     data() {
-        return {
+      return {
             mailbox: {},
             mailboxes: [],
         }

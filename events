@@ -18,3 +18,7 @@ check => handles bulk check/uncheck and single check/uncheck
 replyy => open the reply editor
 toggleTags => tagging and untagging, clearing
 changeThreadAttrs => Updating the attrs using payload method
+openCompose
+closeCompose
+openReply
+closeReply

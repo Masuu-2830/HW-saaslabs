@@ -26,7 +26,8 @@
     >
       <span class="sr-only">Loading...</span>
     </div>
-    <mail-content-reply :thread="thread"></mail-content-reply>
+    <!-- <mail-content-reply :thread="thread"></mail-content-reply> -->
+    <reply-wrapper :thread="thread"></reply-wrapper>
   </div>
 </template>
 
@@ -35,8 +36,9 @@ import MailContentComment from './MailContentComment.vue';
 import MailContentLog from './MailContentLog.vue';
 import MailContentReply from './MailContentReply.vue';
 import MailContentSingleMail from './MailContentSingleMail.vue';
+import ReplyWrapper from './ReplyWrapper.vue';
 export default {
-  components: { MailContentSingleMail, MailContentLog, MailContentReply, MailContentComment },
+  components: { MailContentSingleMail, MailContentLog, MailContentReply, MailContentComment, ReplyWrapper },
   name: "MailContentBody",
   props: {
     thread: Object

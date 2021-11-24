@@ -1014,20 +1014,72 @@ export default {
   },
   methods: {
     async clickThread(id, isstarred) {
-      if(this.isThreadRefresh == false) {
-        bus.$emit('changeRead', id, 1);
+      if(this.route == 'drafts') {
+        var objIndex = this.perPageMails.findIndex((obj => obj.id == id));
+        let emailId = this.perPageMails[objIndex].email.id;
+        fetch(this.$apiBaseURL + "getEmail.php?emailID=" + emailId + "&mailboxID=" + this.$route.params.mailboxId, {credentials: "include"})
+        .then(async response => { 
+          const data = await response.json();
+          if(data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
+          bus.$emit("openCompose", hash, data.data.email);
+        })
+      } else {
+        if(this.isThreadRefresh == false) {
+          bus.$emit('changeRead', id, 1);
+        }
+        this.activeId = id;
+        this.isCompact = true;
+        let data = null;
+        bus.$emit('compact', data);
+        data = await this.fetchThread(id, isstarred);
+        console.log(data);
+        if(this.isThreadRefresh) {
+          let from = {};
+          // from[data.data.contact.emails[0]] = data.data.contact.firstname + " " + data.data.contact.lastname;
+          let ts = data.data.items[0].timestamp;
+          for(let i = 0; i < data.data.items.length; i++) {
+            if(data.data.items[i].timestamp < ts) {
+              ts = data.data.items[i].timestamp;
+            }
+            if(data.data.items[i].type == "email" && data.data.items[i].timestamp == ts) {
+              from = data.data.items[i].data.from;
+            }
+          }
+          let thread = {
+            assignedTo: data.data.currentAssignment,
+            draftOnly: false,
+            id: data.data.ticketNumber,
+            hasDraft: data.data.drafts.length > 0,
+            isArchived: data.data.isArchived,
+            isDeleted: data.data.isDeleted,
+            isRead: true,
+            isSnoozed: data.data.isSnoozed,
+            isSpam: data.data.isSpam,
+            isStarred: data.data.isStarred,
+            order: 0,
+            snippetType: "message",
+            totalEmailCount: data.data.emailCount,
+            ticketNumber: data.data.ticketNumber,
+            tags: data.data.tags,
+            email: {
+              attachments: [],
+              from: from,
+              humanFriendlyDate: moment.unix(ts).format("DD MMM"),
+              subject: data.data.displaySubject,
+              originalSubject: data.data.subject,
+              snippet: data.data.snippet
+            }
+          }
+          console.log(thread);
+          this.perPageMails.push(thread);
+        }
+        console.log(this.perPageMails);
+        bus.$emit('compact', data);
       }
-      this.activeId = id;
-      this.isCompact = true;
-      let data = null;
-      bus.$emit('compact', data);
-      data = await this.fetchThread(id, isstarred);
-      console.log(data);
-      if(this.isThreadRefresh) {
-        this.perPageMails.push(data.data);
-      }
-      console.log(this.perPageMails);
-      bus.$emit('compact', data);
     },
     async fetchThreads() {
       this.loading = true;

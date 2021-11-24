@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div id="composeWindowWrapper" v-if="show">
-      <div
-        id="mailCompose-1633590946839-47991349873"
+      <div v-if="show"
+        :id="`compose-${composer.hash}`"
         class="mail-compose hw_editor show shrink hideMoreEditingOptions"
         style="z-index: 2199921"
+        :style="{right: lr ? '45vw' : ''}"
       >
         <div
           class="mail-compose-dialog mail-compose-dialog-shrink"
@@ -109,7 +109,7 @@
               <a
                 href=""
                 class="nav-link nav-link-close mailComposeClose"
-                @click.prevent="closeCompose"
+                @click.prevent="closeCompose(composer.hash)"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -136,8 +136,7 @@
               <div>From</div>
               <div class="flex-grow-1 pt-2 pl-2" style="max-width: 80%">
                 <b-form-select v-model="fromSelected" class="mb-3">
-                  <!-- <b-form-select-option value="vibhor@saaslabs.co">Masood &lt;vibhor@saaslabs.co&gt;</b-form-select-option>
-                <b-form-select-option value="vibhor@helpwise.io">Vibhor Agrawal &lt;vibhor@helpwise.io&gt;</b-form-select-option> -->
+                  
                   <b-form-select-option
                     v-for="fromOption in fromOptions"
                     :key="fromOption.id"
@@ -147,37 +146,7 @@
                     }}&gt;</b-form-select-option
                   >
                 </b-form-select>
-                <!-- <select
-                class="email-from select2-hidden-accessible"
-                style="
-                  display: inline-block;
-                  min-width: 100%;
-                  max-width: 100%;
-                  padding: 5px;
-                "
-                data-select2-id="60"
-                tabindex="-1"
-                aria-hidden="true"
-              >
-                <option
-                  value="vibhor@saaslabs.co"
-                  data-email="vibhor@saaslabs.co"
-                  data-name="Masood"
-                  data-is-default="true"
-                  selected=""
-                  data-select2-id="62"
-                >
-                  Masood &lt;vibhor@saaslabs.co&gt;
-                </option>
-                <option
-                  value="vibhor@helpwise.io"
-                  data-email="vibhor@helpwise.io"
-                  data-name="Vibhor Agrawal"
-                  data-is-default="false"
-                >
-                  Vibhor Agrawal &lt;vibhor@helpwise.io&gt;
-                </option></select
-              > -->
+                
               </div>
             </div>
             <div class="d-flex align-items-center">
@@ -256,70 +225,7 @@
                       max-width: 100%;
                     "
                   >
-                    <!-- <div class="bootstrap-tagsinput">
-                    <span
-                      class="twitter-typeahead"
-                      style="position: relative; display: inline-block"
-                      ><input
-                        type="text"
-                        class="tt-hint"
-                        readonly=""
-                        autocomplete="off"
-                        spellcheck="false"
-                        tabindex="-1"
-                        dir="ltr"
-                        style="
-                          position: absolute;
-                          top: 0px;
-                          left: 0px;
-                          border-color: transparent;
-                          box-shadow: none;
-                          opacity: 1;
-                          background: none 0% 0% / auto repeat scroll
-                            padding-box border-box rgba(0, 0, 0, 0);
-                        " /><input
-                        type="text"
-                        placeholder=""
-                        class="tt-input"
-                        autocomplete="off"
-                        spellcheck="false"
-                        dir="auto"
-                        style="
-                          position: relative;
-                          vertical-align: top;
-                          background-color: transparent;
-                        " />
-                      <pre
-                        aria-hidden="true"
-                        style="
-                          position: absolute;
-                          visibility: hidden;
-                          white-space: pre;
-                          font-family: sans-serif;
-                          font-size: 14px;
-                          font-style: normal;
-                          font-variant: normal;
-                          font-weight: 400;
-                          word-spacing: 0px;
-                          letter-spacing: 0px;
-                          text-indent: 0px;
-                          text-rendering: auto;
-                          text-transform: none;
-                        "
-                      ></pre>
-                      <div
-                        class="tt-menu"
-                        style="
-                          position: absolute;
-                          top: 100%;
-                          left: 0px;
-                          z-index: 100;
-                          display: none;
-                        "
-                      >
-                        <div class="tt-dataset tt-dataset-contacts"></div></div
-                    ></span>
-                  </div> -->
+                    
                     <vue-tags-input
                       v-model="tagCC"
                       :tags="tagsCC"
@@ -369,70 +275,7 @@
                       max-width: 100%;
                     "
                   >
-                    <!-- <div class="bootstrap-tagsinput">
-                    <span
-                      class="twitter-typeahead"
-                      style="position: relative; display: inline-block"
-                      ><input
-                        type="text"
-                        class="tt-hint"
-                        readonly=""
-                        autocomplete="off"
-                        spellcheck="false"
-                        tabindex="-1"
-                        dir="ltr"
-                        style="
-                          position: absolute;
-                          top: 0px;
-                          left: 0px;
-                          border-color: transparent;
-                          box-shadow: none;
-                          opacity: 1;
-                          background: none 0% 0% / auto repeat scroll
-                            padding-box border-box rgba(0, 0, 0, 0);
-                        " /><input
-                        type="text"
-                        placeholder=""
-                        class="tt-input"
-                        autocomplete="off"
-                        spellcheck="false"
-                        dir="auto"
-                        style="
-                          position: relative;
-                          vertical-align: top;
-                          background-color: transparent;
-                        " />
-                      <pre
-                        aria-hidden="true"
-                        style="
-                          position: absolute;
-                          visibility: hidden;
-                          white-space: pre;
-                          font-family: sans-serif;
-                          font-size: 14px;
-                          font-style: normal;
-                          font-variant: normal;
-                          font-weight: 400;
-                          word-spacing: 0px;
-                          letter-spacing: 0px;
-                          text-indent: 0px;
-                          text-rendering: auto;
-                          text-transform: none;
-                        "
-                      ></pre>
-                      <div
-                        class="tt-menu"
-                        style="
-                          position: absolute;
-                          top: 100%;
-                          left: 0px;
-                          z-index: 100;
-                          display: none;
-                        "
-                      >
-                        <div class="tt-dataset tt-dataset-contacts"></div></div
-                    ></span>
-                  </div> -->
+                    
                     <vue-tags-input
                       v-model="tagBCC"
                       :tags="tagsBCC"
@@ -501,7 +344,7 @@
                   type="submit"
                 >
                   {{
-                    this.$store.state.userSettings.send == "send"
+                    isSend == "send"
                       ? "Send"
                       : "Send and Close"
                   }}
@@ -516,7 +359,7 @@
               id="editor-uploadAttachment"
               multiple
             />
-            <div
+            <!-- <div
               class="d-flex flex-wrap"
               style="max-height: 150px; overflow-y: auto"
               id="compose-attachment-list"
@@ -527,15 +370,14 @@
                 v-html="createAttachmentList(file)"
               >
               </span>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
-    </div>
     <div
       class="card"
       id="undo-container"
-      style="max-width: 100%"
+      style="max-width: 100%; z-index: 9999999;"
       :style="{ display: showUndo ? 'block' : 'none' }"
     >
       <div class="card-body">
@@ -560,34 +402,50 @@ import "froala-editor/js/plugins.pkgd.min";
 import VueTagsInput from "@vojtechlanka/vue-tags-input";
 import axios from "axios";
 import _ from "underscore";
+import AttachmentComp from './AttachmentComp.vue';
+import Vue from 'vue';
 
 export default {
   name: "Compose",
-  // props: {
-  //     mailbox: Object,
-  // },
+  props: {
+    composer: Object,
+    align: Number,
+  },
+  computed: {
+    lr() {
+      if(this.align%2 == 1) {
+        return true
+      }else {
+        return false
+      }
+    }
+  },
   components: { VueTagsInput, FroalaEditor, File },
   data() {
     const self = this;
     return {
-      show: false,
+      show: true,
       showUndo: false,
       message: "New Message",
       undoMessage: "Email Sent.",
       fromOptions: this.aliases(),
       fromSelected: this.defaultAlias(),
-      uploadingFiles: [],
-      files: [],
-      filesMap: [],
+      attachments: this.composer.attachments !== undefined ? this.composer.attachments : {},
+      // attachments: {},
+      // uploadingFiles: [],
+      // files: [],
+      // filesMap: [],
       undoTimer: this.$store.state.userSettings.undoTimer,
+      isSend: this.$store.state.userSettings.send,
       tagTo: "",
-      tagsTo: [],
+      // tagsTo: Object.keys(this.composer.to).length !==0 ? this.composer.to : [],
+      tagsTo: this.tagsto(),
       autocompleteItemsTo: [],
       tagCC: "",
-      tagsCC: [],
+      tagsCC: this.tagscc(),
       autocompleteItemsCC: [],
       tagBCC: "",
-      tagsBCC: [],
+      tagsBCC: this.tagsbcc(),
       autocompleteItemsBCC: [],
       validation: [
         {
@@ -597,7 +455,7 @@ export default {
       ],
       debounce: null,
       message: "New Message",
-      subject: "",
+      subject: this.composer.subject !== undefined ? this.composer.subject : "",
       mail_body: this.signature(),
       noTo: false,
       toNotValid: false,
@@ -605,15 +463,15 @@ export default {
       bccNotValid: false,
       isCC: false,
       isBCC: false,
-      draftID: null,
-      threadID: null,
+      draftID: this.composer.id !== undefined ? this.composer.id : null,
+      threadID: this.composer.threadID !== undefined ? this.composer.threadID : null,
       editorInstance: null,
       config: {
         enter: FroalaEditor.ENTER_DIV,
         placeholderText: "Type something",
         charCounterCount: false,
         toolbarBottom: true,
-        height: "320px",
+        height: "220px",
         imageUploadParam: "files[]",
         imageUploadURL:
           "https://app.helpwise.io/api/uploadInlineAttachment.php",
@@ -629,31 +487,23 @@ export default {
         requestWithCredentials: true,
         events: {
           initialized: async function () {
+            // self.editorInstance.composer = self.composer;
             var editor = this;
+            editor.composer = self.composer;
             self.editorInstance = this;
-            console.log("initializedd");
+            console.log("initialized");
+            console.log(this);
+            let attchComp = Vue.extend(AttachmentComp);
+            let replyAttachmentList = new attchComp({
+              propsData:{
+                attachments: self.attachments
+              }
+            }).$mount();
+            var ed = $(`#editor-uploadAttachment`).data('editor');
+            console.log(editor, ed);
+            editor.$wp.append(replyAttachmentList.$el);
+            ed.$wp.append(replyAttachmentList.$el);
           },
-          // 'file.beforeUpload': function (files) {
-          //   // console.log(files);
-          //   let formData = new FormData();
-          //   formData.append('mailboxID', self.$route.params.mailboxId);
-          //   // formData.append(this.fileUploadParam);
-          //   const requestOptions = {
-          //     method: "POST",
-          //     body: formData,
-          //     // headers: { "Content-Type": "multipart/form-data" },
-          //     credentials: 'include'
-          //   };
-          //   fetch("https://app.helpwise.io/api/uploadAttachment.php", requestOptions)
-          //   .then(async response => {
-          //       const data = await response.json();
-          //       if(data.status !== "success") {
-          //         const error = (data && data.message) || response.status;
-          //         return Promise.reject(error);
-          //       }
-          //       console.log(data);
-          //   })
-          // },
         },
         key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
         toolbarButtons: [
@@ -673,9 +523,12 @@ export default {
     };
   },
   created() {
-    bus.$on("openCompose", () => {
-      console.log("opening");
-      this.show = true;
+    bus.$off("deleteAttachmentUpload");
+    bus.$on("deleteAttachmentUpload", (id) => {
+      console.log("event listenedd", id);
+      Vue.delete(this.attachments, id);
+      this.attachments = this.attachments.filter(i => i.id !== id);
+      console.log(this.attachments, this.files);
     });
   },
   watch: {
@@ -695,15 +548,6 @@ export default {
       }
     },
   },
-  mounted() {
-    var self = this;
-    $(document).on("click", ".delete-compose-attachment", function () {
-      console.log("clicked removedd");
-      let hash = $(this).data("hash");
-      console.log(hash);
-      self.removeAttach(hash);
-    });
-  },
   beforeMount() {
     this.prepareFroalaButtons();
   },
@@ -711,47 +555,50 @@ export default {
     // myGreeting() {
     //   setTimeout(this.saveDraft, this.doneTypingInterval);
     // },
-    createAttachmentList(file) {
-      console.log(file);
-      return `
-        <span class="d-flex justify-content-start attachment align-items-center rounded mt-1 mb-1" id="compose-attachment-${
-          file.hash
-        }" style="width: 200px;border: 1px solid #e2e2e2;margin-left: 10px;position: relative">
-        <div id="progress-compose-${
-          file.hash
-        }" class="progress" style="padding: 11px;background-color: #e2e2e2">
-  <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-</div>
-    <span class="d-flex justify-content-between" data-toggle="tooltip" data-placement="top" title="${
-      file.name
-    } (${this.humanFileSize(
-        file.size,
-        true
-      )})" style="width: 80%;margin-left: 5px;position:absolute;">
-    <span style="overflow: hidden;white-space:nowrap;text-overflow:ellipsis;width:auto%;color: #0168fa;">
-    ${this.getFileIcon(file.name.split(".")[1] || "")} ${file.name}
-    </span>
-   <!-- <span class="attachment-filesize" style="overflow: hidden;white-space:nowrap;text-overflow:ellipsis;display:none">
-    (${this.humanFileSize(file.size, true)})
-    </span> -->
-      </span> <span @click="removeAttach" data-hash="${
-        file.hash
-      }" id="delete-compose-attachment-${
-        file.hash
-      }" class="delete-compose-attachment" style="margin-left: 5px;margin-right: 5px;cursor:pointer;right: 0px;position:absolute;"><i class="far fa-times-circle"></i></span>
-        </span>
-        `;
+    tagsto() {
+      let to = [];
+      if(Object.keys(this.composer.to).length > 0) {
+        for(var key in this.composer.to) {
+          let obj = {};
+          obj["email"] = key;
+          obj["name"] = this.composer.to[key];
+          obj["text"] = this.composer.to[key] + " (" + key + ")";
+          obj["tiClasses"] = ["ti-valid"]
+          to.push(obj);
+        }
+      }
+      console.log(to);
+      return to;
     },
-    removeAttach(hash) {
-      console.log("removing", hash);
-      console.log(this);
-      let obj = this.filesMap.find((o) => o.hash === hash);
-      this.filesMap = this.filesMap.filter((item) => item.hash !== hash);
-      this.uploadingFiles = this.uploadingFiles.filter(
-        (item) => item.hash !== hash
-      );
-      this.files = this.files.filter((item) => item != obj.id);
-      console.log(this.filesMap, this.files);
+    tagscc() {
+      let cc = [];
+      if(Object.keys(this.composer.cc).length > 0) {
+        for(var key in this.composer.cc) {
+          let obj = {};
+          obj["email"] = key;
+          obj["name"] = this.composer.cc[key];
+          obj["text"] = this.composer.cc[key] + " (" + key + ")";
+          obj["tiClasses"] = ["ti-valid"]
+          cc.push(obj);
+        }
+      }
+      console.log(cc);
+      return cc;
+    },
+    tagsbcc() {
+      let bcc = [];
+      if(Object.keys(this.composer.bcc).length > 0) {
+        for(var key in this.composer.bcc) {
+          let obj = {};
+          obj["email"] = key;
+          obj["name"] = this.composer.bcc[key];
+          obj["text"] = this.composer.bcc[key] + " (" + key + ")";
+          obj["tiClasses"] = ["ti-valid"]
+          bcc.push(obj);
+        }
+      }
+      console.log(bcc);
+      return bcc;
     },
     prepareFroalaButtons() {
       const vueThis = this;
@@ -765,6 +612,7 @@ export default {
         refreshAfterCallback: true,
         callback: function () {
           $(`#editor-uploadAttachment`).click();
+          $(`#editor-uploadAttachment`).data('editor',this);
         },
       });
       FroalaEditor.DefineIcon("clear", { NAME: "remove", SVG_KEY: "remove" });
@@ -774,6 +622,7 @@ export default {
         undo: true,
         refreshAfterCallback: true,
         callback: function () {
+          console.log(this);
           const requestOptions = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -793,78 +642,78 @@ export default {
               const error = (data && data.message) || response.status;
               return Promise.reject(error);
             }
-            console.log(data);
-            vueThis.closeCompose();
+            console.log(vueThis);
+            vueThis.closeCompose(this.composer.hash);
           });
         },
       });
     },
-    humanFileSize(bytes, si) {
-      var thresh = si ? 1000 : 1024;
-      if (Math.abs(bytes) < thresh) {
-        return bytes + " B";
-      }
-      var units = si
-        ? ["kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"]
-        : ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
-      var u = -1;
-      do {
-        bytes /= thresh;
-        ++u;
-      } while (Math.abs(bytes) >= thresh && u < units.length - 1);
-      return bytes.toFixed(1) + " " + units[u];
-    },
-    getFileIcon(extension, size) {
-      let iconStyle = "";
-      if (size) {
-        iconStyle = `style="height:${size}px;width:${size}px;"`;
-      }
-
-      let ext = extension.toString().toLowerCase();
-      return `<span ${iconStyle} class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
-    },
     uploadAttachment(event) {
-      const files = event.target.files;
-      console.log(files);
-      for (let i = 0; i < files.length; i++) {
-        let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
-        files[i].hash = hash;
-        this.uploadingFiles.push(files[i]);
-        let selectedFile = files[i];
-        var formData = new FormData();
-        formData.append("files[]", selectedFile);
-        formData.append("mailboxID", this.$route.params.mailboxId);
-        axios
-          .request({
+      const selectedFiles = event.target.files;
+        console.log(selectedFiles);
+        const vueThis = this;
+        for (let i = 0; i < selectedFiles.length; i++) {
+          let selectedFile = selectedFiles[i];
+          let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
+          var formData = new FormData();
+          formData.append('files[]', selectedFile);
+          formData.append('mailboxID', vueThis.$route.params.mailboxId);
+          let attachmentObject = {
+            filename: selectedFile["name"],
+            filesize: selectedFile["size"],
+            progress: 0,
+            isUploaded: false,
+            extension: "pdf"
+          }
+
+          vueThis.attachments[hash] = attachmentObject;
+          Vue.delete(vueThis.attachments, hash);
+          vueThis.attachments[hash] = attachmentObject;
+          axios.request({
             method: "post",
             url: "https://app.helpwise.io/api/uploadAttachment.php",
             data: formData,
             withCredentials: true,
-            onUploadProgress: (p) => {
+            onUploadProgress: function(p){
               let percentage = (p.loaded / p.total) * 100;
               console.log(percentage);
-              $(`#progress-compose-${hash}`).css("width", `${percentage}%`);
-            },
+              console.log(hash);
+              console.log(vueThis.attachments);
+              vueThis.attachments[hash]["progress"] = percentage;
+            }
+          }).then((response)=>{
+            //get the attachment id
+            console.log(response);
+            console.log(hash);
+
+            let attachData = response.data.data.files[0];
+            let attachID = attachData["id"];
+
+            vueThis.attachments[attachID] = vueThis.attachments[hash];
+            Vue.delete(vueThis.attachments, hash);
+            vueThis.attachments[attachID]["isUploaded"] = true;
+            vueThis.attachments[attachID]["progress"] = 100;
+            vueThis.attachments[attachID]["filehash"] = attachData["filehash"];
+            vueThis.attachments[attachID]["filename"] = attachData["filename"];
+            vueThis.attachments[attachID]["filesize"] = attachData["filesize"];
+            vueThis.attachments[attachID]["mimeType"] = attachData["mimeType"];
+            vueThis.attachments[attachID]["extension"] = attachData["extension"];
+            vueThis.attachments[attachID]["id"] = attachID;
+            // vueThis.files.push(attachID);
+            vueThis.editorInstance.attachments = vueThis.attachments;
+            console.log(vueThis.attachments, vueThis.editorInstance);
+            let attchComp = Vue.extend(AttachmentComp);
+            let replyAttachmentList = new attchComp({
+              propsData:{
+                attachments: vueThis.attachments
+              }
+            }).$mount();
+            // $('#editor-<>').data('editor',editor)
+            var ed = $(`#editor-uploadAttachment`).data('editor');
+            console.log(ed);
+            ed.$wp.append(replyAttachmentList.$el);
           })
-          .then((data) => {
-            console.log(data);
-            this.files.push(data.data.data.files[0].id);
-            let obj = { id: data.data.data.files[0].id, hash: hash };
-            this.filesMap.push(obj);
-            console.log(this.files, this.filesMap);
-          });
-        // fetch("https://app.helpwise.io/api/uploadAttachment.php", requestOptions)
-        // .then(async response => {
-        //     const data = await response.json();
-        //     if(data.status !== "success") {
-        //       const error = (data && data.message) || response.status;
-        //       return Promise.reject(error);
-        //     }
-        //     console.log(data);
-        //     this.files.push(data.data.files[0].id);
-        //     console.log(this.files);
-        // })
-      }
+        }
     },
     aliases() {
       let aliases = this.$store.state.aliases.addresses;
@@ -888,9 +737,17 @@ export default {
     },
     defaultAlias() {
       let aliases = this.$store.state.aliases.addresses;
-      for (let i = 0; i < aliases.length; i++) {
-        if (aliases[i].isDefault) {
-          return { id: i, email: aliases[i].email, name: aliases[i].name };
+      if(this.composer.from !== undefined) {
+        for(let i = 0; i < aliases.length; i++) {
+          if(aliases[i].email == Object.keys(this.composer.from)) {
+            return { id: i, email: aliases[i].email, name: aliases[i].name };
+          }
+        }
+      } else {
+        for (let i = 0; i < aliases.length; i++) {
+          if (aliases[i].isDefault) {
+            return { id: i, email: aliases[i].email, name: aliases[i].name };
+          }
         }
       }
       return {};
@@ -898,6 +755,9 @@ export default {
     signature() {
       // return this.$store.state.userInfo;
       // this.aliases();
+      if(this.composer.html !== undefined) {
+        return this.composer.html;
+      }
       let signature = this.$store.state.userSignature.body;
       if (!signature) return "";
       let body = signature.replace(/^.*?<body[^>]*>(.*?)<\/body>.*?$/i, "$1");
@@ -922,11 +782,14 @@ export default {
       console.log(html);
       return html;
     },
-    closeCompose() {
-      this.show = false;
+    closeCompose(hash) {
+      // console.log(hash, this.composer.id, hash == this.composer.id);
+      // this.show = false;
+      // if(hash == this.composer.id) {
       this.isCC = false;
       this.isBCC = false;
       this.files = [];
+      this.attachments = {};
       this.uploadingFiles = [];
       this.filesMap = [];
       this.tagTo = "";
@@ -947,6 +810,9 @@ export default {
       this.message = "New Message";
       this.mail_body = this.signature();
       this.fromSelected = this.defaultAlias();
+      // this.compose = this.compose.filter(el => Object.keys(el) !== hash);
+      bus.$emit("closeCompose", hash);
+      // }
     },
     // getUserSignature() {
     //   fetch(this.$apiBaseURL + "getUserSignature.php?mailboxId=" + this.$route.params.mailboxId, {credentials: "include"})
@@ -1062,14 +928,13 @@ export default {
     saveDraft() {
       // this.getUserSignature();
       if (
-        this.show == true &&
         (this.tagsTo.length > 0 ||
           this.tagsCC.length > 0 ||
           this.tagsBCC.length > 0 ||
           this.subject ||
           this.mail_body)
       ) {
-        console.log("save");
+        console.log("save", this.composer.hash);
         this.message = "Saving Draft";
         let requestOptions = this.createBody("draft");
         fetch(this.$apiBaseURL + "saveDraft.php", requestOptions)
@@ -1140,7 +1005,7 @@ export default {
             console.log(2);
             clearInterval(self.undoInterval);
             self.showUndo = false;
-            self.closeCompose();
+            self.closeCompose(self.composer.hash);
             self.undoTimer = self.$store.state.userSettings.undoTimer;
           }, self.$store.state.userSettings.undoTimer*1000);
           // clearTimeout(this.undoInterval);
