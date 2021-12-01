@@ -52,14 +52,19 @@
                     .then(async response => {
                         const integrationData = await response.json();
                         let integrationData2 = integrationData.data;
-                        this.sidebarData = integrationData2;
-                        this.dataStatus = true;
-                        for(const key in this.sidebarData.create){
-                            this.openCreateFormArray[key] = false;
+                        if(integrationData2.length == 0){
+                            this.dataStatus = false;
+                        }else{
+                            this.sidebarData = integrationData2;
+                            this.dataStatus = true;
+                            for(const key in this.sidebarData.create){
+                                this.openCreateFormArray[key] = false;
+                            }
+                            for(const key in this.sidebarData.update){
+                                this.openUpdateFormArray[key] = false;
+                            }
                         }
-                        for(const key in this.sidebarData.update){
-                            this.openUpdateFormArray[key] = false;
-                        }
+                        console.log("integrationData2",integrationData2.length);
                         // check for error response
                         if (!response.status) {
                             // get error message from body or default to response statusText

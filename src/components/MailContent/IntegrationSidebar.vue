@@ -38,8 +38,8 @@
                                     <p v-for= "(component, index) in sidebar.components[0]"
                                         :key = "index"
                                     >
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="(component.type=='text' || component.type=='dropdown') && component.show == 1">
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown') && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date') && component.show == 1">
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date') && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
                                         <span v-else-if="component.type=='link' && component.show == 1">
                                             <a :href="component.value" target="_blank">{{component.label}}
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -125,8 +125,8 @@
                                             <p v-for= "(com, index) in component"
                                                 :key = "index"
                                             >   
-                                                <span v-if= "com.type=='text' && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if= "com.type=='text' && com.show == 1">
-                                                <span v-if= "com.type=='text' && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
+                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date') && com.show == 1">
+                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
                                                 <span v-else-if="com.type=='link' && com.show == 1">
                                                     <a :href="com.value" target="_blank">{{com.label}}
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -338,6 +338,9 @@ export default {
                 if(this.sidebarData.fetch[0]['associated_id'] && this.sidebarData.fetch[0]['associated_id']!=''){
                     createFormData['associated_id'] = this.sidebarData.fetch[0]['associated_id'];
                 }
+                if(this.sidebarData.fetch[0]['class'] == 'contact' && this.sidebarData.fetch[0]['components'].length != 0 && this.sidebarData.fetch[0]['components'][0][0]['value']!=''){
+                    createFormData['contact_id'] = this.sidebarData.fetch[0]['components'][0][0]['value'];
+                }
                 fetch("https://app.helpwise.io/api/integration-vue/"+int_name+"/post.php", {
                     method: 'POST', 
                     credentials: 'include',
@@ -377,6 +380,9 @@ export default {
                     $(`.${int_name}-edit-${className}-${identifier}-error`).text('');
                 }
                 updateFormData[identifier] = identifier_value;
+                if(component.text_value && component.text_value!= ''){
+                    updateFormData[identifier+'_id'] = component.text_value;
+                }
             });
             if(flag == 0){
                 updateFormData['id'] = this.formData[className]['id'];
@@ -384,6 +390,9 @@ export default {
                 updateFormData['integration_id'] = int_id;
                 if(this.sidebarData.fetch[0]['associated_id'] && this.sidebarData.fetch[0]['associated_id']!=''){
                     updateFormData['associated_id'] = this.sidebarData.fetch[0]['associated_id'];
+                }
+                if(this.sidebarData.fetch[0]['class'] == 'contact' && this.sidebarData.fetch[0]['components'].length != 0 && this.sidebarData.fetch[0]['components'][0][0]['value']!=''){
+                    updateFormData['contact_id'] = this.sidebarData.fetch[0]['components'][0][0]['value'];
                 }
                 fetch("https://app.helpwise.io/api/integration-vue/"+int_name+"/post.php", {
                     method: 'POST', 
