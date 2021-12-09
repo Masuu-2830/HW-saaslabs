@@ -433,7 +433,7 @@ export default {
       attachments: this.composer.attachments !== undefined ? this.composer.attachments : {},
       // attachments: {},
       // uploadingFiles: [],
-      // files: [],
+      files: [],
       // filesMap: [],
       undoTimer: this.$store.state.userSettings.undoTimer,
       isSend: this.$store.state.userSettings.send,
@@ -496,7 +496,8 @@ export default {
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData:{
-                attachments: self.attachments
+                attachments: self.attachments,
+                type: "compose"
               }
             }).$mount();
             var ed = $(`#editor-uploadAttachment`).data('editor');
@@ -557,7 +558,7 @@ export default {
     // },
     tagsto() {
       let to = [];
-      if(Object.keys(this.composer.to).length > 0) {
+      // if(Object.keys(this.composer.to).length > 0) {
         for(var key in this.composer.to) {
           let obj = {};
           obj["email"] = key;
@@ -566,13 +567,13 @@ export default {
           obj["tiClasses"] = ["ti-valid"]
           to.push(obj);
         }
-      }
+      // }
       console.log(to);
       return to;
     },
     tagscc() {
       let cc = [];
-      if(Object.keys(this.composer.cc).length > 0) {
+      // if(Object.keys(this.composer.cc).length > 0) {
         for(var key in this.composer.cc) {
           let obj = {};
           obj["email"] = key;
@@ -581,13 +582,13 @@ export default {
           obj["tiClasses"] = ["ti-valid"]
           cc.push(obj);
         }
-      }
+      // }
       console.log(cc);
       return cc;
     },
     tagsbcc() {
       let bcc = [];
-      if(Object.keys(this.composer.bcc).length > 0) {
+      // if(Object.keys(this.composer.bcc).length > 0) {
         for(var key in this.composer.bcc) {
           let obj = {};
           obj["email"] = key;
@@ -596,7 +597,7 @@ export default {
           obj["tiClasses"] = ["ti-valid"]
           bcc.push(obj);
         }
-      }
+      // }
       console.log(bcc);
       return bcc;
     },
@@ -699,7 +700,7 @@ export default {
             vueThis.attachments[attachID]["mimeType"] = attachData["mimeType"];
             vueThis.attachments[attachID]["extension"] = attachData["extension"];
             vueThis.attachments[attachID]["id"] = attachID;
-            // vueThis.files.push(attachID);
+            vueThis.files.push(attachID);
             vueThis.editorInstance.attachments = vueThis.attachments;
             console.log(vueThis.attachments, vueThis.editorInstance);
             let attchComp = Vue.extend(AttachmentComp);
@@ -890,6 +891,7 @@ export default {
           from,
           subject: this.subject,
           to,
+          inReplyTo: this.composer.inReplyTo
         };
       } else {
         body = {
@@ -902,6 +904,7 @@ export default {
           to,
           threadID: this.threadID,
           draftID: this.draftID,
+          inReplyTo: this.composer.inReplyTo
         };
       }
       let text = html.replace(/(<([^>]+)>)/gi, "");

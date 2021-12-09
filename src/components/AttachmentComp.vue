@@ -1,4 +1,5 @@
 <template>
+<div>
     <div class="attachmentContainer">
         <span
             class="d-flex justify-content-start attachment align-items-center rounded mt-1 mb-1 hwFileAttach"
@@ -21,13 +22,47 @@
             </span>
         </span>
     </div>
+<div v-if="type == 'reply'" @click="showBlock" class="hw_quote rounded hw_collapse-btn hw_collapse-btn-draft badge-pill badge align-items-center justify-content-center text-info"
+                        data-toggle="tooltip" data-placement="top" title="Show trimmed content"
+                        style="cursor:pointer;border-radius:5.5px;height:10px;width:25px;padding:0px;font-size:10px;display: flex;margin-left: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="feather feather-more-horizontal">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="19" cy="12" r="1"></circle>
+                        <circle cx="5" cy="12" r="1"></circle>
+                    </svg>
+                </div>
+                <div class="blockq" :class="!blockOpen && 'd-none'">
+                    <div class="hw_attr hw_quote" dir="ltr" style="margin-left: 10px;">
+                        On {{ date | moment('dddd, MMMM DD, YYYY [at] hh:mm A') }} {{ Object.values(from).toString() }} ({{ Object.keys(from).toString() }}) wrote:
+                    </div>
+                    <blockquote v-html="html" class="hw_blockquote hw_quote" style="border-left:1px solid rgb(204,204,204);margin:0px 0ex 0px 10px;padding: 7px">
+                        <!-- {{html}} -->
+                    </blockquote>
+                </div>
+    </div>
 </template>
 
 <script>
     import { bus } from "../main"
     export default {
-        props:["attachments"],
+        props:{
+            attachments: Array,
+            date: String,
+            html: String,
+            type: String,
+            from: Object
+        },
+        data() {
+            return {
+                blockOpen: false
+            }
+        },
         methods:{
+            showBlock() {
+                this.blockOpen = !this.blockOpen
+            },
             humanFileSize: function(bytes, si) {
                 var thresh = si ? 1000 : 1024;
                 if (Math.abs(bytes) < thresh) {

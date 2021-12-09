@@ -21,13 +21,13 @@ export default {
       thread: Object
     },
     created() {
-        bus.$on("openReply", (data, email) => {
+        bus.$on("openReply", (data, type, email) => {
             console.log("openingg",data, email, this.thread);
             if(email == undefined) {
                 let obj = { hash: data };
                 this.replies.push(obj);
             } else {
-                let obj = { hash: data, id: email.id, email: email };
+                let obj = { hash: data, id: email.id, type: type, email: email };
                 this.replies.push(obj);
             }
             this.show = true;

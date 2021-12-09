@@ -1014,8 +1014,9 @@ export default {
   },
   methods: {
     async clickThread(id, isstarred) {
-      if(this.route == 'drafts') {
-        var objIndex = this.perPageMails.findIndex((obj => obj.id == id));
+      var objIndex = this.perPageMails.findIndex((obj => obj.id == id));
+      console.log(this.perPageMails[objIndex].totalEmailCount, objIndex);
+      if(this.route == 'drafts' && this.perPageMails[objIndex].totalEmailCount == 1) {
         let emailId = this.perPageMails[objIndex].email.id;
         fetch(this.$apiBaseURL + "getEmail.php?emailID=" + emailId + "&mailboxID=" + this.$route.params.mailboxId, {credentials: "include"})
         .then(async response => { 

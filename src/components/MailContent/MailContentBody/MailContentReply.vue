@@ -24,7 +24,7 @@
             rounded
           "
         >
-          <div class="replyMainWrapper">
+          <div class="replyMainWrapper" :class="!show && 'd-none'">
             <div class="d-flex justify-content-between">
               <div
                 class="d-flex justify-content-start flex-grow-1"
@@ -36,16 +36,20 @@
                     style="font-size: 13px"
                     data-toggle="dropdown"
                   >
-                    <i class="reply-type-icon fas fa-reply"></i>
+                    <i v-if="type == 1" class="reply-type-icon fas fa-reply"></i>
+                    <i v-else-if="type == 2" class="reply-type-icon fas fa-reply-all"></i>
+                    <i v-else class="reply-type-icon fas fa-share"></i>
                   </span>
                   <div class="dropdown-menu">
                     <button
+                      @click.prevent="replyy"
                       class="dropdown-item text-secondary reply-state-btn-reply"
                       style="font-size: 13px"
                     >
                       <i class="fas fa-reply"></i> Reply
                     </button>
                     <button
+                      @click.prevent="replyAll"
                       class="
                         dropdown-item
                         text-secondary
@@ -56,6 +60,7 @@
                       <i class="fas fa-reply-all"></i> Reply All
                     </button>
                     <button
+                      @click.prevent="forward"
                       class="
                         dropdown-item
                         text-secondary
@@ -109,6 +114,7 @@
                         @tag-order-changed="newTags => tagsTo = newTags"
                         @tags-changed="updateTo"
                         placeholder=""
+                        style="z-index: 0; max-width: 100%"
                       >
                         <div
                           slot="autocomplete-item"
@@ -131,7 +137,7 @@
                     class="
                       mg-b-0
                       tx-13 tx-color-03
-                      
+                      d-flex
                       flex-row
                       justify-content-start
                       align-items-center
@@ -215,7 +221,7 @@
                         @tag-order-changed="newTags => tagsCC = newTags"
                         @tags-changed="updateCC"
                         placeholder=""
-                        style="z-index: 0"
+                        style="z-index: 0; max-width: 100%"
                       >
                         <div
                           slot="autocomplete-item"
@@ -238,7 +244,7 @@
                     class="
                       mg-b-0
                       tx-13 tx-color-03
-                      
+                      d-flex
                       flex-row
                       justify-content-start
                       align-items-center
@@ -322,7 +328,7 @@
                         @tag-order-changed="newTags => tagsBCC = newTags"
                         @tags-changed="updateBCC"
                         placeholder=""
-                        style="z-index: 0"
+                        style="z-index: 0; max-width: 100%"
                       >
                         <div
                           slot="autocomplete-item"
@@ -380,6 +386,7 @@
                   data-toggle="tooltip"
                   tabindex="-1"
                   class="btn btn-link p-1 popoutReply"
+                  @click.stop.prevent="openInCompose"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -434,14 +441,14 @@
             ></div>
           </div> -->
           <!-- <div class="reply-attachment-list"></div> -->
-          <!-- <div class="replyPoppedOutWrapper tx-12">
+          <div class="replyPoppedOutWrapper tx-12" :class="show && 'd-none'" style="padding: 20px">
             You're editing this draft somewhere else.
             <br />
             Open
             <span
-              ><button class="px-0 btn-link btn popinReply">here</button></span
+              ><button class="px-0 btn-link btn popinReply" @click.stop.prevent="openHere">here</button></span
             >
-          </div> -->
+          </div>
         </div>
       </div>
     </div>
@@ -466,9 +473,11 @@ export default {
         const self = this;
         return {
             show: true,
+            type: this.reply.type,
             fromOptions: this.aliases(),
             fromSelected: this.defaultAlias(),
             attachments: this.reply.attachments !== undefined ? this.reply.attachments : {},
+            files: [],
             undoTimer: this.$store.state.userSettings.undoTimer,
             isSend: this.$store.state.userSettings.send,
             tagTo: '',
@@ -492,8 +501,8 @@ export default {
             toNotValid: false,
             ccNotValid: false,
             bccNotValid: false,
-            isCC: false,
-            isBCC: false,
+            isCC: this.reply.type == 2 && Object.keys(this.reply.email.cc).length > 0 ? true : false,
+            isBCC: this.reply.type == 2 && Object.keys(this.reply.email.bcc).length > 0 ? true : false,
             draftID: null,
             threadID: this.reply.email.threadID !== undefined ? this.reply.email.threadID : null,
             inReplyTo: this.reply.email.id !== undefined ? this.reply.email.id : null,
@@ -503,7 +512,7 @@ export default {
               placeholderText: "Type something",
               charCounterCount: false,
               toolbarBottom: true,
-              height: "220px",
+              height: "320px",
               imageUploadParam: "files[]",
               imageUploadURL:
                 "https://app.helpwise.io/api/uploadInlineAttachment.php",
@@ -525,15 +534,19 @@ export default {
                   self.editorInstance = this;
                   console.log("initialized");
                   console.log(this);
-                  // let attchComp = Vue.extend(AttachmentComp);
-                  // let replyAttachmentList = new attchComp({
-                  //   propsData:{
-                  //     attachments: self.attachments
-                  //   }
-                  // }).$mount();
-                  // // var ed = $(`#reply-uploadAttachment`).data('editor');
-                  // console.log(editor);
-                  // editor.$wp.append(replyAttachmentList.$el);
+                  let attchComp = Vue.extend(AttachmentComp);
+                  let replyAttachmentList = new attchComp({
+                    propsData:{
+                      attachments: self.attachments,
+                      html: self.reply.email.html,
+                      date: self.reply.email.date,
+                      type: "reply",
+                      from: self.reply.email.from
+                    }
+                  }).$mount();
+                  // var ed = $(`#reply-uploadAttachment`).data('editor');
+                  console.log(editor);
+                  editor.$wp.append(replyAttachmentList.$el);
                   // ed.$wp.append(replyAttachmentList.$el);
                 },
               },
@@ -559,8 +572,10 @@ export default {
       bus.$on("deleteAttachmentUpload", (id) => {
         console.log("event listenedd", id);
         Vue.delete(this.attachments, id);
-        this.attachments = this.attachments.filter(i => i.id !== id);
+        Vue.delete(this.files, id);
+        this.files = this.files.filter(i => i !== id);
         console.log(this.attachments, this.files);
+        console.log("File deleted")
       });
     },
     watch: {
@@ -615,10 +630,10 @@ export default {
         // myGreeting() {
         //   setTimeout(this.saveDraft, this.doneTypingInterval);
         // },
-        tagsto() {
+        tagsto(prop) {
           let to = [];
           console.log(this.reply.email.from)
-          if(Object.keys(this.reply.email.from).length > 0) {
+          if(this.reply.type !== 3 && prop !== 3) {
             for(var key in this.reply.email.from) {
               let obj = {};
               obj["email"] = key;
@@ -627,38 +642,66 @@ export default {
               obj["tiClasses"] = ["ti-valid"]
               to.push(obj);
             }
+            if(this.reply.type == 2 || prop == 2) {
+              let aliases = this.$store.state.aliases.addresses;
+              for(var key in this.reply.email.to) {
+                if(!aliases.some(el => el.email == key)) {
+                  let obj = {};
+                  obj["email"] = key;
+                  obj["name"] = this.reply.email.to[key];
+                  obj["text"] = this.reply.email.to[key] + " (" + key + ")";
+                  obj["tiClasses"] = ["ti-valid"]
+                  to.push(obj);
+                }
+              }
+            }
           }
           console.log(to);
           return to;
         },
-        tagscc() {
+        tagscc(prop) {
           let cc = [];
-          // if(Object.keys(this.reply.cc).length > 0) {
-            for(var key in this.reply.cc) {
-              let obj = {};
-              obj["email"] = key;
-              obj["name"] = this.reply.cc[key];
-              obj["text"] = this.reply.cc[key] + " (" + key + ")";
-              obj["tiClasses"] = ["ti-valid"]
-              cc.push(obj);
+          console.log(this.reply.type);
+          if(this.reply.type == 2 || prop == 2) {
+            let aliases = this.$store.state.aliases.addresses;
+            for(var key in this.reply.email.cc) {
+              if(!aliases.some(el => el.email == key)) {
+                let obj = {};
+                obj["email"] = key;
+                obj["name"] = this.reply.email.cc[key];
+                obj["text"] = this.reply.email.cc[key] + " (" + key + ")";
+                obj["tiClasses"] = ["ti-valid"]
+                cc.push(obj);
+              }
             }
-          // }
+          }
           console.log(cc);
+          if(cc.length > 0) {
+            this.isCC = true;
+            console.log(cc.length, this.isCC);
+          }
           return cc;
         },
-        tagsbcc() {
+        tagsbcc(prop) {
           let bcc = [];
-          // if(Object.keys(this.reply.bcc).length > 0) {
-            for(var key in this.reply.bcc) {
-              let obj = {};
-              obj["email"] = key;
-              obj["name"] = this.reply.bcc[key];
-              obj["text"] = this.reply.bcc[key] + " (" + key + ")";
-              obj["tiClasses"] = ["ti-valid"]
-              bcc.push(obj);
+          if(this.reply.type == 2 || prop == 2) {
+            let aliases = this.$store.state.aliases.addresses;
+            for(var key in this.reply.email.bcc) {
+              if(!aliases.some(el => el.email == key)) {
+                let obj = {};
+                obj["email"] = key;
+                obj["name"] = this.reply.email.bcc[key];
+                obj["text"] = this.reply.email.bcc[key] + " (" + key + ")";
+                obj["tiClasses"] = ["ti-valid"]
+                bcc.push(obj);
+              }
             }
-          // }
+          }
           console.log(bcc);
+          if(bcc.length > 0) {
+            this.isBCC = true;
+            console.log(bcc.length, this.isBCC);
+          }
           return bcc;
         },
         prepareFroalaButtons() {
@@ -760,19 +803,19 @@ export default {
                 vueThis.attachments[attachID]["mimeType"] = attachData["mimeType"];
                 vueThis.attachments[attachID]["extension"] = attachData["extension"];
                 vueThis.attachments[attachID]["id"] = attachID;
-                // vueThis.files.push(attachID);
+                vueThis.files.push(attachID);
                 vueThis.editorInstance.attachments = vueThis.attachments;
                 console.log(vueThis.attachments, vueThis.editorInstance);
-                let attchComp = Vue.extend(AttachmentComp);
-                let replyAttachmentList = new attchComp({
-                  propsData:{
-                    attachments: vueThis.attachments
-                  }
-                }).$mount();
-                // $('#editor-<>').data('editor',editor)
-                var ed = $(`#reply-uploadAttachment`).data('editor');
-                console.log(ed);
-                ed.$wp.append(replyAttachmentList.$el);
+                // let attchComp = Vue.extend(AttachmentComp);
+                // let replyAttachmentList = new attchComp({
+                //   propsData:{
+                //     attachments: vueThis.attachments
+                //   }
+                // }).$mount();
+                // // $('#editor-<>').data('editor',editor)
+                // var ed = $(`#reply-uploadAttachment`).data('editor');
+                // console.log(ed);
+                // ed.$wp.append(replyAttachmentList.$el);
               })
             }
         },
@@ -813,9 +856,25 @@ export default {
           }
           return {};
         },
+        replyy() {
+          this.tagsTo = this.tagsto(1);
+          this.tagsCC = this.tagscc(1);
+          this.tagsBCC = this.tagsbcc(1);
+          this.type = 1;
+        },
+        replyAll() {
+          this.tagsTo = this.tagsto(2);
+          this.tagsCC = this.tagscc(2);
+          this.tagsBCC = this.tagsbcc(2);
+          this.type = 2;
+        },
+        forward() {
+          this.tagsTo = this.tagsto(3);
+          this.tagsCC = this.tagscc(3);
+          this.tagsBCC = this.tagsbcc(3);
+          this.type = 3;
+        },
         signature() {
-          // return this.$store.state.userInfo;
-          // this.aliases();
           if(this.reply.html !== undefined) {
             return this.reply.html;
           }
@@ -825,8 +884,6 @@ export default {
           console.log(body);
           let html = "";
           let sign = `<div>${body}</div>`;
-          // let signatureText = sign.text();
-          // if (signatureText.trim() || sign.find('img').length > 0) {
           html = `<br/>
                     <br/>
                     <div><div class="hw_signature rounded">
@@ -835,13 +892,60 @@ export default {
                         --
                         <br />
                         ${sign}
+                        
                     </div>
                     </div>
                     </div>
                     </div>`;
-          // }
           console.log(html);
           return html;
+        },
+        openHere() {
+          this.show = true;
+          bus.$emit("closeCompose", this.reply.hash);
+        },
+        openInCompose() {
+          let email = {};
+          let from = {};
+          from[this.fromSelected.email] = this.fromSelected.name;
+          let to = {};
+          let bcc = {};
+          let cc = {};
+          for(let i = 0; i < this.tagsTo.length; i++) {
+            if(this.tagsTo[i].name == undefined) {
+              to[this.tagsTo[i].email] = this.tagsTo[i].email;
+            } else {
+              to[this.tagsTo[i].email] = this.tagsTo[i].name;
+            }
+          }
+          for(let i = 0; i < this.tagsBCC.length; i++) {
+            if(this.tagsBCC[i].name == undefined) {
+              bcc[this.tagsBCC[i].email] = this.tagsBCC[i].email;
+            } else {
+              bcc[this.tagsBCC[i].email] = this.tagsBCC[i].name;
+            }
+          }
+          for(let i = 0; i < this.tagsCC.length; i++) {
+            if(this.tagsCC[i].name == undefined) {
+              cc[this.tagsCC[i].email] = this.tagsCC[i].email;
+            } else {
+              cc[this.tagsCC[i].email] = this.tagsCC[i].name;
+            }
+          }
+          email["from"] = from;
+          email["to"] = to;
+          email["cc"] = cc;
+          email["bcc"] = bcc;
+          email["subject"] = this.subject;
+          email["threadID"] = this.threadID;
+          email["inReplyTo"] = this.inReplyTo;
+          email["id"] = this.draftID;
+          let html = this.mail_body;
+          var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g"); 
+          html = html.replace(re1, ""); 
+          email["html"] = html;
+          this.show = false;
+          bus.$emit("openCompose", this.reply.hash, email);
         },
         createBody(prop) {
           let from = {};
@@ -872,27 +976,28 @@ export default {
             }
           }
           let html = this.mail_body;
-          var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g"); //匹配html标签的正则表达式，"g"是搜索匹配多个符合的内容
-          html = html.replace(re1, ""); //执行替换成空字符
+          var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g"); 
+          html = html.replace(re1, ""); 
           let body;
           if(this.draftID == null) {
             body = {
               mailboxID: this.$route.params.mailboxId, 
               bcc, 
               cc, 
-              files, 
+              files: this.files, 
               from, 
               subject: this.subject, 
               to,
               threadID: this.threadID,
-              inReplyTo: this.inReplyTo
+              inReplyTo: this.inReplyTo,
+              replyAll: this.reply.email.replyAll
             }
           } else {
             body = {
               mailboxID: this.$route.params.mailboxId, 
               bcc, 
               cc, 
-              files, 
+              files: this.files, 
               from, 
               subject: this.subject, 
               to,
