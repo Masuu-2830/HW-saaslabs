@@ -64,7 +64,7 @@
                                 this.openUpdateFormArray[key] = false;
                             }
                         }
-                        console.log("integrationData2",integrationData2.length);
+                        console.log("integrationData2",integrationData2);
                         // check for error response
                         if (!response.status) {
                             // get error message from body or default to response statusText

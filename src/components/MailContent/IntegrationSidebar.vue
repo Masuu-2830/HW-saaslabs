@@ -38,8 +38,8 @@
                                     <p v-for= "(component, index) in sidebar.components[0]"
                                         :key = "index"
                                     >
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date') && component.show == 1">
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date') && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='number' || component.type=='tags') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='number' || component.type=='tags') && component.show == 1">
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='number') && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
                                         <span v-else-if="component.type=='link' && component.show == 1">
                                             <a :href="component.value" target="_blank">{{component.label}}
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -48,6 +48,16 @@
                                                     <line x1="10" y1="14" x2="21" y2="3"></line>
                                                 </svg>
                                             </a>
+                                        </span>
+                                        <span v-else-if="component.type=='button' && component.show == 1">
+                                            <button type="button" class="mb-2 btn btn-xs btn-primary" :class="component.class" @click="buttonFunction(component.api, integrationName, integrationID, sidebar.components[0])">{{ component.label }}</button>
+                                        </span>
+                                        <span v-else-if="component.type=='tags' && component.show == 1">
+                                            <span v-for= "(tag, index) in component.value"
+                                            :key= "index"
+                                            >
+                                                <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                            </span>
                                         </span>
                                     </p>                  
                                 </div>
@@ -59,7 +69,7 @@
                                                 :key = "index"
                                                 class="form-group">
                                                 <label class="d-block">{{ updateComponent.label }}</label>
-                                                <input v-if="updateComponent.type == 'text'" type="text" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class"
+                                                <input v-if="updateComponent.type == 'text' || updateComponent.type == 'number'" min="0" :max="updateComponent.type == 'number'? updateComponent.max : ''" :type="updateComponent.type" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class"
                                                 :placeholder="updateComponent.placeholder" :value="formData[sidebar.class][updateComponent.label]">
                                                 <select v-if="updateComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class">
                                                     <option v-for= "(option, index) in updateComponent.dropdown"
@@ -125,8 +135,8 @@
                                             <p v-for= "(com, index) in component"
                                                 :key = "index"
                                             >   
-                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date') && com.show == 1">
-                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
+                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='number' || com.type=='tags') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='number' || com.type=='tags') && com.show == 1">
+                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='number') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
                                                 <span v-else-if="com.type=='link' && com.show == 1">
                                                     <a :href="com.value" target="_blank">{{com.label}}
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -135,6 +145,13 @@
                                                             <line x1="10" y1="14" x2="21" y2="3"></line>
                                                         </svg>
                                                     </a>
+                                                </span>
+                                                <span v-else-if="com.type=='tags' && com.show == 1">
+                                                    <span v-for= "(tag, index) in com.value"
+                                                    :key= "index"
+                                                    >
+                                                        <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                                    </span>
                                                 </span>
                                             </p>  
                                         </div>
@@ -153,7 +170,7 @@
                                                 :key = "index"
                                                 class="form-group">
                                                 <label class="d-block">{{ createComponent.label }}</label>
-                                                <input v-if="createComponent.type == 'text'" type="text" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
+                                                <input v-if="createComponent.type == 'text' || createComponent.type == 'number'" min="0" :max="createComponent.type == 'number' ? createComponent.max : ''" :type="createComponent.type" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
                                                 :placeholder="createComponent.placeholder">
                                                 <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class">
                                                     <option v-for= "(option, index) in createComponent.dropdown"
@@ -190,7 +207,7 @@
                                                 :key = "index"
                                                 class="form-group">
                                                 <label class="d-block">{{ updateComponent.label }}</label>
-                                                <input v-if="updateComponent.type == 'text'" type="text" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class"
+                                                <input v-if="updateComponent.type == 'text' || updateComponent.type == 'number'" min="0" :max="updateComponent.type == 'number'? updateComponent.max : ''" :type="updateComponent.type" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class"
                                                 :placeholder="updateComponent.placeholder" :value="formData[sidebar.class][updateComponent.label]">
                                                 <select v-if="updateComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class">
                                                     <option v-for= "(option, index) in updateComponent.dropdown"
@@ -250,8 +267,8 @@
                                             <div v-for = "(createComponent, index) in sidebarData.create[sidebar.class].components"
                                                 :key = "index"
                                                 class="form-group">
-                                                <label class="d-block">{{ createComponent.label }}</label>
-                                                <input v-if="createComponent.type == 'text'" type="text" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
+                                                <label v-if="createComponent.type!='button'" class="d-block">{{ createComponent.label }}</label>
+                                                <input v-if="createComponent.type == 'text' || createComponent.type == 'number'" :type="createComponent.type" min="0" :max="createComponent.type == 'number'? createComponent.max : ''" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
                                                 :placeholder="createComponent.placeholder">
                                                 <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'+ createComponent.class">
                                                     <option v-for= "(option, index) in createComponent.dropdown"
@@ -259,6 +276,11 @@
                                                     :value="option.value">{{ option.label }}
                                                     </option>
                                                 </select>
+                                                <span v-if="createComponent.type=='button'">
+                                                    <div :class="'create_'+ sidebar.class + '_' + createComponent.class + '_div'">
+                                                    </div>
+                                                    <button type="button" class="mb-2 btn btn-xs btn-primary" :class="createComponent.class" @click="addRandomData(createComponent, integrationName, integrationID, sidebar.class, 'create','create_'+ sidebar.class + '_' + createComponent.class + '_div')">{{ createComponent.label }}</button>
+                                                </span>
                                                 <div class="invalid-feedback" :class="integrationName + '-create-' + sidebar.class + '-' + createComponent.class + '-error'"></div>
                                             </div>
                                             
@@ -302,7 +324,8 @@ export default {
         return {
            formData: {},
            openCreateFormArrayInternal: {},
-           openUpdateFormArrayInternal: {}
+           openUpdateFormArrayInternal: {},
+           randomData: {}
         }
     },
     methods: {
@@ -314,6 +337,46 @@ export default {
                 $(`${selectorName}`).addClass('show');
                 $(`${selectorName}_caret`).addClass('fa-caret-up').removeClass('fa-caret-down');
             }
+        },
+        buttonFunction(api_name, int_name, int_id, components){
+            let bodyData = {};
+            components.forEach(component => {
+                let identifier = component.class; 
+                let identifier_value = component.value;
+                if(component.type == 'dropdown'){
+                    identifier_value = component.dropdown_value;
+                }
+                bodyData[identifier] = identifier_value;
+                if(this.sidebarData.fetch[0]['associated_id'] && this.sidebarData.fetch[0]['associated_id']!=''){
+                    bodyData['associated_id'] = this.sidebarData.fetch[0]['associated_id'];
+                }
+                if(this.sidebarData.fetch[0]['class'] == 'contact' && this.sidebarData.fetch[0]['components'].length != 0 && this.sidebarData.fetch[0]['components'][0][0]['value']!=''){
+                    bodyData['contact_id'] = this.sidebarData.fetch[0]['components'][0][0]['value'];
+                }
+            });
+            bodyData['integration_id'] = int_id;
+
+            fetch("https://app.helpwise.io/api/integration-vue/"+int_name+"/"+api_name+".php", {
+                method: 'POST', 
+                credentials: 'include',
+                headers: {
+                'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bodyData)
+            })
+            .then(async response => {
+                const dataResponse = await response.json();
+                if (!response.status) {
+                    const error = (dataResponse && dataResponse.message) || response.status;
+                    return Promise.reject(error);
+                }
+            })
+            .catch(error => {
+                this.errorMessage = error;
+                console.error("There was an error!", error);
+            });
+            this.randomData = {};
+            this.$emit("postData", int_name);
         },
         createData(className, components, int_name, int_id){
             let createFormData = {};
@@ -335,6 +398,9 @@ export default {
             if(flag == 0){
                 createFormData['integration_id'] = int_id;
                 createFormData['functionality'] = 'create_' + className;
+                if(Object.keys(this.randomData).length!=0){
+                    createFormData['randomData'] = this.randomData;
+                }
                 if(this.sidebarData.fetch[0]['associated_id'] && this.sidebarData.fetch[0]['associated_id']!=''){
                     createFormData['associated_id'] = this.sidebarData.fetch[0]['associated_id'];
                 }
@@ -361,6 +427,7 @@ export default {
                     console.error("There was an error!", error);
                 });
                 this.openCreateFormArrayInternal[className] = false;
+                this.randomData = {};
                 this.$emit("postData", int_name);
             }
         },
@@ -394,6 +461,9 @@ export default {
                 if(this.sidebarData.fetch[0]['class'] == 'contact' && this.sidebarData.fetch[0]['components'].length != 0 && this.sidebarData.fetch[0]['components'][0][0]['value']!=''){
                     updateFormData['contact_id'] = this.sidebarData.fetch[0]['components'][0][0]['value'];
                 }
+                if(Object.keys(this.randomData).length!=0){
+                    updateFormData['randomData'] = this.randomData;
+                }
                 fetch("https://app.helpwise.io/api/integration-vue/"+int_name+"/post.php", {
                     method: 'POST', 
                     credentials: 'include',
@@ -414,6 +484,7 @@ export default {
                     console.error("There was an error!", error);
                 });
                 this.openUpdateFormArrayInternal[className] = false;
+                this.randomData = {};
                 this.$emit("postData", int_name);
             }
         },
@@ -423,6 +494,7 @@ export default {
             }else{
                 this.openCreateFormArrayInternal[className] = false;
             }
+            this.randomData = {};
         },
         openUpdateForm(className, components, int_name){
             if(!this.openUpdateFormArrayInternal[className] || this.openUpdateFormArrayInternal[className] == false || components.length != 0){
@@ -430,6 +502,7 @@ export default {
             }else{
                 this.openUpdateFormArrayInternal[className] = false;
             }
+            this.randomData = {};
             this.formData = {};
             this.formData[className] = {};
             components.forEach(component => {
@@ -443,6 +516,40 @@ export default {
                 $(`.${int_name}_edit_${className}_${identifier}`).val(identifier_value);
             }); 
         },
+        addRandomData(component, int_name, int_id, className, action, classDiv){
+            let value = $(`.${int_name}_${action}_${className}_${component.class}`).val();
+            let divLength = $(`.${classDiv}`).children('div').length;
+            let capClassName = component.class.charAt(0).toUpperCase() + component.class.slice(1);
+            divLength =  parseInt(divLength) + 1;
+            if(!this.randomData[value]){
+                if(component.action == "dropdown" && value!=''){
+                    let selectedData = $(`.${int_name}_${action}_${className}_${component.class} option[value=${value}]`).text();
+                    // $(`.classDiv`).append(`<p style= " background:#E9EBEB; padding :5px">${selectedData} </p>`);
+                    $(`.${classDiv}`).append(`
+                        <div class="mg-t-10 d-flex align-items-center justify-content-between ${classDiv}_${divLength}">
+                            <div class="form-group pd-l-0" style="width: -webkit-fill-available;">
+                                <label class="d-block">${capClassName} ${divLength}</label>
+                                <input type="text" value="${selectedData}" class="form-control" readonly>
+                            </div>
+                            <div class="form-group mg-b-0 pd-l-10">
+                                <svg class="close-create-email" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </div>
+                        </div>
+                    `);
+                }
+                this.randomData[value]=value;
+            }
+            console.log("randomData", this.randomData);
+        },
+        removeRandomData(classDivRemove, value){
+            console.log("classDivRemove",classDivRemove);
+            console.log("value",value);
+            $(`.${classDivRemove}`).remove();
+            delete this.randomData[value];
+        },
         capitalizeFirstLetter(string){
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
@@ -450,6 +557,7 @@ export default {
     beforeMount() {
         this.openUpdateFormArrayInternal = {...this.openUpdateFormArray};
         this.openCreateFormArrayInternal = {...this.openCreateFormArray};
+        this.randomData = {};
     }
 }
 </script>
