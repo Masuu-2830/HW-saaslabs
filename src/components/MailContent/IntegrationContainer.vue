@@ -48,7 +48,16 @@
                 this.integrationName = integrationData.lname;
                 this.integrationID = integrationData.id;
                 if(this.sidebarOpen == false){
-                    fetch("https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=tushar@justcall.io&inbox_type=mail&integration_id=" + integrationData.id, {credentials: 'include'})
+                    let fetchUrl = '';
+                    let date = moment().format("YYYY-MM-DD"); 
+                    if(integrationData.lname == 'easy-calendar' || integrationData.lname == 'google-calendar' || integrationData.lname == 'outlook-calendar'){
+                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + integrationData.id + "&date=" + date;
+                    }else if(integrationData.lname == 'asana' || integrationData.lname == 'clickup' || integrationData.lname == 'jira' || integrationData.lname == 'trello'){
+                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "inbox_type=mail&integration_id=" + integrationData.id;
+                    }else{
+                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=tushar@justcall.io&inbox_type=mail&integration_id=" + integrationData.id;
+                    }
+                    fetch(fetchUrl, {credentials: 'include'})
                     .then(async response => {
                         const integrationData = await response.json();
                         let integrationData2 = integrationData.data;
@@ -86,29 +95,37 @@
                 // setTimeout(function () {
                 //     console.log("wait");
                 // }, 500);
-                    fetch("https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=tushar@justcall.io&inbox_type=mail&integration_id=" + this.integrationID, {
-                        method: 'GET', 
-                        credentials: 'include',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                    .then(async response => {
-                        const updateResponse = await response.json();
-                        this.sidebarData = [];
-                        this.sidebarData = updateResponse.data;
-                        // check for error response
-                        if (!response.status) {
-                            // get error message from body or default to response statusText
-                            const error = (updateResponse && updateResponse.message) || response.status;
-                            return Promise.reject(error);
-                        }
-                    })
-                    .catch(error => {
-                        this.errorMessage = error;
-                        console.error("There was an error!", error);
-                    });
-                
+                let fetchUrl = '';
+                let date = moment().format("YYYY-MM-DD"); 
+                if(integration_name == 'easy-calendar' || integration_name == 'google-calendar' || integration_name == 'outlook-calendar'){
+                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + this.integrationID + "&date=" + date;
+                }else if(integration_name == 'asana' || integration_name == 'clickup' || integration_name == 'jira' || integration_name == 'trello'){
+                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&inbox_type=mail&integration_id=" + this.integrationID;
+                }else{
+                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=tushar@justcall.io&inbox_type=mail&integration_id=" + this.integrationID;
+                }
+                fetch(fetchUrl, {
+                    method: 'GET', 
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(async response => {
+                    const updateResponse = await response.json();
+                    this.sidebarData = [];
+                    this.sidebarData = updateResponse.data;
+                    // check for error response
+                    if (!response.status) {
+                        // get error message from body or default to response statusText
+                        const error = (updateResponse && updateResponse.message) || response.status;
+                        return Promise.reject(error);
+                    }
+                })
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.error("There was an error!", error);
+                });
             }
         },
         created() {
