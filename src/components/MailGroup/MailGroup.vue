@@ -4,7 +4,7 @@
         <span class="sr-only">Loading...</span>
     </div>
     <mails-header-search-box v-on:squery="ssquery"></mails-header-search-box>
-    <mails-header-select-all :selectedIds="selectedIds" :tagsInAll="tagsInAll" :tagsPartial="tagsPartial" :mailbox="mailbox" :startThread="startThread" :endThread="endThread" :currPage="currPage" :isnextPage="isnextPage" :mailsnum="mails.length" v-on:bulkRead="bulkRead" v-on:bulkStar="bulkStar" v-on:bulkMerge="bulkMerge" v-on:deleteThreads="deleteThreads" v-on:prevPage="prevPage" v-on:nextPage="nextPage" v-on:filterPerson="filterPerson" v-on:filterOrder="filterOrder"></mails-header-select-all>
+    <mails-header-select-all :selectedIds="selectedIds" :tagsInAll="tagsInAll" :tagsPartial="tagsPartial" :mailbox="mailbox" :startThread="startThread" :endThread="endThread" :currPage="currPage.toString()" :isnextPage="isnextPage" :mailsnum="mails.length" v-on:bulkRead="bulkRead" v-on:bulkStar="bulkStar" v-on:bulkMerge="bulkMerge" v-on:deleteThreads="deleteThreads" v-on:prevPage="prevPage" v-on:nextPage="nextPage" v-on:filterPerson="filterPerson" v-on:filterOrder="filterOrder"></mails-header-select-all>
     <div
       v-if="!loading"
       class="mail-group-body bd-y"
@@ -12,7 +12,7 @@
     >
       <div v-if="perPageMails.length !== 0" id="threads-list">
         <div v-for="mail in perPageMails" :key="mail.id" @click="clickThread(mail.id, mail.isStarred==true)">
-          <mail-group-single-mail :id="'thread-'+mail.id" :class="{'active': activeId === mail.id}" :compact="isCompact" :mailbox="mailbox" :data-thread="mail" :mail="mail"></mail-group-single-mail>
+          <mail-group-single-mail :id="'thread-'+mail.id" :class="{'active': activeId === mail.id}" :compact="isCompact" :mailbox="mailbox" :data-thread="mail" :mail="mail" v-on:deleteThreads="deleteThreads"></mail-group-single-mail>
           </div>
       </div>
       <div v-if="isThreadRefresh" id="view-all-threads" class="d-flex justify-content-center align-items-center"><button @click.stop.prevent="fetchThreads" class="btn btn-link">View All Conversations</button></div>
@@ -97,7 +97,7 @@
 </template>
 
 <script>
-import { bus } from '../../main';
+import { bus, triggerPromptNotif } from '../../main';
 import router from '../../router';
 import MailGroupSingleMail from './MailGroupSingleMail.vue';
 import MailsHeaderSearchBox from './MailsHeaderSearchBox.vue';
@@ -240,12 +240,18 @@ export default {
             const data = await response.json();
             if(data.status !== "success") {
               const error = (data && data.message) || response.status;
+              triggerPromptNotif(error, "error", 3000);
               return Promise.reject(error);
             }
             if(read == 1) {
               this.perPageMails[objIndex].isRead = true;
             } else {
               this.perPageMails[objIndex].isRead = !this.perPageMails[objIndex].isRead;
+            }
+            if(!this.perPageMails[objIndex].isRead && read !== 1) {
+              triggerPromptNotif("Conversation marked unread", "success", 1000);
+            } else {
+              triggerPromptNotif("Conversation marked read", "success", 1000);
             }
           }).catch(error => {
           alert(error);
@@ -274,7 +280,13 @@ export default {
           const data = await response.json();
           if(data.status !== "success") {
             const error = (data && data.message) || response.status;
+            triggerPromptNotif(error, "error", 3000);
             return Promise.reject(error);
+          }
+          if(this.perPageMails[objIndex].isStarred) {
+            triggerPromptNotif("Conversation unstarred", "success", 1000);
+          } else {
+            triggerPromptNotif("Conversation starred", "success", 1000);
           }
           this.perPageMails[objIndex].isStarred = !this.perPageMails[objIndex].isStarred;
           // bus.$emit("chStarInArr", id);
@@ -301,7 +313,13 @@ export default {
           const data = await response.json();
           if(data.message !== "thread archived") {
             const error = (data && data.message) || response.status;
+            triggerPromptNotif(error, "error", 3000);
             return Promise.reject(error);
+          }
+          if(typeof id == 'number') {
+            triggerPromptNotif("Conversation closed", "success", 1000);
+          } else if(typeof id == 'object') {
+            triggerPromptNotif("Conversations closed", "success", 1000);
           }
           for(let i = 0; i< threadIDs.length; i++) {
             this.perPageMails = this.perPageMails.filter(item => item.id !== threadIDs[i]);
@@ -347,7 +365,13 @@ export default {
             const data = await response.json();
             if(data.message !== "thread restored") {
               const error = (data && data.message) || response.status;
+              triggerPromptNotif(error, "error", 3000);
               return Promise.reject(error);
+            }
+            if(typeof id == 'number') {
+              triggerPromptNotif("Conversation moved to inbox", "success", 1000);
+            } else if(typeof id == 'object') {
+              triggerPromptNotif("Conversations moved to inbox", "success", 1000);
             }
             this.perPageMails = this.perPageMails.filter(item => item.id !== id);
             fetch(this.$apiBaseURL + "get-threads.php?mailboxID=" + this.$route.params.mailboxId + "&labelID=" + this.labelId + "&limit=1&offset=19&consistent=true", {credentials: 'include'})
@@ -381,7 +405,13 @@ export default {
             const data = await response.json();
             if(data.message !== "thread marked as spam") {
               const error = (data && data.message) || response.status;
+              triggerPromptNotif(error, "error", 3000);
               return Promise.reject(error);
+            }
+            if(typeof id == 'number') {
+              triggerPromptNotif("Conversation marked spam", "success", 1000);
+            } else if(typeof id == 'object') {
+              triggerPromptNotif("Conversations marked spam", "success", 1000);
             }
             for(let i = 0; i< threadIDs.length; i++) {
               this.perPageMails = this.perPageMails.filter(item => item.id !== threadIDs[i]);
@@ -427,7 +457,13 @@ export default {
             const data = await response.json();
             if(data.status !== "success") {
               const error = (data && data.message) || response.status;
+              triggerPromptNotif(error, "error", 3000);
               return Promise.reject(error);
+            }
+            if(typeof id == 'number') {
+              triggerPromptNotif("Conversation moved", "success", 1000);
+            } else if(typeof id == 'object') {
+              triggerPromptNotif("Conversations moved", "success", 1000);
             }
             for(let i = 0; i< threadIds.length; i++) {
               this.perPageMails = this.perPageMails.filter(item => item.id !== threadIds[i]);
@@ -473,7 +509,13 @@ export default {
             const data = await response.json();
             if(data.message !== "conversation snoozed") {
               const error = (data && data.message) || response.status;
+              triggerPromptNotif(error, "error", 3000);
               return Promise.reject(error);
+            }
+            if(typeof id == 'number') {
+              triggerPromptNotif("Conversation snoozed", "success", 1000);
+            } else if(typeof id == 'object') {
+              triggerPromptNotif("Conversations snoozed", "success", 1000);
             }
             for(let i = 0; i< threadIDs.length; i++) {
               this.perPageMails = this.perPageMails.filter(item => item.id !== threadIDs[i]);
@@ -579,8 +621,10 @@ export default {
           const data = await response.json();
           if(data.status !== "success") {
             const error = (data && data.message) || response.status;
+            triggerPromptNotif(error, "error", 3000);
             return Promise.reject(error);
           }
+          triggerPromptNotif("Message moved to new conversation", "success", 1000);
           let payload = {
             id: messageId,
             type: "moveConv"
@@ -872,7 +916,13 @@ export default {
             const data = await response.json();
             if(data.status !== "success") {
               const error = (data && data.message) || response.status;
+              triggerPromptNotif(error, "error", 3000);
               return Promise.reject(error);
+            }
+            if(!read) {
+              triggerPromptNotif("Conversations marked unread", "success", 1000);
+            } else {
+              triggerPromptNotif("Conversations marked read", "success", 1000);
             }
             for(let i = 0; i < this.selectedIds.length; i++) {
               var objIndex = this.perPageMails.findIndex((obj => obj.id == this.selectedIds[i]));
@@ -899,8 +949,10 @@ export default {
             const data = await response.json();
             if(data.status !== "success") {
               const error = (data && data.message) || response.status;
+              triggerPromptNotif(error, "error", 3000);
               return Promise.reject(error);
             }
+            triggerPromptNotif("Conversations starred", "success", 1000);
             for(let i = 0; i < this.selectedIds.length; i++) {
               var objIndex = this.perPageMails.findIndex((obj => obj.id == this.selectedIds[i]));
               this.perPageMails[objIndex].isStarred = true;
@@ -927,7 +979,13 @@ export default {
             const data = await response.json();
             if(data.status !== "success") {
               const error = (data && data.message) || response.status;
+              triggerPromptNotif(error, "error", 3000);
               return Promise.reject(error);
+            }
+            if(typeof id == 'number') {
+              triggerPromptNotif("Conversation merged", "success", 1000);
+            } else if(typeof id == 'object') {
+              triggerPromptNotif("Conversations merged", "success", 1000);
             }
             var objIndex, sum = 0;
             for(let i = 0; i < threadIds.length; i++) {
@@ -980,7 +1038,13 @@ export default {
             const data = await response.json();
             if(data.status == "error") {
               const error = (data && data.message) || response.status;
+              triggerPromptNotif(error, "error", 3000);
               return Promise.reject(error);
+            }
+            if(typeof id == 'number') {
+              triggerPromptNotif("Conversation deleted", "success", 1000);
+            } else if(typeof id == 'object') {
+              triggerPromptNotif("Conversations deleted", "success", 1000);
             }
             for(let i = 0; i< threadIDs.length; i++) {
               this.perPageMails = this.perPageMails.filter(item => item.id !== threadIDs[i]);
@@ -1213,6 +1277,7 @@ export default {
       if(this.currPage > 1) {
         this.loading = true;
         this.currPage--;
+        console.log(typeof this.currPage);
         if(this.$route.params.threadId == undefined) {
           router.push({ name: 'page', params: {pageNo: this.currPage, type: this.route, mailboxId: this.$store.state.inboxData.id}});
         }
