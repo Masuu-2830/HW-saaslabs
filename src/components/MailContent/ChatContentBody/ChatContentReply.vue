@@ -480,9 +480,7 @@
       bus.$on("modal.savedReplyInsert.click", function(id){
         let editorInstance = vueThis.current == "reply" ? vueThis.replyEditorInstance : vueThis.noteEditorInstance;
 
-        console.log("Thread data", $(`#thread-${vueThis.$route.params.threadId}`).data(), vueThis.$route.params.threadId);
         triggerPromptNotif("Fetching saved reply data");
-
         fetch(
           `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$route.params.mailboxId}&savedReplyID=${id}`,
           {credentials: 'include'}
@@ -490,7 +488,9 @@
         .then(response => {
           if(response.status == "success"){
             editorInstance.html.insert(response.data.savedReply.content);
-            triggerPromptNotif("Saved Reply Inserted", "success", 1000);
+            triggerPromptNotif("Saved Reply Inserted", "success");
+          } else {
+            triggerPromptNotif("Unable to insert Saved Reply", "error");
           }
         })
       })
