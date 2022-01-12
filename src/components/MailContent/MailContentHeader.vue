@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="Object.keys(thread).length !== 0"
     class="mail-content-header justify-content-between align-items-center"
     style="min-height: unset"
   >
@@ -97,11 +98,6 @@
               class="avatar avatar-xxs"
               style="margin-right: -3px"
             >
-              <!-- <span
-                class="avatar-initial rounded-circle"
-                style="background-color: hsl(125, 32%, 64%)"
-                >MM</span
-              > -->
             </div>
           </div>
           <div class="p-1">
@@ -157,11 +153,6 @@
                 style="width: 55%"
               >
                 <div v-html="userInfo.avatarTag" class="avatar avatar-xxs mr-1">
-                  <!-- <span
-                    class="avatar-initial rounded-circle"
-                    style="background-color: hsl(125, 32%, 64%)"
-                    >MM</span
-                  > -->
                 </div>
                 <span
                   class="tx-13 ml-1"
@@ -195,11 +186,6 @@
                 style="width: 55%"
               >
                 <div v-html="teammate.avatarTag" class="avatar avatar-xxs mr-1">
-                  <!-- <span
-                    class="avatar-initial rounded-circle"
-                    style="background-color: hsl(297, 32%, 64%)"
-                    >HD</span
-                  > -->
                 </div>
                 <span
                   class="tx-13 ml-1"
@@ -306,7 +292,8 @@
           "
         >
           <input
-            type="email"
+            type="text"
+            v-model="sqTm"
             class="form-control form-control-sm"
             id="search-assignment-users"
             aria-describedby="emailHelp"
@@ -319,6 +306,7 @@
             style="max-height: 200px; overflow-y: scroll"
           >
             <div
+              v-if="sqTm == ''"
               @click="assign('')"
               id="assignment-teammate-unassigned"
               class="
@@ -380,6 +368,7 @@
               </span>
             </div>
             <div
+              v-if="sqTm == ''"
               @click="assign(userInfo.id)"
               :id="'assignment-teammate-' + userInfo.id"
               class="
@@ -402,11 +391,6 @@
                 class="d-flex align-items-center justify-content-start w-100"
               >
                 <div v-html="userInfo.avatarTag" class="avatar avatar-xxs mr-1">
-                  <!-- <span
-                    class="avatar-initial rounded-circle"
-                    style="background-color: hsl(125, 32%, 64%)"
-                    >MM</span
-                  > -->
                 </div>
                 <span
                   class="tx-13 ml-1 tx-color-02 display-name"
@@ -461,11 +445,6 @@
                 class="d-flex align-items-center justify-content-start w-100"
               >
                 <div v-html="teammate.avatarTag" class="avatar avatar-xxs mr-1">
-                  <!-- <span
-                    class="avatar-initial rounded-circle"
-                    style="background-color: hsl(53, 32%, 64%)"
-                    >AR</span
-                  > -->
                 </div>
                 <span
                   class="tx-13 ml-1 tx-color-02 display-name"
@@ -1127,7 +1106,7 @@
 
           <div
             v-b-modal="'snooze-thread-modall' + this.$route.params.threadId"
-            class="dropdown-item snooze-drop-down show-thread-snooze-modal"
+            class="dropdown-item snooze-drop-down show-thread-snooze-modal" style="cursor: pointer"
           >
             <span>Pick date &amp; time</span>
           </div>
@@ -1136,7 +1115,7 @@
             :ref="'snooze-thread-modall' + this.$route.params.threadId"
             size="sm"
             title="Pick Date & Time"
-            hide-footer="true"
+            hide-footer
           >
             <div class="modal-body">
               <div class="d-flex align-items-center justify-content-center">
@@ -1315,6 +1294,7 @@ export default {
   data() {
     return {
       // isStarred: this.thread.data.isStarred,
+      sqTm: "",
       removetags: [],
       addtags: [],
       inboxSelected: this.$route.params.mailboxId,
@@ -1322,16 +1302,39 @@ export default {
       tagName: "",
       tagColor: "",
       datetime: "",
-      newDateOpen: false
+      newDateOpen: false,
     };
   },
-  // created() {
-  //   bus.$on("changeAssign", (teammate) => {
-  //     console.log(teammate);
-  //     console.log(this.thread.data.currentAssignment);
-  //     this.thread.data.currentAssignment.assigned = teammate[0];
-  //   })
-  // },
+  computed: {
+    userInfo() {
+      return this.$store.state.userInfo;
+    },
+    tags() {
+      return this.$store.state.tags;
+    },
+    teammates() {
+      // let query = this.sqTm.toLowerCase().trim();
+      // if(query == "") {
+        return this.$store.state.teammates;
+      // } else {
+        // return this.teammates.filter((item) => item.id !== this.userInfo.id);
+      // }
+    },
+    mailboxes() {
+      return this.$store.state.mailboxes;
+    },
+    teammatesNew: function () {
+      let query = this.sqTm.toLowerCase().trim();
+      if(query == "") {
+        return this.teammates.filter((item) => item.id !== this.userInfo.id);
+        // console.log(this.teammatesNew);
+      } else {
+        return this.teammates.filter((item) => item.id !== this.userInfo.id && item.name.toLowerCase().search(query) !== -1);
+        // console.log(this.teammatesNew);
+      }
+      // return this.teammates.filter((item) => item.id !== this.userInfo.id);
+    },
+  },
   methods: {
     backThread() {
       bus.$emit("broad");
@@ -1522,23 +1525,6 @@ export default {
     },
     restoreThread(id) {
       bus.$emit("restoreThreads", id);
-    },
-  },
-  computed: {
-    userInfo() {
-      return this.$store.state.userInfo;
-    },
-    tags() {
-      return this.$store.state.tags;
-    },
-    teammates() {
-      return this.$store.state.teammates;
-    },
-    mailboxes() {
-      return this.$store.state.mailboxes;
-    },
-    teammatesNew: function () {
-      return this.teammates.filter((item) => item.id !== this.userInfo.id);
     },
   },
 };

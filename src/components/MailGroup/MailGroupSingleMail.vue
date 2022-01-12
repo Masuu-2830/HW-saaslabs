@@ -5,7 +5,7 @@
     style="border-bottom: 1px solid #e5e9f2"
   >
     <div class="realtimeMarker"></div>
-    <div class="hw_broadThread w-100" :style="{display: !isCompact ? block : none}">
+    <div class="hw_broadThread w-100" :class="compact ? 'd-none' : 'd-block'">
       <div class="row align-items-center w-100" style="padding-left: 20px">
         <div
           class="col-3 d-flex justify-content-between align-items-center pl-0"
@@ -50,7 +50,7 @@
               </svg>
             </div>
           </div>
-          <div class="flex-grow-1 w-100 d-flex thread-addr">
+          <div v-if="mail.email !== undefined" class="flex-grow-1 w-100 d-flex thread-addr">
             <div
               v-if="mail.email.to !== undefined"
               class="text-truncate thread-addr-main"
@@ -97,6 +97,22 @@
               {{ mail.totalEmailCount > 1 ? mail.totalEmailCount : "" }}
             </div>
           </div>
+          <div v-else class="flex-grow-1 w-100 d-flex thread-addr">
+            <div
+              class="text-truncate thread-addr-main"
+              style="max-width: 90%"
+              :style="{ fontWeight: mail.isRead ? '' : '600' }"
+            >
+              {{ mail.displayContact }}
+            </div>
+            <div
+              class="text-primary ml-1"
+              v-if="mail.hasDraft"
+              style="max-width: 25%"
+            >
+              Draft
+            </div>
+          </div>
         </div>
         <div class="col-7 d-flex align-items-center">
           <div
@@ -125,10 +141,18 @@
             </div>
             <div class="d-flex align-items-center">
               <span
+                v-if="mail.email !== undefined"
                 class="tx-14 hw-thread-subject mr-2"
                 :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
               >
                 {{ mail.email.subject ? mail.email.subject : "(no subject)" }}
+              </span>
+              <span
+                v-else
+                class="tx-14 hw-thread-subject mr-2"
+                :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+              >
+                {{ mail.subject ? mail.subject : "(no subject)" }}
               </span>
               <span
                 v-if="mail.snippetType == 'note'"
@@ -136,8 +160,11 @@
                 style="color: #ddcf97"
                 >|</span
               >
-              <span class="tx-14 tx-color-03">
+              <span v-if="mail.email !== undefined" class="tx-14 tx-color-03">
                 {{ mail.email.snippet }}
+              </span>
+              <span v-else class="tx-14 tx-color-03">
+                {{ mail.snippet }}
               </span>
             </div>
           </div>
@@ -182,10 +209,15 @@
           </div>
         </div>
         <div class="col-2 date-thread-options col-lg-1">
-          <span
+          <span v-if="mail.email !== undefined"
             class="tx-13 thread-date"
             :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
             >{{ mail.email.humanFriendlyDate }}</span
+          >
+          <span v-else
+            class="tx-13 thread-date"
+            :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+            >{{ mail.date | moment("MMM D, YYYY") }}</span
           >
           <span
             class="
@@ -385,7 +417,7 @@
                   :ref="'snooze-thread-modal' + mail.id"
                   size="sm"
                   title="Pick Date & Time"
-                  hide-footer="true"
+                  hide-footer
                 >
                   <div class="modal-body">
                     <div
@@ -463,9 +495,25 @@
           </span>
         </div>
       </div>
-      <div class="row" style="padding-left: 20px" v-if="mail.email.attachments.length > 0">
+      <div class="row" style="padding-left: 20px" v-if="mail.email !== undefined && mail.email.attachments !== undefined && mail.email.attachments.length > 0">
         <div class="offset-lg-3 col-7 thread-attachments-list">
           <a v-for="file in mail.email.attachments" :key="file.id"
+            target="_blank"
+            :href='"https://app.helpwise.io/attachments/" + file.id'
+            class="hw-thread-attachment ml-1 mr-1"
+            onclick="event.stopPropagation()"
+            ><div class="d-flex w-100 justify-content-start align-items-center">
+              <span v-html="getFileIcon(file.extension, file.filesize)"></span>
+              <div class="mg-l-10 text-truncate" style="width: 90%">
+                {{file.filename}}
+              </div>
+            </div></a
+          >
+        </div>
+      </div>
+      <div class="row" style="padding-left: 20px" v-if="mail.attachments !== undefined && mail.attachments.length > 0">
+        <div class="offset-lg-3 col-7 thread-attachments-list">
+          <a v-for="file in mail.attachments" :key="file.id"
             target="_blank"
             :href='"https://app.helpwise.io/attachments/" + file.id'
             class="hw-thread-attachment ml-1 mr-1"
@@ -505,7 +553,7 @@
             align-items-center
             w-50
           "
-          ><div class="flex-grow-1 w-100 d-flex thread-addr">
+          ><div v-if="mail.email !== undefined" class="flex-grow-1 w-100 d-flex thread-addr">
             <div
               v-if="mail.email.from == undefined"
               class="text-truncate thread-addr-main"
@@ -543,15 +591,39 @@
             >
               {{ mail.totalEmailCount > 1 ? mail.totalEmailCount : "" }}
             </div>
+          </div>
+          <div v-else class="flex-grow-1 w-100 d-flex thread-addr">
+            <div
+              class="text-truncate thread-addr-main"
+              style="max-width: 90%"
+              :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+            >
+              {{ mail.displayContact }}
+            </div>
+            <div
+              class="text-primary ml-1"
+              v-if="mail.hasDraft"
+              style="max-width: 25%"
+            >
+              Draft
+            </div>
           </div></span
         >
         <span
+          v-if="mail.email !== undefined"
           class="tx-11 thread-date"
           :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
           >{{ mail.email.humanFriendlyDate }}</span
         >
+        <span
+          v-else
+          class="tx-11 thread-date"
+          :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+          >{{ mail.date | moment("MMM D, YYYY") }}</span
+        >
       </div>
       <div
+      v-if="mail.email !== undefined"
         class="tx-13 hw-thread-subject"
         style="
           width: 90%;
@@ -564,9 +636,41 @@
         {{ mail.email.subject ? mail.email.subject : "(no subject)" }}
       </div>
       <div
+      v-else
+        class="tx-13 hw-thread-subject"
+        style="
+          width: 90%;
+          white-space: nowrap;
+          overflow: hidden !important;
+          text-overflow: ellipsis;
+        "
+        :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+      >
+        {{ mail.subject ? mail.subject : "(no subject)" }}
+      </div>
+      <div
         class="d-flex align-items-center justify-content-between mg-b-2 w-100"
       >
         <p
+          class="tx-12 tx-color-03 mg-b-0"
+          style="
+            width: 90%;
+            white-space: nowrap;
+            overflow: hidden !important;
+            text-overflow: ellipsis;
+          "
+          v-if="mail.email !== undefined"
+        >
+          <span
+            v-if="mail.snippetType == 'note'"
+            style="color: #ddcf97"
+            class="tx-bold tx-14 px-2 snippetMarker"
+            >|</span
+          >
+          {{ mail.email.snippet }}
+        </p>
+        <p
+        v-else
           class="tx-12 tx-color-03 mg-b-0"
           style="
             width: 90%;
@@ -581,9 +685,11 @@
             class="tx-bold tx-14 px-2 snippetMarker"
             >|</span
           >
-          {{ mail.email.snippet }}
+          {{ mail.snippet }}
         </p>
-        <span v-if="mail.email.attachments.length > 0"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-paperclip"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg><span>
+        <span v-if="mail.email !== undefined && mail.email.attachments.length > 0"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-paperclip"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg><span>
+        </span></span>
+        <span v-else-if="mail.email == undefined && mail.attachments.length > 0"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-paperclip"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg><span>
         </span></span>
       </div>
     </div>
@@ -599,7 +705,7 @@ export default {
   components: { DatePicker },
   props: {
     mail: Object,
-    isCompact: Boolean
+    compact: Boolean
   },
   data() {
     return {

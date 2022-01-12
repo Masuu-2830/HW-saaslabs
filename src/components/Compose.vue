@@ -318,7 +318,6 @@
                 <div>Subject</div>
                 <div class="flex-grow-1">
                   <input
-                    @blur="saveDraft"
                     v-model="subject"
                     type="text"
                     class="email-sub form-control bd-0"
@@ -356,7 +355,7 @@
               style="display: none"
               name="files[]"
               @change="uploadAttachment"
-              id="editor-uploadAttachment"
+              class="editor-uploadAttachment"
               multiple
             />
             <!-- <div
@@ -490,6 +489,8 @@ export default {
             // self.editorInstance.composer = self.composer;
             var editor = this;
             editor.composer = self.composer;
+            editor.type = "compose";
+            editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
             console.log("initialized");
             console.log(this);
@@ -500,10 +501,10 @@ export default {
                 type: "compose"
               }
             }).$mount();
-            var ed = $(`#editor-uploadAttachment`).data('editor');
-            console.log(editor, ed);
+            // var ed = $(`#editor-uploadAttachment`).data('editor');
+            // console.log(editor, ed);
             editor.$wp.append(replyAttachmentList.$el);
-            ed.$wp.append(replyAttachmentList.$el);
+            // ed.$wp.append(replyAttachmentList.$el);
           },
         },
         key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
@@ -541,6 +542,13 @@ export default {
     tagsBCC: "saveDraft",
     fromSelected: "saveDraft",
     files: "saveDraft",
+    subject: function (to, from) {
+      console.log("subject");
+      if (to !== from) {
+        clearTimeout(this.subjectSave);
+        this.subjectSave = setTimeout(this.saveDraft, 2000);
+      }
+    },
     mail_body: function (to, from) {
       console.log("mailbody");
       if (to !== from) {
@@ -548,9 +556,6 @@ export default {
         this.myGreeting = setTimeout(this.saveDraft, 2000);
       }
     },
-  },
-  beforeMount() {
-    this.prepareFroalaButtons();
   },
   methods: {
     // myGreeting() {
@@ -600,54 +605,6 @@ export default {
       // }
       console.log(bcc);
       return bcc;
-    },
-    prepareFroalaButtons() {
-      const vueThis = this;
-      FroalaEditor.DefineIcon("attach", {
-        FA5NAME: "paperclip",
-        template: "font_awesome_5",
-      });
-      FroalaEditor.RegisterCommand("attach", {
-        title: "Insert Attachment",
-        icon: "attach",
-        refreshAfterCallback: true,
-        callback: function () {
-          $(`#editor-uploadAttachment`).click();
-          $(`#editor-uploadAttachment`).data('editor',this);
-        },
-      });
-      FroalaEditor.DefineIcon("clear", { NAME: "remove", SVG_KEY: "remove" });
-      FroalaEditor.RegisterCommand("clear", {
-        title: "Discard Draft",
-        focus: false,
-        undo: true,
-        refreshAfterCallback: true,
-        callback: function () {
-          console.log(this);
-          const requestOptions = {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              mailboxId: vueThis.$route.params.mailboxId,
-              threadId: vueThis.threadID,
-              draftId: vueThis.draftID,
-            }),
-            credentials: "include",
-          };
-          fetch(
-            "https://app.helpwise.io/api/discardDraft.php",
-            requestOptions
-          ).then(async (response) => {
-            const data = await response.json();
-            if (data.status !== "success") {
-              const error = (data && data.message) || response.status;
-              return Promise.reject(error);
-            }
-            console.log(vueThis);
-            vueThis.closeCompose(this.composer.hash);
-          });
-        },
-      });
     },
     uploadAttachment(event) {
       const selectedFiles = event.target.files;
@@ -703,16 +660,7 @@ export default {
             vueThis.files.push(attachID);
             vueThis.editorInstance.attachments = vueThis.attachments;
             console.log(vueThis.attachments, vueThis.editorInstance);
-            let attchComp = Vue.extend(AttachmentComp);
-            let replyAttachmentList = new attchComp({
-              propsData:{
-                attachments: vueThis.attachments
-              }
-            }).$mount();
-            // $('#editor-<>').data('editor',editor)
-            var ed = $(`#editor-uploadAttachment`).data('editor');
-            console.log(ed);
-            ed.$wp.append(replyAttachmentList.$el);
+            
           })
         }
     },
@@ -949,6 +897,8 @@ export default {
             }
             this.draftID = data.data.draftID;
             this.threadID = data.data.threadID;
+            this.editorInstance.draftID = data.data.draftID;
+            this.editorInstance.threadID = data.data.threadID;
             if (this.subject !== "") {
               this.message = this.subject;
             } else {

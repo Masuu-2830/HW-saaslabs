@@ -39,6 +39,21 @@ export default {
             this.replies = this.replies.filter(el => el.hash !== data);
             console.log(this.replies);
         });
+    },
+    methods: {
+        addDrafts() {
+            if(Object.keys(this.thread).length !== 0) {
+                console.log(this.thread.data.drafts);
+            for(let i = 0; i < this.thread.data.drafts.length; i++) {
+                let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
+                let obj = { hash: hash, id: this.thread.data.drafts[i].id, type: this.thread.data.drafts[i].replyAll ? 2 : 1, email: this.thread.data.drafts[i] };
+                this.replies.push(obj);
+            }
+            }
+        }
+    },
+    beforeMount() {
+        this.addDrafts();
     }
 }
 </script>

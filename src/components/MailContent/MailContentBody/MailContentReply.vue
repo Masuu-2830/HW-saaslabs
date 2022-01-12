@@ -360,11 +360,12 @@
                     <span class="tx-color-01 flex-grow-1"
                       ><input
                         type="text"
-                         @blur="saveDraft" v-model="subject"
+                        v-model="subject"
                         class="form-control-plaintext reply-email-subject p-0"
                         value=""
                         style="outline: none"
                     /></span>
+                    <span v-html="message" style="color: green"></span>
                   </div>
                 </div>
                 <div
@@ -425,9 +426,9 @@
               type="file"
               style="display: none"
               name="files[]"
-              class="reply-multiFiles"
+              
               @change="uploadAttachment"
-              id="reply-uploadAttachment"
+              class="editor-uploadAttachment"
               multiple
             />
           </div>
@@ -494,7 +495,7 @@ export default {
               rule: tag => this.check(tag) 
             }],
             debounce: null,
-            message: "New Message",
+            message: "",
             subject: this.reply.email.subject !== undefined ? this.reply.email.subject : "",
             mail_body: this.signature(),
             noTo: false,
@@ -503,9 +504,9 @@ export default {
             bccNotValid: false,
             isCC: this.reply.type == 2 && Object.keys(this.reply.email.cc).length > 0 ? true : false,
             isBCC: this.reply.type == 2 && Object.keys(this.reply.email.bcc).length > 0 ? true : false,
-            draftID: null,
+            draftID: this.reply.email.id !== undefined ? this.reply.email.id : null,
             threadID: this.reply.email.threadID !== undefined ? this.reply.email.threadID : null,
-            inReplyTo: this.reply.email.id !== undefined ? this.reply.email.id : null,
+            inReplyTo: this.reply.email.inReplyTo !== undefined ? this.reply.email.inReplyTo : null,
             editorInstance: null,
             config: {
               enter: FroalaEditor.ENTER_DIV,
@@ -531,6 +532,10 @@ export default {
                   // self.editorInstance.composer = self.composer;
                   var editor = this;
                   editor.reply = self.reply;
+                  editor.type = "reply"
+                  editor.mailboxID = self.$route.params.mailboxId;
+                  editor.threadID = self.threadID;
+                  editor.draftID = self.draftID;
                   self.editorInstance = this;
                   console.log("initialized");
                   console.log(this);
@@ -558,7 +563,7 @@ export default {
                   "underline",
                   "strikeThrough",
                   "insertHR",
-                  "attach",
+                  "attachReply",
                   "insertImage",
                   "clear",
                 ],
@@ -587,6 +592,13 @@ export default {
       tagsBCC: "saveDraft",
       fromSelected: "saveDraft",
       files: "saveDraft",
+      subject: function (to, from) {
+        console.log("subject");
+        if (to !== from) {
+          clearTimeout(this.subjectSave);
+          this.subjectSave = setTimeout(this.saveDraft, 2000);
+        }
+      },
       mail_body: function (to, from) {
         console.log("mailbody");
         if (to !== from) {
@@ -594,9 +606,6 @@ export default {
           this.myGreeting = setTimeout(this.saveDraft, 2000);
         }
       },
-    },
-    beforeMount() {
-      this.prepareFroalaButtons();
     },
     methods: {
         cancelReply(hash) {
@@ -621,7 +630,7 @@ export default {
             this.subject = "";
             this.threadID = null;
             this.draftID = null;
-            this.message = "New Message";
+            this.message = "";
             this.mail_body = this.signature();
             this.fromSelected = this.defaultAlias();
             // this.compose = this.compose.filter(el => Object.keys(el) !== hash);
@@ -704,54 +713,6 @@ export default {
           }
           return bcc;
         },
-        prepareFroalaButtons() {
-          const vueThis = this;
-          FroalaEditor.DefineIcon("attach", {
-            FA5NAME: "paperclip",
-            template: "font_awesome_5",
-          });
-          FroalaEditor.RegisterCommand("attach", {
-            title: "Insert Attachment",
-            icon: "attach",
-            refreshAfterCallback: true,
-            callback: function () {
-              $(`#reply-uploadAttachment`).click();
-              $(`#reply-uploadAttachment`).data('editor',this);
-            },
-          });
-          FroalaEditor.DefineIcon("clear", { NAME: "remove", SVG_KEY: "remove" });
-          FroalaEditor.RegisterCommand("clear", {
-            title: "Discard Draft",
-            focus: false,
-            undo: true,
-            refreshAfterCallback: true,
-            callback: function () {
-              console.log(this);
-              const requestOptions = {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  mailboxId: vueThis.$route.params.mailboxId,
-                  threadId: vueThis.threadID,
-                  draftId: vueThis.draftID,
-                }),
-                credentials: "include",
-              };
-              fetch(
-                "https://app.helpwise.io/api/discardDraft.php",
-                requestOptions
-              ).then(async (response) => {
-                const data = await response.json();
-                if (data.status !== "success") {
-                  const error = (data && data.message) || response.status;
-                  return Promise.reject(error);
-                }
-                console.log(vueThis);
-                vueThis.cancelReply(this.reply.hash);
-              });
-            },
-          });
-        },
         uploadAttachment(event) {
           const selectedFiles = event.target.files;
             console.log(selectedFiles);
@@ -782,7 +743,7 @@ export default {
                   let percentage = (p.loaded / p.total) * 100;
                   console.log(percentage);
                   console.log(hash);
-                  console.log(vueThis.attachments);
+                  console.log(vueThis.attachments, vueThis.draftID);
                   vueThis.attachments[hash]["progress"] = percentage;
                 }
               }).then((response)=>{
@@ -1034,17 +995,15 @@ export default {
             fetch(this.$apiBaseURL + "saveDraft.php", requestOptions)
           .then(async response => { 
               const data = await response.json();
-              if(data.status !== "success") {
+              if(data.message !== "Draft saved successfully.") {
                 const error = (data && data.message) || response.status;
                 return Promise.reject(error);
               }
               this.draftID = data.data.draftID;
+              this.editorInstance.draftID = data.data.draftID;
               this.threadID = data.data.threadID;
-              if(this.subject !== "") {
-                this.message = this.subject;
-              } else {
-                this.message = "Draft Saved";
-              }
+              this.message = "Draft Saved";
+              // setTimeout(function() {console.log(this.message);self.message = "";}, 3000);
             }).catch(error => {
             alert(error);
           })
@@ -1085,7 +1044,32 @@ export default {
                 const error = (data && data.message) || response.status;
                 return Promise.reject(error);
               }
-              this.cancelReply();
+              if(this.isSend == "send") {
+                let payload = this.reply;
+                payload.subject = this.subject;
+                payload.displaySubject = this.subject;
+                payload.bcc = requestOptions.body.bcc;
+                payload.cc = requestOptions.body.cc;
+                payload.to = requestOptions.body.to;
+                payload.html = requestOptions.body.html;
+                payload.strippedHtml = requestOptions.body.html;
+                payload.text = requestOptions.body.text;
+                payload.snippet = requestOptions.body.text;
+                payload.readStats = {};
+                payload.attachments = requestOptions.body.attachments;
+                payload.date = new Date().toISOString();
+                console.log(payload);
+                let email = {
+                  email: payload,
+                  type: "email"
+                }
+                bus.$emit("changeThreadAttrs", email);
+              } else {
+                bus.$emit("closeThread", this.$route.params.threadId);
+                bus.$emit("broad");
+              }
+              // this.cancelReply();
+              bus.$emit("closeReply", this.reply.hash);
             }).catch(error => {
             alert(error);
           })

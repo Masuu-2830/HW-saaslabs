@@ -2,11 +2,14 @@
     <div class="main">
         <NavBar :mailboxes="mailboxes" />
         <div class="mail-wrapper">
-            <SideBar :mailbox="mailbox" />
-            <MailGroup :mailbox="mailbox" />
+            <SideBar v-if="dataLoaded && loaded" :mailbox="mailbox" />
+            <MailGroup v-if="dataLoaded && loaded" :mailbox="mailbox" />
             <MailContent />
             <compose-wrapper></compose-wrapper>
         </div>
+
+        <HcArticles/>
+        <SavedReply/>
     </div>
 </template>
 
@@ -16,6 +19,8 @@ import MailGroup from './MailGroup/MailGroup.vue';
 import SideBar from './SideBar.vue';
 import MailContent from './MailContent/MailContent.vue'
 import Compose from './Compose.vue';
+import HcArticles from './modals/HcArticles.vue';
+import SavedReply from './modals/SavedReply.vue';
 import ComposeWrapper from './ComposeWrapper.vue';
 export default {
     name: 'Home',
@@ -25,15 +30,19 @@ export default {
         MailGroup,
         MailContent,
         Compose,
+        HcArticles,
+        SavedReply,
         ComposeWrapper
     },
     data() {
       return {
             mailbox: {},
             mailboxes: [],
+            dataLoaded: false,
+            loaded: false
         }
     },
-     watch:{
+    watch:{
         $route (to, from) {
             if(to.params.mailboxId !== from.params.mailboxId) {
                 this.fetchMailBoxData();
@@ -47,6 +56,7 @@ export default {
             const data = await response.json();
             console.log(data);
             this.mailbox = data.data.mailbox;
+            this.dataLoaded = true;
         },
         async fetchMailBoxes() {
             const response = await fetch(this.$apiBaseURL + "mailboxes.php", {credentials: 'include'});
@@ -105,7 +115,7 @@ export default {
             })
         }
     },
-    async mounted() {
+    async beforeMount() {
         await this.fetchSidebarStats();
         this.fetchMailBoxes();
         this.fetchAliases();
@@ -120,6 +130,8 @@ export default {
         console.log("++");
         data1.data.tags = data1.data.tags.sort((b,a) => b.name-a.name);
         await this.$store.dispatch('fetchPingDetails', data1);
+        this.loaded = true;
+        console.log(this.loaded);
 
         const response2 = await fetch("https://app.helpwise.io/api/getAccountMailboxes.php", {credentials: 'include'});
         const data2 = await response2.json();
