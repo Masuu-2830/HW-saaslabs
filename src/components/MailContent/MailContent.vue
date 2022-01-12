@@ -1,13 +1,13 @@
 <template>
   <div
     class="mail-content flex-row-reverse justify-content-between"
-    :style="{ display: display, right: right }"
+    :style="{ display: display }"
   >
     <div v-if="loading" id="thread-spinner" class="spinner-border text-primary" role="status" style="position: absolute; top: 50%; left: 50%;">
         <span class="sr-only">Loading...</span>
     </div>
-    <mail-content-int :thread="thread" v-if="!loading" v-on:openInt="openInt"></mail-content-int>
-    <!-- <IntegrationContainer v-if="!loading"></IntegrationContainer> -->
+    <!-- <mail-content-int v-if="!loading"></mail-content-int> -->
+    <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :sidebarOpen = "sidebarOpen"></IntegrationContainer>
     <div v-if="!loading" class="d-flex flex-column justify-content-between" style="width: calc(100% - 50px);">
       <mail-content-header :thread="thread"></mail-content-header>
       <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body>
@@ -36,7 +36,9 @@ export default {
       display: "none",
       right: '0px',
       thread: {},
-      loading: false
+      loading: false,
+      sidebarOpen: false,
+      integration_id: 0
     };
   },
   watch:{
@@ -113,11 +115,28 @@ export default {
       }
     })
   },
+  methods: {
+    IntegrationSidebar: function (integrationID) {
+      if(this.integration_id != integrationID){
+          this.right = '250px';
+          this.integration_id = integrationID;
+          this.sidebarOpen = true;
+      }else{
+        if(this.right == '250px'){
+          this.right = '0px';
+          this.sidebarOpen = false;
+        }else{
+          this.right = '250px';
+          this.sidebarOpen = true;
+        }
+      }
+    }
+  }
 };
 </script>
 
 <style>
-.df-settings-ontraport.show .df-settings-link-ontraport,
+/* .df-settings-ontraport.show .df-settings-link-ontraport,
 .df-settings-ontraport.show .df-settings-link-ontraport:hover,
 .df-settings-ontraport.show .df-settings-link-ontraport:focus {
   background-color: #fff;
@@ -157,7 +176,7 @@ export default {
 .df-settings-link-ontraport svg {
   width: 20px;
   height: 20px;
-}
+} */
 
 body
   > div.datepicker.datepicker-dropdown.dropdown-menu.datepicker-orient-right.datepicker-orient-bottom {
