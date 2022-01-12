@@ -6,29 +6,30 @@
     <div v-if="loading" id="thread-spinner" class="spinner-border text-primary" role="status" style="position: absolute; top: 50%; left: 50%;">
         <span class="sr-only">Loading...</span>
     </div>
-    <!-- <mail-content-int v-if="!loading"></mail-content-int> -->
-    <IntegrationContainer v-if="!loading"></IntegrationContainer>
+    <mail-content-int :thread="thread" v-if="!loading" v-on:openInt="openInt"></mail-content-int>
+    <!-- <IntegrationContainer v-if="!loading"></IntegrationContainer> -->
     <div v-if="!loading" class="d-flex flex-column justify-content-between" style="width: calc(100% - 50px);">
       <mail-content-header :thread="thread"></mail-content-header>
-      <mail-content-body :thread="thread"></mail-content-body>
-      <!-- <chat-content-body :thread="thread"></chat-content-body> -->
-      <!-- <mail-content-add-note v-if="!loading"></mail-content-add-note> -->
-      <chat-content-reply></chat-content-reply>
+      <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body>
+      <!-- <chat-content-body v-if="this.$store.state.inboxData.type == 'chat'"></chat-content-body> -->
+      <!-- <chat-content-body></chat-content-body> -->
+      <mail-content-add-note v-if="!loading"></mail-content-add-note>
+      <!-- <chat-content-reply></chat-content-reply> -->
     </div>
   </div>
 </template>
 
 <script>
 import { bus } from "../../main";
-import ChatContentBody from '../ChatContentBody.vue';
-import ChatContentReply from '../ChatContentReply.vue';
+import ChatContentBody from './ChatContentBody/ChatContentBody.vue';
+import ChatContentReply from './ChatContentBody/ChatContentReply.vue';
 import MailContentAddNote from './MailContentAddNote.vue';
 import MailContentBody from './MailContentBody/MailContentBody.vue';
 import MailContentHeader from './MailContentHeader.vue';
 import MailContentInt from './MailContentInt.vue';
-import IntegrationContainer from './IntegrationContainer.vue';
+// import IntegrationContainer from './IntegrationContainer.vue';
 export default {
-  components: { MailContentBody, MailContentAddNote, MailContentHeader, MailContentInt, ChatContentBody, ChatContentReply, IntegrationContainer},
+  components: { MailContentBody, MailContentAddNote, MailContentHeader, MailContentInt, ChatContentBody, ChatContentReply},
   name: "MailContent",
   data() {
     return {
@@ -38,9 +39,28 @@ export default {
       loading: false
     };
   },
+  watch:{
+        $route (to, from) {
+            if(to.params.threadId !== from.params.threadId) {
+                // this.ifIntOpen = false;
+                this.right = '0px'
+            }
+        }
+    },
+    methods: {
+      openInt() {
+        console.log("hello");
+        if(this.right == '0px') {
+            this.right = '250px';
+        } else {
+            this.right = '0px';
+        }
+      }
+    },
   created() {
     bus.$on("compact", (data) => {
       this.display = "flex";
+      this.right = '0px';
       if(data == null) {
         this.loading = true;
         console.log(this.loading);
@@ -52,14 +72,6 @@ export default {
     });
     bus.$on("broad", () => {
       this.display = "none";
-    });
-    bus.$on("openInt", () => {
-      console.log("hello");
-      if(this.right == '0px') {
-          this.right = '250px';
-      } else {
-          this.right = '0px';
-      }
     });
     bus.$on("changeThreadAttrs", (data) => {
       if(data.type == "assignment") {
@@ -96,6 +108,8 @@ export default {
         }
       } else if(data.type == "moveConv") {
         this.thread.data.items = this.thread.data.items.filter(item => item.data.id !== data.id);
+      } else if(data.type == "email") {
+        this.thread.data.items.push(data.email);
       }
     })
   },

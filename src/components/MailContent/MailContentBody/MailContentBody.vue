@@ -11,7 +11,7 @@
     >
       <span class="sr-only">Loading...</span>
     </div>
-    <div class="emails-wrapper">
+    <div v-if="Object.keys(thread).length !== 0" class="emails-wrapper">
       <div v-for="(item,index) in thread.data.items" :key="index">
           <mail-content-single-mail v-if="item.type == 'email'" :isCollapsed="lastMailId !== item.data.id" :subject="thread.data.displaySubject" :item="item"></mail-content-single-mail>
           <mail-content-comment v-else-if="item.type == 'comment'" :item="item"></mail-content-comment>
@@ -26,7 +26,8 @@
     >
       <span class="sr-only">Loading...</span>
     </div>
-    <mail-content-reply :thread="thread"></mail-content-reply>
+    <!-- <mail-content-reply :thread="thread"></mail-content-reply> -->
+    <reply-wrapper :thread="thread"></reply-wrapper>
   </div>
 </template>
 
@@ -35,17 +36,20 @@ import MailContentComment from './MailContentComment.vue';
 import MailContentLog from './MailContentLog.vue';
 import MailContentReply from './MailContentReply.vue';
 import MailContentSingleMail from './MailContentSingleMail.vue';
+import ReplyWrapper from './ReplyWrapper.vue';
 export default {
-  components: { MailContentSingleMail, MailContentLog, MailContentReply, MailContentComment },
+  components: { MailContentSingleMail, MailContentLog, MailContentReply, MailContentComment, ReplyWrapper },
   name: "MailContentBody",
   props: {
     thread: Object
   },
   computed: {
     lastMailId() {
-      let mails = this.thread.data.items.filter(item => item.type == 'email').map(item => item.data);
-      let lastmailid = mails[mails.length - 1].id;
-      return lastmailid;
+      if(Object.keys(this.thread).length !== 0) {
+        let mails = this.thread.data.items.filter(item => item.type == 'email').map(item => item.data);
+        let lastmailid = mails[mails.length - 1].id;
+        return lastmailid;
+      }
     }
   }
 };

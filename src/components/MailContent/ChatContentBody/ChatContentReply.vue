@@ -27,10 +27,10 @@
   import FroalaEditor from 'froala-editor';
   // import VueTribute from "vue-tribute";
   import Tribute from "tributejs";
-  import AttachmentComp from './AttachmentComp.vue';
+  import AttachmentComp from '../../AttachmentComp.vue';
   // import HcArticles from './modals/HcArticles.vue';
   import Vue from 'vue';
-  import { bus, triggerPromptNotif } from "../main";
+  import { bus, triggerPromptNotif } from "../../../main";
   const axios = require('axios').default;
 
   export default {

@@ -300,8 +300,7 @@ export default {
     },
     methods: {
       submit() {
-        // window.alert(this.squery);
-        bus.$emit('squery', this.squery);
+        this.$emit('squery', this.squery);
       }
     }
 }

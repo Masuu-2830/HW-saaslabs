@@ -469,25 +469,10 @@
               d-flex
               align-items-center
             "
-            @click="reply"
+            @click.stop="reply(1)"
           >
             <i class="fas fa-reply mr-1"></i>
             <span class="ml-1"> Reply</span>
-          </button>
-          <button
-            type="button"
-            class="
-              forward-btn
-              btn btn-xs btn-outline-primary
-              mr-1
-              rounded-pill
-              d-flex
-              align-items-center
-            "
-            @click="reply"
-          >
-            <i class="fas fa-share mr-1"></i>
-            <span class="ml-1">Forward</span>
           </button>
           <button
             v-if="item.data.cc.length !== 0"
@@ -499,10 +484,25 @@
               d-flex
               align-items-center
             "
-            @click="reply"
+            @click.stop="reply(2)"
           >
             <i class="fas fa-reply-all mr-1"></i>
             <span class="ml-1"> Reply All </span>
+          </button>
+          <button
+            type="button"
+            class="
+              forward-btn
+              btn btn-xs btn-outline-primary
+              mr-1
+              rounded-pill
+              d-flex
+              align-items-center
+            "
+            @click.stop="reply(3)"
+          >
+            <i class="fas fa-share mr-1"></i>
+            <span class="ml-1">Forward</span>
           </button>
         </div>
       </div>
@@ -576,9 +576,10 @@ export default {
       );
       this.$refs["move-new-modal"].hide();
     },
-    reply(e) {
-      bus.$emit("replyy", this.item.data.id);
-      e.cancelBubble = true;
+    reply(type) {
+      console.log("open reply")
+      let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
+      bus.$emit("openReply", hash, type, this.item.data);
     },
     changeCollapseState() {
       this.isMailCollapsed = !this.isMailCollapsed;

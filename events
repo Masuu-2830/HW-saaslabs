@@ -1,20 +1,31 @@
 compact => viewing single thread content
 broad => back to group of threads view
-openInt => open the right side integrations panel
 closeThread => closing/archiving thread
 changeRead => read or unread both being handled
-bulkRead => both bulk read and unread
 changeStarred => star/unstar
-bulkStar => bulk star threads
 snoozeThread => snoozing a thread
 assignThread => assigning to a teammate
-prevPage => move to previous page
+changeType => sidebar changing type of threads
+check => handles bulk check/uncheck and single check/uncheck
+toggleTags => tagging and untagging, clearing
+changeThreadAttrs => Updating the attrs using payload method
+openCompose
+closeCompose
+openReply
+closeReply
+moveToInbox
+spamThreads
+restoreThreads
+moveConv => move a specific email
+
+
+openInt => open the right side integrations panel 
+bulkRead => both bulk read and unread
+bulkStar => bulk star threads
+bulkMerge
+deleteThreads
 nextPage => move to next page
+prevPage => move to previous page
 filterPerson => filtering the threads based on assigned/unassigned
 filterOrder => newest/oldest threads
 squery => basic searching queries
-changeType => sidebar changing type of threads
-check => handles bulk check/uncheck and single check/uncheck
-replyy => open the reply editor
-toggleTags => tagging and untagging, clearing
-changeThreadAttrs => Updating the attrs using payload method

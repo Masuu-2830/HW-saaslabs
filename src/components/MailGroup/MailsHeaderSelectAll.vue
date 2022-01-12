@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="this.$store.state.stateLoaded"
     class="mail-group-header justify-content-center"
     style="top: 55px; height: 40px"
   >
@@ -1062,6 +1063,7 @@
                 <div class="dropdown-item">
                   <input
                     type="text"
+                    v-model="sqTm"
                     class="form-control form-control-sm"
                     id="search-assign-users"
                     aria-describedby="emailHelp"
@@ -1069,6 +1071,7 @@
                   />
                 </div>
                 <div
+                  v-if="sqTm == ''"
                   id="bulk-unassigned-to-item"
                   @click="bulkAssign('')"
                   class="dropdown-item"
@@ -1108,6 +1111,7 @@
                   </div>
                 </div>
                 <div
+                  v-if="sqTm == ''"
                   style="cursor: pointer"
                   data-text="Me"
                   @click="bulkAssign(userInfo.id)"
@@ -1254,7 +1258,7 @@
                 style="display: inline-block"
                 class="mr-1 ml-1 btn p-0 prev-page-btn"
                 @click="prevPage"
-                :disabled="currPage == 1 && 'disabled'"
+                :disabled="currPage == '1' && 'disabled'"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -1403,10 +1407,11 @@
                       "
                       >Me&nbsp;&nbsp;&nbsp;</span
                     ><span
-                      v-if="userInfo.id in mailbox.userAssignmentCount"
-                      class="user-assigned-count"
+                      v-if="userInfo.id in Object.keys(mailbox.userAssignmentCount)"
+                      class="user-assigned-count d-none"
                       :id="'user-assigned-count-' + userInfo.id"
-                      >{{ mailbox.userAssignmentCount[userInfo.id] }}</span
+                      v-html="mailbox.userAssignmentCount[userInfo.id]"
+                      >{{ mailbox.userAssignmentCount[userInfo.id] }} h</span
                     >
                     <span
                       v-else
@@ -1474,9 +1479,10 @@
                       "
                       >{{ teammate.name }}</span
                     ><span
-                      v-if="teammate.id in mailbox.userAssignmentCount"
+                      v-if="teammate.id in Object.keys(mailbox.userAssignmentCount)"
                       class="user-assigned-count"
                       :id="'user-assigned-count-' + teammate.id"
+                      v-html="mailbox.userAssignmentCount[teammate.id]"
                       >{{ mailbox.userAssignmentCount[teammate.id] }}</span
                     >
                     <span
@@ -1587,7 +1593,7 @@ export default {
     startThread: Number,
     endThread: Number,
     isnextPage: Boolean,
-    currPage: Number,
+    currPage: String,
     mailbox: Object,
     selectedIds: Array,
     tagsInAll: Array,
@@ -1595,6 +1601,7 @@ export default {
   },
   data() {
     return {
+      sqTm: "",
       checkAll: false,
       currId: 0,
       currName: "",
@@ -1609,21 +1616,14 @@ export default {
       newDateOpen: false
     };
   },
-  // watch: {
-  //   deep: true,
-  //   selectedIds(val, oldVal) {
-  //     // console.log(val, oldVal);
-  //     if(val !== oldVal) {
-  //       this.addtags = [];
-  //       this.removetags = [];
-  //     }
-  //     console.log(this.addtags, this.removetags);
-  //   },
-  // },
   created() {
     bus.$on("changeType", () => {
       (this.currName = ""), (this.order = "Newest"), (this.checkAll = false);
     });
+    console.log(typeof this.currPage);
+    console.log((this.mailbox));
+    console.log(this.userInfo)
+    console.log(this.mailbox.userAssignmentCount[this.userInfo.id])
   },
   methods: {
     handleChange(value, type) {
@@ -1766,19 +1766,19 @@ export default {
     },
     bulkRead(r) {
       if (r == 1) {
-        bus.$emit("bulkRead", true);
+        this.$emit("bulkRead", true);
       } else {
-        bus.$emit("bulkRead", false);
+        this.$emit("bulkRead", false);
       }
     },
     bulkStar() {
-      bus.$emit("bulkStar");
+      this.$emit("bulkStar");
     },
     bulkSpam() {
       bus.$emit("spamThreads", this.selectedIds);
     },
     bulkDelete() {
-      bus.$emit("deleteThreads", this.selectedIds);
+      this.$emit("deleteThreads", this.selectedIds);
     },
     bulkClose() {
       bus.$emit("closeThread", this.selectedIds);
@@ -1791,7 +1791,7 @@ export default {
       this.$refs['move-thread-modal'].hide()
     },
     bulkMerge() {
-      bus.$emit('bulkMerge', this.selectedIds);
+      this.$emit('bulkMerge', this.selectedIds);
       this.$refs['bulk-merge-modal'].hide()
     },
     bulkSnooze(till) {
@@ -1829,19 +1829,19 @@ export default {
       bus.$emit("snoozeThread", this.selectedIds, mom);
     },
     prevPage() {
-      bus.$emit("prevPage");
+      this.$emit("prevPage");
     },
     nextPage() {
-      bus.$emit("nextPage");
+      this.$emit("nextPage");
     },
     filterPerson(id, name) {
       this.currId = id;
       this.currName = name;
-      bus.$emit("filterPerson", id);
+      this.$emit("filterPerson", id);
     },
     filterOrder(order, orderType) {
       this.order = order;
-      bus.$emit("filterOrder", orderType);
+      this.$emit("filterOrder", orderType);
     },
   },
   computed: {
@@ -1859,7 +1859,15 @@ export default {
       return this.$store.state.teammates;
     },
     teammatesNew: function () {
-      return this.teammates.filter((item) => item.id !== this.userInfo.id);
+      let query = this.sqTm.toLowerCase().trim();
+      if(query == "") {
+        return this.teammates.filter((item) => item.id !== this.userInfo.id);
+        // console.log(this.teammatesNew);
+      } else {
+        return this.teammates.filter((item) => item.id !== this.userInfo.id && item.name.toLowerCase().search(query) !== -1);
+        // console.log(this.teammatesNew);
+      }
+      // return this.teammates.filter((item) => item.id !== this.userInfo.id);
     },
   },
 };

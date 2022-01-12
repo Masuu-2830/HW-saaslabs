@@ -95,7 +95,7 @@
 
 <script>
 export default {
-  name: "MailContentLog",
+  name: "MailContentComment",
   props: {
     item: Object,
   },
