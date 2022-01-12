@@ -19,6 +19,7 @@
                 :openCreateFormArray= "openCreateFormArray"
                 :openUpdateFormArray= "openUpdateFormArray"
                 @postData= "postData"
+                @pmIntegration= "pmIntegration"
             />
         </div>
     </div>
@@ -55,7 +56,7 @@
                     }else if(integrationData.lname == 'asana' || integrationData.lname == 'clickup' || integrationData.lname == 'jira' || integrationData.lname == 'trello'){
                         fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "inbox_type=mail&integration_id=" + integrationData.id;
                     }else{
-                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=tushar@justcall.io&inbox_type=mail&integration_id=" + integrationData.id;
+                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + integrationData.id;
                     }
                     fetch(fetchUrl, {credentials: 'include'})
                     .then(async response => {
@@ -102,7 +103,7 @@
                 }else if(integration_name == 'asana' || integration_name == 'clickup' || integration_name == 'jira' || integration_name == 'trello'){
                     fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&inbox_type=mail&integration_id=" + this.integrationID;
                 }else{
-                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=tushar@justcall.io&inbox_type=mail&integration_id=" + this.integrationID;
+                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + this.integrationID;
                 }
                 fetch(fetchUrl, {
                     method: 'GET', 
@@ -126,13 +127,17 @@
                     this.errorMessage = error;
                     console.error("There was an error!", error);
                 });
+            },
+            pmIntegration(integrationData){
+                console.log("fetched Data", integrationData);
+                this.sidebarData = [];
+                this.sidebarData = integrationData;
             }
         },
         created() {
             fetch("https://app.helpwise.io/api/connected_integrations.php?mailbox_id=" + this.$route.params.mailboxId, {credentials: 'include'})
             .then(async response => {
                 const data = await response.json();
-                // console.log("data parsed",JSON.parse(data));
                 let data2 = data.data;
                 this.integrations = data2;
                 // check for error response
