@@ -65,7 +65,7 @@
       </div>
       <!-- navbar-menu-header -->
       <ul class="nav navbar-menu" style="max-width: 100% !important">
-        <li class="nav-item with-sub" :class="show && 'show'">
+        <li class="nav-item with-sub" :class="show ? 'show' : ''">
           <a href="JavaScript:void(0)" class="nav-link">Inboxes</a>
           <ul class="navbar-menu-sub" style="padding-bottom: 0px">
             <div
@@ -102,7 +102,7 @@
                 >
               </li>
               <div class="dropdown-divider mg-y-5" style="margin: 0px"></div>
-              <li class="nav-sub-item" v-for="mailbox in mailboxes" :key="mailbox.id">
+              <li class="nav-sub-item" v-for="mailbox in mailboxes" :key="mailbox.id" @click="hideNavSub">
                 <router-link :to="{ name: 'mailbox', params: {mailboxId: mailbox.id}}">
                 <a
                   :id="'mailbox-'+mailbox.id"
@@ -728,8 +728,8 @@ export default {
     }
   },
   methods: {
-    showNavSub() {
-      this.show = !this.show;
+    hideNavSub() {
+      this.show = false;
     }
   }
 };

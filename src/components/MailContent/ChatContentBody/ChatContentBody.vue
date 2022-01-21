@@ -17,8 +17,8 @@
     </div>
     <div class="emails-wrapper">
       <div v-for="item in thread.data.items" :key="item.timestamp">
-        <chat-content-log v-if="item.cardType == 'log'" :item="item"></chat-content-log>
-        <chat-content-comment v-else-if="item.cardType == 'comment'" :item="item" v-on:deleteComment="deleteComment"></chat-content-comment>
+        <mail-content-log v-if="item.cardType == 'log'" :item="item"></mail-content-log>
+        <mail-content-comment v-else-if="item.cardType == 'comment'" :item="item" v-on:deleteComment="deleteComment"></mail-content-comment>
         <chat-content-message-left v-else-if="item.cardType == 'message' && item.data.type == 0" :item="item"></chat-content-message-left>
         <chat-content-message-right v-else-if="item.cardType == 'message' && item.data.type == 1" :item="item" v-on:deleteMessage="deleteComment"></chat-content-message-right>
       </div>
@@ -37,12 +37,12 @@
 </template>
 
 <script>
-import ChatContentComment from './ChatContentComment.vue';
-import ChatContentLog from './ChatContentLog.vue';
+import MailContentComment from '../MailContentBody/MailContentComment.vue';
+import MailContentLog from '../MailContentBody/MailContentLog.vue';
 import ChatContentMessageLeft from './ChatContentMessageLeft.vue';
 import ChatContentMessageRight from './ChatContentMessageRight.vue';
 export default {
-  components: { ChatContentLog, ChatContentComment, ChatContentMessageLeft, ChatContentMessageRight },
+  components: { ChatContentMessageLeft, ChatContentMessageRight, MailContentLog, MailContentComment },
   name: "ChatContentBody",
   props: {
     // thread: Object,

@@ -14,6 +14,7 @@ closeCompose
 openReply
 closeReply
 moveToInbox - N
+doneThreads - N
 spamThreads - N
 restoreThreads - N
 moveConv => move a specific email - N
@@ -24,6 +25,7 @@ bulkRead => both bulk read and unread - N
 bulkStar => bulk star threads - N
 bulkMerge - N
 deleteThreads - N
+perDeleteThreads - N
 nextPage => move to next page
 prevPage => move to previous page
 filterPerson => filtering the threads based on assigned/unassigned

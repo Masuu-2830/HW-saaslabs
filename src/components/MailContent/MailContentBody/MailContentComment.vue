@@ -1,67 +1,76 @@
 <template>
   <div
+    v-if="item.type == 'comment' || item.cardType == 'comment'"
     class="comment-body"
-    :id="'comment-options-'+item.data.id"
-    style="margin-left: 20px; margin-top: 20px; margin-right: 20px"
+    :id="'comment-options-' + item.data.id"
+    style="
+      margin-left: 20px;
+      margin-top: 0px;
+      margin-right: 20px;
+      padding-bottom: 15px;
+    "
   >
-    <div class="comment d-flex justify-content-between align-items-center">
+    <div class="comment d-flex justify-content-end align-items-end">
       <div
-        class="avtar-message d-flex justify-content-start align-items-center"
+        class="avatar-message d-flex justify-content-start align-items-center"
       >
-        <div v-html="item.data.by.avatarTag" class="avatar">
-        </div>
-        <div
-          class="
-            message-name
-            d-flex
-            flex-column
-            justify-content-start
-            align-items-start
-          "
-          style="margin-left: 10px; margin-bottom: 10px"
-        >
-          <span class="tx-12" style="font-weight: 300">{{ item.data.by.firstname}} {{ item.data.by.lastname}}</span>
+        <div class="d-flex flex-column align-items-end justify-content-end">
           <div
             class="
-              msg-del-wrapper
+              message-name
               d-flex
-              justify-content-between
-              align-items-center
+              flex-column
+              justify-content-start
+              align-items-start
             "
+            style="margin-right: 10px"
           >
             <div
-              class="card"
-              style="padding: 5px; background-color: #feedaf; max-width: 650px"
+              class="
+                d-flex
+                align-items-center
+                justify-content-center
+                flex-row-reverse
+              "
+              v-on:mouseover="showDelete"
+              v-on:mouseleave="hideDelete"
             >
-              <div v-html="item.data.body" class="tx-13" :id="'edit-comment-'+item.data.id">
-                
-              </div>
-              <div class="list-group" :id="'edit-comment-attachment-'+item.data.id"></div>
-            </div>
-            <span
-              ><div class="edit-comment-btn ml-1" :id="'edit-comment-btn-'+item.data.id">
-                <svg
-                  style="color: #8392a5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  class="feather feather-edit-2"
+              <div
+                class="
+                  msg-del-wrapper
+                  d-flex
+                  flex-column
+                  justify-content-start
+                  align-items-start
+                "
+              >
+                <span style="font-size: smaller"
+                  >{{ item.data.by.firstname }}
+                  {{ item.data.by.lastname }}</span
                 >
-                  <path
-                    d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"
-                  ></path>
-                </svg></div
-            ></span>
-            <span
-              ><div class="delete-comment-btn ml-1">
+                <div
+                  class="card"
+                  style="
+                    padding: 14px;
+                    background-color: #feedaf;
+                    max-width: 650px;
+                    width: 100%;
+                  "
+                >
+                  <div class="tx-14 commentText" style="color: #222">
+                    <p v-html="item.data.body"></p>
+                  </div>
+                  <div class="list-group"></div>
+                </div>
+              </div>
+              <div
+                class="del-comment-btn ml-1"
+                :class="showDel ? 'd-flex' : 'd-none'"
+                style="padding-right: 10px"
+              >
                 <svg
-                  style="color: #8392a5"
+                  v-b-modal="'delete-modal' + item.data.id"
+                  style="color: #8392a5; margin-top: 10px"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="none"
@@ -70,24 +79,90 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   class="feather feather-trash"
-                  height="18"
-                  width="18"
+                  height="14"
+                  width="14"
                 >
                   <polyline points="3 6 5 6 21 6"></polyline>
                   <path
                     d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
                   ></path>
-                </svg></div
-            ></span>
+                </svg>
+                <b-modal
+                  :ref="'delete-modal'+item.data.id"
+                  :id="'delete-modal'+item.data.id"
+                  title="Are you sure to delete this comment?"
+                >
+                  <div class="modal-body pd-20 pd-sm-30">
+                    <span id="modal-text"
+                      >Once deleted you won't be able to restore it.</span
+                    >
+                  </div>
+                  <template
+                    class="align-items-center justify-content-between"
+                    #modal-footer="{ cancel }"
+                  >
+                    <b-row class="text-center" align-v="center">
+                      <b-col class="float-left">
+                        <b-button
+                          size="xs"
+                          variant="outline-secondary"
+                          @click="cancel()"
+                        >
+                          No
+                        </b-button>
+                      </b-col>
+                      <!-- Button with custom close trigger value -->
+                      <b-col class="float-right">
+                        <b-button
+                          @click="deleteComment"
+                          size="xs"
+                          variant="outline-success"
+                        >
+                          Yes
+                        </b-button>
+                      </b-col>
+                    </b-row>
+                  </template>
+                </b-modal>
+              </div>
+            </div>
           </div>
+          <span
+            v-if="show"
+            class="comment-time tx-13 hw_rel-date"
+            :data_date="item.data.at"
+            style="
+              font-weight: 300;
+              font-size: 10px;
+              letter-spacing: 0.4px;
+              color: #989898;
+              margin-right: 10px;
+            "
+            v-on:mouseover="mouseover"
+            v-on:mouseleave="mouseleave"
+            >{{ item.timestamp | moment("from", "now", true) }}</span
+          >
+          <span
+            v-if="!show"
+            class="comment-time tx-13 hw_rel-date"
+            :data_date="item.data.at"
+            style="
+              font-weight: 300;
+              font-size: 10px;
+              letter-spacing: 0.4px;
+              color: #989898;
+              margin-right: 10px;
+            "
+            v-on:mouseover="mouseover"
+            v-on:mouseleave="mouseleave"
+            >{{ this.item.timestamp | moment("MMM D, YYYY hh:mm a") }}</span
+          >
         </div>
-      </div>
-      <div
-        class="comment-time hw_rel-date text-right tx-12"
-        :data_date="item.data.at"
-        style="min-width: 180px; font-weight: 300"
-      >
-        {{ item.timestamp | moment("from", "now") }}
+        <div
+          class="avatar"
+          v-html="item.data.by.avatarTag"
+          style="margin-bottom: 7px"
+        ></div>
       </div>
     </div>
   </div>
@@ -98,6 +173,55 @@ export default {
   name: "MailContentComment",
   props: {
     item: Object,
+  },
+  data() {
+    return {
+      show: true,
+      showDel: false,
+    };
+  },
+  methods: {
+    mouseover: function () {
+      this.show = false;
+    },
+    mouseleave: function () {
+      this.show = true;
+    },
+    showDelete: function () {
+      this.showDel = true;
+    },
+    hideDelete: function () {
+      this.showDel = false;
+    },
+    deleteComment() {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          commentID: this.item.data.id,
+          mailboxID: this.$route.params.mailboxId,
+          threadID: this.$route.params.threadId,
+        }),
+        credentials: "include",
+      };
+      console.log(requestOptions.body);
+      let url = this.$apiBaseURL + (this.$store.state.inboxData.type == "mail" ? "delete_comments.php" : "chat-widget/delete_comment.php");
+      console.log(url);
+      // fetch(url, requestOptions)
+      // .then(async (response) => {
+      //   const data = await response.json();
+      //   if (data.status !== "success") {
+      //     const error = (data && data.message) || response.status;
+      //     return Promise.reject(error);
+      //   }
+        this.$emit("deleteComment", this.item.data.id);
+        let ref = "delete-modal" + this.item.data.id;
+        this.$refs[ref].hide();
+      // })
+      // .catch((error) => {
+      //   alert(error);
+      // });
+    },
   },
 };
 </script>

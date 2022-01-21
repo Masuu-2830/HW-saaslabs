@@ -539,13 +539,12 @@
                 <span class="badge"></span>
               </span>
             </router-link>
+            <router-link v-for="tag in tags" :key="tag.id" :to="{ name: 'type', params: {type: 'tag-'+tag.id, mailboxId: mailbox.id}}">
               <a
-                v-for="tag in tags" :key="tag.id"
                 style="cursor: pointer"
                 :data-mailbox-id="mailbox.id"
                 :data-tag-id="tag.id"
                 class="nav-link hw_sidebarTag hw-label-badge"
-                :href="'https://app.helpwise.io/mail/204420/tag/'+tag.id"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -577,6 +576,7 @@
                 <span class="badge text-primary hw-count hw_sidebarTagCount">
                 </span>
               </a>
+            </router-link>
               
             </div>
           </nav>

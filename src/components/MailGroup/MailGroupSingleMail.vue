@@ -269,12 +269,12 @@
                 this.$route.params.type !== 'trash'
               "
               class="archive-thread pr-1 pl-1"
+              data-toggle="tooltip"
+                data-placement="top"
+                title="Close"
               @click.stop="closeThread(mail.id)"
             >
               <svg
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Close"
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
                 height="16"
@@ -476,6 +476,9 @@
               v-if="this.$route.params.type !== 'trash'"
               class="deleteThread pr-1 pl-1"
               :id="'deleteThread-' + mail.id"
+              data-toggle="tooltip"
+                data-placement="top"
+                title="Trash"
               @click.stop="deleteThread(mail.id)"
             >
               <svg
@@ -503,6 +506,10 @@
               v-if="this.$route.params.type == 'trash'"
               class="permanentlyDeleteThread pr-1 pl-1"
               :id="'permanentlyDeleteThread-' + mail.id"
+              data-toggle="tooltip"
+                data-placement="top"
+                title="Permanently Delete"
+              @click.stop="perDeleteThread(mail.id)"
             >
               <svg
                 data-toggle="tooltip"
@@ -533,6 +540,9 @@
                 this.$route.params.type == 'trash'
               "
               class="restore-thread pr-1 pl-1"
+              data-toggle="tooltip"
+                data-placement="top"
+                title="Move To Inbox"
               @click.stop="restoreThread(mail.id)"
             >
               <svg
@@ -971,6 +981,9 @@ export default {
     },
     deleteThread(id) {
       this.$emit("deleteThreads", id);
+    },
+    perDeleteThread(id) {
+      this.$emit("perDeleteThreads", id);
     },
     closeThread(id) {
       bus.$emit("closeThread", id);
