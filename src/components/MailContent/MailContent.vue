@@ -8,7 +8,7 @@
     </div>
     <!-- <mail-content-int v-if="!loading"></mail-content-int> -->
     <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :sidebarOpen = "sidebarOpen"></IntegrationContainer>
-    <div v-if="!loading" class="d-flex flex-column justify-content-between" style="width: calc(100% - 50px);">
+    <div v-if="!loading" class="d-flex flex-column justify-content-between" :style="{width: 'calc(100% - 60px - '+right+')'}">
       <mail-content-header :thread="thread"></mail-content-header>
       <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body>
       <!-- <chat-content-body v-if="this.$store.state.inboxData.type == 'chat'"></chat-content-body> -->
@@ -53,7 +53,7 @@ export default {
       openInt() {
         console.log("hello");
         if(this.right == '0px') {
-            this.right = '250px';
+            this.right = '300px';
         } else {
             this.right = '0px';
         }
@@ -118,15 +118,15 @@ export default {
   methods: {
     IntegrationSidebar: function (integrationID) {
       if(this.integration_id != integrationID){
-          this.right = '250px';
+          this.right = '300px';
           this.integration_id = integrationID;
           this.sidebarOpen = true;
       }else{
-        if(this.right == '250px'){
+        if(this.right == '300px'){
           this.right = '0px';
           this.sidebarOpen = false;
         }else{
-          this.right = '250px';
+          this.right = '300px';
           this.sidebarOpen = true;
         }
       }
