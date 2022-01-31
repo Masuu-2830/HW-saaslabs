@@ -1,10 +1,11 @@
 <template>
-    <div class="integrationContainer">
+    <div class="integrationContainer bd-l">
         <div class="integrationIcons d-flex flex-column" :class="{open: sidebarOpen}">
             <IntegrationData
                 v-for = "(integration, index) in integrations"
                 :key = "index"
                 :integration_data = "integration"
+                :activeInt = "activeInt"
                 @openInt = "openIntegration"
             />
         </div>
@@ -32,6 +33,7 @@
         data(){
             return {
                 integrations: [],
+                activeInt: "",
                 isSidebarActive: false,
                 sidebarData: [],
                 integrationName: '',
@@ -48,6 +50,7 @@
                 this.$emit("openInt", integrationData.id);
                 this.integrationName = integrationData.lname;
                 this.integrationID = integrationData.id;
+                this.activeInt = this.integrationName;
                 if(this.sidebarOpen == false){
                     let fetchUrl = '';
                     let date = moment().format("YYYY-MM-DD"); 
@@ -211,7 +214,6 @@
     .integrationContainer{
         display: flex;
         flex-direction: row;
-        padding: 20px 10px;
     }
     .integrationSidebar{
         display: none;
@@ -222,6 +224,7 @@
     }
     .integrationIcons{
         right: 0px; 
+        padding: 10px 7px;
     }
     .integrationIcons.open{
         right: 250px;
