@@ -202,7 +202,7 @@
                 >
               </span>
               <span
-                v-if="teammate.id in thread.data.usersReadMap"
+                v-if="thread.data.usersReadMap !== null && teammate.id in thread.data.usersReadMap"
                 class="participant-status tx-color-03"
                 >Read
                 {{

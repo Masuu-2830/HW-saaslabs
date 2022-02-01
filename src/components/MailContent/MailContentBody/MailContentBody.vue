@@ -5,8 +5,9 @@
   >
     <div
       class="spinner-border text-primary"
+      :class="loading ? '' : 'd-none'"
       id="threadLoadingSpinner"
-      style="position: relative; left: 50%; display: none"
+      style="position: relative; left: 50%;"
       role="status"
     >
       <span class="sr-only">Loading...</span>
@@ -41,7 +42,8 @@ export default {
   components: { MailContentSingleMail, MailContentLog, MailContentReply, MailContentComment, ReplyWrapper },
   name: "MailContentBody",
   props: {
-    thread: Object
+    thread: Object,
+    loading: false
   },
   methods: {
     deleteComment(id) {

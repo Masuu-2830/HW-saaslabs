@@ -29,7 +29,7 @@
             </svg>
           </router-link>
         </div>
-        <div role="group" class="btn-group btn-block">
+        <div v-if="this.$store.state.inboxData.type == 'mail'" role="group" class="btn-group btn-block">
           <button
             @click="openCompose"
             class="

@@ -50,7 +50,7 @@
               </svg>
             </div>
           </div>
-          <div
+          <!-- <div
             v-if="mail.email !== undefined"
             class="flex-grow-1 w-100 d-flex thread-addr"
           >
@@ -104,8 +104,8 @@
             >
               {{ mail.totalEmailCount > 1 ? mail.totalEmailCount : "" }}
             </div>
-          </div>
-          <div v-else class="flex-grow-1 w-100 d-flex thread-addr">
+          </div> -->
+          <div class="flex-grow-1 w-100 d-flex thread-addr">
             <div
               class="text-truncate thread-addr-main"
               style="max-width: 90%"
@@ -119,6 +119,12 @@
               style="max-width: 25%"
             >
               Draft
+            </div>
+            <div
+              class="text-secondary ml-1 total-email-count"
+              style="max-width: 10%"
+            >
+              {{ mail.messageCount > 1 ? mail.messageCount : "" }}
             </div>
           </div>
         </div>
@@ -148,30 +154,29 @@
               >
             </div>
             <div class="d-flex align-items-center">
-              <span
+              <!-- <span
                 v-if="mail.email !== undefined"
                 class="tx-14 hw-thread-subject mr-2"
                 :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
               >
                 {{ mail.email.subject ? mail.email.subject : "(no subject)" }}
-              </span>
+              </span> -->
               <span
-                v-else
                 class="tx-14 hw-thread-subject mr-2"
                 :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
               >
                 {{ mail.subject ? mail.subject : "(no subject)" }}
               </span>
               <span
-                v-if="mail.snippetType == 'note'"
+                v-if="mail.snippetType == '2'"
                 class="tx-16 tx-color-03 px-2 tx-bold snippetMarker"
                 style="color: #ddcf97"
                 >|</span
               >
-              <span v-if="mail.email !== undefined" class="tx-14 tx-color-03">
+              <!-- <span v-if="mail.email !== undefined" class="tx-14 tx-color-03">
                 {{ mail.email.snippet }}
-              </span>
-              <span v-else class="tx-14 tx-color-03">
+              </span> -->
+              <span class="tx-14 tx-color-03">
                 {{ mail.snippet }}
               </span>
             </div>
@@ -189,7 +194,7 @@
               ></div>
             </div>
             <div
-              v-if="this.$route.params.type == 'sent' || mail.seenAt"
+              v-if="mail.seenAt"
               class="col-6"
             >
               <div
@@ -218,16 +223,9 @@
         </div>
         <div class="col-2 date-thread-options col-lg-1">
           <span
-            v-if="mail.email !== undefined"
             class="tx-13 thread-date"
             :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
-            >{{ mail.email.humanFriendlyDate }}</span
-          >
-          <span
-            v-else
-            class="tx-13 thread-date"
-            :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
-            >{{ mail.date | moment("MMM D, YYYY") }}</span
+            >{{ mail.humanFriendlyDate }}</span
           >
           <span
             class="
@@ -569,7 +567,7 @@
           </span>
         </div>
       </div>
-      <div
+      <!-- <div
         class="row"
         style="padding-left: 20px"
         v-if="
@@ -594,7 +592,7 @@
             </div></a
           >
         </div>
-      </div>
+      </div> -->
       <div
         class="row"
         style="padding-left: 20px"
@@ -643,7 +641,8 @@
             align-items-center
             w-50
           "
-          ><div
+          >
+          <!-- <div
             v-if="mail.email !== undefined"
             class="flex-grow-1 w-100 d-flex thread-addr"
           >
@@ -684,8 +683,8 @@
             >
               {{ mail.totalEmailCount > 1 ? mail.totalEmailCount : "" }}
             </div>
-          </div>
-          <div v-else class="flex-grow-1 w-100 d-flex thread-addr">
+          </div> -->
+          <div class="flex-grow-1 w-100 d-flex thread-addr">
             <div
               class="text-truncate thread-addr-main"
               style="max-width: 90%"
@@ -700,22 +699,27 @@
             >
               Draft
             </div>
+            <div
+              class="text-secondary ml-1 total-email-count"
+              style="max-width: 10%"
+            >
+              {{ mail.messageCount > 1 ? mail.messageCount : "" }}
+            </div>
           </div></span
         >
-        <span
+        <!-- <span
           v-if="mail.email !== undefined"
           class="tx-11 thread-date"
           :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
           >{{ mail.email.humanFriendlyDate }}</span
-        >
+        > -->
         <span
-          v-else
           class="tx-11 thread-date"
           :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
-          >{{ mail.date | moment("MMM D, YYYY") }}</span
+          >{{ mail.humanFriendlyDate }}</span
         >
       </div>
-      <div
+      <!-- <div
         v-if="mail.email !== undefined"
         class="tx-13 hw-thread-subject"
         style="
@@ -727,9 +731,8 @@
         :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
       >
         {{ mail.email.subject ? mail.email.subject : "(no subject)" }}
-      </div>
+      </div> -->
       <div
-        v-else
         class="tx-13 hw-thread-subject"
         style="
           width: 90%;
@@ -744,7 +747,7 @@
       <div
         class="d-flex align-items-center justify-content-between mg-b-2 w-100"
       >
-        <p
+        <!-- <p
           class="tx-12 tx-color-03 mg-b-0"
           style="
             width: 90%;
@@ -761,9 +764,8 @@
             >|</span
           >
           {{ mail.email.snippet }}
-        </p>
+        </p> -->
         <p
-          v-else
           class="tx-12 tx-color-03 mg-b-0"
           style="
             width: 90%;
@@ -773,14 +775,14 @@
           "
         >
           <span
-            v-if="mail.snippetType == 'note'"
+            v-if="mail.snippetType == '2'"
             style="color: #ddcf97"
             class="tx-bold tx-14 px-2 snippetMarker"
             >|</span
           >
           {{ mail.snippet }}
         </p>
-        <span
+        <!-- <span
           v-if="mail.email !== undefined && mail.email.attachments.length > 0"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
@@ -798,8 +800,8 @@
               d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
             ></path></svg
           ><span> </span
-        ></span>
-        <span v-else-if="mail.email == undefined && mail.attachments.length > 0"
+        ></span> -->
+        <span v-if="mail.attachments.length > 0"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             width="14"

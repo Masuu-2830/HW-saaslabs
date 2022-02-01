@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="item.cardType == 'message' && item.data.type == 1"
+    v-if="item.data.type == 1"
     class="comment-body sms-body right-align"
     :id="'sms-options-' + item.data.id"
     style="
@@ -130,7 +130,7 @@
                       margin-bottom: 0;
                       width: 100%;
                     "
-                    v-html="item.data.body"
+                    v-html="item.data.text"
                   ></span>
                 </div>
               </div>
@@ -150,7 +150,7 @@
                 letter-spacing: 0.4px;
                 color: #989898;
               "
-              :data_date="item.data.at"
+              :data_date="item.data.date"
               >{{ item.timestamp | moment("from", "now", true) }}</span
             >
             <span
@@ -162,14 +162,14 @@
                 letter-spacing: 0.4px;
                 color: #989898;
               "
-              :data_date="item.data.at"
-              >{{ this.item.timestamp | moment("MMM D, YYYY hh:mm a") }}</span
+              :data_date="item.data.date"
+              >{{ item.timestamp | moment("MMM D, YYYY hh:mm a") }}</span
             >
           </div>
         </div>
       </div>
       <div class="avatar hw-sent-avatar mg-b-15">
-        <div class="avatar" v-html="item.data.sent_by.avatarTag"></div>
+        <div class="avatar" v-html="item.data.sentBy.avatarTag"></div>
       </div>
     </div>
   </div>

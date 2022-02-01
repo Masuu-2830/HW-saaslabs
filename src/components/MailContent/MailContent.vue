@@ -11,7 +11,7 @@
     <div v-if="!loading" class="d-flex flex-column justify-content-between" style="width: calc(100% - 50px);">
       <mail-content-header :thread="thread"></mail-content-header>
       <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body>
-      <!-- <chat-content-body v-if="this.$store.state.inboxData.type == 'chat'"></chat-content-body> -->
+      <chat-content-body v-if="this.$store.state.inboxData.type !== 'mail'" :thread="thread"></chat-content-body>
       <!-- <chat-content-body></chat-content-body> -->
       <chat-content-reply></chat-content-reply>
       <!-- <mail-content-add-note v-if="!loading"></mail-content-add-note> -->

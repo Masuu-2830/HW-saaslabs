@@ -42,7 +42,7 @@
         <div
           v-for="mail in perPageMails"
           :key="mail.id"
-          @click="clickThread(mail.id, mail.isStarred == true)"
+          @click="clickThread(mail.id, mail.type, mail.subtype, mail.ticketNumber, mail.isStarred == true)"
         >
           <mail-group-single-mail
             :id="'thread-' + mail.id"
@@ -1636,7 +1636,7 @@ export default {
           alert(error);
         });
     },
-    async clickThread(id, isstarred) {
+    async clickThread(id, type, subtype, ticketNumber, isstarred) {
       var objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
       if (
         this.route == "drafts" &&
@@ -1662,18 +1662,16 @@ export default {
           bus.$emit("openCompose", hash, data.data.email);
         });
       } else {
-        // if(this.isThreadRefresh == false) {
         bus.$emit("changeRead", id, 1);
-        // }
         this.activeId = id;
         this.isCompact = true;
         let data = null;
         bus.$emit("compact", data);
-        data = await this.fetchThread(id, isstarred);
+        data = await this.fetchThread(id, type, subtype, isstarred);
+        data["data"]["ticketNumber"] = ticketNumber;
         console.log(data);
         if (this.isThreadRefresh) {
           let from = {};
-          // from[data.data.contact.emails[0]] = data.data.contact.firstname + " " + data.data.contact.lastname;
           let ts = data.data.items[0].timestamp;
           for (let i = 0; i < data.data.items.length; i++) {
             if (data.data.items[i].timestamp < ts) {
@@ -1702,14 +1700,11 @@ export default {
             totalEmailCount: data.data.emailCount,
             ticketNumber: data.data.ticketNumber,
             tags: data.data.tags,
-            email: {
-              attachments: [],
-              from: from,
-              humanFriendlyDate: moment.unix(ts).format("DD MMM"),
-              subject: data.data.displaySubject,
-              originalSubject: data.data.subject,
-              snippet: data.data.snippet,
-            },
+            attachments: [],
+            subject: data.data.displaySubject,
+            originalSubject: data.data.subject,
+            snippet: data.data.snippet,
+            humanFriendlyDate: moment.unix(ts).format("DD MMM"),
           };
           console.log(thread);
           this.perPageMails.push(thread);
@@ -1723,7 +1718,7 @@ export default {
       bus.$emit("broad");
       let url =
         this.$apiBaseURL +
-        "get-threads.php?mailboxID=" +
+        "unifiedv2/getThreads.php?mailboxIDs[]=" +
         this.$route.params.mailboxId +
         "&page=" +
         this.currPage +
@@ -1767,18 +1762,22 @@ export default {
       console.log(this.startThread);
       console.log(this.$store.state.userSettings.resultsPerPage);
     },
-    async fetchThread(id, isstarred) {
+    async fetchThread(id, type, subtype, isstarred) {
       console.log(isstarred);
       const response = await fetch(
         this.$apiBaseURL +
-          "getThreadData.php?threadID=" +
+          "unifiedv2/getThreadData.php?threadID=" +
           id +
           "&mailboxID=" +
           this.$route.params.mailboxId +
+          "&inboxType=" +
+          type +
+          "&inboxSubType=" +
+          subtype +
           "&labelID=" +
           this.labelId +
-          "&page=1",
-        { credentials: "include" }
+          "&maxDate=0&page=1",
+        {credentials: "include"}
       );
       const data = await response.json();
       if (this.$store.state.userSettings.orderThread == "asc") {
@@ -1792,6 +1791,7 @@ export default {
       }
       // data.data.isRead = isread;
       data.data.isStarred = isstarred;
+      data.data.labelId = this.labelId;
       console.log(data);
       router.push({
         name: "thread",
@@ -1809,7 +1809,7 @@ export default {
         this.currPage++;
         let url =
           this.$apiBaseURL +
-          "get-threads.php?mailboxID=" +
+          "unifiedv2/getThreads.php?mailboxIDs[]=" +
           this.$route.params.mailboxId +
           "&page=" +
           this.currPage +
@@ -1866,7 +1866,7 @@ export default {
         }
         let url =
         this.$apiBaseURL +
-          "get-threads.php?mailboxID=" +
+          "unifiedv2/getThreads.php?mailboxIDs[]=" +
           this.$route.params.mailboxId +
           "&page=" +
           this.currPage +
