@@ -21,9 +21,12 @@
               <div
                 class="avatar avatar mr-2"
                 style="cursor: default"
-                v-html="item.type == 'twitter' ? item.data.img : item.data.sentBy.avatarTag"
-              >
-              </div>
+                v-html="
+                  item.type == 'twitter'
+                    ? item.data.img
+                    : item.data.sentBy.avatarTag
+                "
+              ></div>
               <div v-if="item.type == 'twitter'" class="mg-b-0">
                 <strong style="cursor: default">{{
                   Object.values(item.data.from).toString()
@@ -36,7 +39,7 @@
                   "
                 >
                   <div style="cursor: pointer" class="copyable tx-color-03">
-                    {{Object.keys(item.data.from).toString()}}
+                    {{ Object.keys(item.data.from).toString() }}
                   </div></a
                 >
               </div>
@@ -170,6 +173,7 @@
                   type="button"
                   class="dropdown-item delete-email-btn"
                   :id="'delete-email-' + item.data.id"
+                  @click.stop.prevent="$emit('deleteTweet', item.data.id)"
                 >
                   Delete
                 </button>
@@ -182,34 +186,55 @@
 
     <hr style="margin-top: 0px !important; margin-bottom: 0px !important" />
 
-    <div class="row mg-l-4" style="display: contents">
-      <a
-        v-if="
-          item.data.attachments !== null &&
-          item.data.attachments.length > 0 &&
-          item.data.attachments[0].extension == 'jpg'
-        "
-        alt="img"
-        :href="item.data.attachments[0].filehash"
-        target="_blank"
-        draggable="true"
-        style="
-          background-size: cover;
-          background-repeat: no-repeat;
-          width: 100%;
-          height: 400px;
-          border-radius: 15px;
-          margin-bottom: 10px;
-          cursor: pointer;
-          margin-top: 10px;
-          border: 1px solid #ccd6dd;
-          background-position: center center;
-        "
-        :style="
-          'background-image: url(' + item.data.attachments[0].filehash + ');'
-        "
+    <div
+      v-if="item.data.attachments !== null && item.data.attachments.length > 0"
+      class="row mg-l-4"
+      style="display: contents"
+    >
+      <div
+        v-for="attachment in item.data.attachments"
+        :key="attachment.attachment_url"
       >
-      </a>
+        <a
+          v-if="attachment.attachment_type == 'image'"
+          alt="img"
+          :href="attachment.attachment_url"
+          target="_blank"
+          draggable="true"
+          style="
+            background-size: cover;
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 400px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            border: 1px solid #ccd6dd;
+            background-position: center center;
+          "
+          :style="'background-image: url(' + attachment.attachment_url + ');'"
+        >
+        </a>
+        <video
+          v-if="attachment.attachment_type == 'video'"
+          controls=""
+          style="
+            height: 230px;
+            width: 300px;
+            object-fit: cover;
+            border-radius: 28px;
+          "
+          class=""
+        >
+          <source
+            :src="attachment.attachment_url"
+            type="video/mp4"
+            :name="attachment.file_name"
+          />
+          Sorry, your browser doesn't support embedded videos.
+        </video>
+      </div>
     </div>
     <div
       class="email-html pl-2"
@@ -238,6 +263,7 @@
       <div class="d-flex flex-row m-0 reply-row">
         <div class="col-1">
           <button
+            @click.stop.prevent="openCardReply"
             class="p-2 reply-btn"
             data-toggle="tooltip"
             title="Reply"
@@ -269,6 +295,7 @@
         </div>
         <div v-if="item.type == 'twitter'" class="col-1 like">
           <button
+            @click.stop.prevent="toggleLike"
             class="p-2 like_"
             id="like-219160"
             data-toggle="tooltip"
@@ -278,11 +305,21 @@
               background: none;
               color: #8392a5;
               border: none;
-
               cursor: pointer;
             "
           >
             <i
+              v-if="item.data.isLiked == '1'"
+              class="fas fa-heart"
+              style="
+                font-size: 17px;
+                color: rgb(224, 36, 94);
+                padding-top: 2px;
+                margin-left: 0px;
+              "
+            ></i>
+            <i
+              v-else
               class="far fa-heart"
               style="
                 font-size: 17px;
@@ -290,7 +327,6 @@
                 padding-top: 2px;
                 margin-left: 0px;
               "
-              :style="{color: item.data.isLiked ? 'rgb(224,36,94)' : '#8392a5'}"
             ></i>
           </button>
         </div>
@@ -306,10 +342,10 @@
             data-original-title="Retweet"
             style="
               background: none;
-              color: #8392a5;
               border: none;
               cursor: pointer;
             "
+            :style="{color: item.data.isRetweeted ? 'rgb(23, 191, 99)' : '#8392a5'}"
           >
             <svg viewBox="0 0 24 24" class="stp1">
               <g>
@@ -326,10 +362,48 @@
 </template>
 
 <script>
+import { bus } from "../../../main";
 export default {
   name: "ChatContentCard",
   props: {
     item: Object,
+  },
+  methods: {
+    openCardReply() {
+      bus.$emit('openCardReply', this.item);
+    },
+    toggleLike() {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          'mailbox_id': this.$route.params.mailboxId,
+          'id[]': this.item.data.id,
+        }),
+        credentials: "include",
+      };
+      console.log(requestOptions.body);
+      let url = "";
+      if (this.item.data.isLiked == '1') {
+        url = "https://app.helpwise.io/twitter1/api/search/unlike_tweet.php";
+      } else {
+        url = "https://app.helpwise.io/twitter1/api/search/like_tweet.php";
+      }
+      fetch(url, requestOptions)
+        .then(async (response) => {
+          const data = await response.json();
+          if (data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            triggerPromptNotif(error, "error", 3000);
+            return Promise.reject(error);
+          }
+          this.item.data.isLiked =
+            !this.item.data.isLiked;
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    },
   },
 };
 </script>

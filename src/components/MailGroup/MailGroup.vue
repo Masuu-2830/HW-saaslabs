@@ -413,26 +413,44 @@ export default {
         });
     });
     bus.$on("closeThread", (id) => {
+      console.log(id, typeof id);
       let threadIDs = new Array();
       if (typeof id == "number") {
         threadIDs[0] = id;
       } else if (typeof id == "object") {
         threadIDs = id;
       }
-      console.log(threadIDs);
+      let mailboxThreadMap = {};
+      if (typeof id == "number") {
+        let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      } else if (typeof id == "object") {
+        var objIndex;
+        for(let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          if(!(this.perPageMails[objIndex].mailboxId in Object.keys(mailboxThreadMap))) {
+            mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+          } 
+        }
+        for(let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id[i]);
+        }
+      }
+      console.log(mailboxThreadMap);
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxID: this.$route.params.mailboxId,
-          threadIDs,
+          mailboxThreadMap
         }),
         credentials: "include",
       };
-      fetch(this.$apiBaseURL + "archiveThreads.php", requestOptions)
+      fetch(this.$apiBaseURL + "unifiedv2/archiveThreads.php", requestOptions)
         .then(async (response) => {
           const data = await response.json();
-          if (data.message !== "thread archived") {
+          if (data.status !== "success") {
             const error = (data && data.message) || response.status;
             triggerPromptNotif(error, "error", 3000);
             return Promise.reject(error);

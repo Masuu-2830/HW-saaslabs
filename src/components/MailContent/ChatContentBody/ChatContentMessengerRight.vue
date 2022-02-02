@@ -51,47 +51,52 @@
                 margin-right: 18px;
               "
             >
-              <a
-                v-if="
-                  item.data.attachments !== null &&
-                  item.data.attachment.attachment_type == 'image'
-                "
-                :href="item.data.attachment.attachment_url"
-                target="_blank"
-                ><img
-                  :src="item.data.attachment.attachment_url"
-                  alt="whatsapp image"
-                  :name="item.data.attachment.file_name"
-                  class=""
-                  style="
-                    object-fit: contain;
-                    border-radius: 28px;
-                    max-height: 200px;
-                    max-width: 400px;
-                    min-width: 100px;
-                  "
-              /></a>
-              <video
-                v-if="
-                  item.data.attachments !== null &&
-                  item.data.attachment.attachment_type == 'video'
-                "
-                controls=""
-                style="
-                  height: 230px;
-                  width: 300px;
-                  object-fit: cover;
-                  border-radius: 28px;
-                "
-                class=""
-              >
-                <source
-                  :src="item.data.attachment.attachment_url"
-                  type="video/mp4"
-                  :name="item.data.attachment.file_name"
-                />
-                Sorry, your browser doesn't support embedded videos.
-              </video>
+              <div v-if="item.data.attachments !== null && item.data.attachments.length > 0">
+                <div
+                  v-for="attachment in item.data.attachments"
+                  :key="attachment.attachment_url"
+                >
+                  <a
+                    v-if="
+                      attachment.attachment_type == 'image'
+                    "
+                    :href="attachment.attachment_url"
+                    target="_blank"
+                    ><img
+                      :src="attachment.attachment_url"
+                      alt="image"
+                      :name="attachment.file_name"
+                      class=""
+                      style="
+                        object-fit: contain;
+                        border-radius: 28px;
+                        max-height: 200px;
+                        max-width: 400px;
+                        min-width: 100px;
+                      "
+                  /></a>
+                  <video
+                    v-if="
+                      attachment.attachment_type == 'video'
+                    "
+                    controls=""
+                    style="
+                      height: 230px;
+                      width: 300px;
+                      object-fit: cover;
+                      border-radius: 28px;
+                    "
+                    class=""
+                  >
+                    <source
+                      :src="attachment.attachment_url"
+                      type="video/mp4"
+                      :name="attachment.file_name"
+                    />
+                    Sorry, your browser doesn't support embedded videos.
+                  </video>
+                </div>
+              </div>
               <span
                 class="tx-14"
                 style="

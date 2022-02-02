@@ -22,7 +22,7 @@
         <mail-content-log v-if="item.type == 'log'" :item="item"></mail-content-log>
         <mail-content-comment v-else-if="item.type == 'comment'" :item="item" v-on:deleteComment="deleteComment"></mail-content-comment>
         <chat-content-messenger-right v-else-if="item.type == 'facebook' && item.data.type == 1" :item="item"></chat-content-messenger-right>
-        <chat-content-card v-else-if="item.type == 'fb-feed' || item.type == 'instagram' || item.type == 'twitter'" :item="item"></chat-content-card>
+        <chat-content-card v-else-if="item.type == 'fb-feed' || item.type == 'instagram' || item.type == 'twitter'" :item="item" v-on:deleteTweet="deleteTweet"></chat-content-card>
         <chat-content-message-left v-else-if="item.data.type == 0" :item="item"></chat-content-message-left>
         <chat-content-message-right v-else-if="item.data.type == 1" :item="item" v-on:deleteMessage="deleteComment"></chat-content-message-right>
       </div>
@@ -35,8 +35,9 @@
     >
       <span class="sr-only">Loading...</span>
     </div>
-    <div id="tweetReplyWindow"></div>
-    <div id="replyWindowWrapper"></div>
+    <div id="tweetReplyWindow">
+      <chat-content-card-reply></chat-content-card-reply>
+    </div>
   </div>
 </template>
 
@@ -44,11 +45,12 @@
 import MailContentComment from '../MailContentBody/MailContentComment.vue';
 import MailContentLog from '../MailContentBody/MailContentLog.vue';
 import ChatContentCard from './ChatContentCard.vue';
+import ChatContentCardReply from './ChatContentCardReply.vue';
 import ChatContentMessageLeft from './ChatContentMessageLeft.vue';
 import ChatContentMessageRight from './ChatContentMessageRight.vue';
 import ChatContentMessengerRight from './ChatContentMessengerRight.vue';
 export default {
-  components: { ChatContentMessageLeft, ChatContentMessageRight, MailContentLog, MailContentComment, ChatContentMessengerRight, ChatContentCard },
+  components: { ChatContentMessageLeft, ChatContentMessageRight, MailContentLog, MailContentComment, ChatContentMessengerRight, ChatContentCard, ChatContentCardReply },
   name: "ChatContentBody",
   props: {
     thread: Object,
@@ -57,6 +59,32 @@ export default {
     deleteComment(id) {
       console.log(id);
       this.thread.data.items = this.thread.data.items.filter(item => item.data.id !== id);
+    },
+    deleteTweet(id) {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mailboxID: this.$route.params.mailboxId,
+          emailID: id,
+          threadID: this.$route.params.threadId
+        }),
+        credentials: "include",
+      };
+      console.log(requestOptions.body);
+      fetch(this.$apiBaseURL + "delete-tweet.php", requestOptions)
+        .then(async (response) => {
+          const data = await response.json();
+          if (data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            triggerPromptNotif(error, "error", 3000);
+            return Promise.reject(error);
+          }
+          this.thread.data.items = this.thread.data.items.filter(item => item.data.id !== id);
+        })
+        .catch((error) => {
+          alert(error);
+        });
     },
     onScroll ({ target: { scrollTop }}) {
       if (scrollTop == 0) {
