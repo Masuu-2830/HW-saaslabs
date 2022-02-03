@@ -18,12 +18,13 @@
                 :key = "index">
 
                     <!-- Component for CRM -->
-                    <div class="pd-y-10" v-if= "sidebar.type == 'crm'">
-                        <div class="integration-collapse-body shadow-sm bg-white rounded">
+                    <div class="pd-y-10" v-if= "sidebar.type == 'crm' || sidebar.type == 'custom-app'">
+                        <div class="integration-collapse-body shadow-sm bg-white rounded" style="border-style: solid;border-width: thin;border-color: rgb(210, 210, 210);">
                             <div class="collapse-header row custom-header" style="cursor: pointer;height:50px;">
                                 <div class="col-8">
                                     <p class="pd-l-13 pd-t-15">
-                                        {{ sidebar.title }}
+                                        <i :class="sidebar.icon"></i>
+                                        <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:5px;margin-right:5px;">{{ sidebar.title }}</span>
                                         <i v-if="sidebar.update==1 && sidebar.component_type=='single'" class="fas fa-xs fa-pen" :class="integrationName + '_' + sidebar.class + '_edit_button'" @click="openUpdateForm(sidebar.class, sidebar.components[0], integrationName)"></i>
                                     </p>  
                                 </div>
@@ -198,11 +199,12 @@
 
                     <!-- Multiple Component for Calendar -->
                     <div class="pd-y-10" v-if= "sidebar.type == 'calendar'">
-                        <div class="integration-collapse-body shadow-sm bg-white rounded">
+                        <div class="integration-collapse-body shadow-sm bg-white rounded" style="border-style: solid;border-width: thin;border-color: rgb(210, 210, 210);">
                             <div class="row integration_header" style="cursor: pointer;height:50px;">
                                 <div class="col-8">
                                     <p class="pd-l-13 pd-t-15">
-                                        {{ sidebar.title }}
+                                        <i :class="sidebar.icon"></i>
+                                        <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:5px;margin-right:5px;">{{ sidebar.title }}</span>
                                     </p>
                                 </div>
                                 <div class="col-4 pd-t-15" @click="collapseHeader('.' + sidebar.class + '_integration_collapsible')">
@@ -395,7 +397,7 @@
                     <div class="pd-y-10" v-if= "sidebar.type =='project_management' && sidebar.dropdown_components.length >= 0">
                         <div v-for= "(component, index) in sidebar.dropdown_components"
                         :key="index">
-                            <select v-if="component.type == 'dropdown_api'" class="form-control custom-select" :class="integrationName + '_custom_' + component.class" @change="callRandomApi(integrationName, component.class, component.api, integrationID, component.attributes, component.email, $event)" style="margin-top:10px;">
+                            <select v-if="component.type == 'dropdown_api'" class="form-control custom-select" :class="integrationName + '_fetch_custom_' + component.class" @change="callRandomApi(integrationName, component.class, component.api, integrationID, component.attributes, component.email, $event, 'fetch', sidebar.class)" style="margin-top:10px;">
                                 <option v-for= "(option, index) in component.value"
                                 :key= "index"
                                 :value="option.value">{{ option.label }}
@@ -403,11 +405,13 @@
                             </select>
                         </div>
 
-                        <div v-if="sidebar.final==1" class="integration-collapse-body shadow-sm bg-white rounded">
+                        <div v-if="sidebar.final==1" class="integration-collapse-body shadow-sm bg-white rounded" style="border-style: solid;border-width: thin;border-color: rgb(210, 210, 210);">
                             <div class="row integration_header" style="cursor: pointer;height:50px;">
                                 <div class="col-8">
                                     <p class="pd-l-13 pd-t-15">
-                                        {{ sidebar.title }}
+                                        <i :class="sidebar.icon"></i>
+                                        <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:5px;margin-right:5px;">{{ sidebar.title }}</span>
+                                        <i v-if="sidebar.update==1 && sidebar.component_type=='single'" class="fas fa-xs fa-pen" :class="integrationName + '_' + sidebar.class + '_edit_button'" @click="openUpdateForm(sidebar.class, sidebar.components[0], integrationName)"></i>
                                     </p>
                                 </div>
                                 <div class="col-4 pd-t-15" @click="collapseHeader('.' + sidebar.class + '_integration_collapsible')">
@@ -545,6 +549,10 @@
                                                         </div>
                                                     </div>
                                                 </span>
+                                                <span v-else-if="com.type=='link_api' && com.show == 1">
+                                                    <span @click="callRandomApi(integrationName, com.class, com.api, integrationID, com.attributes, com.email, $event, 'fetch', sidebar.class)">{{ com.label }}</span>
+                                                    <div :class="integrationName + sidebar.class + '_all_' + com.class"></div>
+                                                </span>
                                             </p>  
                                         </div>
                                     </div>
@@ -565,6 +573,12 @@
                                                 <input v-if="createComponent.type == 'text' || createComponent.type == 'number'" min="0" :max="createComponent.type == 'number' ? createComponent.max : ''" :type="createComponent.type" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
                                                 :placeholder="createComponent.placeholder">
                                                 <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class">
+                                                    <option v-for= "(option, index) in createComponent.dropdown"
+                                                    :key= "index"
+                                                    :value="option.value">{{ option.label }}
+                                                    </option>
+                                                </select>
+                                                <select v-if="createComponent.type == 'dropdown_api'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" @change="callRandomApi(integrationName, createComponent.class, createComponent.api, integrationID, createComponent.attributes, createComponent.email, $event, 'create', sidebar.class)">
                                                     <option v-for= "(option, index) in createComponent.dropdown"
                                                     :key= "index"
                                                     :value="option.value">{{ option.label }}
@@ -656,6 +670,251 @@
                         </div>
                     </div>
 
+
+                    <!-- Component for E-commerce -->
+                    <div class="pd-y-10" v-if= "sidebar.type == 'e-commerce'">
+                        <div class="collapse-body shadow-sm bg-white rounded">
+                            <div class="collapse-header custom-header row" style="cursor: pointer;height:50px;">
+                                <div class="col-8">
+                                    <p class="pd-l-13 pd-t-15" style="display:flex;align-items:center;">
+                                        <i :class="sidebar.icon"></i>
+                                        <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:10px;">{{ sidebar.title }}</span>
+                                    </p>
+                                </div>
+
+                                <div class="col-4 pd-t-15" @click="collapseHeader('.' + sidebar.class + '_integration_collapsible')">
+                                    <p class="integration_collapse_header pd-r-10 text-right">
+                                        <i class="fas fa-caret-up" :class="sidebar.class + '_integration_collapsible_caret'" style="color: silver;border-radius:5px;"></i>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="pd-l-0 pd-b-1 collapse show" :class="sidebar.class + '_integration_collapsible'" style="word-wrap: break-word;line-height: 1.50;padding:5px;">
+
+                                <!-- Single component -->
+                                <div v-if="sidebar.component_type == 'single'" class="col s12">
+                                    <p v-for= "(component, index) in sidebar.components[0]"
+                                        :key = "index"
+                                    >
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags') && component.show == 1">
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number') && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
+                                        <span v-else-if="component.type=='link' && component.show == 1">
+                                            <a :href="component.value" target="_blank">{{component.label}}
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                </svg>
+                                            </a>
+                                        </span>
+                                        <span v-else-if="(component.type=='button' || component.type=='api_button') && component.show == 1">
+                                            <button type="button" class="mb-2 btn btn-xs btn-primary" :class="component.class" @click="buttonFunction(component.api, integrationName, integrationID, sidebar.components[0], '')">{{ component.label }}</button>
+                                        </span>
+                                        <span v-else-if="component.type=='link_button' && component.show == 1">
+                                            <a :href="component.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="component.class">{{ component.label }}</button></a>
+                                        </span>
+                                        <span v-else-if="component.type=='tags' && component.show == 1">
+                                            <span v-for= "(tag, index) in component.value"
+                                            :key= "index"
+                                            >
+                                                <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                            </span>
+                                        </span>
+                                    </p>                  
+                                </div>
+
+                                <!-- Multiple component -->
+                                <div v-if="sidebar.component_type == 'multiple'" class="pd-5">
+                                    <div class="pd-y-10" v-for= "(store_component, index) in sidebar.components"
+                                    :key= "index"
+                                    >
+                                        <div class="collapse-body shadow-sm bg-white rounded" style="border-style: solid;border-width: thin;border-color: #d2d2d2;">
+                                            <div class="collapse-header custom-header row" style="cursor: pointer;height:50px;">
+                                                <div class="col-8">
+                                                    <p class="pd-l-13 pd-t-15">
+                                                        <i :class="store_component.icon"></i>
+                                                        <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:10px;">{{ store_component.title }}</span>
+                                                    </p>
+                                                </div>
+                                                <div class="col-4 pd-t-15" @click="collapseHeader('.' + store_component.class + '_integration_collapsible')">
+                                                    <p class="pd-r-10 text-right">
+                                                        <i class="fas fa-caret-up" :class="store_component.class + '_integration_collapsible_caret'" style="color: silver;border-radius:5px;"></i>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="pd-l-0 pd-b-1 collapse show" :class="store_component.class + '_integration_collapsible'" style="word-wrap: break-word;line-height: 1.50;">
+                                                <!-- inner no component -->
+                                                <div v-if="store_component.component_type == 'no'" class="col s12" :class="'no_' + store_component.class + '_component'">
+                                                    <p style="color:#4f5d6b;">{{ store_component.text }}</p>
+                                                </div>
+                                                
+                                                <!-- inner single component -->
+                                                <div class="col s12" v-else-if="store_component.component_type == 'single'">
+                                                    <p v-for= "(com, index) in store_component.components"
+                                                        :key = "index"
+                                                    >
+                                                        <span v-if="(com.type=='text'  || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if="(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags') && com.show == 1">
+                                                        <span v-if="(com.type=='text'  || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
+                                                        <span v-else-if="com.type=='link' && com.show == 1">
+                                                            <a :href="com.value" target="_blank">{{com.label}}
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                </svg>
+                                                            </a>
+                                                        </span>
+                                                        <span v-else-if="(com.type=='button' || com.type=='api_button') && com.show == 1">
+                                                            <button type="button" class="mb-2 btn btn-xs btn-primary" :class="com.class" @click="buttonFunction(com.api, integrationName, integrationID, component.components[0], '')">{{ com.label }}</button>
+                                                        </span>
+                                                        <span v-else-if="com.type=='link_button' && com.show == 1">
+                                                            <a :href="com.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="com.class">{{ com.label }}</button></a>
+                                                        </span>
+                                                        <span v-else-if="com.type=='tags' && com.show == 1">
+                                                            <span v-for= "(tag, index) in com.value"
+                                                            :key= "index"
+                                                            >
+                                                                <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                                            </span>
+                                                        </span>
+                                                    </p> 
+                                                </div>
+
+                                                <!-- inner multiple component -->
+                                                <div v-else-if="store_component.component_type == 'multiple'" class="pd-5">
+                                                    <div class="card rounded mg-b-10" v-for= "(multi_compos, index) in store_component.components"
+                                                        :key= "index"
+                                                    >
+                                                        <div class="d-flex align-items-center justify-content-between bg-gray-100" style="padding: 15px;">
+                                                            <span style="font-size:13px;">{{ multi_compos[1].value }}</span>    
+                                                            <div>
+                                                                <span style="cursor:pointer;" @click="collapseHeader('.' + integrationName + '_' + store_component.class + '_' + multi_compos[0].value)">
+                                                                    <i class="fas fa-caret-down" :class="integrationName + '_' + store_component.class + '_' + multi_compos[0].value + '_caret'" style="color: silver;border-radius:5px;"></i>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+
+                                                        <div class="pd-l-0 pd-b-1 collapse" :class="integrationName + '_' + store_component.class + '_' + multi_compos[0].value">
+                                                            <div class="pd-5">
+                                                                <div v-for= "(multi_compo,index) in multi_compos"
+                                                                :key= "index">
+                                                                    <div class="collapse-body shadow-sm bg-white rounded mg-y-10" v-if="multi_compo.show==1 && (multi_compo.type == 'multiple_component' || multi_compo.type=='single_component')" style="border-style: solid; border-width: thin; border-color: rgb(210, 210, 210);">
+                                                                        <div class="collapse-header row custom-header" style="cursor: pointer;height:50px;">
+                                                                            <div class="col-8">
+                                                                                <p class="pd-l-13 pd-t-15">
+                                                                                    {{ multi_compo.label }}
+                                                                                    <!-- <i v-if="sidebar.update==1 && sidebar.component_type=='single'" class="fas fa-xs fa-pen" :class="integrationName + '_' + sidebar.class + '_edit_button'" @click="openUpdateForm(sidebar.class, sidebar.components[0], integrationName)"></i> -->
+                                                                                </p>  
+                                                                            </div>
+                                                                            <div class="col-4 pd-t-15" @click="collapseHeader('.' + multi_compo.class + multi_compos[0].value + '_integration_collapsible')">
+                                                                                <p class="integration_collapse_header pd-r-10 text-right">
+                                                                                    <i class="fas fa-caret-up" :class="multi_compo.class + multi_compos[0].value + '_integration_collapsible_caret'" style="color: silver;border-radius:5px;"></i>
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="pd-l-0 pd-b-1 collapse show" :class="multi_compo.class + multi_compos[0].value + '_integration_collapsible'"  style="word-wrap: break-word;line-height: 1.5;">
+
+                                                                            <!-- Single Component -->
+                                                                            <div v-if="multi_compo.type == 'single_component'" class="col s12">
+                                                                                <p v-for= "(comp, index) in multi_compo.value"
+                                                                                    :key = "index"
+                                                                                >
+                                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ comp.label }}</span><br v-if="(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1">
+                                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number') && comp.show == 1" style="color:#4f5d6b;font-size:13px;">{{comp.value ? comp.value : 'No ' + comp.label}}</span>
+                                                                                    <span v-else-if="comp.type=='link' && comp.show == 1">
+                                                                                        <a :href="comp.value" target="_blank">{{comp.label}}
+                                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                                                                <polyline points="15 3 21 3 21 9"></polyline>
+                                                                                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                                            </svg>
+                                                                                        </a>
+                                                                                    </span>
+                                                                                    <span v-else-if="(comp.type=='button' || comp.type=='api_button') && comp.show == 1">
+                                                                                        <button type="button" class="mb-2 btn btn-xs btn-primary" :class="comp.class" @click="buttonFunction(comp.api, integrationName, integrationID, multi_compo, '')">{{ comp.label }}</button>
+                                                                                    </span>
+                                                                                    <span v-else-if="comp.type=='link_button' && comp.show == 1">
+                                                                                        <a :href="comp.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="comp.class">{{ comp.label }}</button></a>
+                                                                                    </span>
+                                                                                    <span v-else-if="comp.type=='tags' && comp.show == 1">
+                                                                                        <span v-for= "(tag, index) in comp.value"
+                                                                                        :key= "index"
+                                                                                        >
+                                                                                            <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                                                                        </span>
+                                                                                    </span>
+                                                                                </p>                  
+                                                                            </div>
+
+                                                                            <!-- Multiple Component -->
+                                                                            <div v-else-if="multi_compo.type == 'multiple_component'" class="pd-5">
+                                                                                <div class="card rounded mg-b-10" v-for= "(compo, index) in multi_compo.value"
+                                                                                :key= "index"
+                                                                                >
+                                                                                    <div class="d-flex align-items-center justify-content-between bg-gray-100" style="padding: 15px;">
+                                                                                        <span style="font-size:13px;">{{ compo[1].value }}</span>    
+                                                                                        <div>
+                                                                                            <!-- <span style="cursor:pointer;" :class="integrationName + '_edit_' + sidebar.class + '_button'" class="mg-r-10" v-if="sidebar.update == 1" @click="openUpdateForm(sidebar.class, component, integrationName)"><i class="fas fa-pen fa-xs"></i></span> -->
+                                                                                            <span style="cursor:pointer;" @click="collapseHeader('.' + integrationName + '_' + multi_compo.class + '_' + compo[0].value)">
+                                                                                                <i class="fas fa-caret-down" :class="integrationName + '_' + multi_compo.class + '_' + compo[0].value + '_caret'" style="color: silver;border-radius:5px;"></i>
+                                                                                            </span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="mg-l-10 mg-r-10 collapse" :class="integrationName + '_' + multi_compo.class + '_' + compo[0].value">
+                                                                                        <p v-for= "(com, index) in compo"
+                                                                                            :key = "index"
+                                                                                        >   
+                                                                                            <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags' || com.type=='list') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags' || com.type=='list') && com.show == 1">
+                                                                                            <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
+                                                                                            <span v-else-if="com.type=='link' && com.show == 1">
+                                                                                                <a :href="com.value" target="_blank">{{com.label}}
+                                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                                                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                                                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                                                                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                                                    </svg>
+                                                                                                </a>
+                                                                                            </span>
+                                                                                            <span v-else-if="com.type=='link_button' && com.show == 1">
+                                                                                                <a :href="com.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="com.class">{{ com.label }}</button></a>
+                                                                                            </span>
+                                                                                            <span v-else-if="com.type=='tags' && com.show == 1">
+                                                                                                <span v-for= "(tag, index) in com.value"
+                                                                                                :key= "index"
+                                                                                                >
+                                                                                                    <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                                                                                </span>
+                                                                                            </span>
+                                                                                            <span style="text-align: center;" v-else-if="com.type=='form_button' && com.show == 1">
+                                                                                                <button type="button" class="mb-2 btn btn-xs btn-secondary" :class="com.class" @click="addCustomData(integrationName, integrationID, com.class, com.associated_id, compo, 'create')">{{ com.label }}</button>
+                                                                                            </span>
+                                                                                        </p>  
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-center" v-else-if="multi_compo.show==1 && multi_compo.type=='link'">
+                                                                        <a :href="multi_compo.value" target="_blank">{{multi_compo.label}}
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                                                <polyline points="15 3 21 3 21 9"></polyline>
+                                                                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                            </svg>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -741,7 +1000,7 @@ export default {
                 let identifier = component.class;
                 let identifier_value = $(`.${int_name}_create_${className}_${identifier}`).val();
                 let identifier_label = component.label;
-                if(component.required == 1 && identifier_value == ''){
+                if(component.required == 1 && (identifier_value == '' || identifier_value == 0)){
                     $(`.${int_name}_create_${className}_${identifier}`).removeClass('is-valid').addClass('is-invalid');
                     $(`.${int_name}-create-${className}-${identifier}-error`).text(`${identifier_label} cannot be empty`);
                     flag=1;
@@ -766,6 +1025,7 @@ export default {
             if(flag == 0){
                 createFormData['integration_id'] = int_id;
                 createFormData['functionality'] = 'create_' + className;
+                createFormData['locationURL'] = location.pathname;
                 if(Object.keys(this.randomData).length!=0){
                     createFormData['randomData'] = this.randomData;
                 }
@@ -812,7 +1072,7 @@ export default {
                 let identifier = component.class;
                 let identifier_value = $(`.${int_name}_edit_${className}_${identifier}`).val();
                 let identifier_label = component.label;
-                if(component.required == 1 && identifier_value == ''){
+                if(component.required == 1 && (identifier_value == '' || identifier_value == 0)){
                     $(`.${int_name}_edit_${className}_${identifier}`).removeClass('is-valid').addClass('is-invalid');
                     $(`.${int_name}-edit-${className}-${identifier}-error`).text(`${identifier_label} cannot be empty`);
                     flag=1;
@@ -829,6 +1089,7 @@ export default {
                 updateFormData['id'] = this.formData[className]['id'];
                 updateFormData['functionality'] = 'update_' + className;
                 updateFormData['integration_id'] = int_id;
+                updateFormData['locationURL'] = location.pathname;
                 if(this.sidebarData.fetch[0]['associated_id'] && this.sidebarData.fetch[0]['associated_id']!=''){
                     updateFormData['associated_id'] = this.sidebarData.fetch[0]['associated_id'];
                 }
@@ -869,11 +1130,9 @@ export default {
             }
         },
         openCreateForm(className){
-            if(!this.openCreateFormArrayInternal[className] || this.openCreateFormArrayInternal[className] == false){
-                this.openCreateFormArrayInternal[className] = true;
-            }else{
-                this.openCreateFormArrayInternal[className] = false;
-            }
+            console.log("hello bacha",this.openCreateFormArrayInternal);
+            console.log("hello bacha",className);
+            this.openCreateFormArrayInternal[className] = !this.openCreateFormArrayInternal[className];
             this.randomData = {};
         },
         openUpdateForm(className, components, int_name){
@@ -962,19 +1221,20 @@ export default {
         removeRandomData(indexData){
             this.guestEmails.splice(indexData, 1);
         },
-        callRandomApi(int_name, className, api_name, int_id, attributes, email, event){
+        callRandomApi(int_name, className, api_name, int_id, attributes, email, event, action, sectionClass){
             let pm_data = {};
             if(event.target.value!=0){
                 if(attributes.length!=0){
                     attributes.forEach(attribute => {
                         let identifier = attribute.class; 
-                        let identifier_value = $(`${int_name}_custom_${identifier}`).val();
+                        let identifier_value = $(`.${int_name}_fetch_custom_${identifier}`).val();
                         if(identifier_value!=0){
                             pm_data[identifier] = identifier_value;
                         }
                     });
                 }
                 pm_data[className] = event.target.value;
+                pm_data['locationURL'] = location.pathname;
                 pm_data['email'] = email;
                 pm_data['integration_id'] = int_id;
                 fetch("https://app.helpwise.io/api/integration-vue/"+int_name+"/"+api_name+".php", {
@@ -989,6 +1249,30 @@ export default {
                     const dataResponse = await response.json();
                     if(dataResponse.data['fetch'][0]['final'] == 1){
                         this.$emit("pmIntegration", dataResponse.data);
+                    }else{
+                        if(action == 'create' || action == 'update'){
+                            let componentData = dataResponse.data['fetch'][0];
+                            $(`.${int_name}_${action}_${sectionClass}_${componentData.class}`).html('');
+                            componentData.components[0].value.forEach(component => {
+                                $(`.${int_name}_${action}_${sectionClass}_${componentData.class}`).append(`<option value="${component.value}">${component.label}</option>`);
+                            });
+                        }else{
+                            let componentData = dataResponse.data['fetch'][0];
+                            console.log("component ka data",componentData);
+                            for(let i=0; i<componentData.components.length; i++){
+                                console.log("com",componentData.components[i]);
+                                if(componentData.components[i].value.length > 1){
+                                    let fetchClass = componentData.components[i].class;
+                                    $(`.${int_name}_fetch_custom_${fetchClass}`).removeClass('d-none');
+                                    $(`.${int_name}_fetch_custom_${fetchClass}`).html('');
+                                    componentData.components[i].value.forEach(component => {
+                                        $(`.${int_name}_fetch_custom_${fetchClass}`).append(`<option value="${component.value}">${component.label}</option>`);
+                                    });
+                                }else{
+                                    $(`.${int_name}_fetch_custom_${componentData.class}`).addClass('d-none');
+                                }
+                            }
+                        }
                     }
                     if (!response.status) {
                         const error = (dataResponse && dataResponse.message) || response.status;
@@ -1000,6 +1284,14 @@ export default {
                     console.error("There was an error!", error);
                 });
             }
+        },
+        addCustomData(int_name, int_id, className, associated_id, components, action){
+            console.log("int_name",int_name);
+            console.log("int_name",int_id);
+            console.log("int_name",className);
+            console.log("int_name",associated_id);
+            console.log("int_name",components);
+            console.log("int_name",action);
         },
         capitalizeFirstLetter(string){
             return string.charAt(0).toUpperCase() + string.slice(1);
