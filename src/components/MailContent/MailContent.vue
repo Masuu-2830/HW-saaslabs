@@ -25,10 +25,10 @@ import ChatContentBody from './ChatContentBody/ChatContentBody.vue';
 import ChatContentReply from './ChatContentBody/ChatContentReply.vue';
 import MailContentBody from './MailContentBody/MailContentBody.vue';
 import MailContentHeader from './MailContentHeader.vue';
-import MailContentInt from './MailContentInt.vue';
+// import MailContentInt from './MailContentInt.vue'; .
 import IntegrationContainer from './IntegrationContainer.vue';
 export default {
-  components: { MailContentBody, MailContentAddNote, MailContentHeader, MailContentInt, ChatContentBody, ChatContentReply, IntegrationContainer },
+  components: { MailContentBody, MailContentAddNote, MailContentHeader, ChatContentBody, ChatContentReply, IntegrationContainer },
   name: "MailContent",
   data() {
     return {
