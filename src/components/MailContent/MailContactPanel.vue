@@ -1280,7 +1280,7 @@
 <script>
 import { bus } from "../../main";
 export default {
-  name: "MailContentVue",
+  name: "MailContactPanel",
   props: ["thread"],
   data() {
     return {

@@ -5,8 +5,9 @@
   >
     <div
       class="spinner-border text-primary"
+      :class="loading ? '' : 'd-none'"
       id="threadLoadingSpinner"
-      style="position: relative; left: 50%; display: none"
+      style="position: relative; left: 50%;"
       role="status"
     >
       <span class="sr-only">Loading...</span>
@@ -14,7 +15,7 @@
     <div v-if="Object.keys(thread).length !== 0" class="emails-wrapper">
       <div v-for="(item,index) in thread.data.items" :key="index">
           <mail-content-single-mail v-if="item.type == 'email'" :isCollapsed="lastMailId !== item.data.id" :subject="thread.data.displaySubject" :item="item"></mail-content-single-mail>
-          <mail-content-comment v-else-if="item.type == 'comment'" :item="item"></mail-content-comment>
+          <mail-content-comment v-else-if="item.type == 'comment'" :item="item" v-on:deleteComment="deleteComment"></mail-content-comment>
           <mail-content-log v-else :item="item"></mail-content-log>
       </div>
     </div>
@@ -41,7 +42,14 @@ export default {
   components: { MailContentSingleMail, MailContentLog, MailContentReply, MailContentComment, ReplyWrapper },
   name: "MailContentBody",
   props: {
-    thread: Object
+    thread: Object,
+    loading: false
+  },
+  methods: {
+    deleteComment(id) {
+      console.log(id);
+      this.thread.data.items = this.thread.data.items.filter(item => item.data.id !== id);
+    }
   },
   computed: {
     lastMailId() {

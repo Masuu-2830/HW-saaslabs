@@ -32,6 +32,11 @@ export default new Router({
       name: 'type',
       component: Home,
     },
+    // {
+    //   path: '/:mailboxId/tag/:tagId',
+    //   name: 'tags',
+    //   component: Home,
+    // },
     {
       path: '/:mailboxId/:type/p/:pageNo',
       name: 'page',

@@ -71,6 +71,7 @@ export default {
             // this.mailboxes = data.data.mailboxes;
         },
         async fetchMailBoxData() {
+            console.log(this.$route.params.mailboxId);
             const response = await fetch("https://app.helpwise.io/api/ping.php?mailboxID=" + this.$route.params.mailboxId, {credentials: 'include'});
             const data = await response.json();
             console.log(data);

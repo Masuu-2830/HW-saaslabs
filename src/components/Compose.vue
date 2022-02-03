@@ -2,7 +2,8 @@
   <div>
       <div v-if="show"
         :id="`compose-${composer.hash}`"
-        class="mail-compose hw_editor show shrink hideMoreEditingOptions"
+        class="mail-compose hw_editor show hideMoreEditingOptions"
+        :class="normal && minimize ? 'shrink minimize' : normal && maximize ? '' : 'shrink'"
         style="z-index: 2199921"
         :style="{right: lr ? '45vw' : ''}"
       >
@@ -10,7 +11,7 @@
           class="mail-compose-dialog mail-compose-dialog-shrink"
           style="width: 43vw !important"
         >
-          <div class="mail-compose-header" style="padding: 10px">
+          <div class="mail-compose-header" @click.stop.prevent="minimize = !minimize" style="padding: 10px; cursor: pointer">
             <h6
               class="mail-compose-title tx-white flex-grow-1 w-50 text-truncate"
             >
@@ -34,6 +35,8 @@
                 "
               >
                 <svg
+                  v-if="!minimize"
+                  @click.stop.prevent="minimize = true"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -48,6 +51,8 @@
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
                 <svg
+                  v-if="minimize"
+                  @click.stop.prevent="minimize = false"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -72,6 +77,8 @@
                 "
               >
                 <svg
+                  v-if="maximize"
+                  @click.stop.prevent="maximize = false"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -89,6 +96,8 @@
                   <line x1="3" y1="21" x2="10" y2="14"></line>
                 </svg>
                 <svg
+                  v-if="!maximize"
+                  @click.stop.prevent="maximize = true"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -424,6 +433,9 @@ export default {
     const self = this;
     return {
       show: true,
+      normal: true,
+      minimize: false,
+      maximize: false,
       showUndo: false,
       message: "New Message",
       undoMessage: "Email Sent.",

@@ -1036,18 +1036,20 @@ export default {
           }
           if(this.toNotValid || this.ccNotValid || this.bccNotValid) return;
           let requestOptions = this.createBody("send");
-          console.log(requestOptions.body);
-          fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
-          .then(async response => { 
-              const data = await response.json();
-              if(data.status !== "success") {
-                const error = (data && data.message) || response.status;
-                return Promise.reject(error);
-              }
+          requestOptions.body = JSON.parse(requestOptions.body);
+          console.log(typeof requestOptions.body);
+          // fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
+          // .then(async response => { 
+          //     const data = await response.json();
+          //     if(data.status !== "success") {
+          //       const error = (data && data.message) || response.status;
+          //       return Promise.reject(error);
+          //     }
               if(this.isSend == "send") {
                 let payload = this.reply;
                 payload.subject = this.subject;
                 payload.displaySubject = this.subject;
+                payload.from = requestOptions.body.from;
                 payload.bcc = requestOptions.body.bcc;
                 payload.cc = requestOptions.body.cc;
                 payload.to = requestOptions.body.to;
@@ -1058,7 +1060,7 @@ export default {
                 payload.readStats = {};
                 payload.attachments = requestOptions.body.attachments;
                 payload.date = new Date().toISOString();
-                console.log(payload);
+                console.log(payload, this.reply);
                 let email = {
                   email: payload,
                   type: "email"
@@ -1070,9 +1072,9 @@ export default {
               }
               // this.cancelReply();
               bus.$emit("closeReply", this.reply.hash);
-            }).catch(error => {
-            alert(error);
-          })
+          //   }).catch(error => {
+          //   alert(error);
+          // })
         },
         showCC() {
           this.isCC = true

@@ -11,10 +11,10 @@
     <div v-if="!loading" class="d-flex flex-column justify-content-between" :style="{width: 'calc(100% - 60px - '+right+')'}">
       <mail-content-header :thread="thread"></mail-content-header>
       <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body>
-      <!-- <chat-content-body v-if="this.$store.state.inboxData.type == 'chat'"></chat-content-body> -->
+      <chat-content-body v-if="this.$store.state.inboxData.type !== 'mail'" :thread="thread"></chat-content-body>
       <!-- <chat-content-body></chat-content-body> -->
-      <mail-content-add-note v-if="!loading"></mail-content-add-note>
-      <!-- <chat-content-reply></chat-content-reply> -->
+      <chat-content-reply></chat-content-reply>
+      <!-- <mail-content-add-note v-if="!loading"></mail-content-add-note> -->
     </div>
   </div>
 </template>
@@ -23,7 +23,6 @@
 import { bus } from "../../main";
 import ChatContentBody from './ChatContentBody/ChatContentBody.vue';
 import ChatContentReply from './ChatContentBody/ChatContentReply.vue';
-import MailContentAddNote from './MailContentAddNote.vue';
 import MailContentBody from './MailContentBody/MailContentBody.vue';
 import MailContentHeader from './MailContentHeader.vue';
 import MailContentInt from './MailContentInt.vue';
@@ -38,7 +37,7 @@ export default {
       thread: {},
       loading: false,
       sidebarOpen: false,
-      integration_id: 0
+      integration_id: 1
     };
   },
   watch:{
@@ -111,7 +110,12 @@ export default {
       } else if(data.type == "moveConv") {
         this.thread.data.items = this.thread.data.items.filter(item => item.data.id !== data.id);
       } else if(data.type == "email") {
-        this.thread.data.items.push(data.email);
+        let mail = {};
+        mail["data"] = data.email;
+        mail["type"] = "email";
+        mail["timestamp"] = data.email.date;
+        this.thread.data.items.push(mail);
+        console.log(this.thread.data.items);
       }
     })
   },

@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if=""
     class="
       mail-body
       hwEmail
@@ -162,8 +163,8 @@
                 </div>
                 <div
                   class="mg-b-0 tx-color-03"
-                  :class="item.data.cc.length == 0 ? 'd-none' : ''"
-                  v-if="item.data.cc.length !== 0"
+                  :class="Object.keys(item.data.cc).length == 0 ? 'd-none' : ''"
+                  v-if="Object.keys(item.data.cc).length !== 0"
                 >
                   Cc:
                   <span v-for="(value, key, index) in item.data.cc" :key="index"
@@ -208,7 +209,7 @@
                   class="mg-b-0 tx-color-03 addr-hideable"
                   :class="item.data.replyTo == null ? 'd-none' : ''"
                   v-if="
-                    item.data.replyTo !== null && item.data.replyTo.length > 0
+                    item.data.replyTo !== null && item.data.replyTo !== undefined && item.data.replyTo.length > 0
                   "
                   :style="{ display: showEmailAddresses ? '' : 'none' }"
                 >
@@ -282,7 +283,7 @@
                 <i class="fas fa-reply"></i>
               </button>
               <button
-                v-if="item.data.cc.length !== 0"
+                v-if="Object.keys(item.data.cc).length !== 0"
                 class="reply-all-btn btn replyIconBtn px-1"
                 data-toggle="tooltip"
                 title="Reply All"
@@ -336,13 +337,13 @@
                   class="dropdown-menu"
                   aria-labelledby="dropdownMenuLink"
                 >
-                  <button type="button" class="dropdown-item reply-btn">
+                  <button type="button" @click.stop="reply(1); showDD();" class="dropdown-item reply-btn">
                     Reply
                   </button>
-                  <button type="button" class="dropdown-item reply-all-btn">
+                  <button type="button" @click.stop="reply(2); showDD();" class="dropdown-item reply-all-btn">
                     Reply all
                   </button>
-                  <button type="button" class="dropdown-item forward-btn">
+                  <button type="button" @click.stop="reply(3); showDD();" class="dropdown-item forward-btn">
                     Forward
                   </button>
                   <button
@@ -475,7 +476,7 @@
             <span class="ml-1"> Reply</span>
           </button>
           <button
-            v-if="item.data.cc.length !== 0"
+            v-if="Object.keys(item.data.cc).length !== 0"
             type="button"
             class="
               reply-all-btn

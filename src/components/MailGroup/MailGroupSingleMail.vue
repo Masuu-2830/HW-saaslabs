@@ -50,14 +50,22 @@
               </svg>
             </div>
           </div>
-          <div v-if="mail.email !== undefined" class="flex-grow-1 w-100 d-flex thread-addr">
+          <!-- <div
+            v-if="mail.email !== undefined"
+            class="flex-grow-1 w-100 d-flex thread-addr"
+          >
             <div
               v-if="mail.email.to !== undefined"
               class="text-truncate thread-addr-main"
               style="max-width: 90%"
               :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
             >
-              To: {{ Object.keys(mail.email.to).length !== 0 ? Object.values(mail.email.to).toString() : '(no recipient)'}}
+              To:
+              {{
+                Object.keys(mail.email.to).length !== 0
+                  ? Object.values(mail.email.to).toString()
+                  : "(no recipient)"
+              }}
             </div>
             <div
               v-else-if="mail.email.from == undefined"
@@ -96,8 +104,8 @@
             >
               {{ mail.totalEmailCount > 1 ? mail.totalEmailCount : "" }}
             </div>
-          </div>
-          <div v-else class="flex-grow-1 w-100 d-flex thread-addr">
+          </div> -->
+          <div class="flex-grow-1 w-100 d-flex thread-addr">
             <div
               class="text-truncate thread-addr-main"
               style="max-width: 90%"
@@ -111,6 +119,12 @@
               style="max-width: 25%"
             >
               Draft
+            </div>
+            <div
+              class="text-secondary ml-1 total-email-count"
+              style="max-width: 10%"
+            >
+              {{ mail.messageCount > 1 ? mail.messageCount : "" }}
             </div>
           </div>
         </div>
@@ -140,30 +154,29 @@
               >
             </div>
             <div class="d-flex align-items-center">
-              <span
+              <!-- <span
                 v-if="mail.email !== undefined"
                 class="tx-14 hw-thread-subject mr-2"
                 :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
               >
                 {{ mail.email.subject ? mail.email.subject : "(no subject)" }}
-              </span>
+              </span> -->
               <span
-                v-else
                 class="tx-14 hw-thread-subject mr-2"
                 :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
               >
                 {{ mail.subject ? mail.subject : "(no subject)" }}
               </span>
               <span
-                v-if="mail.snippetType == 'note'"
+                v-if="mail.snippetType == '2'"
                 class="tx-16 tx-color-03 px-2 tx-bold snippetMarker"
                 style="color: #ddcf97"
                 >|</span
               >
-              <span v-if="mail.email !== undefined" class="tx-14 tx-color-03">
+              <!-- <span v-if="mail.email !== undefined" class="tx-14 tx-color-03">
                 {{ mail.email.snippet }}
-              </span>
-              <span v-else class="tx-14 tx-color-03">
+              </span> -->
+              <span class="tx-14 tx-color-03">
                 {{ mail.snippet }}
               </span>
             </div>
@@ -181,7 +194,7 @@
               ></div>
             </div>
             <div
-              v-if="this.$route.params.type == 'sent' || mail.seenAt"
+              v-if="mail.seenAt"
               class="col-6"
             >
               <div
@@ -209,15 +222,10 @@
           </div>
         </div>
         <div class="col-2 date-thread-options col-lg-1">
-          <span v-if="mail.email !== undefined"
+          <span
             class="tx-13 thread-date"
             :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
-            >{{ mail.email.humanFriendlyDate }}</span
-          >
-          <span v-else
-            class="tx-13 thread-date"
-            :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
-            >{{ mail.date | moment("MMM D, YYYY") }}</span
+            >{{ mail.humanFriendlyDate }}</span
           >
           <span
             class="
@@ -259,12 +267,12 @@
                 this.$route.params.type !== 'trash'
               "
               class="archive-thread pr-1 pl-1"
+              data-toggle="tooltip"
+                data-placement="top"
+                title="Close"
               @click.stop="closeThread(mail.id)"
             >
               <svg
-                data-toggle="tooltip"
-                data-placement="top"
-                title="Close"
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
                 height="16"
@@ -463,12 +471,76 @@
               </div>
             </span>
             <span
+              v-if="this.$route.params.type !== 'trash'"
+              class="deleteThread pr-1 pl-1"
+              :id="'deleteThread-' + mail.id"
+              data-toggle="tooltip"
+                data-placement="top"
+                title="Trash"
+              @click.stop="deleteThread(mail.id)"
+            >
+              <svg
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Trash"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="feather feather-trash"
+              >
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path
+                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                ></path>
+              </svg>
+            </span>
+            <span
+              v-if="this.$route.params.type == 'trash'"
+              class="permanentlyDeleteThread pr-1 pl-1"
+              :id="'permanentlyDeleteThread-' + mail.id"
+              data-toggle="tooltip"
+                data-placement="top"
+                title="Permanently Delete"
+              @click.stop="perDeleteThread(mail.id)"
+            >
+              <svg
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Permanently Delete"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="feather feather-trash"
+                data-original-title="Permanently Delete"
+              >
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path
+                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                ></path>
+              </svg>
+            </span>
+            <span
               v-if="
                 this.$route.params.type == 'closed' ||
                 this.$route.params.type == 'spam' ||
                 this.$route.params.type == 'trash'
               "
               class="restore-thread pr-1 pl-1"
+              data-toggle="tooltip"
+                data-placement="top"
+                title="Move To Inbox"
               @click.stop="restoreThread(mail.id)"
             >
               <svg
@@ -495,33 +567,49 @@
           </span>
         </div>
       </div>
-      <div class="row" style="padding-left: 20px" v-if="mail.email !== undefined && mail.email.attachments !== undefined && mail.email.attachments.length > 0">
+      <!-- <div
+        class="row"
+        style="padding-left: 20px"
+        v-if="
+          mail.email !== undefined &&
+          mail.email.attachments !== undefined &&
+          mail.email.attachments.length > 0
+        "
+      >
         <div class="offset-lg-3 col-7 thread-attachments-list">
-          <a v-for="file in mail.email.attachments" :key="file.id"
+          <a
+            v-for="file in mail.email.attachments"
+            :key="file.id"
             target="_blank"
-            :href='"https://app.helpwise.io/attachments/" + file.id'
+            :href="'https://app.helpwise.io/attachments/' + file.id"
             class="hw-thread-attachment ml-1 mr-1"
             onclick="event.stopPropagation()"
             ><div class="d-flex w-100 justify-content-start align-items-center">
               <span v-html="getFileIcon(file.extension, file.filesize)"></span>
               <div class="mg-l-10 text-truncate" style="width: 90%">
-                {{file.filename}}
+                {{ file.filename }}
               </div>
             </div></a
           >
         </div>
-      </div>
-      <div class="row" style="padding-left: 20px" v-if="mail.attachments !== undefined && mail.attachments.length > 0">
+      </div> -->
+      <div
+        class="row"
+        style="padding-left: 20px"
+        v-if="mail.attachments !== undefined && mail.attachments.length > 0"
+      >
         <div class="offset-lg-3 col-7 thread-attachments-list">
-          <a v-for="file in mail.attachments" :key="file.id"
+          <a
+            v-for="file in mail.attachments"
+            :key="file.id"
             target="_blank"
-            :href='"https://app.helpwise.io/attachments/" + file.id'
+            :href="'https://app.helpwise.io/attachments/' + file.id"
             class="hw-thread-attachment ml-1 mr-1"
             onclick="event.stopPropagation()"
             ><div class="d-flex w-100 justify-content-start align-items-center">
               <span v-html="getFileIcon(file.extension, file.filesize)"></span>
               <div class="mg-l-10 text-truncate" style="width: 90%">
-                {{file.filename}}
+                {{ file.filename }}
               </div>
             </div></a
           >
@@ -553,7 +641,11 @@
             align-items-center
             w-50
           "
-          ><div v-if="mail.email !== undefined" class="flex-grow-1 w-100 d-flex thread-addr">
+          >
+          <!-- <div
+            v-if="mail.email !== undefined"
+            class="flex-grow-1 w-100 d-flex thread-addr"
+          >
             <div
               v-if="mail.email.from == undefined"
               class="text-truncate thread-addr-main"
@@ -591,8 +683,8 @@
             >
               {{ mail.totalEmailCount > 1 ? mail.totalEmailCount : "" }}
             </div>
-          </div>
-          <div v-else class="flex-grow-1 w-100 d-flex thread-addr">
+          </div> -->
+          <div class="flex-grow-1 w-100 d-flex thread-addr">
             <div
               class="text-truncate thread-addr-main"
               style="max-width: 90%"
@@ -607,23 +699,28 @@
             >
               Draft
             </div>
+            <div
+              class="text-secondary ml-1 total-email-count"
+              style="max-width: 10%"
+            >
+              {{ mail.messageCount > 1 ? mail.messageCount : "" }}
+            </div>
           </div></span
         >
-        <span
+        <!-- <span
           v-if="mail.email !== undefined"
           class="tx-11 thread-date"
           :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
           >{{ mail.email.humanFriendlyDate }}</span
-        >
+        > -->
         <span
-          v-else
           class="tx-11 thread-date"
           :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
-          >{{ mail.date | moment("MMM D, YYYY") }}</span
+          >{{ mail.humanFriendlyDate }}</span
         >
       </div>
-      <div
-      v-if="mail.email !== undefined"
+      <!-- <div
+        v-if="mail.email !== undefined"
         class="tx-13 hw-thread-subject"
         style="
           width: 90%;
@@ -634,9 +731,8 @@
         :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
       >
         {{ mail.email.subject ? mail.email.subject : "(no subject)" }}
-      </div>
+      </div> -->
       <div
-      v-else
         class="tx-13 hw-thread-subject"
         style="
           width: 90%;
@@ -651,7 +747,7 @@
       <div
         class="d-flex align-items-center justify-content-between mg-b-2 w-100"
       >
-        <p
+        <!-- <p
           class="tx-12 tx-color-03 mg-b-0"
           style="
             width: 90%;
@@ -668,9 +764,8 @@
             >|</span
           >
           {{ mail.email.snippet }}
-        </p>
+        </p> -->
         <p
-        v-else
           class="tx-12 tx-color-03 mg-b-0"
           style="
             width: 90%;
@@ -680,17 +775,50 @@
           "
         >
           <span
-            v-if="mail.snippetType == 'note'"
+            v-if="mail.snippetType == '2'"
             style="color: #ddcf97"
             class="tx-bold tx-14 px-2 snippetMarker"
             >|</span
           >
           {{ mail.snippet }}
         </p>
-        <span v-if="mail.email !== undefined && mail.email.attachments.length > 0"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-paperclip"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg><span>
-        </span></span>
-        <span v-else-if="mail.email == undefined && mail.attachments.length > 0"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-paperclip"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg><span>
-        </span></span>
+        <!-- <span
+          v-if="mail.email !== undefined && mail.email.attachments.length > 0"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="feather feather-paperclip"
+          >
+            <path
+              d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
+            ></path></svg
+          ><span> </span
+        ></span> -->
+        <span v-if="mail.attachments.length > 0"
+          ><svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="feather feather-paperclip"
+          >
+            <path
+              d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"
+            ></path></svg
+          ><span> </span
+        ></span>
       </div>
     </div>
   </div>
@@ -705,7 +833,7 @@ export default {
   components: { DatePicker },
   props: {
     mail: Object,
-    compact: Boolean
+    compact: Boolean,
   },
   data() {
     return {
@@ -779,13 +907,13 @@ export default {
   },
   methods: {
     getFileIcon(extension, size) {
-        let iconStyle = '';
-        if (size) {
-            iconStyle = `style="height:${size}px;width:${size}px;"`;
-        }
+      let iconStyle = "";
+      if (size) {
+        iconStyle = `style="height:${size}px;width:${size}px;"`;
+      }
 
-        let ext = extension.toString().toLowerCase();
-        return `<span ${iconStyle} class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
+      let ext = extension.toString().toLowerCase();
+      return `<span ${iconStyle} class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
     },
     checkBox() {
       this.checkAll = !this.checkAll;
@@ -852,6 +980,12 @@ export default {
     },
     changeStarred(id) {
       bus.$emit("changeStarred", id);
+    },
+    deleteThread(id) {
+      this.$emit("deleteThreads", id);
+    },
+    perDeleteThread(id) {
+      this.$emit("perDeleteThreads", id);
     },
     closeThread(id) {
       bus.$emit("closeThread", id);

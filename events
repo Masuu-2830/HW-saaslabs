@@ -1,9 +1,9 @@
 compact => viewing single thread content
 broad => back to group of threads view
-closeThread => closing/archiving thread
-changeRead => read or unread both being handled
-changeStarred => star/unstar
-snoozeThread => snoozing a thread
+closeThread => closing/archiving thread - N
+changeRead => read or unread both being handled - N
+changeStarred => star/unstar - N
+snoozeThread => snoozing a thread - N
 assignThread => assigning to a teammate
 changeType => sidebar changing type of threads
 check => handles bulk check/uncheck and single check/uncheck
@@ -13,17 +13,19 @@ openCompose
 closeCompose
 openReply
 closeReply
-moveToInbox
-spamThreads
-restoreThreads
-moveConv => move a specific email
+moveToInbox - N
+doneThreads - N
+spamThreads - N
+restoreThreads - N
+moveConv => move a specific email - N
 
 
 openInt => open the right side integrations panel 
-bulkRead => both bulk read and unread
-bulkStar => bulk star threads
-bulkMerge
-deleteThreads
+bulkRead => both bulk read and unread - N
+bulkStar => bulk star threads - N
+bulkMerge - N
+deleteThreads - N
+perDeleteThreads - N
 nextPage => move to next page
 prevPage => move to previous page
 filterPerson => filtering the threads based on assigned/unassigned

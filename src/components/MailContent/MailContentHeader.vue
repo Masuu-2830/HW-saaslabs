@@ -30,7 +30,7 @@
           class="d-flex flex-column justify-content-center"
         >
           <h6 class="tx-15 mb-1 mt-2" id="thread-subject" style="width: 100%">
-            {{ thread.data.subject ? thread.data.subject : '(no subject)' }}
+            {{ thread.data.subject ? thread.data.subject : "(no subject)" }}
           </h6>
           <span
             id="tagsTicketContainer"
@@ -77,7 +77,7 @@
         class="dropdown nav-link d-none d-sm-block"
         id="hw_viewing"
         style="cursor: pointer"
-        title=""
+        title="Viewing"
         data-toggle="tooltip"
         data-original-title="Viewing"
       >
@@ -97,8 +97,7 @@
               v-html="userInfo.avatarTag"
               class="avatar avatar-xxs"
               style="margin-right: -3px"
-            >
-            </div>
+            ></div>
           </div>
           <div class="p-1">
             <svg
@@ -152,8 +151,10 @@
                 class="d-flex align-items-center justify-content-start w-100"
                 style="width: 55%"
               >
-                <div v-html="userInfo.avatarTag" class="avatar avatar-xxs mr-1">
-                </div>
+                <div
+                  v-html="userInfo.avatarTag"
+                  class="avatar avatar-xxs mr-1"
+                ></div>
                 <span
                   class="tx-13 ml-1"
                   style="
@@ -185,8 +186,10 @@
                 class="d-flex align-items-center justify-content-start w-100"
                 style="width: 55%"
               >
-                <div v-html="teammate.avatarTag" class="avatar avatar-xxs mr-1">
-                </div>
+                <div
+                  v-html="teammate.avatarTag"
+                  class="avatar avatar-xxs mr-1"
+                ></div>
                 <span
                   class="tx-13 ml-1"
                   style="
@@ -199,7 +202,7 @@
                 >
               </span>
               <span
-                v-if="teammate.id in thread.data.usersReadMap"
+                v-if="thread.data.usersReadMap !== null && teammate.id in thread.data.usersReadMap"
                 class="participant-status tx-color-03"
                 >Read
                 {{
@@ -217,7 +220,7 @@
         id="assignmentWrapper"
         class="dropdown nav-link d-none d-sm-block"
         style="cursor: pointer; max-width: 38%"
-        title=""
+        title="Assign"
         data-toggle="tooltip"
         data-original-title="Assign"
       >
@@ -390,8 +393,10 @@
               <div
                 class="d-flex align-items-center justify-content-start w-100"
               >
-                <div v-html="userInfo.avatarTag" class="avatar avatar-xxs mr-1">
-                </div>
+                <div
+                  v-html="userInfo.avatarTag"
+                  class="avatar avatar-xxs mr-1"
+                ></div>
                 <span
                   class="tx-13 ml-1 tx-color-02 display-name"
                   style="
@@ -444,8 +449,10 @@
               <div
                 class="d-flex align-items-center justify-content-start w-100"
               >
-                <div v-html="teammate.avatarTag" class="avatar avatar-xxs mr-1">
-                </div>
+                <div
+                  v-html="teammate.avatarTag"
+                  class="avatar avatar-xxs mr-1"
+                ></div>
                 <span
                   class="tx-13 ml-1 tx-color-02 display-name"
                   style="
@@ -478,7 +485,10 @@
         </div>
       </div>
       <a
-        v-if="thread.data.isArchived == false"
+        v-if="
+          this.$route.params.type !== 'closed' &&
+          this.$route.params.type !== 'drafts'
+        "
         href="#"
         @click.stop="closeThread"
         data-toggle="tooltip"
@@ -501,7 +511,11 @@
         </svg>
       </a>
       <a
+        v-if="
+                this.$route.params.type == 'mentions'
+              "
         href=""
+        @click.stop.prevent="markDone"
         data-toggle="tooltip"
         title="Mark as done"
         class="nav-link done-current-thread"
@@ -529,11 +543,13 @@
         title="Move To Inbox"
         class="nav-link reopen-current-thread"
         v-if="
-          thread.data.isArchived ||
-          thread.data.isSpam ||
-          thread.data.isDeleted ||
-          thread.data.isSnoozed
+          this.$route.params.type == 'snoozed' ||
+          this.$route.params.type == 'closed' ||
+          this.$route.params.type == 'spam' ||
+          this.$route.params.type == 'trash' ||
+          this.$route.params.type == 'drafts'
         "
+        @click.stop.prevent="restoreThread"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -582,7 +598,13 @@
       </a>
       <a
         v-if="
+          this.$route.params.type !== 'mentions' &&
+          this.$route.params.type !== 'discussions' &&
+          this.$route.params.type !== 'starred' &&
+          this.$route.params.type !== 'snoozed' &&
+          this.$route.params.type !== 'drafts' &&
           this.$route.params.type !== 'sent' &&
+          this.$route.params.type !== 'scheduled' &&
           this.$route.params.type !== 'closed' &&
           this.$route.params.type !== 'spam' &&
           this.$route.params.type !== 'trash'
@@ -645,6 +667,7 @@
               type="text"
               class="form-control form-control-sm search-tag"
               aria-describedby="emailHelp"
+              v-model="sqTag"
               placeholder="Seach Tags..."
             />
           </div>
@@ -762,7 +785,7 @@
             class="dropdown-item mt-2 new-tag-btn"
             data-toggle="modal"
             data-target="#new-tag-modal"
-             v-b-modal.newtag-thread-modal
+            v-b-modal.newtag-thread-modal
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -785,11 +808,13 @@
               ></path>
               <line x1="7" y1="7" x2="7" y2="7"></line>
             </svg>
-            <span class="tx-13 tx-bold ml-2"
-              >New Tag</span
-            >
+            <span class="tx-13 tx-bold ml-2">New Tag</span>
 
-            <b-modal ref="newtag-thread-modal" id="newtag-thread-modal" title="Create Tag">
+            <b-modal
+              ref="newtag-thread-modal"
+              id="newtag-thread-modal"
+              title="Create Tag"
+            >
               <div class="modal-body">
                 <div class="form-group">
                   <label for="formGroupExampleInput" class="d-block"
@@ -836,7 +861,12 @@
                       @click.stop.prevent="changeTagColor('#7fc7af')"
                       style="background-color: #7fc7af"
                     >
-                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#7fc7af'"></i></div>
+                      <i
+                        class="fas fa-check fa-1x"
+                        style="color: white"
+                        v-if="tagColor == '#7fc7af'"
+                      ></i>
+                    </div>
                     <div
                       class="
                         square
@@ -847,7 +877,12 @@
                       @click.stop.prevent="changeTagColor('#9b59b6')"
                       style="background-color: #9b59b6"
                     >
-                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#9b59b6'"></i></div>
+                      <i
+                        class="fas fa-check fa-1x"
+                        style="color: white"
+                        v-if="tagColor == '#9b59b6'"
+                      ></i>
+                    </div>
                     <div
                       class="
                         square
@@ -858,7 +893,12 @@
                       @click.stop.prevent="changeTagColor('#f1c40f')"
                       style="background-color: #f1c40f"
                     >
-                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#f1c40f'"></i></div>
+                      <i
+                        class="fas fa-check fa-1x"
+                        style="color: white"
+                        v-if="tagColor == '#f1c40f'"
+                      ></i>
+                    </div>
                     <div
                       class="
                         square
@@ -869,7 +909,12 @@
                       @click.stop.prevent="changeTagColor('#e74c3c')"
                       style="background-color: #e74c3c"
                     >
-                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#e74c3c'"></i></div>
+                      <i
+                        class="fas fa-check fa-1x"
+                        style="color: white"
+                        v-if="tagColor == '#e74c3c'"
+                      ></i>
+                    </div>
                     <div
                       class="
                         square
@@ -880,7 +925,12 @@
                       @click.stop.prevent="changeTagColor('#00ff41')"
                       style="background-color: #00ff41"
                     >
-                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#00ff41'"></i></div>
+                      <i
+                        class="fas fa-check fa-1x"
+                        style="color: white"
+                        v-if="tagColor == '#00ff41'"
+                      ></i>
+                    </div>
                     <div
                       class="
                         square
@@ -891,7 +941,12 @@
                       @click.stop.prevent="changeTagColor('#2aaccf')"
                       style="background-color: #2aaccf"
                     >
-                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#2aaccf'"></i></div>
+                      <i
+                        class="fas fa-check fa-1x"
+                        style="color: white"
+                        v-if="tagColor == '#2aaccf'"
+                      ></i>
+                    </div>
                     <div
                       class="
                         square
@@ -902,7 +957,12 @@
                       @click.stop.prevent="changeTagColor('#d0d7d8')"
                       style="background-color: #d0d7d8"
                     >
-                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#d0d7d8'"></i></div>
+                      <i
+                        class="fas fa-check fa-1x"
+                        style="color: white"
+                        v-if="tagColor == '#d0d7d8'"
+                      ></i>
+                    </div>
                     <div
                       class="
                         square
@@ -913,7 +973,12 @@
                       @click.stop.prevent="changeTagColor('#ff3d7f')"
                       style="background-color: #ff3d7f"
                     >
-                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#ff3d7f'"></i></div>
+                      <i
+                        class="fas fa-check fa-1x"
+                        style="color: white"
+                        v-if="tagColor == '#ff3d7f'"
+                      ></i>
+                    </div>
                     <div
                       class="
                         square
@@ -924,7 +989,12 @@
                       @click.stop.prevent="changeTagColor('#f7bd80')"
                       style="background-color: #f7bd80"
                     >
-                      <i class="fas fa-check fa-1x" style="color:white" v-if="tagColor == '#f7bd80'"></i></div>
+                      <i
+                        class="fas fa-check fa-1x"
+                        style="color: white"
+                        v-if="tagColor == '#f7bd80'"
+                      ></i>
+                    </div>
                   </div>
                   <p id="tag-color-error-msg" style="color: red"></p>
                 </div>
@@ -944,7 +1014,11 @@
                     </b-button>
                   </b-col>
                   <b-col class="float-right">
-                    <b-button @click.stop="createTag" size="xs" variant="outline-primary">
+                    <b-button
+                      @click.stop="createTag"
+                      size="xs"
+                      variant="outline-primary"
+                    >
                       Create
                     </b-button>
                   </b-col>
@@ -984,7 +1058,9 @@
         </div>
       </div>
       <div
-        v-if="thread.data.isSnoozed == false"
+        v-if="
+              this.$route.params.type !== 'trash'
+            "
         id="snooze-thread"
         data-toggle="tooltip"
         title="Snooze"
@@ -1106,7 +1182,8 @@
 
           <div
             v-b-modal="'snooze-thread-modall' + this.$route.params.threadId"
-            class="dropdown-item snooze-drop-down show-thread-snooze-modal" style="cursor: pointer"
+            class="dropdown-item snooze-drop-down show-thread-snooze-modal"
+            style="cursor: pointer"
           >
             <span>Pick date &amp; time</span>
           </div>
@@ -1119,10 +1196,35 @@
           >
             <div class="modal-body">
               <div class="d-flex align-items-center justify-content-center">
-                <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="30" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
+                <date-picker
+                  :open.sync="newDateOpen"
+                  @change="handleChange"
+                  type="datetime"
+                  v-model="datetime"
+                  value-type="timestamp"
+                  :minute-step="30"
+                  :showSecond="false"
+                  :default-value="
+                    new Date().setHours(new Date().getHours() + 1, 0, 0, 0)
+                  "
+                  :disabled-date="notBeforeToday"
+                  :disabled-time="notBeforeNow"
+                  placeholder="Select Date & Time"
+                  :clearable="false"
+                ></date-picker>
               </div>
-              <div class="d-flex align-items-center justify-content-center" style="margin-top:10px;">
-                  <button type="button" @click.stop.prevent="snoozeThread('newDate')" class="btn btn-xs btn-primary bulk-select-snooze-btn" :disabled="datetime == '' && true">Snooze</button>
+              <div
+                class="d-flex align-items-center justify-content-center"
+                style="margin-top: 10px"
+              >
+                <button
+                  type="button"
+                  @click.stop.prevent="snoozeThread('newDate')"
+                  class="btn btn-xs btn-primary bulk-select-snooze-btn"
+                  :disabled="datetime == '' && true"
+                >
+                  Snooze
+                </button>
               </div>
             </div>
           </b-modal>
@@ -1153,14 +1255,25 @@
           <polyline points="12 5 19 12 12 19"></polyline>
         </svg>
       </a>
-      <b-modal ref="move-thread-modal" id="move-thread-modal" title="Select Inbox">
+      <b-modal
+        ref="move-thread-modal"
+        id="move-thread-modal"
+        title="Select Inbox"
+      >
         <div class="modal-body">
           Chose the Inbox you want to move these conversations to.
           <b-form-select v-model="inboxSelected" class="mb-3">
             <b-form-select-option selected="true" value="b"
               >Please select an option</b-form-select-option
             >
-            <b-form-select-option v-for="mailbox in mailboxes" :key="mailbox.id" :value="mailbox.id">{{mailbox.displayName}} ({{mailbox.externalAddress}})</b-form-select-option>
+            <b-form-select-option
+              v-for="mailbox in mailboxes"
+              :key="mailbox.id"
+              :value="mailbox.id"
+              >{{ mailbox.displayName }} ({{
+                mailbox.externalAddress
+              }})</b-form-select-option
+            >
           </b-form-select>
         </div>
         <template
@@ -1175,11 +1288,41 @@
             </b-col>
             <!-- Button with custom close trigger value -->
             <b-col class="float-right">
-              <b-button @click="moveToInbox" size="xs" variant="primary"> Move </b-button>
+              <b-button @click="moveToInbox" size="xs" variant="primary">
+                Move
+              </b-button>
             </b-col>
           </b-row>
         </template>
       </b-modal>
+      <a
+        v-if="this.$route.params.type !== 'trash'"
+        @click.stop.prevent="deleteConv"
+        href=""
+        id="trash-thread"
+        data-toggle="tooltip"
+        title="Delete Conversation"
+        class="nav-link"
+        data-original-title="Delete Conversation"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="feather feather-trash"
+        >
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path
+            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+          ></path>
+        </svg>
+      </a>
       <div class="dropdown">
         <span
           class="three-dot"
@@ -1253,7 +1396,10 @@
           </button>
           <button
             @click.stop="spamThreads"
-            v-if="thread.data.isSpam == false"
+            v-if="
+              this.$route.params.type == 'trash' ||
+              this.$route.params.type == 'spam'
+            "
             type="button"
             class="dropdown-item d-flex"
             id="mark-spam"
@@ -1283,11 +1429,11 @@
 
 <script>
 import { bus } from "../../main";
-import DatePicker from 'vue2-datepicker';
-import 'vue2-datepicker/index.css';
+import DatePicker from "vue2-datepicker";
+import "vue2-datepicker/index.css";
 export default {
   name: "MailContentHeader",
-  components: {DatePicker},
+  components: { DatePicker },
   props: {
     thread: Object,
   },
@@ -1295,6 +1441,7 @@ export default {
     return {
       // isStarred: this.thread.data.isStarred,
       sqTm: "",
+      sqTag: "",
       removetags: [],
       addtags: [],
       inboxSelected: this.$route.params.mailboxId,
@@ -1310,14 +1457,24 @@ export default {
       return this.$store.state.userInfo;
     },
     tags() {
-      return this.$store.state.tags;
+      let query = this.sqTag.toLowerCase().trim();
+      if (query == "") {
+        return this.$store.state.tags;
+        // console.log(this.teammatesNew);
+      } else {
+        return this.$store.state.tags.filter(
+          (item) =>
+            item.name.toLowerCase().search(query) !== -1
+        );
+        // console.log(this.teammatesNew);
+      }
     },
     teammates() {
       // let query = this.sqTm.toLowerCase().trim();
       // if(query == "") {
-        return this.$store.state.teammates;
+      return this.$store.state.teammates;
       // } else {
-        // return this.teammates.filter((item) => item.id !== this.userInfo.id);
+      // return this.teammates.filter((item) => item.id !== this.userInfo.id);
       // }
     },
     mailboxes() {
@@ -1325,11 +1482,15 @@ export default {
     },
     teammatesNew: function () {
       let query = this.sqTm.toLowerCase().trim();
-      if(query == "") {
+      if (query == "") {
         return this.teammates.filter((item) => item.id !== this.userInfo.id);
         // console.log(this.teammatesNew);
       } else {
-        return this.teammates.filter((item) => item.id !== this.userInfo.id && item.name.toLowerCase().search(query) !== -1);
+        return this.teammates.filter(
+          (item) =>
+            item.id !== this.userInfo.id &&
+            item.name.toLowerCase().search(query) !== -1
+        );
         // console.log(this.teammatesNew);
       }
       // return this.teammates.filter((item) => item.id !== this.userInfo.id);
@@ -1349,6 +1510,10 @@ export default {
       bus.$emit("closeThread", this.$route.params.threadId);
       bus.$emit("broad");
     },
+    markDone() {
+      bus.$emit("doneThreads", this.$route.params.threadId);
+      bus.$emit("broad");
+    },
     spamThreads() {
       // console.log(this.thread);
       bus.$emit("spamThreads", this.$route.params.threadId);
@@ -1360,14 +1525,18 @@ export default {
       this.thread.data.isStarred = !this.thread.data.isStarred;
       // bus.$emit("broad");
     },
+    deleteConv() {
+      bus.$emit("deleteThreads", this.$route.params.threadId);
+      bus.$emit("broad");
+    },
     moveToInbox() {
       console.log(this.inboxSelected);
-      bus.$emit('moveToInbox', this.$route.params.threadId, this.inboxSelected);
-      this.$refs['move-thread-modal'].hide()
+      bus.$emit("moveToInbox", this.$route.params.threadId, this.inboxSelected);
+      this.$refs["move-thread-modal"].hide();
       bus.$emit("broad");
     },
     handleChange(value, type) {
-      if (type === 'minute') {
+      if (type === "minute") {
         this.newDateOpen = false;
       }
     },
@@ -1375,7 +1544,9 @@ export default {
       return date < new Date(new Date().setHours(0, 0, 0, 0));
     },
     notBeforeNow(date) {
-      return date < new Date(new Date().setHours(new Date().getHours() + 1, 0, 0, 0));
+      return (
+        date < new Date(new Date().setHours(new Date().getHours() + 1, 0, 0, 0))
+      );
     },
     snoozeThread(till) {
       console.log(till);
@@ -1417,7 +1588,7 @@ export default {
       bus.$emit("assignThread", this.$route.params.threadId, id);
     },
     changeTagColor(color) {
-      this.tagColor = color
+      this.tagColor = color;
     },
     createTag() {
       this.removetags = [];
@@ -1426,32 +1597,39 @@ export default {
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mailboxId: this.$route.params.mailboxId, color: this.tagColor, folder: this.tagPinned, name: this.tagName, threadIds: this.selectedIds }),
-        credentials: 'include'
+        body: JSON.stringify({
+          mailboxId: this.$route.params.mailboxId,
+          color: this.tagColor,
+          folder: this.tagPinned,
+          name: this.tagName,
+          threadIds: this.selectedIds,
+        }),
+        credentials: "include",
       };
       // console.log(requestOptions);
       fetch(this.$apiBaseURL + "/tags/create.php", requestOptions)
-      .then(async response => { 
-        const data = await response.json();
-        if(data.status !== "success") {
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
-        this.addtags.push(data.data.id);
-        bus.$emit(
-          "toggleTags",
-          this.$route.params.threadId,
-          this.addtags,
-          this.removetags,
-          data.data
-        );
-        this.$refs['newtag-thread-modal'].hide();
-        this.tagName = "";
-        this.tagColor = "";
-        this.tagPinned = false;
-      }).catch(error => {
-        alert(error);
-      })
+        .then(async (response) => {
+          const data = await response.json();
+          if (data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          this.addtags.push(data.data.id);
+          bus.$emit(
+            "toggleTags",
+            this.$route.params.threadId,
+            this.addtags,
+            this.removetags,
+            data.data
+          );
+          this.$refs["newtag-thread-modal"].hide();
+          this.tagName = "";
+          this.tagColor = "";
+          this.tagPinned = false;
+        })
+        .catch((error) => {
+          alert(error);
+        });
     },
     toggleTag(id) {
       this.removetags = [];

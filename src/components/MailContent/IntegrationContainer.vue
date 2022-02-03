@@ -1,6 +1,7 @@
 <template>
     <div class="integrationContainer bd-l">
         <div class="integrationIcons d-flex flex-column" :class="{open: sidebarOpen}">
+            <!-- <mail-content-int style="margin-bottom: 40px" @openInt="openContactPanel" :thread="thread"></mail-content-int> -->
             <IntegrationData
                 v-for = "(integration, index) in integrations"
                 :key = "index"
@@ -29,6 +30,7 @@
 <script>
     import IntegrationData from './IntegrationData.vue';
     import IntegrationSidebar from './IntegrationSidebar.vue';
+import MailContactPanel from './MailContactPanel.vue';
     export default {
         data(){
             return {
@@ -43,9 +45,12 @@
                 openUpdateFormArray: {}
             }
         },
-        props: ["sidebarOpen"],
-        components:{IntegrationData, IntegrationSidebar},
+        props: ["sidebarOpen", "contactOpen", "thread"],
+        components:{IntegrationData, IntegrationSidebar, MailContactPanel},
         methods: {
+            openContactPanel() {
+                this.$emit("openInt", 0);
+            },
             openIntegration(integrationData){
                 this.$emit("openInt", integrationData.id);
                 this.integrationName = integrationData.lname;
@@ -142,7 +147,10 @@
             .then(async response => {
                 const data = await response.json();
                 let data2 = data.data;
-                this.integrations = data2;
+                for (var i of data2) {
+                    this.integrations.push(i);
+                }
+                // this.integrations.push(data2);
                 // check for error response
                 if (!response.status) {
                     // get error message from body or default to response statusText

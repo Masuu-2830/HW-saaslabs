@@ -30,6 +30,10 @@
             :class="selectedIds.length && 'show'"
           >
             <span
+              v-if="
+                this.$route.params.type !== 'closed' && 
+                this.$route.params.type !== 'trash'
+              "
               @click.stop.prevent="bulkClose"
               id="bulk-close"
               data-toggle="tooltip"
@@ -54,10 +58,14 @@
               </svg>
             </span>
             <span
+              v-if="
+                this.$route.params.type == 'mentions'
+              "
+              @click.stop.prevent="bulkDone"
               id="bulk-done"
               data-toggle="tooltip"
               title="Done"
-              class="align-items-center d-none px-2"
+              class="align-items-center d-flex px-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -78,6 +86,18 @@
               </svg>
             </span>
             <span
+              v-if="
+                this.$route.params.type !== 'mentions' &&
+                this.$route.params.type !== 'discussions' && 
+                this.$route.params.type !== 'starred' &&
+                this.$route.params.type !== 'snoozed' &&
+                this.$route.params.type !== 'drafts' && 
+                this.$route.params.type !== 'sent' && 
+                this.$route.params.type !== 'scheduled' && 
+                this.$route.params.type !== 'closed' && 
+                this.$route.params.type !== 'spam' && 
+                this.$route.params.type !== 'trash'
+              "
               @click.stop.prevent="bulkRead(1)"
               id="bulk-read"
               data-toggle="tooltip"
@@ -104,6 +124,18 @@
             </span>
 
             <span
+              v-if="
+                this.$route.params.type !== 'mentions' &&
+                this.$route.params.type !== 'discussions' && 
+                this.$route.params.type !== 'starred' &&
+                this.$route.params.type !== 'snoozed' &&
+                this.$route.params.type !== 'drafts' && 
+                this.$route.params.type !== 'sent' && 
+                this.$route.params.type !== 'scheduled' && 
+                this.$route.params.type !== 'closed' && 
+                this.$route.params.type !== 'spam' && 
+                this.$route.params.type !== 'trash'
+              "
               @click.stop.prevent="bulkRead(0)"
               id="bulk-unread"
               data-toggle="tooltip"
@@ -285,6 +317,7 @@
             </span>
 
             <span
+              v-if="this.$route.params.type !== 'trash'"
               @click.stop.prevent="bulkDelete"
               id="bulk-trash"
               data-toggle="tooltip"
@@ -314,10 +347,12 @@
             </span>
 
             <span
+              v-if="this.$route.params.type == 'trash'"
+              @click.stop.prevent="bulkPerDelete"
               id="bulk-permanent-delete"
               data-toggle="tooltip"
               title="Permanently Delete"
-              class="align-items-center px-2 d-none"
+              class="align-items-center px-2 d-flex"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -340,6 +375,7 @@
               </svg>
             </span>
             <span
+              v-if="this.$route.params.type !== 'spam' && this.$route.params.type !== 'trash'"
               @click.stop.prevent="bulkSpam"
               id="bulk-spam"
               data-toggle="tooltip"
@@ -369,10 +405,17 @@
             </span>
 
             <span
+              v-if="
+                this.$route.params.type == 'snoozed' || 
+                this.$route.params.type == 'closed' || 
+                this.$route.params.type == 'spam' || 
+                this.$route.params.type == 'trash'
+              "              
+              @click.stop.prevent="bulkMove"
               id="bulk-move-to-inbox"
               data-toggle="tooltip"
               title="Move to Inbox"
-              class="align-items-center px-2 d-none"
+              class="align-items-center px-2 d-flex"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -395,6 +438,9 @@
               </svg>
             </span>
             <span
+              v-if="
+                this.$route.params.type !== 'starred'
+              "
               id="bulk-star-threads"
               class="align-items-center d-flex px-2"
               title="Mark as Important"
@@ -419,10 +465,14 @@
               </svg>
             </span>
             <span
+              v-if="
+                this.$route.params.type == 'starred'
+              "
+              @click.stop.prevent="bulkStar()"
               id="bulk-unstar-threads"
               title="Unmark as Important"
               data-toggle="tooltip"
-              class="align-items-center px-2 d-none"
+              class="align-items-center px-2 d-flex"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -490,6 +540,7 @@
                     type="text"
                     class="form-control form-control-sm search-tag"
                     aria-describedby="emailHelp"
+                    v-model="sqTag"
                     placeholder="Seach Tags..."
                   />
                 </div>
@@ -1026,6 +1077,11 @@
               </template>
             </b-modal>
             <div
+              v-if="
+                this.$route.params.type !== 'drafts' && 
+                this.$route.params.type !== 'sent' && 
+                this.$route.params.type !== 'scheduled'
+              "
               class="
                 dropdown
                 px-2
@@ -1602,6 +1658,7 @@ export default {
   data() {
     return {
       sqTm: "",
+      sqTag: "",
       checkAll: false,
       currId: 0,
       currName: "",
@@ -1777,11 +1834,20 @@ export default {
     bulkSpam() {
       bus.$emit("spamThreads", this.selectedIds);
     },
+    bulkMove() {
+      bus.$emit("restoreThreads", this.selectedIds);
+    },
     bulkDelete() {
-      this.$emit("deleteThreads", this.selectedIds);
+      bus.$emit("deleteThreads", this.selectedIds);
+    },
+    bulkPerDelete() {
+      this.$emit("perDeleteThreads", this.selectedIds);
     },
     bulkClose() {
       bus.$emit("closeThread", this.selectedIds);
+    },
+    bulkDone() {
+      bus.$emit("doneThreads", this.selectedIds);
     },
     bulkAssign(id) {
       bus.$emit("assignThread", this.selectedIds, id);
@@ -1837,6 +1903,7 @@ export default {
     filterPerson(id, name) {
       this.currId = id;
       this.currName = name;
+      console.log(this.currName);
       this.$emit("filterPerson", id);
     },
     filterOrder(order, orderType) {
@@ -1849,7 +1916,17 @@ export default {
       return this.$store.state.userInfo;
     },
     tags() {
-      return this.$store.state.tags;
+      let query = this.sqTag.toLowerCase().trim();
+      if (query == "") {
+        return this.$store.state.tags;
+        // console.log(this.teammatesNew);
+      } else {
+        return this.$store.state.tags.filter(
+          (item) =>
+            item.name.toLowerCase().search(query) !== -1
+        );
+        // console.log(this.teammatesNew);
+      }
     },
 
     mailboxes() {
