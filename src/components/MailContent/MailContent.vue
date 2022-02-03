@@ -28,7 +28,7 @@ import MailContentHeader from './MailContentHeader.vue';
 // import MailContentInt from './MailContentInt.vue'; .
 import IntegrationContainer from './IntegrationContainer.vue';
 export default {
-  components: { MailContentBody, MailContentAddNote, MailContentHeader, ChatContentBody, ChatContentReply, IntegrationContainer },
+  components: { MailContentBody, MailContentHeader, ChatContentBody, ChatContentReply, IntegrationContainer },
   name: "MailContent",
   data() {
     return {
