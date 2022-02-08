@@ -1,9 +1,11 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
 export const store = new Vuex.Store({
+    plugins: [createPersistedState()],
     state: {
         inboxData: {},
         userInfo: {},
@@ -14,7 +16,8 @@ export const store = new Vuex.Store({
         mailboxes: [],
         userSignature: {},
         aliases: {},
-        stateLoaded: false
+        stateLoaded: false,
+        type: ""
     },
     mutations: {
         setState: (state, data) => {
@@ -38,7 +41,11 @@ export const store = new Vuex.Store({
         setAliases: (state, data) => {
             console.log(data)
             state.aliases = data;
-        }
+        },
+        setType: (state, data) => {
+            console.log(data)
+            state.type = data;
+        },
     },
     actions: {
         async fetchPingDetails(context, data) {
@@ -52,6 +59,9 @@ export const store = new Vuex.Store({
         },
         async fetchAliases(context, data) {
             await context.commit('setAliases', data);
-        }
+        },
+        async type(context, data) {
+            await context.commit('setType', data);
+        },
     }
 })

@@ -7,8 +7,9 @@
         <span class="sr-only">Loading...</span>
     </div>
     <!-- <mail-content-int v-if="!loading"></mail-content-int> -->
-    <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :thread="thread" :sidebarOpen = "sidebarOpen"></IntegrationContainer>
-    <div v-if="!loading" class="d-flex flex-column justify-content-between" style="width: calc(100% - 50px);">
+    <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :thread="thread" :sidebarOpen = "sidebarOpen" :contactOpen="contactOpen"></IntegrationContainer>
+    <!-- <mail-contact-panel @openInt="openInt" v-if="!loading" :thread="thread"></mail-contact-panel> -->
+    <div v-if="!loading" class="d-flex flex-column justify-content-between" style="width: calc(100% - 50px);" :style="{right: right}">
       <mail-content-header :thread="thread"></mail-content-header>
       <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body>
       <chat-content-body v-if="this.$store.state.inboxData.type !== 'mail'" :thread="thread"></chat-content-body>
@@ -26,8 +27,9 @@ import ChatContentReply from './ChatContentBody/ChatContentReply.vue';
 import MailContentBody from './MailContentBody/MailContentBody.vue';
 import MailContentHeader from './MailContentHeader.vue';
 import IntegrationContainer from './IntegrationContainer.vue';
+import MailContactPanel from './MailContactPanel.vue';
 export default {
-  components: { MailContentBody, MailContentHeader, ChatContentBody, ChatContentReply, IntegrationContainer},
+  components: { MailContentBody, MailContentHeader, ChatContentBody, ChatContentReply, IntegrationContainer, MailContactPanel},
   name: "MailContent",
   data() {
     return {
@@ -36,6 +38,7 @@ export default {
       thread: {},
       loading: false,
       sidebarOpen: false,
+      contactOpen: false,
       integration_id: 1
     };
   },
@@ -47,16 +50,6 @@ export default {
             }
         }
     },
-    // methods: {
-    //   openInt() {
-    //     console.log("hello");
-    //     if(this.right == '0px') {
-    //         this.right = '250px';
-    //     } else {
-    //         this.right = '0px';
-    //     }
-    //   }
-    // },
   created() {
     bus.$on("compact", (data) => {
       this.display = "flex";
@@ -119,18 +112,45 @@ export default {
     })
   },
   methods: {
+    openInt() {
+        console.log("hello");
+        if(this.right == '0px') {
+            this.right = '250px';
+        } else {
+            this.right = '0px';
+        }
+      },
     IntegrationSidebar: function (integrationID) {
       if(this.integration_id != integrationID){
-          this.right = '250px';
+          this.right = '300px';
+          console.log(1);
           this.integration_id = integrationID;
-          this.sidebarOpen = true;
+          if(integrationID == 204376) {
+            console.log(2);
+            this.contactOpen = true;
+            this.sidebarOpen = false;
+          } else {
+            console.log(3);
+            this.sidebarOpen = true;
+            this.contactOpen = false;
+          }
       }else{
-        if(this.right == '250px'){
+        if(this.right == '300px'){
+          console.log(4);
           this.right = '0px';
           this.sidebarOpen = false;
+          this.contactOpen = false;
         }else{
-          this.right = '250px';
-          this.sidebarOpen = true;
+          this.right = '300px';
+          if(integrationID == 204376) {
+            console.log(5);
+            this.contactOpen = true;
+            this.sidebarOpen = false;
+          } else {
+            console.log(6);
+            this.sidebarOpen = true;
+            this.contactOpen = false;
+          }
         }
       }
     }

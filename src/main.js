@@ -30,6 +30,18 @@ Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 
 export const bus = new Vue();
+FroalaEditor.DefineIcon("scheduleReply", {
+  FA5NAME: "clock",
+  template: "font_awesome_5",
+});
+FroalaEditor.RegisterCommand("scheduleReply", {
+  title: "Schedule Reply",
+  icon: "timer",
+  refreshAfterCallback: true,
+  callback: function () {
+    // this.$wp.parents(".mail-compose").find(".editor-uploadAttachment").trigger("click");
+  },
+});
 FroalaEditor.DefineIcon("attach", {
   FA5NAME: "paperclip",
   template: "font_awesome_5",
@@ -56,6 +68,19 @@ FroalaEditor.RegisterCommand("attachReply", {
   },
 });
 
+FroalaEditor.DefineIcon("attachCardReply", {
+  FA5NAME: "paperclip",
+  template: "font_awesome_5",
+});
+FroalaEditor.RegisterCommand("attachCardReply", {
+  title: "Insert Attachment",
+  icon: "attach",
+  refreshAfterCallback: true,
+  callback: function () {
+    this.$wp.parents(".card_compose").find(".editor-uploadAttachment").trigger("click");
+  },
+});
+
 FroalaEditor.DefineIcon("clear", { NAME: "remove", SVG_KEY: "remove" });
 FroalaEditor.RegisterCommand("clear", {
   title: "Discard Draft",
@@ -63,7 +88,7 @@ FroalaEditor.RegisterCommand("clear", {
   undo: true,
   refreshAfterCallback: true,
   callback: function () {
-    console.log(this.composer, this.draftID, this.threadID);
+    console.log(this.draftID, this.threadID);
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -91,6 +116,9 @@ FroalaEditor.RegisterCommand("clear", {
       } else if(this.type == "reply") {
         console.log("reply from main");
         bus.$emit("closeReply", this.reply.hash);
+      } else if(this.type == "replyCard") {
+        console.log("replyCard from main");
+        bus.$emit("closeReplyCard", this.reply.hash);
       }
     });
   },

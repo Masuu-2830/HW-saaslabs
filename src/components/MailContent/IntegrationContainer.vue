@@ -1,6 +1,6 @@
 <template>
     <div class="integrationContainer">
-        <div class="integrationIcons d-flex flex-column" :class="{open: sidebarOpen}">
+        <div class="integrationIcons d-flex flex-column" :class="{open: sidebarOpen || contactOpen}">
             <!-- <mail-content-int style="margin-bottom: 40px" @openInt="openContactPanel" :thread="thread"></mail-content-int> -->
             <IntegrationData
                 v-for = "(integration, index) in integrations"
@@ -23,6 +23,9 @@
                 @pmIntegration= "pmIntegration"
             />
         </div>
+        <div v-if="contactOpen" :class="{open: contactOpen}" style="overflow-y: auto; overflow-x: hidden">
+            <mail-contact-panel :thread="thread"></mail-contact-panel>
+        </div>
     </div>
 </template>
 
@@ -33,15 +36,7 @@ import MailContactPanel from './MailContactPanel.vue';
     export default {
         data(){
             return {
-                integrations: [
-                    {
-                        "icon": "https://cdn.helpwise.io/assets/images/ontraport-integration.png",
-                        "id": 0,
-                        "lname": "contact",
-                        "name": "contact",
-                        "pixel": 60
-                    }
-                ],
+                integrations: [],
                 isSidebarActive: false,
                 sidebarData: [],
                 integrationName: '',
@@ -54,9 +49,6 @@ import MailContactPanel from './MailContactPanel.vue';
         props: ["sidebarOpen", "contactOpen", "thread"],
         components:{IntegrationData, IntegrationSidebar, MailContactPanel},
         methods: {
-            openContactPanel() {
-                this.$emit("openInt", 0);
-            },
             openIntegration(integrationData){
                 this.$emit("openInt", integrationData.id);
                 this.integrationName = integrationData.lname;
