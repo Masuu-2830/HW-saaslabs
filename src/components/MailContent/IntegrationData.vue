@@ -1,7 +1,7 @@
 <template>
     <!-- <a :class="[ 'df-settings-link-' + integration_data.lname , 'df-' + integration_data.lname + '-settings  all_icon integrations-settings-sidebar']" @click="openInt" data-toggle="tooltip" :title="integration_data.name" style="left: -44px; background: transparent; border-right: none; display: flex;" :style="'top:'+ integration_data.pixel +'px !important;'"> -->
     <div 
-        :class="[ 'df-settings-link-' + integration_data.lname , 'df-' + integration_data.lname + '-settings  all_icon integrations-settings-sidebar', activeInt == integration_data.lname ? 'active' : '']"
+        :class="[ 'df-settings-link-' + integration_data.lname , 'df-' + integration_data.lname + '-settings all_icon integrations-settings-sidebar', activeInt == integration_data.lname ? 'active' : '']"
         @click="openInt" 
         data-toggle="tooltip" 
         :title="integration_data.name"

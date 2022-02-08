@@ -7,7 +7,7 @@
         <span class="sr-only">Loading...</span>
     </div>
     <!-- <mail-content-int v-if="!loading"></mail-content-int> -->
-    <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :sidebarOpen = "sidebarOpen"></IntegrationContainer>
+    <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :sidebarOpen = "sidebarOpen" :contactOpen = "contactOpen" :thread= "thread"></IntegrationContainer>
     <div v-if="!loading" class="d-flex flex-column justify-content-between" :style="{width: 'calc(100% - 60px - '+right+')'}">
       <mail-content-header :thread="thread"></mail-content-header>
       <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body>
@@ -38,6 +38,7 @@ export default {
       thread: {},
       loading: false,
       sidebarOpen: false,
+      contactOpen: false,
       integration_id: 0
     };
   },
@@ -120,14 +121,27 @@ export default {
       if(this.integration_id != integrationID){
           this.right = '300px';
           this.integration_id = integrationID;
-          this.sidebarOpen = true;
+          if(integrationID == 204376){
+            this.sidebarOpen = false;
+            this.contactOpen = true;
+          }else{
+            this.sidebarOpen = true;
+            this.contactOpen = false;
+          }
       }else{
         if(this.right == '300px'){
           this.right = '0px';
           this.sidebarOpen = false;
+          this.contactOpen = false;
         }else{
           this.right = '300px';
-          this.sidebarOpen = true;
+          if(integrationID == 204376){
+            this.sidebarOpen = false;
+            this.contactOpen = true;
+          }else{
+            this.sidebarOpen = true;
+            this.contactOpen = false;
+          }
         }
       }
     }

@@ -1,10 +1,10 @@
 <template>
-  <div v-if="Object.keys(thread).length !== 0" class="integration-sidebar bd-l" style="width: 50px; background: white">
-    <div
+  <!-- <div  class="integration-sidebar bd-l" style="width: 50px; background: white"> -->
+    <!-- <div
       class="df-settings df-contact-settings d-none d-md-block"
       :class="ifIntOpen && 'show'"
-    >
-      <a
+    > -->
+      <!-- <a
         id="dfSettingsShow"
         @click="openInt"
         class="df-settings-link all_icon"
@@ -31,8 +31,8 @@
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
-      </a>
-      <div class="df-settings-body pd-l-10 pd-r-15">
+      </a> -->
+      <div v-if="Object.keys(thread).length !== 0 && contactOpen==true" class="df-settings-body pd-l-10 pd-r-15">
         <div id="contactDetailsWrapper" style="">
           <div class="pd-t-20">
             <!-- <div id="chatUser-name-window"> -->
@@ -1273,15 +1273,15 @@
         </div>
       </div>
       <!-- <IntegrationContainer></IntegrationContainer> -->
-    </div>
-  </div>
+    <!-- </div> -->
+  <!-- </div> -->
 </template>
 
 <script>
 import { bus } from "../../main";
 export default {
   name: "MailContentVue",
-  props: ["thread"],
+  props: ["thread", "contactOpen"],
   data() {
     return {
       ifIntOpen: false,
@@ -1696,5 +1696,17 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+    .df-settings-body {
+        position: unset;
+        width: 300px !important;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background-color: #fff;
+        border-left: 1px solid #c0ccda;
+        box-shadow: 0 0 15px rgb(28 39 60 / 10%);
+        padding: 0 20px;
+        overflow-y: auto; 
+    }
 </style>
