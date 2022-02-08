@@ -32,7 +32,7 @@
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
       </a> -->
-      <div v-if="Object.keys(thread).length !== 0 && contactOpen==true" class="df-settings-body pd-l-10 pd-r-15">
+      <div v-if="Object.keys(thread).length !== 0" class="df-settings-body pd-l-10 pd-r-15">
         <div id="contactDetailsWrapper" style="">
           <div class="pd-t-20">
             <!-- <div id="chatUser-name-window"> -->
@@ -1281,7 +1281,7 @@
 import { bus } from "../../main";
 export default {
   name: "MailContentVue",
-  props: ["thread", "contactOpen"],
+  props: ["thread"],
   data() {
     return {
       ifIntOpen: false,

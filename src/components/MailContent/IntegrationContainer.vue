@@ -27,7 +27,7 @@
 
         <div class="MailContactInt" :class="{open: contactOpen}">
             <MailContentInt 
-                :contactOpen="contactOpen"
+                v-if = "contactOpen"
                 :thread="thread"
             />
         </div>
