@@ -25,48 +25,11 @@
             }
         },
         computed: {
-            // settingsStyleShow: function () {
-            //     return {
-            //         backgroundColor: '#fff',
-            //         border: '#c0ccda',
-            //         color: '#1c273c',
-            //         boxShadow: 'none'
-            //     }
-            // },
-            // settingsStyle: function () {
-            //     return {
-            //         position: 'absolute',
-            //         top: '98px',
-            //         left: '-44px',
-            //         width: '45px',
-            //         height: '45px',
-            //         backgroundColor: '#fff',
-            //         color: '#7987a1',
-            //         display: 'flex',
-            //         align: 'center',
-            //         justify: 'center',
-            //         border: '1px solid #c0ccda'
-                    
-            //         // border-right-width: '0',
-            //         // border-top-left-radius: 0.25rem;
-            //         // border-bottom-left-radius: 0.25rem;
-            //         // transition: all 0.2s ease-in-out;
-            //         // z-index: 1;
-            //     }
-            // }
         }
     }
 </script>
 
 <style scoped>
-    /* .integrations-settings-sidebar.show .integrations-settings-sidebar,
-    .integrations-settings-sidebar.show .integrations-settings-sidebar:hover,
-    .integrations-settings-sidebar.show .integrations-settings-sidebar:focus {
-        background-color: #fff;
-        border-color: #c0ccda;
-        color: #1c273c;
-        box-shadow: none;
-    } */
     .integrations-settings-sidebar {
         width: 45px;
         height: 45px;
@@ -106,13 +69,6 @@
     .fas.fa-caret-down.on{
         transform: rotateZ(180deg);
     }
-    /* .df-settings-body.easy-calendar-integrations-width{
-        width: 300px !important;
-    } */
-
-    /* .df-settings.show.integrations-settings-sidebar-btn {
-        right: 300px;
-    } */
     body > div.datepicker.datepicker-dropdown.dropdown-menu.datepicker-orient-right.datepicker-orient-bottom{
         width: 200px !important;
         left: 1219px;

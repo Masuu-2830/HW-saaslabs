@@ -136,48 +136,6 @@ export default {
 </script>
 
 <style>
-/* .df-settings-ontraport.show .df-settings-link-ontraport,
-.df-settings-ontraport.show .df-settings-link-ontraport:hover,
-.df-settings-ontraport.show .df-settings-link-ontraport:focus {
-  background-color: #fff;
-  border-color: #c0ccda;
-  color: #1c273c;
-  box-shadow: none;
-}
-.df-settings-link-ontraport {
-  position: absolute;
-  top: 98px;
-  left: -44px;
-  width: 45px;
-  height: 45px;
-  background-color: #fff;
-  color: #7987a1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #c0ccda;
-  border-right-width: 0;
-  border-top-left-radius: 0.25rem;
-  border-bottom-left-radius: 0.25rem;
-  transition: all 0.2s ease-in-out;
-  z-index: 1;
-}
-@media (prefers-reduced-motion: reduce) {
-  .df-settings-link-ontraport {
-    transition: none;
-  }
-}
-.df-settings-link-ontraport:hover,
-.df-settings-link-ontraport:focus {
-  color: #1c273c;
-  border-color: #8392a5;
-  box-shadow: 0 0 10px 2px rgba(28, 39, 60, 0.1);
-}
-.df-settings-link-ontraport svg {
-  width: 20px;
-  height: 20px;
-} */
-
 body
   > div.datepicker.datepicker-dropdown.dropdown-menu.datepicker-orient-right.datepicker-orient-bottom {
   width: 200px !important;
