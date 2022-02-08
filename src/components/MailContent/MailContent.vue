@@ -7,9 +7,8 @@
         <span class="sr-only">Loading...</span>
     </div>
     <!-- <mail-content-int v-if="!loading"></mail-content-int> -->
-    <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :thread="thread" :sidebarOpen = "sidebarOpen" :contactOpen="contactOpen"></IntegrationContainer>
-    <!-- <mail-contact-panel @openInt="openInt" v-if="!loading" :thread="thread"></mail-contact-panel> -->
-    <div v-if="!loading" class="d-flex flex-column justify-content-between" style="width: calc(100% - 50px);" :style="{right: right}">
+    <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :thread="thread" :contactOpen="contactOpen" :sidebarOpen = "sidebarOpen"></IntegrationContainer>
+    <div v-if="!loading" class="d-flex flex-column justify-content-between" :style="{width: 'calc(100% - 60px - '+right+')'}">
       <mail-content-header :thread="thread"></mail-content-header>
       <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body>
       <chat-content-body v-if="this.$store.state.inboxData.type !== 'mail'" :thread="thread"></chat-content-body>
@@ -26,10 +25,11 @@ import ChatContentBody from './ChatContentBody/ChatContentBody.vue';
 import ChatContentReply from './ChatContentBody/ChatContentReply.vue';
 import MailContentBody from './MailContentBody/MailContentBody.vue';
 import MailContentHeader from './MailContentHeader.vue';
+// import MailContentInt from './MailContentInt.vue'; .
 import IntegrationContainer from './IntegrationContainer.vue';
-import MailContactPanel from './MailContactPanel.vue';
+// import MailContactPanel from './MailContactPanel.vue';
 export default {
-  components: { MailContentBody, MailContentHeader, ChatContentBody, ChatContentReply, IntegrationContainer, MailContactPanel},
+  components: { MailContentBody, MailContentHeader, ChatContentBody, ChatContentReply, IntegrationContainer },
   name: "MailContent",
   data() {
     return {
@@ -123,7 +123,6 @@ export default {
     IntegrationSidebar: function (integrationID) {
       if(this.integration_id != integrationID){
           this.right = '300px';
-          console.log(1);
           this.integration_id = integrationID;
           if(integrationID == 204376) {
             console.log(2);
@@ -136,7 +135,6 @@ export default {
           }
       }else{
         if(this.right == '300px'){
-          console.log(4);
           this.right = '0px';
           this.sidebarOpen = false;
           this.contactOpen = false;

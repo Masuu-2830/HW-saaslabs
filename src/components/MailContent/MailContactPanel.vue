@@ -983,7 +983,6 @@
                                 v-model="startDate"
                                 id="activityStartDate"
                                 type="date"
-                                value=""
                                 class="form-control"
                                 placeholder="Select date"
                               />
@@ -1015,7 +1014,6 @@
                                 v-model="endDate"
                                 id="activityEndDate"
                                 type="date"
-                                value=""
                                 class="form-control"
                                 placeholder="Select date"
                               />
