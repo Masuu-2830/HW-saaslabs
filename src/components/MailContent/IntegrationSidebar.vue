@@ -10,7 +10,7 @@
         </div>
         <div class="integration-data">
             <div v-if="!dataStatus">
-                <p style="padding:5px;color:#4f5d6b;">Uh oh, something went wrong.<br>
+                <p style="padding:5px;color:#4f5d6b;">{{ errorMsg }}<br>
                 </p> 
             </div>
             <div v-else>
@@ -41,8 +41,13 @@
                                     <p v-for= "(component, index) in sidebar.components[0]"
                                         :key = "index"
                                     >
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags') && component.show == 1">
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number') && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">
+                                            {{ component.label }}
+                                        </span>
+                                        <br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='tags') && component.show == 1">
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number') && component.show == 1" style="color:#4f5d6b;font-size:13px;">
+                                            {{component.value ? component.value : 'No ' + component.label}}
+                                        </span>
                                         <span v-else-if="component.type=='link' && component.show == 1">
                                             <a :href="component.value" target="_blank">{{component.label}}
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -65,12 +70,107 @@
                                                 <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
                                             </span>
                                         </span>
+                                        <span v-else-if="(component.type=='single_component' || component.type=='multiple_component') && component.show == 1">
+                                            <div class="collapse-body shadow-sm bg-white rounded mg-y-10" style="border-style: solid; border-width: thin; border-color: rgb(210, 210, 210);">
+                                                <div class="collapse-header row custom-header" style="cursor: pointer;height:50px;">
+                                                    <div class="col-8">
+                                                        <p class="pd-l-13 pd-t-15">
+                                                            {{ component.label }}
+                                                        </p>  
+                                                    </div>
+                                                    <div class="col-4 pd-t-15" @click="collapseHeader('.' + component.class + sidebar.components[0][0].value + '_integration_collapsible')">
+                                                        <p class="integration_collapse_header pd-r-10 text-right">
+                                                            <i class="fas fa-caret-up" :class="component.class +  sidebar.components[0][0].value + '_integration_collapsible_caret'" style="color: silver;border-radius:5px;"></i>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="pd-l-0 pd-b-1 collapse show" :class="component.class + sidebar.components[0][0].value + '_integration_collapsible'"  style="word-wrap: break-word;line-height: 1.5;">
+                                                    <!-- Single Component -->
+                                                    <div v-if="component.type == 'single_component'" class="col s12">
+                                                        <p v-for= "(comp, index) in component.value"
+                                                            :key = "index"
+                                                        >
+                                                            <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ comp.label }}</span><br v-if="(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1">
+                                                            <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number') && comp.show == 1" style="color:#4f5d6b;font-size:13px;">{{comp.value ? comp.value : 'No ' + comp.label}}</span>
+                                                            <span v-else-if="comp.type=='link' && comp.show == 1">
+                                                                <a :href="comp.value" target="_blank">{{comp.label}}
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                    </svg>
+                                                                </a>
+                                                            </span>
+                                                            <span v-else-if="(comp.type=='button' || comp.type=='api_button') && comp.show == 1">
+                                                                <button type="button" class="mb-2 btn btn-xs btn-primary" :class="comp.class" @click="buttonFunction(comp.api, integrationName, integrationID, component, '')">{{ comp.label }}</button>
+                                                            </span>
+                                                            <span v-else-if="comp.type=='link_button' && comp.show == 1">
+                                                                <a :href="comp.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="comp.class">{{ comp.label }}</button></a>
+                                                            </span>
+                                                            <span v-else-if="comp.type=='tags' && comp.show == 1">
+                                                                <span v-for= "(tag, index) in comp.value"
+                                                                :key= "index"
+                                                                >
+                                                                    <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                                                </span>
+                                                            </span>
+                                                        </p>                  
+                                                    </div>
+
+                                                    <!-- Multiple Component -->
+                                                    <div v-else-if="component.type == 'multiple_component'" class="pd-5">
+                                                        <div class="card rounded mg-b-10" v-for= "(compo, index) in component.value"
+                                                        :key= "index"
+                                                        >
+                                                            <div class="d-flex align-items-center justify-content-between bg-gray-100" style="padding: 15px;">
+                                                                <span style="font-size:13px;">{{ compo[1].value }}</span>    
+                                                                <div>
+                                                                    <!-- <span style="cursor:pointer;" :class="integrationName + '_edit_' + sidebar.class + '_button'" class="mg-r-10" v-if="sidebar.update == 1" @click="openUpdateForm(sidebar.class, component, integrationName)"><i class="fas fa-pen fa-xs"></i></span> -->
+                                                                    <span style="cursor:pointer;" @click="collapseHeader('.' + integrationName + '_' + component.class + '_' + compo[0].value)">
+                                                                        <i class="fas fa-caret-down" :class="integrationName + '_' + component.class + '_' + compo[0].value + '_caret'" style="color: silver;border-radius:5px;"></i>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="mg-l-10 mg-r-10 collapse" :class="integrationName + '_' + component.class + '_' + compo[0].value">
+                                                                <p v-for= "(com, index) in compo"
+                                                                    :key = "index"
+                                                                >   
+                                                                    <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags' || com.type=='list') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags' || com.type=='list') && com.show == 1">
+                                                                    <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
+                                                                    <span v-else-if="com.type=='link' && com.show == 1">
+                                                                        <a :href="com.value" target="_blank">{{com.label}}
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                                                <polyline points="15 3 21 3 21 9"></polyline>
+                                                                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                            </svg>
+                                                                        </a>
+                                                                    </span>
+                                                                    <span v-else-if="com.type=='link_button' && com.show == 1">
+                                                                        <a :href="com.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="com.class">{{ com.label }}</button></a>
+                                                                    </span>
+                                                                    <span v-else-if="com.type=='tags' && com.show == 1">
+                                                                        <span v-for= "(tag, index) in com.value"
+                                                                        :key= "index"
+                                                                        >
+                                                                            <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                                                        </span>
+                                                                    </span>
+                                                                    <span style="text-align: center;" v-else-if="com.type=='form_button' && com.show == 1">
+                                                                        <button type="button" class="mb-2 btn btn-xs btn-secondary" :class="com.class" @click="addCustomData(integrationName, integrationID, com.class, com.associated_id, compo, 'create')">{{ com.label }}</button>
+                                                                    </span>
+                                                                </p>  
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>  
+                                        </span>
                                     </p>                  
                                 </div>
 
                                 <!-- Multiple Component -->
                                 <div v-else-if="sidebar.component_type == 'multiple'" class="pd-5">
-
                                     <div class="card rounded mg-b-10" v-for= "(component, index) in sidebar.components"
                                         :key= "index"
                                     >
@@ -106,15 +206,111 @@
                                                         <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
                                                     </span>
                                                 </span>
+                                                <span v-else-if="(com.type=='single_component' || com.type=='multiple_component')">
+                                                    <div class="collapse-body shadow-sm bg-white rounded mg-y-10" style="border-style: solid; border-width: thin; border-color: rgb(210, 210, 210);">
+                                                        <div class="collapse-header row custom-header" style="cursor: pointer;height:50px;">
+                                                            <div class="col-8">
+                                                                <p class="pd-l-13 pd-t-15">
+                                                                    {{ com.label }}
+                                                                </p>  
+                                                            </div>
+                                                            <div class="col-4 pd-t-15" @click="collapseHeader('.' + com.class + com[0].value + '_integration_collapsible')">
+                                                                <p class="integration_collapse_header pd-r-10 text-right">
+                                                                    <i class="fas fa-caret-up" :class="com.class + com[0].value + '_integration_collapsible_caret'" style="color: silver;border-radius:5px;"></i>
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="pd-l-0 pd-b-1 collapse show" :class="com.class + com[0].value + '_integration_collapsible'"  style="word-wrap: break-word;line-height: 1.5;">
+                                                            <!-- Single Component -->
+                                                            <div v-if="com.type == 'single_component'" class="col s12">
+                                                                <p v-for= "(comp, index) in com.value"
+                                                                    :key = "index"
+                                                                >
+                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ comp.label }}</span><br v-if="(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1">
+                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number') && comp.show == 1" style="color:#4f5d6b;font-size:13px;">{{comp.value ? comp.value : 'No ' + comp.label}}</span>
+                                                                    <span v-else-if="comp.type=='link' && comp.show == 1">
+                                                                        <a :href="comp.value" target="_blank">{{comp.label}}
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                                                <polyline points="15 3 21 3 21 9"></polyline>
+                                                                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                            </svg>
+                                                                        </a>
+                                                                    </span>
+                                                                    <span v-else-if="(comp.type=='button' || comp.type=='api_button') && comp.show == 1">
+                                                                        <button type="button" class="mb-2 btn btn-xs btn-primary" :class="comp.class" @click="buttonFunction(comp.api, integrationName, integrationID, com, '')">{{ comp.label }}</button>
+                                                                    </span>
+                                                                    <span v-else-if="comp.type=='link_button' && comp.show == 1">
+                                                                        <a :href="comp.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="comp.class">{{ comp.label }}</button></a>
+                                                                    </span>
+                                                                    <span v-else-if="comp.type=='tags' && comp.show == 1">
+                                                                        <span v-for= "(tag, index) in comp.value"
+                                                                        :key= "index"
+                                                                        >
+                                                                            <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                                                        </span>
+                                                                    </span>
+                                                                </p>                  
+                                                            </div>
+
+                                                            <!-- Multiple Component -->
+                                                            <div v-else-if="com.type == 'multiple_component'" class="pd-5">
+                                                                <div class="card rounded mg-b-10" v-for= "(compo, index) in com.value"
+                                                                :key= "index"
+                                                                >
+                                                                    <div class="d-flex align-items-center justify-content-between bg-gray-100" style="padding: 15px;">
+                                                                        <span style="font-size:13px;">{{ compo[1].value }}</span>    
+                                                                        <div>
+                                                                            <!-- <span style="cursor:pointer;" :class="integrationName + '_edit_' + sidebar.class + '_button'" class="mg-r-10" v-if="sidebar.update == 1" @click="openUpdateForm(sidebar.class, component, integrationName)"><i class="fas fa-pen fa-xs"></i></span> -->
+                                                                            <span style="cursor:pointer;" @click="collapseHeader('.' + integrationName + '_' + com.class + '_' + compo[0].value)">
+                                                                                <i class="fas fa-caret-down" :class="integrationName + '_' + com.class + '_' + compo[0].value + '_caret'" style="color: silver;border-radius:5px;"></i>
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="mg-l-10 mg-r-10 collapse" :class="integrationName + '_' + com.class + '_' + compo[0].value">
+                                                                        <p v-for= "(comp, index) in compo"
+                                                                            :key = "index"
+                                                                        >   
+                                                                            <span v-if= "(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ comp.label }}</span><br v-if= "(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1">
+                                                                            <span v-if= "(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number') && comp.show == 1" style="color:#4f5d6b;font-size:13px;">{{comp.value ? comp.value : 'No ' + comp.label}}</span>
+                                                                            <span v-else-if="comp.type=='link' && comp.show == 1">
+                                                                                <a :href="comp.value" target="_blank">{{comp.label}}
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                                                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                                    </svg>
+                                                                                </a>
+                                                                            </span>
+                                                                            <span v-else-if="comp.type=='link_button' && comp.show == 1">
+                                                                                <a :href="comp.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="comp.class">{{ comp.label }}</button></a>
+                                                                            </span>
+                                                                            <span v-else-if="comp.type=='tags' && comp.show == 1">
+                                                                                <span v-for= "(tag, index) in comp.value"
+                                                                                :key= "index"
+                                                                                >
+                                                                                    <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                                                                </span>
+                                                                            </span>
+                                                                            <span style="text-align: center;" v-else-if="comp.type=='form_button' && comp.show == 1">
+                                                                                <button type="button" class="mb-2 btn btn-xs btn-secondary" :class="comp.class" @click="addCustomData(integrationName, integrationID, comp.class, comp.associated_id, compo, 'create')">{{ comp.label }}</button>
+                                                                            </span>
+                                                                        </p>  
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div> 
+                                                </span>
                                             </p>  
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- No Component -->
-                                <div v-if="sidebar.component_type == 'no' && sidebarData.create[sidebar.class] && !openCreateFormArrayInternal[sidebar.class]" class="col s12" :class="'no_' + sidebar.class + '_component'">
+                                <div v-if="sidebar.component_type == 'no'" class="col s12" :class="'no_' + sidebar.class + '_component'">
                                     <p style="color:#4f5d6b;">{{ sidebar.text }}</p>
-                                    <p style="color:#0168fa; cursor:pointer;" @click="openCreateForm(sidebar.class)">Create new {{ sidebar.class }}</p>
+                                    <p v-if="sidebarData.create[sidebar.class] && !openCreateFormArrayInternal[sidebar.class]" style="color:#0168fa; cursor:pointer;" @click="openCreateForm(sidebar.class)">Create new {{ sidebar.class }}</p>
                                 </div>
 
                                 <!-- Create Button for Multiple Component -->
@@ -143,8 +339,30 @@
                                                 </select>
                                                 <span v-if="createComponent.type=='button'">
                                                     <div :class="'create_'+ sidebar.class + '_' + createComponent.class + '_div'">
+                                                        <div v-for= "(dropdownValue, index) in randomDropdown"
+                                                        :key= "index"
+                                                        >
+                                                            <div v-if="dropdownValue!=''" class="mg-t-10 d-flex align-items-center justify-content-between">
+                                                                <div class="form-group pd-l-0" style="width: -webkit-fill-available;">
+                                                                    <label class="d-block">{{ capitalizeFirstLetter(createComponent.class) }} {{ index + 1 }}</label>
+                                                                    <input type="text" :name="'create_'+createComponent.name" :value="dropdownValue" class="form-control" readonly>
+                                                                </div>
+                                                                <div class="form-group mg-b-0 pd-l-10">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index, dropdownValue)">
+                                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                                    </svg>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                     <button type="button" class="mb-2 btn btn-xs btn-primary" :class="createComponent.class" @click="addRandomData(createComponent, integrationName, integrationID, sidebar.class, 'create','create_'+ sidebar.class + '_' + createComponent.class + '_div')">{{ createComponent.label }}</button>
+                                                </span>
+                                                <span v-else-if="createComponent.type=='date'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
+                                                </span>
+                                                <span v-else-if="createComponent.type=='datetime'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
                                                 </span>
                                                 <div class="invalid-feedback" :class="integrationName + '-create-' + sidebar.class + '-' + createComponent.class + '-error'"></div>
                                             </div>
@@ -178,6 +396,12 @@
                                                     :value="option.value">{{ option.label }}
                                                     </option>
                                                 </select>
+                                                <span v-else-if="updateComponent.type=='date'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
+                                                </span>
+                                                <span v-else-if="updateComponent.type=='datetime'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
+                                                </span>
                                                 <div class="invalid-feedback" :class="integrationName + '-edit-' + sidebar.class + '-' + updateComponent.class + '-error'"></div>
                                             </div>
                                             
@@ -317,7 +541,7 @@
                                                                 <input type="text" class="form-control" :placeholder="createComponent.placeholder" :name="'create_'+createComponent.name" :value="emailValue">
                                                             </div>
                                                             <div class="form-group mg-b-0 pd-l-10">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index)">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index, emailValue)">
                                                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                                                 <line x1="6" y1="6" x2="18" y2="18"></line>
                                                                 </svg>
@@ -325,6 +549,12 @@
                                                         </div>
                                                     </div>
                                                     <button type="button" class="mb-2 btn btn-xs btn-primary" :class="createComponent.class" @click="addRandomData(createComponent, integrationName, integrationID, sidebar.class, 'create','create_'+ sidebar.class + '_' + createComponent.class + '_div')">{{ createComponent.label }}</button>
+                                                </span>
+                                                <span v-else-if="createComponent.type=='date'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
+                                                </span>
+                                                <span v-else-if="createComponent.type=='datetime'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
                                                 </span>
                                                 <div class="invalid-feedback" :class="integrationName + '-create-' + sidebar.class + '-' + createComponent.class + '-error'"></div>
                                             </div>
@@ -366,7 +596,7 @@
                                                                 <input type="text" class="form-control" :placeholder="updateComponent.placeholder" :name="'edit_'+updateComponent.name" :value="emailValue">
                                                             </div>
                                                             <div class="form-group mg-b-0 pd-l-10">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index)">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index, emailValue)">
                                                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                                                 <line x1="6" y1="6" x2="18" y2="18"></line>
                                                                 </svg>
@@ -374,6 +604,12 @@
                                                         </div>
                                                     </div>
                                                     <button type="button" class="mb-2 btn btn-xs btn-primary" :class="updateComponent.class" @click="addRandomData(updateComponent, integrationName, integrationID, sidebar.class, 'edit','edit_'+ sidebar.class + '_' + updateComponent.class + '_div')">{{ updateComponent.label }}</button>
+                                                </span>
+                                                <span v-else-if="updateComponent.type=='date'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
+                                                </span>
+                                                <span v-else-if="updateComponent.type=='datetime'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
                                                 </span>
                                                 <div class="invalid-feedback" :class="integrationName + '-edit-' + sidebar.class + '-' + updateComponent.class + '-error'"></div>
                                             </div>
@@ -594,7 +830,7 @@
                                                                 <input type="text" class="form-control" :placeholder="createComponent.placeholder" :name="'create_'+createComponent.name" :value="emailValue">
                                                             </div>
                                                             <div class="form-group mg-b-0 pd-l-10">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index)">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index, emailValue)">
                                                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                                                 <line x1="6" y1="6" x2="18" y2="18"></line>
                                                                 </svg>
@@ -602,6 +838,12 @@
                                                         </div>
                                                     </div>
                                                     <button type="button" class="mb-2 btn btn-xs btn-primary" :class="createComponent.class" @click="addRandomData(createComponent, integrationName, integrationID, sidebar.class, 'create','create_'+ sidebar.class + '_' + createComponent.class + '_div')">{{ createComponent.label }}</button>
+                                                </span>
+                                                <span v-else-if="createComponent.type=='date'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
+                                                </span>
+                                                <span v-else-if="createComponent.type=='datetime'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
                                                 </span>
                                                 <div class="invalid-feedback" :class="integrationName + '-create-' + sidebar.class + '-' + createComponent.class + '-error'"></div>
                                             </div>
@@ -643,7 +885,7 @@
                                                                 <input type="text" class="form-control" :placeholder="updateComponent.placeholder" :name="'edit_'+updateComponent.name" :value="emailValue">
                                                             </div>
                                                             <div class="form-group mg-b-0 pd-l-10">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index)">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index, emailValue)">
                                                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                                                 <line x1="6" y1="6" x2="18" y2="18"></line>
                                                                 </svg>
@@ -651,6 +893,12 @@
                                                         </div>
                                                     </div>
                                                     <button type="button" class="mb-2 btn btn-xs btn-primary" :class="updateComponent.class" @click="addRandomData(updateComponent, integrationName, integrationID, sidebar.class, 'edit','edit_'+ sidebar.class + '_' + updateComponent.class + '_div')">{{ updateComponent.label }}</button>
+                                                </span>
+                                                <span v-else-if="updateComponent.type=='date'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
+                                                </span>
+                                                <span v-else-if="updateComponent.type=='datetime'">
+                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
                                                 </span>
                                                 <div class="invalid-feedback" :class="integrationName + '-edit-' + sidebar.class + '-' + updateComponent.class + '-error'"></div>
                                             </div>
@@ -923,15 +1171,23 @@
 
 <script>
 // import { component } from 'vue/types/umd';
+import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
 export default {
-    props: ["sidebarData", "integrationName", "dataStatus","openCreateFormArray","openUpdateFormArray", "integrationID"],
+    components: { DatePicker },
+    props: ["sidebarData", "integrationName", "dataStatus","openCreateFormArray","openUpdateFormArray", "integrationID", "errorMsg"],
     data(){
         return {
             formData: {},
             openCreateFormArrayInternal: {},
             openUpdateFormArrayInternal: {},
             randomData: {},
-            guestEmails: [""]
+            guestEmails: [""],
+            randomDropdown: [],
+            arrayObject: [],
+            datetime: "",
+            newDateOpen: false,
+            date: ""
         }
     },
     methods: {
@@ -1062,6 +1318,9 @@ export default {
                 });
                 this.openCreateFormArrayInternal[className] = false;
                 this.randomData = {};
+                this.randomDropdown = [];
+                this.guestEmails = [];
+                this.arrayObject = [];
                 this.$emit("postData", int_name);
             }
         },
@@ -1126,12 +1385,13 @@ export default {
                 });
                 this.openUpdateFormArrayInternal[className] = false;
                 this.randomData = {};
+                this.randomDropdown = [];
+                this.guestEmails = [];
+                this.arrayObject = [];
                 this.$emit("postData", int_name);
             }
         },
         openCreateForm(className){
-            console.log("hello bacha",this.openCreateFormArrayInternal);
-            console.log("hello bacha",className);
             this.openCreateFormArrayInternal[className] = !this.openCreateFormArrayInternal[className];
             this.randomData = {};
         },
@@ -1165,27 +1425,23 @@ export default {
         },
         addRandomData(component, int_name, int_id, className, action, classDiv){
             let value = $(`.${int_name}_${action}_${className}_${component.class}`).val();
-            let divLength = $(`.${classDiv}`).children('div').length;
-            let capClassName = component.class.charAt(0).toUpperCase() + component.class.slice(1);
-            divLength =  parseInt(divLength) + 1;
+            // let divLength = $(`.${classDiv}`).children('div').length;
+            // let capClassName = component.class.charAt(0).toUpperCase() + component.class.slice(1);
+            // divLength =  parseInt(divLength) + 1;
+            console.log("value",value);
+            console.log("this.randomData",this.randomData);
+            console.log("this.randomData",this.arrayObject);
             if(component.action == "dropdown" && value!='' || value!=undefined){
                 if(!this.randomData[value]){
-                    let selectedData = $(`.${int_name}_${action}_${className}_${component.class} option[value=${value}]`).text();
-                    $(`.${classDiv}`).append(`
-                        <div class="mg-t-10 d-flex align-items-center justify-content-between ${classDiv}_${divLength}">
-                            <div class="form-group pd-l-0" style="width: -webkit-fill-available;">
-                                <label class="d-block">${capClassName} ${divLength}</label>
-                                <input type="text" value="${selectedData}" class="form-control" readonly>
-                            </div>
-                            <div class="form-group mg-b-0 pd-l-10">
-                                <svg class="close-create-random-data" id="${classDiv}_${divLength}" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </div>
-                        </div>
-                    `);
+                    var selectedData = $(`.${int_name}_${action}_${className}_${component.class} option[value=${value}]`).text();
+                    selectedData = selectedData.trim();
+                    var random_index = '';
+                    console.log("selectedData",selectedData);
+                    if(!this.randomDropdown.includes(selectedData) && selectedData!=''){
+                        this.randomDropdown.push(selectedData);
+                    }
                     this.randomData[value]=value;
+                    this.arrayObject[selectedData] = value;
                 }
             }    
             if(component.action == "input_field"){
@@ -1218,8 +1474,18 @@ export default {
                 }
             }
         },
-        removeRandomData(indexData){
-            this.guestEmails.splice(indexData, 1);
+        removeRandomData(indexData, selectedData){
+            console.log("indexData",indexData);
+            console.log("selectedData",selectedData);
+            if(this.guestEmails.length!=0){
+                this.guestEmails.splice(indexData, 1);
+            }
+            if(this.randomDropdown.length!=0){
+                let value = this.arrayObject[selectedData.trim()];
+                console.log("value",value);
+                delete this.randomData[value];
+                this.randomDropdown.splice(indexData, 1);
+            }
         },
         callRandomApi(int_name, className, api_name, int_id, attributes, email, event, action, sectionClass){
             let pm_data = {};
@@ -1292,6 +1558,19 @@ export default {
             console.log("int_name",associated_id);
             console.log("int_name",components);
             console.log("int_name",action);
+        },
+        handleChange(value, type) {
+            console.log("value",value);
+            console.log("type",type);
+            if (type === 'minute') {
+                this.newDateOpen = false;
+            }
+        },
+        notBeforeToday(date) {
+            return date < new Date(new Date().setHours(0, 0, 0, 0));
+        },
+        notBeforeNow(date) {
+            return date < new Date(new Date().setHours(new Date().getHours() + 1, 0, 0, 0));
         },
         capitalizeFirstLetter(string){
             return string.charAt(0).toUpperCase() + string.slice(1);

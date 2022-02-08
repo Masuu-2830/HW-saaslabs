@@ -1,6 +1,9 @@
 <template>
-  <div class="integration-sidebar bd-l" style="width: 300px; background: white">
-    
+  <!-- <div  class="integration-sidebar bd-l" style="width: 50px; background: white"> -->
+    <!-- <div
+      class="df-settings df-contact-settings d-none d-md-block"
+      :class="ifIntOpen && 'show'"
+    > -->
       <!-- <a
         id="dfSettingsShow"
         @click="openInt"
@@ -29,7 +32,7 @@
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
       </a> -->
-      <div class="df-settings-body pd-l-10 pd-r-15">
+      <div v-if="Object.keys(thread).length !== 0" class="df-settings-body pd-l-10 pd-r-15">
         <div id="contactDetailsWrapper" style="">
           <div class="pd-t-20">
             <!-- <div id="chatUser-name-window"> -->
@@ -1266,8 +1269,10 @@
             </div>
           </div>
         </div>
-    </div>
-  </div>
+      </div>
+      <!-- <IntegrationContainer></IntegrationContainer> -->
+    <!-- </div> -->
+  <!-- </div> -->
 </template>
 
 <script>
@@ -1689,8 +1694,8 @@ export default {
 };
 </script>
 
-<style>
-.df-settings-body {
+<style scoped>
+    .df-settings-body {
         position: unset;
         width: 300px !important;
         top: 0;
