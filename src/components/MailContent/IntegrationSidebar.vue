@@ -918,7 +918,6 @@
                         </div>
                     </div>
 
-
                     <!-- Component for E-commerce -->
                     <div class="pd-y-10" v-if= "sidebar.type == 'e-commerce'">
                         <div class="collapse-body shadow-sm bg-white rounded">
@@ -1163,6 +1162,7 @@
                             </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
         </div>
