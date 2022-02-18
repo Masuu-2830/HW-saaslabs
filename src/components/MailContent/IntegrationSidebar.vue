@@ -20,9 +20,9 @@
                     <!-- Component for CRM -->
                     <div class="pd-y-10" v-if= "sidebar.type == 'crm' || sidebar.type == 'custom-app'">
                         <div class="integration-collapse-body shadow-sm bg-white rounded" style="border-style: solid;border-width: thin;border-color: rgb(210, 210, 210);">
-                            <div class="collapse-header row custom-header" style="cursor: pointer;height:50px;">
+                            <div class="collapse-header row custom-header" style="cursor: pointer;">
                                 <div class="col-8">
-                                    <p class="pd-l-13 pd-t-15">
+                                    <p class="pd-l-13 pd-t-15 pd-b-10 mg-b-0">
                                         <i :class="sidebar.icon"></i>
                                         <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:5px;margin-right:5px;">{{ sidebar.title }}</span>
                                         <i v-if="sidebar.update==1 && sidebar.component_type=='single'" class="fas fa-xs fa-pen" :class="integrationName + '_' + sidebar.class + '_edit_button'" @click="openUpdateForm(sidebar.class, sidebar.components[0], integrationName)"></i>
@@ -41,11 +41,11 @@
                                     <p v-for= "(component, index) in sidebar.components[0]"
                                         :key = "index"
                                     >
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='email') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">
                                             {{ component.label }}
                                         </span>
-                                        <br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='tags') && component.show == 1">
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number') && component.show == 1" style="color:#4f5d6b;font-size:13px;">
+                                        <br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='tags' || component.type=='email') && component.show == 1">
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='email') && component.show == 1" style="color:#4f5d6b;font-size:13px;">
                                             {{component.value ? component.value : 'No ' + component.label}}
                                         </span>
                                         <span v-else-if="component.type=='link' && component.show == 1">
@@ -72,9 +72,9 @@
                                         </span>
                                         <span v-else-if="(component.type=='single_component' || component.type=='multiple_component') && component.show == 1">
                                             <div class="collapse-body shadow-sm bg-white rounded mg-y-10" style="border-style: solid; border-width: thin; border-color: rgb(210, 210, 210);">
-                                                <div class="collapse-header row custom-header" style="cursor: pointer;height:50px;">
+                                                <div class="collapse-header row custom-header" style="cursor: pointer;">
                                                     <div class="col-8">
-                                                        <p class="pd-l-13 pd-t-15">
+                                                        <p class="pd-l-13 pd-t-15 pd-b-10 mg-b-0">
                                                             {{ component.label }}
                                                         </p>  
                                                     </div>
@@ -90,8 +90,8 @@
                                                         <p v-for= "(comp, index) in component.value"
                                                             :key = "index"
                                                         >
-                                                            <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ comp.label }}</span><br v-if="(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1">
-                                                            <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number') && comp.show == 1" style="color:#4f5d6b;font-size:13px;">{{comp.value ? comp.value : 'No ' + comp.label}}</span>
+                                                            <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list' || comp.type=='email') && comp.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ comp.label }}</span><br v-if="(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list' || comp.type=='email') && comp.show == 1">
+                                                            <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='email') && comp.show == 1" style="color:#4f5d6b;font-size:13px;">{{comp.value ? comp.value : 'No ' + comp.label}}</span>
                                                             <span v-else-if="comp.type=='link' && comp.show == 1">
                                                                 <a :href="comp.value" target="_blank">{{comp.label}}
                                                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -208,9 +208,9 @@
                                                 </span>
                                                 <span v-else-if="(com.type=='single_component' || com.type=='multiple_component')">
                                                     <div class="collapse-body shadow-sm bg-white rounded mg-y-10" style="border-style: solid; border-width: thin; border-color: rgb(210, 210, 210);">
-                                                        <div class="collapse-header row custom-header" style="cursor: pointer;height:50px;">
+                                                        <div class="collapse-header row custom-header" style="cursor: pointer;">
                                                             <div class="col-8">
-                                                                <p class="pd-l-13 pd-t-15">
+                                                                <p class="pd-l-13 pd-t-15 pd-b-10 mg-b-0">
                                                                     {{ com.label }}
                                                                 </p>  
                                                             </div>
@@ -226,8 +226,8 @@
                                                                 <p v-for= "(comp, index) in com.value"
                                                                     :key = "index"
                                                                 >
-                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ comp.label }}</span><br v-if="(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1">
-                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number') && comp.show == 1" style="color:#4f5d6b;font-size:13px;">{{comp.value ? comp.value : 'No ' + comp.label}}</span>
+                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list' || comp.type=='email') && comp.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ comp.label }}</span><br v-if="(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list' || comp.type=='email') && comp.show == 1">
+                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='email') && comp.show == 1" style="color:#4f5d6b;font-size:13px;">{{comp.value ? comp.value : 'No ' + comp.label}}</span>
                                                                     <span v-else-if="comp.type=='link' && comp.show == 1">
                                                                         <a :href="comp.value" target="_blank">{{comp.label}}
                                                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -331,6 +331,7 @@
                                                 <label v-if="createComponent.type!='button' && createComponent.type!='input_field'" class="d-block">{{ createComponent.label }}</label>
                                                 <input v-if="createComponent.type == 'text' || createComponent.type == 'number'" min="0" :max="createComponent.type == 'number' ? createComponent.max : ''" :type="createComponent.type" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
                                                 :placeholder="createComponent.placeholder">
+                                                <input v-else-if="createComponent.type == 'email'" type="email" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class" :value="createComponent.value" readonly="true">
                                                 <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class">
                                                     <option v-for= "(option, index) in createComponent.dropdown"
                                                     :key= "index"
@@ -359,10 +360,10 @@
                                                     <button type="button" class="mb-2 btn btn-xs btn-primary" :class="createComponent.class" @click="addRandomData(createComponent, integrationName, integrationID, sidebar.class, 'create','create_'+ sidebar.class + '_' + createComponent.class + '_div')">{{ createComponent.label }}</button>
                                                 </span>
                                                 <span v-else-if="createComponent.type=='date'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
+                                                    <date-picker :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false" style="width: 100%;"></date-picker>
                                                 </span>
                                                 <span v-else-if="createComponent.type=='datetime'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
+                                                    <date-picker :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false" style="width: 100%;"></date-picker>
                                                 </span>
                                                 <div class="invalid-feedback" :class="integrationName + '-create-' + sidebar.class + '-' + createComponent.class + '-error'"></div>
                                             </div>
@@ -390,6 +391,7 @@
                                                 <label class="d-block">{{ updateComponent.label }}</label>
                                                 <input v-if="updateComponent.type == 'text' || updateComponent.type == 'number'" min="0" :max="updateComponent.type == 'number'? updateComponent.max : ''" :type="updateComponent.type" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class"
                                                 :placeholder="updateComponent.placeholder" :value="formData[sidebar.class][updateComponent.label]">
+                                                <input v-else-if="updateComponent.type == 'email'" type="email" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class" :value="updateComponent.value" readonly="true">
                                                 <select v-if="updateComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class">
                                                     <option v-for= "(option, index) in updateComponent.dropdown"
                                                     :key= "index"
@@ -397,10 +399,10 @@
                                                     </option>
                                                 </select>
                                                 <span v-else-if="updateComponent.type=='date'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
+                                                    <date-picker :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class" :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false" style="width: 100%;"></date-picker>
                                                 </span>
                                                 <span v-else-if="updateComponent.type=='datetime'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
+                                                    <date-picker :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class" :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false" style="width: 100%;"></date-picker>
                                                 </span>
                                                 <div class="invalid-feedback" :class="integrationName + '-edit-' + sidebar.class + '-' + updateComponent.class + '-error'"></div>
                                             </div>
@@ -423,10 +425,22 @@
 
                     <!-- Multiple Component for Calendar -->
                     <div class="pd-y-10" v-if= "sidebar.type == 'calendar'">
+                        <div class="col s12 pd-x-0">
+                            <form>
+                                <fieldset class="form-fieldset pd-x-0 pd-y-0" style="border: none;">
+                                    <div>
+                                        <label class="tx-color-03 d-block pt-2">Search Event</label>
+                                        <date-picker :class="integrationName+'_search_event'" :open.sync="searchDateOpen" @change="searchEvent" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false" style="width: 100%;"></date-picker>
+                                    </div> 
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="pd-y-10" v-if= "sidebar.type == 'calendar'">
                         <div class="integration-collapse-body shadow-sm bg-white rounded" style="border-style: solid;border-width: thin;border-color: rgb(210, 210, 210);">
-                            <div class="row integration_header" style="cursor: pointer;height:50px;">
+                            <div class="row integration_header" style="cursor: pointer;">
                                 <div class="col-8">
-                                    <p class="pd-l-13 pd-t-15">
+                                    <p class="pd-l-13 pd-t-15 pd-b-10 mg-b-0">
                                         <i :class="sidebar.icon"></i>
                                         <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:5px;margin-right:5px;">{{ sidebar.title }}</span>
                                     </p>
@@ -438,8 +452,12 @@
                                 </div>
                             </div>
                             <div class="pd-l-0 pd-b-1 collapse show" :class="sidebar.class + '_integration_collapsible'" style="word-wrap: break-word;line-height: 1.5;">
-                                <div class="pd-5">
+                                <!-- no component -->
+                                <div v-if="sidebar.component_type == 'no'" class="col s12" :class="'no_' + sidebar.class + '_component'">
+                                    <p style="color:#4f5d6b;">{{ sidebar.text }}</p>
+                                </div>
 
+                                <div v-else-if="sidebar.component_type == 'multiple'" class="pd-5">
                                     <div class="card rounded mg-b-10" v-for= "(component, index) in sidebar.components"
                                         :key= "index"
                                     >
@@ -454,8 +472,8 @@
                                             <p v-for= "(com, index) in component"
                                                 :key = "index"
                                             >   
-                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags' || com.type=='list') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags' || com.type=='list') && com.show == 1">
-                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
+                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='datetime1' || com.type=='number' || com.type=='tags' || com.type=='list') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='datetime1' || com.type=='number' || com.type=='tags' || com.type=='list') && com.show == 1">
+                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='datetime1') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
                                                 <span v-else-if="com.type=='link' && com.show == 1">
                                                     <a :href="com.value" target="_blank">{{com.label}}
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -510,66 +528,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col s12 mg-b-10" v-if="sidebarData.create[sidebar.class]" style="text-align: center;">
-                                    <button type="button" :class="integrationName + '_add_' + sidebar.class + '_btn'" class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">New
-                                        {{ capitalizeFirstLetter(sidebar.class) }}
-                                    </button>
-                                </div>
-                                <div class="col s12 pd-x-0" :class="integrationName + '_create_' + sidebar.class + '_form'" v-if="sidebarData.create[sidebar.class] && openCreateFormArrayInternal[sidebar.class]">
-                                    <form :class="'create_'+sidebar.class+'_form_field'">
-                                        <fieldset class="form-fieldset pd-x-10" style="border: none;">
 
-                                            <div v-for = "(createComponent, index) in sidebarData.create[sidebar.class].components"
-                                                :key = "index"
-                                                class="form-group">
-                                                <label v-if="createComponent.type!='button' && createComponent.type!='input_field'" class="d-block">{{ createComponent.label }}</label>
-                                                <input v-if="createComponent.type == 'text' || createComponent.type == 'number'" min="0" :max="createComponent.type == 'number' ? createComponent.max : ''" :type="createComponent.type" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
-                                                :placeholder="createComponent.placeholder">
-                                                <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class">
-                                                    <option v-for= "(option, index) in createComponent.dropdown"
-                                                    :key= "index"
-                                                    :value="option.value">{{ option.label }}
-                                                    </option>
-                                                </select>
-                                                <span v-if="createComponent.type=='button'">
-                                                    <div :class="'create_'+ sidebar.class + '_' + createComponent.class + '_div'">
-                                                        <div v-for= "(emailValue, index) in guestEmails"
-                                                        :key= "index"
-                                                        class="mg-t-10 d-flex align-items-center justify-content-between">
-                                                            <div class="form-group pd-l-0" style="width: -webkit-fill-available;">
-                                                                <label class="d-block">{{ capitalizeFirstLetter(createComponent.class) }} {{ index + 1 }}</label>
-                                                                <input type="text" class="form-control" :placeholder="createComponent.placeholder" :name="'create_'+createComponent.name" :value="emailValue">
-                                                            </div>
-                                                            <div class="form-group mg-b-0 pd-l-10">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index, emailValue)">
-                                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                                                </svg>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="mb-2 btn btn-xs btn-primary" :class="createComponent.class" @click="addRandomData(createComponent, integrationName, integrationID, sidebar.class, 'create','create_'+ sidebar.class + '_' + createComponent.class + '_div')">{{ createComponent.label }}</button>
-                                                </span>
-                                                <span v-else-if="createComponent.type=='date'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
-                                                </span>
-                                                <span v-else-if="createComponent.type=='datetime'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
-                                                </span>
-                                                <div class="invalid-feedback" :class="integrationName + '-create-' + sidebar.class + '-' + createComponent.class + '-error'"></div>
-                                            </div>
-                                            
-                                            <div :class="integrationName + '-create-' + sidebar.class + '-btn-progress'" style="display: flex; justify-content: space-between;">
-                                                <button type="button"
-                                                    class="btn btn-xs btn-primary" @click="createData(sidebar.class, sidebarData.create[sidebar.class].components, integrationName, integrationID)">Create {{sidebar.class}}
-                                                </button>
-                                                <button type="button"
-                                                    class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">Cancel
-                                                </button>
-                                            </div>
-                                        </fieldset>
-                                    </form>
-                                </div>
                                 <div class="col s12 pd-x-0" :class="integrationName + '_edit_' + sidebar.class + '_form'" v-if="openUpdateFormArrayInternal[sidebar.class] && sidebar.update==1">
                                     <form :class="'edit_'+sidebar.class+'_form_field'">
                                         <fieldset class="form-fieldset pd-x-10" style="border: none;">
@@ -580,6 +539,7 @@
                                                 <label v-if="updateComponent.type!='button' && updateComponent.type!='input_field'" class="d-block">{{ updateComponent.label }}</label>
                                                 <input v-if="updateComponent.type == 'text' || updateComponent.type == 'number'" min="0" :max="updateComponent.type == 'number'? updateComponent.max : ''" :type="updateComponent.type" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class"
                                                 :placeholder="updateComponent.placeholder" :value="formData[sidebar.class][updateComponent.label]">
+                                                <input v-else-if="updateComponent.type == 'email'" type="email" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class" :value="updateComponent.value" readonly="true">
                                                 <select v-if="updateComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class">
                                                     <option v-for= "(option, index) in updateComponent.dropdown"
                                                     :key= "index"
@@ -606,10 +566,10 @@
                                                     <button type="button" class="mb-2 btn btn-xs btn-primary" :class="updateComponent.class" @click="addRandomData(updateComponent, integrationName, integrationID, sidebar.class, 'edit','edit_'+ sidebar.class + '_' + updateComponent.class + '_div')">{{ updateComponent.label }}</button>
                                                 </span>
                                                 <span v-else-if="updateComponent.type=='date'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
+                                                    <date-picker :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class" :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false" style="width: 100%;"></date-picker>
                                                 </span>
                                                 <span v-else-if="updateComponent.type=='datetime'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
+                                                    <date-picker :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class" :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false" style="width: 100%;"></date-picker>
                                                 </span>
                                                 <div class="invalid-feedback" :class="integrationName + '-edit-' + sidebar.class + '-' + updateComponent.class + '-error'"></div>
                                             </div>
@@ -627,6 +587,71 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- create form -->
+                        <div class="col s12 mg-b-10 mg-t-10" v-if="sidebarData.create[sidebar.class]" style="text-align: center;">
+                            <button type="button" :class="integrationName + '_add_' + sidebar.class + '_btn'" class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">New
+                                {{ capitalizeFirstLetter(sidebar.class) }}
+                            </button>
+                        </div>
+                        <div class="col s12 pd-x-0" :class="integrationName + '_create_' + sidebar.class + '_form'" v-if="sidebarData.create[sidebar.class] && openCreateFormArrayInternal[sidebar.class]">
+                            <form :class="'create_'+sidebar.class+'_form_field'">
+                                <fieldset class="form-fieldset pd-x-10" style="border: none;">
+
+                                    <div v-for = "(createComponent, index) in sidebarData.create[sidebar.class].components"
+                                        :key = "index"
+                                        class="form-group">
+                                        <label v-if="createComponent.type!='button' && createComponent.type!='input_field'" class="d-block">{{ createComponent.label }}</label>
+                                        <input v-if="createComponent.type == 'text' || createComponent.type == 'number'" min="0" :max="createComponent.type == 'number' ? createComponent.max : ''" :type="createComponent.type" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
+                                        :placeholder="createComponent.placeholder">
+                                        <input v-else-if="createComponent.type == 'email'" type="email" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class" :value="createComponent.value" readonly="true">
+                                        <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class">
+                                            <option v-for= "(option, index) in createComponent.dropdown"
+                                            :key= "index"
+                                            :value="option.value">{{ option.label }}
+                                            </option>
+                                        </select>
+                                        <span v-if="createComponent.type=='button'">
+                                            <div :class="'create_'+ sidebar.class + '_' + createComponent.class + '_div'">
+                                                <div v-for= "(emailValue, index) in guestEmails"
+                                                :key= "index"
+                                                class="mg-t-10 d-flex align-items-center justify-content-between">
+                                                    <div class="form-group pd-l-0" style="width: -webkit-fill-available;">
+                                                        <label class="d-block">{{ capitalizeFirstLetter(createComponent.class) }} {{ index + 1 }}</label>
+                                                        <input type="text" class="form-control" :placeholder="createComponent.placeholder" :name="'create_'+createComponent.name" :value="emailValue">
+                                                    </div>
+                                                    <div class="form-group mg-b-0 pd-l-10">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index, emailValue)">
+                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="mb-2 btn btn-xs btn-primary" :class="createComponent.class" @click="addRandomData(createComponent, integrationName, integrationID, sidebar.class, 'create','create_'+ sidebar.class + '_' + createComponent.class + '_div')">{{ createComponent.label }}</button>
+                                        </span>
+                                        <span v-else-if="createComponent.type=='date'">
+                                            <date-picker :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false" style="width: 100%;"></date-picker>
+                                        </span>
+                                        <span v-else-if="createComponent.type=='datetime'">
+                                            <date-picker :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false" style="width: 100%;"></date-picker>
+                                        </span>
+                                        <span v-else-if="createComponent.type=='datetime1'">
+                                            <date-picker :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" :open.sync="newDateOpen1" @change="handleChange1" type="datetime" v-model="datetime1" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false" style="width: 100%;"></date-picker>
+                                        </span>
+                                        <div class="invalid-feedback" :class="integrationName + '-create-' + sidebar.class + '-' + createComponent.class + '-error'"></div>
+                                    </div>
+                                    
+                                    <div :class="integrationName + '-create-' + sidebar.class + '-btn-progress'" style="display: flex; justify-content: space-between;">
+                                        <button type="button"
+                                            class="btn btn-xs btn-primary" @click="createData(sidebar.class, sidebarData.create[sidebar.class].components, integrationName, integrationID)">Create {{sidebar.class}}
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">Cancel
+                                        </button>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
                     </div>
 
                     <!-- Component for Project Management -->
@@ -641,12 +666,13 @@
                             </select>
                         </div>
 
-                        <div v-if="sidebar.final==1" class="integration-collapse-body shadow-sm bg-white rounded" style="border-style: solid;border-width: thin;border-color: rgb(210, 210, 210);">
-                            <div class="row integration_header" style="cursor: pointer;height:50px;">
+                        <div v-if="sidebar.final==1" class="integration-collapse-body shadow-sm bg-white rounded mg-t-10" style="border-style: solid;border-width: thin;border-color: rgb(210, 210, 210);">
+                            <div class="row integration_header" style="cursor: pointer;">
                                 <div class="col-8">
-                                    <p class="pd-l-13 pd-t-15">
+                                    <p class="pd-l-13 pd-t-15 pd-b-10 mg-b-0">
                                         <i :class="sidebar.icon"></i>
-                                        <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:5px;margin-right:5px;">{{ sidebar.title }}</span>
+                                        <span v-if="integrationName=='asana'" class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:5px;margin-right:5px;">{{ sidebar.components[0][1]['value'] }}</span>
+                                        <span v-else class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:5px;margin-right:5px;">{{ sidebar.title }}</span>
                                         <i v-if="sidebar.update==1 && sidebar.component_type=='single'" class="fas fa-xs fa-pen" :class="integrationName + '_' + sidebar.class + '_edit_button'" @click="openUpdateForm(sidebar.class, sidebar.components[0], integrationName)"></i>
                                     </p>
                                 </div>
@@ -657,12 +683,15 @@
                                 </div>
                             </div>
                             <div class="pd-l-0 pd-b-1 collapse show" :class="sidebar.class + '_integration_collapsible'" style="word-wrap: break-word;line-height: 1.5;">
-                                <div v-if="sidebar.component_type == 'single'" class="col s12 integration_component_details">
+                                <div v-if="sidebar.component_type == 'no'" class="col s12" :class="'no_' + sidebar.class + '_component'">
+                                    <p style="color:#4f5d6b;">{{ sidebar.text }}</p>
+                                </div>
+                                <div v-else-if="sidebar.component_type == 'single'" class="col s12 integration_component_details">
                                     <p v-for= "(component, index) in sidebar.components[0]"
                                         :key = "index"
                                     >
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='list') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='list') && component.show == 1">
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number') && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='list' || component.type=='email') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='list' || component.type=='email') && component.show == 1">
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='email') && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
                                         <span v-else-if="component.type=='link' && component.show == 1">
                                             <a :href="component.value" target="_blank">{{component.label}}
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -793,72 +822,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col s12 mg-b-10" v-if="sidebarData.create[sidebar.class]" style="text-align: center;">
-                                    <button type="button" :class="integrationName + '_add_' + sidebar.class + '_btn'" class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">New
-                                        {{ capitalizeFirstLetter(sidebar.class) }}
-                                    </button>
-                                </div>
-                                <div class="col s12 pd-x-0" :class="integrationName + '_create_' + sidebar.class + '_form'" v-if="sidebarData.create[sidebar.class] && openCreateFormArrayInternal[sidebar.class]">
-                                    <form :class="'create_'+sidebar.class+'_form_field'">
-                                        <fieldset class="form-fieldset pd-x-10" style="border: none;">
-
-                                            <div v-for = "(createComponent, index) in sidebarData.create[sidebar.class].components"
-                                                :key = "index"
-                                                class="form-group">
-                                                <label v-if="createComponent.type!='button' && createComponent.type!='input_field'" class="d-block">{{ createComponent.label }}</label>
-                                                <input v-if="createComponent.type == 'text' || createComponent.type == 'number'" min="0" :max="createComponent.type == 'number' ? createComponent.max : ''" :type="createComponent.type" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
-                                                :placeholder="createComponent.placeholder">
-                                                <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class">
-                                                    <option v-for= "(option, index) in createComponent.dropdown"
-                                                    :key= "index"
-                                                    :value="option.value">{{ option.label }}
-                                                    </option>
-                                                </select>
-                                                <select v-if="createComponent.type == 'dropdown_api'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" @change="callRandomApi(integrationName, createComponent.class, createComponent.api, integrationID, createComponent.attributes, createComponent.email, $event, 'create', sidebar.class)">
-                                                    <option v-for= "(option, index) in createComponent.dropdown"
-                                                    :key= "index"
-                                                    :value="option.value">{{ option.label }}
-                                                    </option>
-                                                </select>
-                                                <span v-if="createComponent.type=='button'">
-                                                    <div :class="'create_'+ sidebar.class + '_' + createComponent.class + '_div'">
-                                                        <div v-for= "(emailValue, index) in guestEmails"
-                                                        :key= "index"
-                                                        class="mg-t-10 d-flex align-items-center justify-content-between">
-                                                            <div class="form-group pd-l-0" style="width: -webkit-fill-available;">
-                                                                <label class="d-block">{{ capitalizeFirstLetter(createComponent.class) }} {{ index + 1 }}</label>
-                                                                <input type="text" class="form-control" :placeholder="createComponent.placeholder" :name="'create_'+createComponent.name" :value="emailValue">
-                                                            </div>
-                                                            <div class="form-group mg-b-0 pd-l-10">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index, emailValue)">
-                                                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                                                                </svg>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="mb-2 btn btn-xs btn-primary" :class="createComponent.class" @click="addRandomData(createComponent, integrationName, integrationID, sidebar.class, 'create','create_'+ sidebar.class + '_' + createComponent.class + '_div')">{{ createComponent.label }}</button>
-                                                </span>
-                                                <span v-else-if="createComponent.type=='date'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
-                                                </span>
-                                                <span v-else-if="createComponent.type=='datetime'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
-                                                </span>
-                                                <div class="invalid-feedback" :class="integrationName + '-create-' + sidebar.class + '-' + createComponent.class + '-error'"></div>
-                                            </div>
-                                            
-                                            <div :class="integrationName + '-create-' + sidebar.class + '-btn-progress'" style="display: flex; justify-content: space-between;">
-                                                <button type="button"
-                                                    class="btn btn-xs btn-primary" @click="createData(sidebar.class, sidebarData.create[sidebar.class].components, integrationName, integrationID)">Create {{sidebar.class}}
-                                                </button>
-                                                <button type="button"
-                                                    class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">Cancel
-                                                </button>
-                                            </div>
-                                        </fieldset>
-                                    </form>
-                                </div>
                                 <div class="col s12 pd-x-0" :class="integrationName + '_edit_' + sidebar.class + '_form'" v-if="openUpdateFormArrayInternal[sidebar.class] && sidebar.update==1">
                                     <form :class="'edit_'+sidebar.class+'_form_field'">
                                         <fieldset class="form-fieldset pd-x-10" style="border: none;">
@@ -869,6 +832,7 @@
                                                 <label v-if="updateComponent.type!='button' && updateComponent.type!='input_field'" class="d-block">{{ updateComponent.label }}</label>
                                                 <input v-if="updateComponent.type == 'text' || updateComponent.type == 'number'" min="0" :max="updateComponent.type == 'number'? updateComponent.max : ''" :type="updateComponent.type" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class"
                                                 :placeholder="updateComponent.placeholder" :value="formData[sidebar.class][updateComponent.label]">
+                                                <input v-else-if="updateComponent.type == 'email'" type="email" class="form-control" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class" :value="updateComponent.value" readonly="true">
                                                 <select v-if="updateComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class">
                                                     <option v-for= "(option, index) in updateComponent.dropdown"
                                                     :key= "index"
@@ -895,10 +859,10 @@
                                                     <button type="button" class="mb-2 btn btn-xs btn-primary" :class="updateComponent.class" @click="addRandomData(updateComponent, integrationName, integrationID, sidebar.class, 'edit','edit_'+ sidebar.class + '_' + updateComponent.class + '_div')">{{ updateComponent.label }}</button>
                                                 </span>
                                                 <span v-else-if="updateComponent.type=='date'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false"></date-picker>
+                                                    <date-picker :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class" :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false" style="width: 100%;"></date-picker>
                                                 </span>
                                                 <span v-else-if="updateComponent.type=='datetime'">
-                                                    <date-picker :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false"></date-picker>
+                                                    <date-picker :class="integrationName + '_edit_' + sidebar.class + '_' + updateComponent.class" :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false" style="width: 100%;"></date-picker>
                                                 </span>
                                                 <div class="invalid-feedback" :class="integrationName + '-edit-' + sidebar.class + '-' + updateComponent.class + '-error'"></div>
                                             </div>
@@ -916,14 +880,82 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col s12 mg-b-10 mg-t-10" v-if="sidebarData.create[sidebar.class]" style="text-align: center;">
+                            <button type="button" :class="integrationName + '_add_' + sidebar.class + '_btn'" class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">New
+                                {{ capitalizeFirstLetter(sidebar.class) }}
+                            </button>
+                        </div>
+                        <div class="col s12 pd-x-0" :class="integrationName + '_create_' + sidebar.class + '_form'" v-if="sidebarData.create[sidebar.class] && openCreateFormArrayInternal[sidebar.class]">
+                            <form :class="'create_'+sidebar.class+'_form_field'">
+                                <fieldset class="form-fieldset pd-x-10" style="border: none;">
+
+                                    <div v-for = "(createComponent, index) in sidebarData.create[sidebar.class].components"
+                                        :key = "index"
+                                        class="form-group">
+                                        <label v-if="createComponent.type!='button' && createComponent.type!='input_field'" class="d-block">{{ createComponent.label }}</label>
+                                        <input v-if="createComponent.type == 'text' || createComponent.type == 'number'" min="0" :max="createComponent.type == 'number' ? createComponent.max : ''" :type="createComponent.type" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
+                                        :placeholder="createComponent.placeholder">
+                                        <input v-else-if="createComponent.type == 'email'" type="email" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class" :value="createComponent.value" readonly="true">
+                                        <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class">
+                                            <option v-for= "(option, index) in createComponent.dropdown"
+                                            :key= "index"
+                                            :value="option.value">{{ option.label }}
+                                            </option>
+                                        </select>
+                                        <select v-if="createComponent.type == 'dropdown_api'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" @change="callRandomApi(integrationName, createComponent.class, createComponent.api, integrationID, createComponent.attributes, createComponent.email, $event, 'create', sidebar.class)">
+                                            <option v-for= "(option, index) in createComponent.dropdown"
+                                            :key= "index"
+                                            :value="option.value">{{ option.label }}
+                                            </option>
+                                        </select>
+                                        <span v-if="createComponent.type=='button'">
+                                            <div :class="'create_'+ sidebar.class + '_' + createComponent.class + '_div'">
+                                                <div v-for= "(emailValue, index) in guestEmails"
+                                                :key= "index"
+                                                class="mg-t-10 d-flex align-items-center justify-content-between">
+                                                    <div class="form-group pd-l-0" style="width: -webkit-fill-available;">
+                                                        <label class="d-block">{{ capitalizeFirstLetter(createComponent.class) }} {{ index + 1 }}</label>
+                                                        <input type="text" class="form-control" :placeholder="createComponent.placeholder" :name="'create_'+createComponent.name" :value="emailValue">
+                                                    </div>
+                                                    <div class="form-group mg-b-0 pd-l-10">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index, emailValue)">
+                                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="mb-2 btn btn-xs btn-primary" :class="createComponent.class" @click="addRandomData(createComponent, integrationName, integrationID, sidebar.class, 'create','create_'+ sidebar.class + '_' + createComponent.class + '_div')">{{ createComponent.label }}</button>
+                                        </span>
+                                        <span v-else-if="createComponent.type=='date'">
+                                            <date-picker :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false" style="width: 100%;"></date-picker>
+                                        </span>
+                                        <span v-else-if="createComponent.type=='datetime'">
+                                            <date-picker :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false" style="width: 100%;"></date-picker>
+                                        </span>
+                                        <div class="invalid-feedback" :class="integrationName + '-create-' + sidebar.class + '-' + createComponent.class + '-error'"></div>
+                                    </div>
+                                    
+                                    <div :class="integrationName + '-create-' + sidebar.class + '-btn-progress'" style="display: flex; justify-content: space-between;">
+                                        <button type="button"
+                                            class="btn btn-xs btn-primary" @click="createData(sidebar.class, sidebarData.create[sidebar.class].components, integrationName, integrationID)">Create {{sidebar.class}}
+                                        </button>
+                                        <button type="button"
+                                            class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">Cancel
+                                        </button>
+                                    </div>
+                                </fieldset>
+                            </form>
+                        </div>
                     </div>
 
                     <!-- Component for E-commerce -->
                     <div class="pd-y-10" v-if= "sidebar.type == 'e-commerce'">
                         <div class="collapse-body shadow-sm bg-white rounded">
-                            <div class="collapse-header custom-header row" style="cursor: pointer;height:50px;">
+                            <div class="collapse-header custom-header row" style="cursor: pointer;">
                                 <div class="col-8">
-                                    <p class="pd-l-13 pd-t-15" style="display:flex;align-items:center;">
+                                    <p class="pd-l-13 pd-t-15 pd-b-10 mg-b-0" style="display:flex;align-items:center;">
                                         <i :class="sidebar.icon"></i>
                                         <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:10px;">{{ sidebar.title }}</span>
                                     </p>
@@ -942,8 +974,8 @@
                                     <p v-for= "(component, index) in sidebar.components[0]"
                                         :key = "index"
                                     >
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags') && component.show == 1">
-                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number') && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='email') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ component.label }}</span><br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='email') && component.show == 1">
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='email') && component.show == 1" style="color:#4f5d6b;font-size:13px;">{{component.value ? component.value : 'No ' + component.label}}</span>
                                         <span v-else-if="component.type=='link' && component.show == 1">
                                             <a :href="component.value" target="_blank">{{component.label}}
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -975,9 +1007,9 @@
                                     :key= "index"
                                     >
                                         <div class="collapse-body shadow-sm bg-white rounded" style="border-style: solid;border-width: thin;border-color: #d2d2d2;">
-                                            <div class="collapse-header custom-header row" style="cursor: pointer;height:50px;">
+                                            <div class="collapse-header custom-header row" style="cursor: pointer;">
                                                 <div class="col-8">
-                                                    <p class="pd-l-13 pd-t-15">
+                                                    <p class="pd-l-13 pd-t-15 pd-b-10 mg-b-0">
                                                         <i :class="store_component.icon"></i>
                                                         <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:10px;">{{ store_component.title }}</span>
                                                     </p>
@@ -999,8 +1031,8 @@
                                                     <p v-for= "(com, index) in store_component.components"
                                                         :key = "index"
                                                     >
-                                                        <span v-if="(com.type=='text'  || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if="(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags') && com.show == 1">
-                                                        <span v-if="(com.type=='text'  || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
+                                                        <span v-if="(com.type=='text'  || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags' || com.type=='email') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if="(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags' || com.type=='email') && com.show == 1">
+                                                        <span v-if="(com.type=='text'  || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='email') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
                                                         <span v-else-if="com.type=='link' && com.show == 1">
                                                             <a :href="com.value" target="_blank">{{com.label}}
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -1046,9 +1078,9 @@
                                                                 <div v-for= "(multi_compo,index) in multi_compos"
                                                                 :key= "index">
                                                                     <div class="collapse-body shadow-sm bg-white rounded mg-y-10" v-if="multi_compo.show==1 && (multi_compo.type == 'multiple_component' || multi_compo.type=='single_component')" style="border-style: solid; border-width: thin; border-color: rgb(210, 210, 210);">
-                                                                        <div class="collapse-header row custom-header" style="cursor: pointer;height:50px;">
+                                                                        <div class="collapse-header row custom-header" style="cursor: pointer;">
                                                                             <div class="col-8">
-                                                                                <p class="pd-l-13 pd-t-15">
+                                                                                <p class="pd-l-13 pd-t-15 pd-b-10 mg-b-0">
                                                                                     {{ multi_compo.label }}
                                                                                     <!-- <i v-if="sidebar.update==1 && sidebar.component_type=='single'" class="fas fa-xs fa-pen" :class="integrationName + '_' + sidebar.class + '_edit_button'" @click="openUpdateForm(sidebar.class, sidebar.components[0], integrationName)"></i> -->
                                                                                 </p>  
@@ -1066,8 +1098,8 @@
                                                                                 <p v-for= "(comp, index) in multi_compo.value"
                                                                                     :key = "index"
                                                                                 >
-                                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ comp.label }}</span><br v-if="(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list') && comp.show == 1">
-                                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number') && comp.show == 1" style="color:#4f5d6b;font-size:13px;">{{comp.value ? comp.value : 'No ' + comp.label}}</span>
+                                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list' || comp.type=='email') && comp.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ comp.label }}</span><br v-if="(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list' || comp.type=='email') && comp.show == 1">
+                                                                                    <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='email') && comp.show == 1" style="color:#4f5d6b;font-size:13px;">{{comp.value ? comp.value : 'No ' + comp.label}}</span>
                                                                                     <span v-else-if="comp.type=='link' && comp.show == 1">
                                                                                         <a :href="comp.value" target="_blank">{{comp.label}}
                                                                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
@@ -1162,7 +1194,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         </div>
@@ -1186,8 +1218,11 @@ export default {
             randomDropdown: [],
             arrayObject: [],
             datetime: "",
+            datetime1: "",
             newDateOpen: false,
-            date: ""
+            newDateOpen1: false,
+            date: "",
+            searchDateOpen: false
         }
     },
     methods: {
@@ -1256,6 +1291,11 @@ export default {
                 let identifier = component.class;
                 let identifier_value = $(`.${int_name}_create_${className}_${identifier}`).val();
                 let identifier_label = component.label;
+                if(component.type == 'date' || component.type == 'datetime' || component.type == 'datetime1'){
+                    identifier_value = $(`.${int_name}_create_${className}_${identifier}`).children().children().val();
+                }
+                console.log("identifier_label",int_name+'_create_'+className+'_'+identifier);
+                console.log("identifier_value",identifier_value);
                 if(component.required == 1 && (identifier_value == '' || identifier_value == 0)){
                     $(`.${int_name}_create_${className}_${identifier}`).removeClass('is-valid').addClass('is-invalid');
                     $(`.${int_name}-create-${className}-${identifier}-error`).text(`${identifier_label} cannot be empty`);
@@ -1330,7 +1370,13 @@ export default {
             components.forEach(component => {
                 let identifier = component.class;
                 let identifier_value = $(`.${int_name}_edit_${className}_${identifier}`).val();
+                // let identifier_value = document.getElementsByClassName(int_name+'_edit_'+className+'_'+identifier)[0].value;
                 let identifier_label = component.label;
+                if(component.type == 'date' || component.type == 'datetime' || component.type == 'datetime1'){
+                    identifier_value = $(`.${int_name}_edit_${className}_${identifier}`).children().children().val();
+                }
+                console.log("identifier_label",int_name+'_edit_'+className+'_'+identifier);
+                console.log("identifier_value",identifier_value);
                 if(component.required == 1 && (identifier_value == '' || identifier_value == 0)){
                     $(`.${int_name}_edit_${className}_${identifier}`).removeClass('is-valid').addClass('is-invalid');
                     $(`.${int_name}-edit-${className}-${identifier}-error`).text(`${identifier_label} cannot be empty`);
@@ -1340,6 +1386,7 @@ export default {
                     $(`.${int_name}-edit-${className}-${identifier}-error`).text('');
                 }
                 updateFormData[identifier] = identifier_value;
+                console.log("component",component);
                 if(component.text_value && component.text_value!= ''){
                     updateFormData[identifier+'_id'] = component.text_value;
                 }
@@ -1559,11 +1606,25 @@ export default {
             console.log("int_name",components);
             console.log("int_name",action);
         },
+        searchEvent(value, type) {
+            console.log("value",value);
+            console.log("type",type);
+            if (type === 'minute') {
+                this.newDateOpen = false;
+            }
+        },
         handleChange(value, type) {
             console.log("value",value);
             console.log("type",type);
             if (type === 'minute') {
                 this.newDateOpen = false;
+            }
+        },
+        handleChange1(value, type) {
+            console.log("value",value);
+            console.log("type",type);
+            if (type === 'minute') {
+                this.newDateOpen1 = false;
             }
         },
         notBeforeToday(date) {
@@ -1610,5 +1671,8 @@ export default {
         font-size: 14px;
         font-weight: 500;
         text-align: center;
+    }
+    .fa-pen{
+        cursor: pointer;
     }
 </style>

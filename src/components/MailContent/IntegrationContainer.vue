@@ -33,7 +33,7 @@
 <script>
     import IntegrationData from './IntegrationData.vue';
     import IntegrationSidebar from './IntegrationSidebar.vue';
-import MailContactPanel from './MailContactPanel.vue';
+    import MailContactPanel from './MailContactPanel.vue';
     export default {
         data(){
             return {
@@ -44,8 +44,8 @@ import MailContactPanel from './MailContactPanel.vue';
                 integrationName: '',
                 integrationID: '',
                 dataStatus: false,
-                openCreateFormArray: {},
-                openUpdateFormArray: {},
+                openCreateFormArray: { 'candidate': false, 'customer': false, 'contact': false, 'deal':false, 'task':false, 'lead':false, 'opportunity':false, 'offer':false, 'company':false, 'card':false, 'subscriber':false, 'event': false },
+                openUpdateFormArray: { 'candidate': false, 'customer': false, 'contact': false, 'deal':false, 'task':false, 'lead':false, 'opportunity':false, 'offer':false, 'company':false, 'card':false, 'subscriber':false,'event': false },
                 errorMsg: 'Please wait for the response.'
             }
         },
@@ -54,6 +54,7 @@ import MailContactPanel from './MailContactPanel.vue';
         methods: {
             openIntegration(integrationData){
                 console.log("integrationData", integrationData);
+                var mailboxID = this.$store.state.inboxData.id;
                 this.$emit("openInt", integrationData);
                 if(integrationData.lname!='contact'){
                     if(this.sidebarOpen == false){
@@ -62,7 +63,7 @@ import MailContactPanel from './MailContactPanel.vue';
                         let threadID = location.pathname.split('/')[3];
                         if(integrationData.lname == 'custom-app'){
                             let pm_data = {};
-                            pm_data['mailbox_id'] = this.$route.params.mailboxId;
+                            pm_data['mailbox_id'] = mailboxID;
                             pm_data['thread_id'] = threadID;
                             pm_data['inbox_type'] = 'mail';
                             // pm_data['contact'] = ;
@@ -107,11 +108,11 @@ import MailContactPanel from './MailContactPanel.vue';
                             });
                         }else{
                             if(integrationData.lname == 'easy-calendar' || integrationData.lname == 'google-calendar' || integrationData.lname == 'outlook-calendar'){
-                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + integrationData.id + "&date=" + date;
+                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + integrationData.id + "&date=" + date;
                             }else if(integrationData.lname == 'asana' || integrationData.lname == 'clickup' || integrationData.lname == 'jira' || integrationData.lname == 'trello'){
-                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + integrationData.id;
+                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + integrationData.id;
                             }else{
-                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=hello@justcall.io&inbox_type=mail&integration_id=" + integrationData.id;
+                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + integrationData.id;
                             }
                             fetch(fetchUrl, {credentials: 'include'})
                             .then(async response => {
@@ -122,6 +123,7 @@ import MailContactPanel from './MailContactPanel.vue';
                                     this.errorMsg = integrationData.message;
                                 }else{
                                     this.sidebarData = integrationData2;
+                                    console.log("this", this.sidebarData);
                                     this.dataStatus = true;
                                     console.log("123");
                                     for(const key in this.sidebarData.create){
@@ -252,15 +254,16 @@ import MailContactPanel from './MailContactPanel.vue';
                 // }, 500);
                 let fetchUrl = '';
                 let date = moment().format("YYYY-MM-DD");
+                let mailboxID = this.$store.state.inboxData.id;
                 if(integration_name == 'custom-app'){
 
                 }else{ 
                     if(integration_name == 'easy-calendar' || integration_name == 'google-calendar' || integration_name == 'outlook-calendar'){
-                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + this.integrationID + "&date=" + date;
+                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + this.integrationID + "&date=" + date;
                     }else if(integration_name == 'asana' || integration_name == 'clickup' || integration_name == 'jira' || integration_name == 'trello'){
-                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + this.integrationID;
+                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + this.integrationID;
                     }else{
-                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + this.integrationID;
+                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + this.integrationID;
                     }
                     fetch(fetchUrl, {
                         method: 'GET', 
@@ -273,8 +276,9 @@ import MailContactPanel from './MailContactPanel.vue';
                         const updateResponse = await response.json();
                         this.sidebarData = [];
                         this.sidebarData = updateResponse.data;
+                        console.log("this.sidevar", this.sidebarData);
                         // check for error response
-                        if (response.status!='success') {
+                        if (response.status!=200 && response.status!='success') {
                             // get error message from body or default to response statusText
                             const error = (updateResponse && updateResponse.message) || response.status;
                             this.errorMsg = error;
@@ -293,7 +297,7 @@ import MailContactPanel from './MailContactPanel.vue';
             }
         },
         created() {
-            fetch("https://app.helpwise.io/api/connected_integrations.php?mailbox_id=" + this.$route.params.mailboxId, {credentials: 'include'})
+            fetch("https://app.helpwise.io/api/connected_integrations.php?mailbox_id=" + this.$store.state.inboxData.id, {credentials: 'include'})
             .then(async response => {
                 const data = await response.json();
                 let data2 = data.data;
