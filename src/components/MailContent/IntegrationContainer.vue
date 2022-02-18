@@ -1,7 +1,6 @@
 <template>
     <div class="integrationContainer bd-l">
-        <div class="integrationIcons d-flex flex-column" :class="{open: sidebarOpen}">
-            <!-- <mail-content-int style="margin-bottom: 40px" @openInt="openContactPanel" :thread="thread"></mail-content-int> -->
+        <div class="integrationIcons d-flex flex-column" :class="{open: sidebarOpen || contactOpen}">
             <IntegrationData
                 v-for = "(integration, index) in integrations"
                 :key = "index"
@@ -18,11 +17,15 @@
                 :integrationID = "integrationID" 
                 v-if = "sidebarOpen"
                 :dataStatus= "dataStatus"
+                :errorMsg= "errorMsg"
                 :openCreateFormArray= "openCreateFormArray"
                 :openUpdateFormArray= "openUpdateFormArray"
                 @postData= "postData"
                 @pmIntegration= "pmIntegration"
             />
+        </div>
+        <div v-if="contactOpen" :class="{open: contactOpen}" style="overflow-y: auto; overflow-x: hidden">
+            <mail-contact-panel :thread="thread"></mail-contact-panel>
         </div>
     </div>
 </template>
@@ -42,116 +45,120 @@ import MailContactPanel from './MailContactPanel.vue';
                 integrationID: '',
                 dataStatus: false,
                 openCreateFormArray: {},
-                openUpdateFormArray: {}
+                openUpdateFormArray: {},
+                errorMsg: 'Please wait for the response.'
             }
         },
         props: ["sidebarOpen", "contactOpen", "thread"],
         components:{IntegrationData, IntegrationSidebar, MailContactPanel},
         methods: {
-            openContactPanel() {
-                this.$emit("openInt", 0);
-            },
             openIntegration(integrationData){
+                console.log("integrationData", integrationData);
                 this.$emit("openInt", integrationData.id);
                 this.integrationName = integrationData.lname;
                 this.integrationID = integrationData.id;
                 this.activeInt = this.integrationName;
-                if(this.sidebarOpen == false){
-                    let fetchUrl = '';
-                    let date = moment().format("YYYY-MM-DD"); 
-                    let threadID = location.pathname.split('/')[3];
-                    if(integrationData.lname == 'custom-app'){
-                        let pm_data = {};
-                        pm_data['mailbox_id'] = this.$route.params.mailboxId;
-                        pm_data['thread_id'] = threadID;
-                        pm_data['inbox_type'] = 'mail';
-                        // pm_data['contact'] = ;
-                        pm_data['integration_id'] = integrationData.id;
-                        fetch("https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php", {
-                            method: 'POST', 
-                            credentials: 'include',
-                            headers: {
-                            'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(pm_data)
-                        })
-                        .then(async response => {
-                            const integrationData = await response.json();
-                            let integrationData2 = integrationData.data;
-                            if(integrationData2.length == 0){
-                                this.dataStatus = false;
-                            }else{
-                                this.sidebarData = integrationData2;
-                                this.dataStatus = true;
-                                for(const key in this.sidebarData.create){
-                                    this.openCreateFormArray[key] = false;
+                if(this.integrationName!='contact'){
+                    if(this.sidebarOpen == false){
+                        let fetchUrl = '';
+                        let date = moment().format("YYYY-MM-DD"); 
+                        let threadID = location.pathname.split('/')[3];
+                        if(integrationData.lname == 'custom-app'){
+                            let pm_data = {};
+                            pm_data['mailbox_id'] = this.$route.params.mailboxId;
+                            pm_data['thread_id'] = threadID;
+                            pm_data['inbox_type'] = 'mail';
+                            // pm_data['contact'] = ;
+                            pm_data['integration_id'] = integrationData.id;
+                            fetch("https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php", {
+                                method: 'POST', 
+                                credentials: 'include',
+                                headers: {
+                                'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify(pm_data)
+                            })
+                            .then(async response => {
+                                const integrationData = await response.json();
+                                let integrationData2 = integrationData.data;
+                                if(integrationData2.length == 0){
+                                    this.dataStatus = false;
+                                    this.errorMsg = integrationData.message;
+                                }else{
+                                    this.sidebarData = integrationData2;
+                                    this.dataStatus = true;
+                                    for(const key in this.sidebarData.create){
+                                        this.openCreateFormArray[key] = false;
+                                    }
+                                    for(const key in this.sidebarData.update){
+                                        this.openUpdateFormArray[key] = false;
+                                    }
                                 }
-                                for(const key in this.sidebarData.update){
-                                    this.openUpdateFormArray[key] = false;
-                                }
-                            }
-                            console.log("integrationData2",integrationData2);
-                            // check for error response
-                            if (!response.status) {
-                                // get error message from body or default to response statusText
-                                const error = (integrationData && integrationData.message) || response.status;
+                                // check for error response
+                                if (response.status!=200 && response.status!='success') {
+                                    // get error message from body or default to response statusText
+                                    const error = (integrationData && integrationData.message) || response.status;
+                                    this.dataStatus = false;
+                                    this.errorMsg = error;
+                                    return Promise.reject(error);
+                                } 
+                            })
+                            .catch(error => {
+                                this.errorMsg = error;
+                                console.error("There was an error!", error);
                                 this.dataStatus = false;
-                                return Promise.reject(error);
-                            } 
-                        })
-                        .catch(error => {
-                            this.errorMessage = error;
-                            console.error("There was an error!", error);
-                            this.dataStatus = false;
-                        });
-                    }else{
-                        if(integrationData.lname == 'easy-calendar' || integrationData.lname == 'google-calendar' || integrationData.lname == 'outlook-calendar'){
-                            fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + integrationData.id + "&date=" + date;
-                        }else if(integrationData.lname == 'asana' || integrationData.lname == 'clickup' || integrationData.lname == 'jira' || integrationData.lname == 'trello'){
-                            fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + integrationData.id;
+                            });
                         }else{
-                            fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=a@justcall.io&inbox_type=mail&integration_id=" + integrationData.id;
-                        }
-                        fetch(fetchUrl, {credentials: 'include'})
-                        .then(async response => {
-                            const integrationData = await response.json();
-                            let integrationData2 = integrationData.data;
-                            if(integrationData2.length == 0){
-                                this.dataStatus = false;
+                            if(integrationData.lname == 'easy-calendar' || integrationData.lname == 'google-calendar' || integrationData.lname == 'outlook-calendar'){
+                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + integrationData.id + "&date=" + date;
+                            }else if(integrationData.lname == 'asana' || integrationData.lname == 'clickup' || integrationData.lname == 'jira' || integrationData.lname == 'trello'){
+                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + integrationData.id;
                             }else{
-                                this.sidebarData = integrationData2;
-                                this.dataStatus = true;
-                                for(const key in this.sidebarData.create){
-                                    this.openCreateFormArray[key] = false;
-                                }
-                                for(const key in this.sidebarData.update){
-                                    this.openUpdateFormArray[key] = false;
-                                }
+                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + integrationData.id;
                             }
-                            console.log("integrationData2",integrationData2);
-                            // check for error response
-                            if (!response.status) {
-                                // get error message from body or default to response statusText
-                                const error = (integrationData && integrationData.message) || response.status;
+                            fetch(fetchUrl, {credentials: 'include'})
+                            .then(async response => {
+                                const integrationData = await response.json();
+                                let integrationData2 = integrationData.data;
+                                if(integrationData2.length == 0){
+                                    this.dataStatus = false;
+                                    this.errorMsg = integrationData.message;
+                                }else{
+                                    this.sidebarData = integrationData2;
+                                    this.dataStatus = true;
+                                    console.log("123");
+                                    for(const key in this.sidebarData.create){
+                                        this.openCreateFormArray[key] = false;
+                                    }
+                                    for(const key in this.sidebarData.update){
+                                        this.openUpdateFormArray[key] = false;
+                                    }
+                                }
+                                console.log("131",response);
+                                // check for error response
+                                if (response.status!=200 && response.status!='success') {
+                                    console.log("133",response);
+                                    // get error message from body or default to response statusText
+                                    const error = (integrationData && integrationData.message) || response.status;
+                                    this.dataStatus = false;
+                                    this.errorMsg = error;
+                                    return Promise.reject(error);
+                                }
+                            })
+                            .catch(error => {
+                                this.errorMsg = error;
                                 this.dataStatus = false;
-                                return Promise.reject(error);
-                            }
-                        })
-                        .catch(error => {
-                            this.errorMessage = error;
-                            console.error("There was an error!", error);
-                            this.dataStatus = false;
-                        });
+                            });
+                        }
+                    }else{
+                        this.sidebarData = [];
                     }
-                }else{
-                    this.sidebarData = [];
                 }
             },
             postData(integration_name){
                 // setTimeout(function () {
                 //     console.log("wait");
                 // }, 500);
-                console.log("integration_name",integration_name);
                 let fetchUrl = '';
                 let date = moment().format("YYYY-MM-DD");
                 if(integration_name == 'custom-app'){
@@ -162,7 +169,7 @@ import MailContactPanel from './MailContactPanel.vue';
                     }else if(integration_name == 'asana' || integration_name == 'clickup' || integration_name == 'jira' || integration_name == 'trello'){
                         fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + this.integrationID;
                     }else{
-                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=a@justcall.io&inbox_type=mail&integration_id=" + this.integrationID;
+                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + this.integrationID;
                     }
                     fetch(fetchUrl, {
                         method: 'GET', 
@@ -176,20 +183,20 @@ import MailContactPanel from './MailContactPanel.vue';
                         this.sidebarData = [];
                         this.sidebarData = updateResponse.data;
                         // check for error response
-                        if (!response.status) {
+                        if (response.status!='success') {
                             // get error message from body or default to response statusText
                             const error = (updateResponse && updateResponse.message) || response.status;
+                            this.errorMsg = error;
                             return Promise.reject(error);
                         }
                     })
                     .catch(error => {
-                        this.errorMessage = error;
+                        this.errorMsg = error;
                         console.error("There was an error!", error);
                     });
                 }
             },
             pmIntegration(integrationData){
-                console.log("fetched Data", integrationData);
                 this.sidebarData = [];
                 this.sidebarData = integrationData;
             }
@@ -211,7 +218,7 @@ import MailContactPanel from './MailContactPanel.vue';
                 }
             })
             .catch(error => {
-                this.errorMessage = error;
+                this.errorMsg = error;
                 console.error("There was an error!", error);
             });
         }

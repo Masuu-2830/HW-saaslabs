@@ -38,11 +38,13 @@
       class="mail-group-body bd-y"
       style="overflow-y: auto; overflow-x: hidden; background-color: white"
     >
-      <div v-if="perPageMails.length !== 0" id="threads-list">
+      <div v-if="this.$store.state.threads.length !== 0" id="threads-list">
         <div
-          v-for="mail in perPageMails"
+          v-for="mail in this.$store.state.threads"
           :key="mail.id"
-          @click="clickThread(mail.id, mail.type, mail.subtype, mail.ticketNumber, mail.isStarred == true)"
+          @click="
+            clickThread(mail.id, mail.type, mail.subtype, mail.ticketNumber)
+          "
         >
           <mail-group-single-mail
             :id="'thread-' + mail.id"
@@ -60,7 +62,7 @@
         id="view-all-threads"
         class="d-flex justify-content-center align-items-center"
       >
-        <button @click.stop.prevent="fetchThreads" class="btn btn-link">
+        <button @click.stop.prevent="broad" class="btn btn-link">
           View All Conversations
         </button>
       </div>
@@ -307,44 +309,54 @@ export default {
         this.activeId = "";
         if (this.isThreadRefresh) {
           router.push({
-            name: "type",
+            name: "page",
             params: {
-              type: this.route,
-              mailboxId: this.$route.params.mailboxId,
+              pageNo: this.currPage,
+              type: this.route ? this.route : this.$store.state.type,
+              mailboxId:
+                this.$route.params.mailboxId !== undefined
+                  ? this.$route.params.mailboxId
+                  : this.$store.state.inboxData.id,
             },
           });
           this.isThreadRefresh = false;
+          this.fetchThreads();
         } else {
+          console.log(this.$store.state.inboxData.id);
           router.push({
             name: "page",
             params: {
               pageNo: this.currPage,
               type: this.route,
-              mailboxId: this.$route.params.mailboxId,
+              mailboxId:
+                this.$route.params.mailboxId !== undefined
+                  ? this.$route.params.mailboxId
+                  : this.$store.state.inboxData.id,
             },
           });
         }
       });
     bus.$on("changeRead", (id, read) => {
       console.log(read);
-      var objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
-      let threadIDs = new Array();
-      threadIDs[0] = id;
+      let mailboxThreadMap = {};
+      let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+      mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+      mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      console.log(mailboxThreadMap);
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxID: this.$route.params.mailboxId,
-          threadIDs,
+          mailboxThreadMap,
         }),
         credentials: "include",
       };
       console.log(requestOptions.body);
       let url;
       if (this.perPageMails[objIndex].isRead && read !== 1) {
-        url = this.$apiBaseURL + "unread-thread.php";
+        url = this.$apiBaseURL + "unifiedv2/unreadThreads.php";
       } else {
-        url = this.$apiBaseURL + "read-thread.php";
+        url = this.$apiBaseURL + "unifiedv2/readThreads.php";
       }
       fetch(url, requestOptions)
         .then(async (response) => {
@@ -362,7 +374,8 @@ export default {
           }
           if (!this.perPageMails[objIndex].isRead && read !== 1) {
             triggerPromptNotif("Conversation marked unread", "success", 1000);
-          } else {
+          }
+          if (this.perPageMails[objIndex].isRead && !this.isCompact) {
             triggerPromptNotif("Conversation marked read", "success", 1000);
           }
         })
@@ -372,24 +385,25 @@ export default {
     });
 
     bus.$on("changeStarred", (id) => {
-      var objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
-      let threadIds = new Array();
-      threadIds[0] = id;
+      let mailboxThreadMap = {};
+      let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+      mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+      mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      console.log(mailboxThreadMap);
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxId: this.$route.params.mailboxId,
-          threadIds,
+          mailboxThreadMap,
         }),
         credentials: "include",
       };
       console.log(requestOptions.body);
       let url = "";
       if (this.perPageMails[objIndex].isStarred) {
-        url = this.$apiBaseURL + "unstarThreads.php";
+        url = this.$apiBaseURL + "unifiedv2/unstarThreads.php";
       } else {
-        url = this.$apiBaseURL + "starThreads.php";
+        url = this.$apiBaseURL + "unifiedv2/starThreads.php";
       }
       fetch(url, requestOptions)
         .then(async (response) => {
@@ -427,13 +441,19 @@ export default {
         mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
       } else if (typeof id == "object") {
         var objIndex;
-        for(let i in id) {
+        for (let i in id) {
           objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
-          if(!(this.perPageMails[objIndex].mailboxId in Object.keys(mailboxThreadMap))) {
-            mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
-          } 
+          if (
+            !(
+              this.perPageMails[objIndex].mailboxId in
+              Object.keys(mailboxThreadMap)
+            )
+          ) {
+            mailboxThreadMap[this.perPageMails[objIndex].mailboxId] =
+              new Array();
+          }
         }
-        for(let i in id) {
+        for (let i in id) {
           objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
           mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id[i]);
         }
@@ -443,7 +463,7 @@ export default {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxThreadMap
+          mailboxThreadMap,
         }),
         credentials: "include",
       };
@@ -465,6 +485,7 @@ export default {
               (item) => item.id !== threadIDs[i]
             );
           }
+          bus.$emit("fetchSideBarStats");
           const limit = threadIDs.length;
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIDs.length;
@@ -472,7 +493,7 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -482,7 +503,7 @@ export default {
           } else {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -501,6 +522,8 @@ export default {
             for (let i = 0; i < data.data.threads.length; i++) {
               this.perPageMails.push(data.data.threads[i]);
             }
+            // this.$store.state.threads = this.perPageMails;
+            this.$store.dispatch("updateThreads", this.perPageMails);
           });
         })
         .catch((error) => {
@@ -514,6 +537,31 @@ export default {
       } else if (typeof id == "object") {
         threadIDs = id;
       }
+      let mailboxThreadMap = {};
+      if (typeof id == "number") {
+        let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      } else if (typeof id == "object") {
+        var objIndex;
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          if (
+            !(
+              this.perPageMails[objIndex].mailboxId in
+              Object.keys(mailboxThreadMap)
+            )
+          ) {
+            mailboxThreadMap[this.perPageMails[objIndex].mailboxId] =
+              new Array();
+          }
+        }
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id[i]);
+        }
+      }
+      console.log(mailboxThreadMap);
       let unspam = false;
       if (this.labelId == 8) {
         unspam = true;
@@ -522,20 +570,20 @@ export default {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxID: this.$route.params.mailboxId,
-          threadIDs,
+          mailboxThreadMap,
           unspam,
         }),
         credentials: "include",
       };
-      fetch(this.$apiBaseURL + "restoreThreads.php", requestOptions)
+      fetch(this.$apiBaseURL + "unifiedv2/restoreThreads.php", requestOptions)
         .then(async (response) => {
           const data = await response.json();
-          if (data.message !== "thread restored") {
+          if (data.status !== "success") {
             const error = (data && data.message) || response.status;
             triggerPromptNotif(error, "error", 3000);
             return Promise.reject(error);
           }
+          bus.$emit("fetchSideBarStats");
           if (typeof id == "number") {
             triggerPromptNotif("Conversation moved to inbox", "success", 1000);
           } else if (typeof id == "object") {
@@ -553,7 +601,7 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -563,7 +611,7 @@ export default {
           } else {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -582,6 +630,7 @@ export default {
             for (let i = 0; i < data.data.threads.length; i++) {
               this.perPageMails.push(data.data.threads[i]);
             }
+            this.$store.dispatch("updateThreads", this.perPageMails);
           });
         })
         .catch((error) => {
@@ -595,19 +644,43 @@ export default {
       } else if (typeof id == "object") {
         threadIDs = id;
       }
+      let mailboxThreadMap = {};
+      if (typeof id == "number") {
+        let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      } else if (typeof id == "object") {
+        var objIndex;
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          if (
+            !(
+              this.perPageMails[objIndex].mailboxId in
+              Object.keys(mailboxThreadMap)
+            )
+          ) {
+            mailboxThreadMap[this.perPageMails[objIndex].mailboxId] =
+              new Array();
+          }
+        }
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id[i]);
+        }
+      }
+      console.log(mailboxThreadMap);
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxID: this.$route.params.mailboxId,
-          threadIDs,
+          mailboxThreadMap,
         }),
         credentials: "include",
       };
-      fetch(this.$apiBaseURL + "spamThreads.php", requestOptions)
+      fetch(this.$apiBaseURL + "unifiedv2/spamThreads.php", requestOptions)
         .then(async (response) => {
           const data = await response.json();
-          if (data.message !== "thread marked as spam") {
+          if (data.status !== "success") {
             const error = (data && data.message) || response.status;
             triggerPromptNotif(error, "error", 3000);
             return Promise.reject(error);
@@ -622,6 +695,7 @@ export default {
               (item) => item.id !== threadIDs[i]
             );
           }
+          bus.$emit("fetchSideBarStats");
           const limit = threadIDs.length;
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIDs.length;
@@ -629,7 +703,7 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -639,7 +713,7 @@ export default {
           } else {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -658,6 +732,7 @@ export default {
             for (let i = 0; i < data.data.threads.length; i++) {
               this.perPageMails.push(data.data.threads[i]);
             }
+            this.$store.dispatch("updateThreads", this.perPageMails);
           });
         })
         .catch((error) => {
@@ -671,17 +746,41 @@ export default {
       } else if (typeof id == "object") {
         threadIds = id;
       }
+      let mailboxThreadMap = {};
+      if (typeof id == "number") {
+        let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      } else if (typeof id == "object") {
+        var objIndex;
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          if (
+            !(
+              this.perPageMails[objIndex].mailboxId in
+              Object.keys(mailboxThreadMap)
+            )
+          ) {
+            mailboxThreadMap[this.perPageMails[objIndex].mailboxId] =
+              new Array();
+          }
+        }
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id[i]);
+        }
+      }
+      console.log(mailboxThreadMap);
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxId: this.$route.params.mailboxId,
-          threadIds,
+          mailboxThreadMap,
           targetMailboxId: mailboxId,
         }),
         credentials: "include",
       };
-      fetch(this.$apiBaseURL + "moveThreads.php", requestOptions)
+      fetch(this.$apiBaseURL + "unifiedv2/moveThreads.php", requestOptions)
         .then(async (response) => {
           const data = await response.json();
           if (data.status !== "success") {
@@ -699,6 +798,7 @@ export default {
               (item) => item.id !== threadIds[i]
             );
           }
+          bus.$emit("fetchSideBarStats");
           const limit = threadIds.length;
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIds.length;
@@ -706,7 +806,7 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -716,7 +816,7 @@ export default {
           } else {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -735,6 +835,7 @@ export default {
             for (let i = 0; i < data.data.threads.length; i++) {
               this.perPageMails.push(data.data.threads[i]);
             }
+            this.$store.dispatch("updateThreads", this.perPageMails);
           });
         })
         .catch((error) => {
@@ -776,6 +877,7 @@ export default {
               (item) => item.id !== threadIDs[i]
             );
           }
+          bus.$emit("fetchSideBarStats");
           const limit = threadIDs.length;
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIDs.length;
@@ -783,7 +885,7 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -793,7 +895,7 @@ export default {
           } else {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -812,6 +914,7 @@ export default {
             for (let i = 0; i < data.data.threads.length; i++) {
               this.perPageMails.push(data.data.threads[i]);
             }
+            this.$store.dispatch("updateThreads", this.perPageMails);
           });
         })
         .catch((error) => {
@@ -825,20 +928,44 @@ export default {
       } else if (typeof id == "object") {
         threadIDs = id;
       }
+      let mailboxThreadMap = {};
+      if (typeof id == "number") {
+        let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      } else if (typeof id == "object") {
+        var objIndex;
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          if (
+            !(
+              this.perPageMails[objIndex].mailboxId in
+              Object.keys(mailboxThreadMap)
+            )
+          ) {
+            mailboxThreadMap[this.perPageMails[objIndex].mailboxId] =
+              new Array();
+          }
+        }
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id[i]);
+        }
+      }
+      console.log(mailboxThreadMap);
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxID: this.$route.params.mailboxId,
-          threadIDs,
+          mailboxThreadMap,
           snoozeTill: till,
         }),
         credentials: "include",
       };
-      fetch(this.$apiBaseURL + "snoozeThreads.php", requestOptions)
+      fetch(this.$apiBaseURL + "unifiedv2/snoozeThreads.php", requestOptions)
         .then(async (response) => {
           const data = await response.json();
-          if (data.message !== "conversation snoozed") {
+          if (data.status !== "success") {
             const error = (data && data.message) || response.status;
             triggerPromptNotif(error, "error", 3000);
             return Promise.reject(error);
@@ -853,6 +980,7 @@ export default {
               (item) => item.id !== threadIDs[i]
             );
           }
+          bus.$emit("fetchSideBarStats");
           const limit = threadIDs.length;
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIDs.length;
@@ -860,7 +988,7 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -870,7 +998,7 @@ export default {
           } else {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -889,6 +1017,7 @@ export default {
             for (let i = 0; i < data.data.threads.length; i++) {
               this.perPageMails.push(data.data.threads[i]);
             }
+            this.$store.dispatch("updateThreads", this.perPageMails);
           });
         })
         .catch((error) => {
@@ -902,16 +1031,39 @@ export default {
       } else if (typeof id == "object") {
         threadIds = id;
       }
+      let mailboxThreadMap = {};
+      if (typeof id == "number") {
+        let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      } else if (typeof id == "object") {
+        var objIndex;
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          if (
+            !(
+              this.perPageMails[objIndex].mailboxId in
+              Object.keys(mailboxThreadMap)
+            )
+          ) {
+            mailboxThreadMap[this.perPageMails[objIndex].mailboxId] =
+              new Array();
+          }
+        }
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id[i]);
+        }
+      }
+      console.log(mailboxThreadMap);
       let body;
       if (userId == "") {
         body = JSON.stringify({
-          mailboxId: this.$route.params.mailboxId,
-          threadIds,
+          mailboxThreadMap,
         });
       } else {
         body = JSON.stringify({
-          mailboxId: this.$route.params.mailboxId,
-          threadIds,
+          mailboxThreadMap,
           assignedUser: userId,
         });
       }
@@ -921,7 +1073,7 @@ export default {
         body: body,
         credentials: "include",
       };
-      fetch(this.$apiBaseURL + "assignThreads.php", requestOptions)
+      fetch(this.$apiBaseURL + "unifiedv2/assignThreads.php", requestOptions)
         .then(async (response) => {
           const data = await response.json();
           if (data.status !== "success") {
@@ -1017,16 +1169,40 @@ export default {
       } else if (typeof id == "object") {
         threadIDs = id;
       }
+      let mailboxThreadMap = {};
+      if (typeof id == "number") {
+        let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      } else if (typeof id == "object") {
+        var objIndex;
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          if (
+            !(
+              this.perPageMails[objIndex].mailboxId in
+              Object.keys(mailboxThreadMap)
+            )
+          ) {
+            mailboxThreadMap[this.perPageMails[objIndex].mailboxId] =
+              new Array();
+          }
+        }
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id[i]);
+        }
+      }
+      console.log(mailboxThreadMap);
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxID: this.$route.params.mailboxId,
-          threadIDs,
+          mailboxThreadMap,
         }),
         credentials: "include",
       };
-      fetch(this.$apiBaseURL + "deleteThreads.php", requestOptions)
+      fetch(this.$apiBaseURL + "unifiedv2/trashThreads.php", requestOptions)
         .then(async (response) => {
           const data = await response.json();
           if (data.status == "error") {
@@ -1044,6 +1220,7 @@ export default {
               (item) => item.id !== threadIDs[i]
             );
           }
+          bus.$emit("fetchSideBarStats");
           const limit = threadIDs.length;
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIDs.length;
@@ -1051,7 +1228,7 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -1061,7 +1238,7 @@ export default {
           } else {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -1080,7 +1257,148 @@ export default {
             for (let i = 0; i < data.data.threads.length; i++) {
               this.perPageMails.push(data.data.threads[i]);
             }
+            this.$store.dispatch("updateThreads", this.perPageMails);
           });
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    });
+    bus.$on("createTags", (id, tagName, tagColor, folder) => {
+      console.log(id, tagName, tagColor, folder);
+      let threadIds = new Array();
+      if (typeof id == "number") {
+        threadIds[0] = id;
+      } else if (typeof id == "object") {
+        threadIds = id;
+      }
+      let mailboxThreadMap = {};
+      if (typeof id == "number") {
+        let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      } else if (typeof id == "object") {
+        var objIndex;
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          if (
+            !(
+              this.perPageMails[objIndex].mailboxId in
+              Object.keys(mailboxThreadMap)
+            )
+          ) {
+            mailboxThreadMap[this.perPageMails[objIndex].mailboxId] =
+              new Array();
+          }
+        }
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id[i]);
+        }
+      }
+      console.log(mailboxThreadMap);
+      if(tagColor == '' || tagColor == undefined) {
+        tagColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
+      }
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mailboxThreadMap,
+          color: tagColor,
+          folder,
+          name: tagName,
+        }),
+        credentials: "include",
+      };
+      fetch(this.$apiBaseURL + "unifiedv2/tags/createTags.php", requestOptions)
+        .then(async (response) => {
+          const data = await response.json();
+          if (data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          triggerPromptNotif("New tag added", "success", 1000);
+          for (let t = 0; t < threadIds.length; t++) {
+            var objIndex = this.perPageMails.findIndex(
+              (obj) => obj.id == threadIds[t]
+            );
+            let newTag = new Object();
+            newTag['name'] = tagName;
+            newTag['id'] = data.data;
+            newTag['color'] = tagColor;
+            this.perPageMails[objIndex].tags.push(newTag);
+            let logs = new Array();
+            let toAdd = new Array();
+            let toRemove = new Array();
+            let body;
+            if (newTag !== undefined) {
+              toAdd.push(newTag);
+              body = `${this.$store.state.userInfo.firstname} ${this.$store.state.userInfo.lastname} added the tag ${newTag.name}`;
+            }
+            logs.push({
+              data: {
+                body,
+                at: new Date().toISOString(),
+                type: "tag",
+              },
+              timestamp: Date.now(),
+              type: "log",
+            });
+            let payload = {
+              logs,
+              toAdd,
+              toRemove,
+              type: "tag",
+            };
+            console.log(payload);
+            if (this.isCompact) {
+              bus.$emit("changeThreadAttrs", payload);
+            }
+            // for (var i = 0; i < addtags.length; i++) {
+            //   let tag;
+            //   if (!this.tagsInAll.some((tag) => tag == addtags[i])) {
+            //     this.tagsInAll.push(addtags[i]);
+            //   }
+            //   if (newTag !== undefined) {
+            //     this.perPageMails[objIndex].tags.push(newTag);
+            //   } else {
+            //     tag = this.$store.state.tags.filter(
+            //       (obj) => obj.id == addtags[i]
+            //     );
+            //     if (
+            //       !this.perPageMails[objIndex].tags.some(
+            //         (tag) => tag.id == addtags[i]
+            //       )
+            //     ) {
+            //       this.perPageMails[objIndex].tags.push(tag[0]);
+            //     }
+            //   }
+            //   let body;
+            //   if (newTag !== undefined) {
+            //     toAdd.push(newTag);
+            //     body = `${this.$store.state.userInfo.firstname} ${this.$store.state.userInfo.lastname} added the tag ${newTag.name}`;
+            //   }
+            //   logs.push({
+            //     data: {
+            //       body,
+            //       at: new Date().toISOString(),
+            //       type: "tag",
+            //     },
+            //     timestamp: Date.now(),
+            //     type: "log",
+            //   });
+            // }
+            // let payload = {
+            //   logs,
+            //   toAdd,
+            //   type: "tag",
+            // };
+            // console.log(payload);
+            // if (this.isCompact) {
+            //   bus.$emit("changeThreadAttrs", payload);
+            // }
+          }
         })
         .catch((error) => {
           alert(error);
@@ -1097,6 +1415,31 @@ export default {
         } else if (typeof id == "object") {
           threadIds = id;
         }
+        let mailboxThreadMap = {};
+        if (typeof id == "number") {
+          let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+        } else if (typeof id == "object") {
+          var objIndex;
+          for (let i in id) {
+            objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+            if (
+              !(
+                this.perPageMails[objIndex].mailboxId in
+                Object.keys(mailboxThreadMap)
+              )
+            ) {
+              mailboxThreadMap[this.perPageMails[objIndex].mailboxId] =
+                new Array();
+            }
+          }
+          for (let i in id) {
+            objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+            mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id[i]);
+          }
+        }
+        console.log(mailboxThreadMap);
         for (var i = 0; i < addtags.length; i++) {
           addTags.push(addtags[i]);
         }
@@ -1109,20 +1452,20 @@ export default {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            mailboxId: this.$route.params.mailboxId,
-            threadIds,
+            mailboxThreadMap,
             addTags,
             removeTags,
           }),
           credentials: "include",
         };
-        fetch(this.$apiBaseURL + "tags/apply.php", requestOptions)
+        fetch(this.$apiBaseURL + "unifiedv2/tags/applyTags.php", requestOptions)
           .then(async (response) => {
             const data = await response.json();
-            if (data.message !== "Tags updated.") {
+            if (data.status !== "success") {
               const error = (data && data.message) || response.status;
               return Promise.reject(error);
             }
+            triggerPromptNotif("Tags updated", "success", 1000);
             for (let t = 0; t < threadIds.length; t++) {
               var objIndex = this.perPageMails.findIndex(
                 (obj) => obj.id == threadIds[t]
@@ -1206,10 +1549,16 @@ export default {
   },
   watch: {
     $route(to, from) {
-      console.log(to.params.type);
-      this.route = to.params.type;
+      console.log(to.params.type, from.params.type);
+      // this.route = to.params.type;
       this.selectedIds = [];
-      if (to.params.type !== from.params.type) {
+      console.log(this.isThreadRefresh);
+      if (
+        (to.params.type !== from.params.type &&
+          from.params.type !== undefined) ||
+        (from.params.threadId !== undefined && this.isThreadRefresh) ||
+        (from.params.threadId !== undefined && to.params.type !== this.route)
+      ) {
         console.log("type");
         bus.$emit("changeType");
         if (to.params.type == "assigned") {
@@ -1362,6 +1711,8 @@ export default {
           this.order = "";
           this.squery = "";
         }
+        this.$store.dispatch("type", this.route);
+        this.$store.dispatch("labelId", this.labelId);
         this.fetchThreads();
       }
       if (
@@ -1377,6 +1728,38 @@ export default {
     },
   },
   methods: {
+    broad() {
+      this.isCompact = false;
+      this.activeId = "";
+      if (this.isThreadRefresh) {
+        router.push({
+          name: "page",
+          params: {
+            pageNo: this.currPage,
+            type: this.route ? this.route : this.$store.state.type,
+            mailboxId:
+              this.$route.params.mailboxId !== undefined
+                ? this.$route.params.mailboxId
+                : this.$store.state.inboxData.id,
+          },
+        });
+        this.isThreadRefresh = false;
+        this.fetchThreads();
+      } else {
+        console.log(this.$store.state.inboxData.id);
+        router.push({
+          name: "page",
+          params: {
+            pageNo: this.currPage,
+            type: this.route,
+            mailboxId:
+              this.$route.params.mailboxId !== undefined
+                ? this.$route.params.mailboxId
+                : this.$store.state.inboxData.id,
+          },
+        });
+      }
+    },
     filterPerson(data) {
       this.personId = data;
       this.currPage = 1;
@@ -1397,21 +1780,44 @@ export default {
     },
     bulkRead(read) {
       console.log(read);
+      let mailboxThreadMap = {};
+      var objIndex;
+      for (let i in this.selectedIds) {
+        objIndex = this.perPageMails.findIndex(
+          (obj) => obj.id == this.selectedIds[i]
+        );
+        if (
+          !(
+            this.perPageMails[objIndex].mailboxId in
+            Object.keys(mailboxThreadMap)
+          )
+        ) {
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+        }
+      }
+      for (let i in this.selectedIds) {
+        objIndex = this.perPageMails.findIndex(
+          (obj) => obj.id == this.selectedIds[i]
+        );
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(
+          this.selectedIds[i]
+        );
+      }
+      console.log(mailboxThreadMap);
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxID: this.$route.params.mailboxId,
-          threadIDs: this.selectedIds,
+          mailboxThreadMap,
         }),
         credentials: "include",
       };
       console.log(requestOptions.body);
       let url;
       if (!read) {
-        url = this.$apiBaseURL + "unread-thread.php";
+        url = this.$apiBaseURL + "unifiedv2/unreadThreads.php";
       } else {
-        url = this.$apiBaseURL + "read-thread.php";
+        url = this.$apiBaseURL + "unifiedv2/readThreads.php";
       }
       fetch(url, requestOptions)
         .then(async (response) => {
@@ -1442,21 +1848,44 @@ export default {
         });
     },
     bulkStar() {
+      let mailboxThreadMap = {};
+      var objIndex;
+      for (let i in this.selectedIds) {
+        objIndex = this.perPageMails.findIndex(
+          (obj) => obj.id == this.selectedIds[i]
+        );
+        if (
+          !(
+            this.perPageMails[objIndex].mailboxId in
+            Object.keys(mailboxThreadMap)
+          )
+        ) {
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+        }
+      }
+      for (let i in this.selectedIds) {
+        objIndex = this.perPageMails.findIndex(
+          (obj) => obj.id == this.selectedIds[i]
+        );
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(
+          this.selectedIds[i]
+        );
+      }
+      console.log(mailboxThreadMap);
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxId: this.$route.params.mailboxId,
-          threadIds: this.selectedIds,
+          mailboxThreadMap,
         }),
         credentials: "include",
       };
       console.log(requestOptions.body);
       let url = "";
       if (this.$route.params.type == "starred") {
-        url = this.$apiBaseURL + "unstarThreads.php";
+        url = this.$apiBaseURL + "unifiedv2/unstarThreads.php";
       } else {
-        url = this.$apiBaseURL + "starThreads.php";
+        url = this.$apiBaseURL + "unifiedv2/starThreads.php";
       }
       fetch(url, requestOptions)
         .then(async (response) => {
@@ -1495,16 +1924,41 @@ export default {
       } else if (typeof id == "object") {
         threadIds = id;
       }
+      let mailboxThreadMap = {};
+      if (typeof id == "number") {
+        let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
+        mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      } else if (typeof id == "object") {
+        var objIndex;
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          if (
+            !(
+              this.perPageMails[objIndex].mailboxId in
+              Object.keys(mailboxThreadMap)
+            )
+          ) {
+            mailboxThreadMap[this.perPageMails[objIndex].mailboxId] =
+              new Array();
+          }
+        }
+        for (let i in id) {
+          objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id[i]);
+        }
+      }
+      console.log(mailboxThreadMap);
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          mailboxId: this.$route.params.mailboxId,
-          threadIds,
+          mailboxThreadMap,
         }),
         credentials: "include",
       };
-      fetch(this.$apiBaseURL + "mergeThreads.php", requestOptions)
+      console.log(requestOptions);
+      fetch(this.$apiBaseURL + "unifiedv2/mergeThreads.php", requestOptions)
         .then(async (response) => {
           const data = await response.json();
           if (data.status !== "success") {
@@ -1523,17 +1977,20 @@ export default {
             objIndex = this.perPageMails.findIndex(
               (obj) => obj.id == threadIds[i]
             );
-            sum += this.perPageMails[objIndex].totalEmailCount;
+            console.log(objIndex, i, threadIds[i], this.perPageMails[objIndex]);
+            sum += this.perPageMails[objIndex].messageCount;
           }
           objIndex = this.perPageMails.findIndex(
             (obj) => obj.id == data.data.master
           );
-          this.perPageMails[objIndex].totalEmailCount = sum;
+          console.log(objIndex, data.data.master, this.perPageMails[objIndex]);
+          this.perPageMails[objIndex].messageCount = sum;
           for (let i = 0; i < threadIds.length; i++) {
             this.perPageMails = this.perPageMails.filter(
               (item) => item.id !== threadIds[i] || item.id == data.data.master
             );
           }
+          bus.$emit("fetchSideBarStats");
           const limit = threadIds.length - 1;
           const offset =
             this.$store.state.userSettings.resultsPerPage -
@@ -1543,7 +2000,7 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -1553,7 +2010,7 @@ export default {
           } else {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -1572,6 +2029,7 @@ export default {
             for (let i = 0; i < data.data.threads.length; i++) {
               this.perPageMails.push(data.data.threads[i]);
             }
+            this.$store.dispatch("updateThreads", this.perPageMails);
           });
         })
         .catch((error) => {
@@ -1602,6 +2060,7 @@ export default {
             triggerPromptNotif(error, "error", 3000);
             return Promise.reject(error);
           }
+          bus.$emit("fetchSideBarStats");
           if (typeof id == "number") {
             triggerPromptNotif("Conversation deleted", "success", 1000);
           } else if (typeof id == "object") {
@@ -1619,7 +2078,7 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -1629,7 +2088,7 @@ export default {
           } else {
             url =
               this.$apiBaseURL +
-              "get-threads.php?mailboxID=" +
+              "unifiedv2/getThreads.php?mailboxIDs[]=" +
               this.$route.params.mailboxId +
               "&labelID=" +
               this.labelId +
@@ -1648,20 +2107,21 @@ export default {
             for (let i = 0; i < data.data.threads.length; i++) {
               this.perPageMails.push(data.data.threads[i]);
             }
+            this.$store.dispatch("updateThreads", this.perPageMails);
           });
         })
         .catch((error) => {
           alert(error);
         });
     },
-    async clickThread(id, type, subtype, ticketNumber, isstarred) {
+    async clickThread(id, type, subtype, ticketNumber) {
       var objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
       if (
         this.route == "drafts" &&
-        this.perPageMails[objIndex].totalEmailCount == 1
+        this.perPageMails[objIndex].messageCount == 1
       ) {
-        console.log(this.perPageMails[objIndex].totalEmailCount, objIndex);
-        let emailId = this.perPageMails[objIndex].email.id;
+        console.log(this.perPageMails[objIndex].messageCount, objIndex);
+        let emailId = this.perPageMails[objIndex].id;
         fetch(
           this.$apiBaseURL +
             "getEmail.php?emailID=" +
@@ -1685,7 +2145,7 @@ export default {
         this.isCompact = true;
         let data = null;
         bus.$emit("compact", data);
-        data = await this.fetchThread(id, type, subtype, isstarred);
+        data = await this.fetchThread(id, type, subtype);
         data["data"]["ticketNumber"] = ticketNumber;
         console.log(data);
         if (this.isThreadRefresh) {
@@ -1695,12 +2155,12 @@ export default {
             if (data.data.items[i].timestamp < ts) {
               ts = data.data.items[i].timestamp;
             }
-            if (
-              data.data.items[i].type == "email" &&
-              data.data.items[i].timestamp == ts
-            ) {
-              from = data.data.items[i].data.from;
-            }
+            // if (
+            //   data.data.items[i].type == "email" &&
+            //   data.data.items[i].timestamp == ts
+            // ) {
+            //   from = data.data.items[i].data.from;
+            // }
           }
           let thread = {
             assignedTo: data.data.currentAssignment,
@@ -1719,40 +2179,45 @@ export default {
             ticketNumber: data.data.ticketNumber,
             tags: data.data.tags,
             attachments: [],
-            subject: data.data.displaySubject,
+            subject: data.data.subject,
             originalSubject: data.data.subject,
             snippet: data.data.snippet,
             humanFriendlyDate: moment.unix(ts).format("DD MMM"),
           };
           console.log(thread);
           this.perPageMails.push(thread);
+          this.$store.dispatch("updateThreads", this.perPageMails); 
         }
-        console.log(this.perPageMails);
-        bus.$emit("compact", data);
+        console.log(this.perPageMails, this.$store.state.threadData[id]);
+        bus.$emit("compact", this.$store.state.threadData[id]);
       }
     },
     async fetchThreads() {
       this.loading = true;
+      console.log(this.labelId, this.type);
       bus.$emit("broad");
       let url =
         this.$apiBaseURL +
         "unifiedv2/getThreads.php?mailboxIDs[]=" +
-        this.$route.params.mailboxId +
+        (this.$route.params.mailboxId !== undefined
+          ? this.$route.params.mailboxId
+          : this.$store.state.inboxData.id) +
         "&page=" +
         this.currPage +
         "&labelID=" +
         this.labelId +
-        (this.squery !== "" ? "&squery=" + this.squery : "") + 
-        (this.tagId !== 0 ? "&tagID=" + this.tagId: "") +
-        (this.personId == 1 ? "&filter=unassigned" : "") + 
-        (this.personId == 2 ? "&filter=unread" : "") + 
-        (this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : "") + 
+        (this.squery !== "" ? "&squery=" + this.squery : "") +
+        (this.tagId !== 0 ? "&tagID=" + this.tagId : "") +
+        (this.personId == 1 ? "&filter=unassigned" : "") +
+        (this.personId == 2 ? "&filter=unread" : "") +
+        (this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : "") +
         (this.order !== "" ? "&order=" + this.order : "");
       console.log(url);
       let response = await fetch(url, { credentials: "include" });
       const data = await response.json();
       console.log(data.data.threads);
       this.mails = data.data.threads;
+      this.$store.dispatch("updateThreads", data.data.threads);
       this.loading = false;
       this.isnextPage = data.data.nextPage;
       console.log(this.mails.length);
@@ -1768,7 +2233,10 @@ export default {
         params: {
           pageNo: this.currPage,
           type: this.route,
-          mailboxId: this.$route.params.mailboxId,
+          mailboxId:
+            this.$route.params.mailboxId !== undefined
+              ? this.$route.params.mailboxId
+              : this.$store.state.inboxData.id,
         },
       });
       console.log(this.currPage, this.resultsPerPage);
@@ -1780,14 +2248,14 @@ export default {
       console.log(this.startThread);
       console.log(this.$store.state.userSettings.resultsPerPage);
     },
-    async fetchThread(id, type, subtype, isstarred) {
-      console.log(isstarred);
+    async fetchThread(id, type, subtype) {
+      // console.log(isstarred);
       const response = await fetch(
         this.$apiBaseURL +
           "unifiedv2/getThreadData.php?threadID=" +
           id +
           "&mailboxID=" +
-          this.$route.params.mailboxId +
+          this.$store.state.inboxData.id +
           "&inboxType=" +
           type +
           "&inboxSubType=" +
@@ -1795,7 +2263,7 @@ export default {
           "&labelID=" +
           this.labelId +
           "&maxDate=0&page=1",
-        {credentials: "include"}
+        { credentials: "include" }
       );
       const data = await response.json();
       if (this.$store.state.userSettings.orderThread == "asc") {
@@ -1808,15 +2276,16 @@ export default {
         );
       }
       // data.data.isRead = isread;
-      data.data.isStarred = isstarred;
       data.data.labelId = this.labelId;
+      data.data.id = id;
       console.log(data);
+      if (!(id in Object.keys(await this.$store.state.threadData))) {
+        this.$store.dispatch("updateThreadData", data);
+      }
       router.push({
         name: "thread",
         params: {
           threadId: id,
-          type: this.route,
-          mailboxId: this.$store.state.inboxData.id,
         },
       });
       return data;
@@ -1833,17 +2302,18 @@ export default {
           this.currPage +
           "&labelID=" +
           this.labelId +
-          (this.squery !== "" ? "&squery=" + this.squery : "") + 
-          (this.tagId !== 0 ? "&tagID=" + this.tagId: "") +
-          (this.personId == 1 ? "&filter=unassigned" : "") + 
-          (this.personId == 2 ? "&filter=unread" : "") + 
-          (this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : "") + 
+          (this.squery !== "" ? "&squery=" + this.squery : "") +
+          (this.tagId !== 0 ? "&tagID=" + this.tagId : "") +
+          (this.personId == 1 ? "&filter=unassigned" : "") +
+          (this.personId == 2 ? "&filter=unread" : "") +
+          (this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : "") +
           (this.order !== "" ? "&order=" + this.order : "");
         console.log(url);
         let response = await fetch(url, { credentials: "include" });
         const data = await response.json();
         console.log(data);
         this.mails = data.data.threads;
+        this.$store.dispatch("updateThreads", data.data.threads);
         this.loading = false;
         this.isnextPage = data.data.nextPage;
         console.log(this.mails.length);
@@ -1883,24 +2353,25 @@ export default {
           });
         }
         let url =
-        this.$apiBaseURL +
+          this.$apiBaseURL +
           "unifiedv2/getThreads.php?mailboxIDs[]=" +
           this.$route.params.mailboxId +
           "&page=" +
           this.currPage +
           "&labelID=" +
           this.labelId +
-          (this.squery !== "" ? "&squery=" + this.squery : "") + 
-          (this.tagId !== 0 ? "&tagID=" + this.tagId: "") +
-          (this.personId == 1 ? "&filter=unassigned" : "") + 
-          (this.personId == 2 ? "&filter=unread" : "") + 
-          (this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : "") + 
+          (this.squery !== "" ? "&squery=" + this.squery : "") +
+          (this.tagId !== 0 ? "&tagID=" + this.tagId : "") +
+          (this.personId == 1 ? "&filter=unassigned" : "") +
+          (this.personId == 2 ? "&filter=unread" : "") +
+          (this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : "") +
           (this.order !== "" ? "&order=" + this.order : "");
         console.log(url);
         let response = await fetch(url, { credentials: "include" });
         const data = await response.json();
         console.log(data);
         this.mails = data.data.threads;
+        this.$store.dispatch("updateThreads", data.data.threads);
         this.loading = false;
         this.isnextPage = data.data.nextPage;
         console.log(this.mails.length);
@@ -1945,37 +2416,42 @@ export default {
     // }
   },
   async beforeMount() {
-    if (this.$route.params.type == "assigned") {
-      this.labelId = 0;
-      this.route = this.$route.params.type;
-    } else if (this.$route.params.type == "mine") {
-      this.labelId = 4;
-      this.route = this.$route.params.type;
-    } else if (this.$route.params.type == "mentions") {
-      this.labelId = 13;
-      this.route = this.$route.params.type;
-    } else if (this.$route.params.type == "discussions") {
-      this.labelId = 15;
-      this.route = this.$route.params.type;
-    } else if (this.$route.params.type == "unassigned") {
-      this.labelId = 10;
-      this.route = this.$route.params.type;
-    } else if (this.$route.params.type == "starred") {
-      this.labelId = 11;
-      this.route = this.$route.params.type;
-    } else if (this.$route.params.type == "snoozed") {
-      this.labelId = 9;
-      this.route = this.$route.params.type;
-    } else if (this.$route.params.type == "drafts") {
-      this.labelId = 2;
-      this.route = this.$route.params.type;
-    } else if (this.$route.params.type == "all") {
-      this.labelId = 14;
-      this.route = this.$route.params.type;
-    } else {
-      this.labelId = 0;
-      this.route = this.$route.params.type;
-      this.tagId = this.$route.params.type.substring(4);
+    console.log(this.$route.params.type);
+    if (this.$route.params.type !== undefined) {
+      if (this.$route.params.type == "assigned") {
+        this.labelId = 0;
+        this.route = this.$route.params.type;
+      } else if (this.$route.params.type == "mine") {
+        this.labelId = 4;
+        this.route = this.$route.params.type;
+      } else if (this.$route.params.type == "mentions") {
+        this.labelId = 13;
+        this.route = this.$route.params.type;
+      } else if (this.$route.params.type == "discussions") {
+        this.labelId = 15;
+        this.route = this.$route.params.type;
+      } else if (this.$route.params.type == "unassigned") {
+        this.labelId = 10;
+        this.route = this.$route.params.type;
+      } else if (this.$route.params.type == "starred") {
+        this.labelId = 11;
+        this.route = this.$route.params.type;
+      } else if (this.$route.params.type == "snoozed") {
+        this.labelId = 9;
+        this.route = this.$route.params.type;
+      } else if (this.$route.params.type == "drafts") {
+        this.labelId = 2;
+        this.route = this.$route.params.type;
+      } else if (this.$route.params.type == "all") {
+        this.labelId = 14;
+        this.route = this.$route.params.type;
+      } else {
+        this.labelId = 0;
+        this.route = this.$route.params.type;
+        this.tagId = this.$route.params.type.substring(4);
+      }
+      this.$store.dispatch("type", this.route);
+      this.$store.dispatch("labelId", this.labelId);
     }
     console.log(1);
     if (this.$route.params.pageNo !== undefined) {
@@ -1985,6 +2461,39 @@ export default {
     } else {
       if (this.$route.params.threadId !== undefined) {
         this.isThreadRefresh = true;
+        if (this.$store.state.type == "assigned") {
+          this.labelId = 0;
+          this.route = this.$store.state.type;
+        } else if (this.$store.state.type == "mine") {
+          this.labelId = 4;
+          this.route = this.$store.state.type;
+        } else if (this.$store.state.type == "mentions") {
+          this.labelId = 13;
+          this.route = this.$store.state.type;
+        } else if (this.$store.state.type == "discussions") {
+          this.labelId = 15;
+          this.route = this.$store.state.type;
+        } else if (this.$store.state.type == "unassigned") {
+          this.labelId = 10;
+          this.route = this.$store.state.type;
+        } else if (this.$store.state.type == "starred") {
+          this.labelId = 11;
+          this.route = this.$store.state.type;
+        } else if (this.$store.state.type == "snoozed") {
+          this.labelId = 9;
+          this.route = this.$store.state.type;
+        } else if (this.$store.state.type == "drafts") {
+          this.labelId = 2;
+          this.route = this.$store.state.type;
+        } else if (this.$store.state.type == "all") {
+          this.labelId = 14;
+          this.route = this.$store.state.type;
+        } else {
+          this.labelId = 0;
+          this.route = this.$store.state.type;
+          this.tagId = this.$store.state.type.substring(4);
+        }
+        this.currPage = 1;
         // var objIndex = this.perPageMails.findIndex((obj => obj.id == this.$route.params.pageNo.threadId));
         this.clickThread(this.$route.params.threadId);
         console.log(3);

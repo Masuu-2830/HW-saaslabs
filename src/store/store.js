@@ -1,9 +1,15 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
+const dataState = createPersistedState({
+    paths: ['inboxData', 'type']
+})
+
 export const store = new Vuex.Store({
+    plugins: [dataState],
     state: {
         inboxData: {},
         userInfo: {},
@@ -14,7 +20,12 @@ export const store = new Vuex.Store({
         mailboxes: [],
         userSignature: {},
         aliases: {},
-        stateLoaded: false
+        stateLoaded: false,
+        type: "",
+        labelId: -1,
+        threads: [],
+        threadData: {},
+        firebaseModal: ''
     },
     mutations: {
         setState: (state, data) => {
@@ -38,6 +49,30 @@ export const store = new Vuex.Store({
         setAliases: (state, data) => {
             console.log(data)
             state.aliases = data;
+        },
+        setType: (state, data) => {
+            console.log(data)
+            state.type = data;
+        },
+        setLabelId: (state, data) => {
+            console.log(data)
+            state.labelId = data;
+        },
+        setThreads: (state, data) => {
+            console.log(data)
+            state.threads = data;
+        },
+        setThreadData: (state, data) => {
+            console.log(data);
+            if(!(data.id in Object.keys(state.threadData))) {
+                state.threadData[data.data.id] = data;
+                console.log("adding new thread")
+            }
+            console.log(state.threadData);
+        },
+        setFirebaseModal: (state, data) => {
+            console.log(data);
+            state.firebaseModal = data;
         }
     },
     actions: {
@@ -52,6 +87,21 @@ export const store = new Vuex.Store({
         },
         async fetchAliases(context, data) {
             await context.commit('setAliases', data);
-        }
+        },
+        async type(context, data) {
+            await context.commit('setType', data);
+        },
+        async labelId(context, data) {
+            await context.commit('setLabelId', data);
+        },
+        async updateThreads(context, data) {
+            await context.commit('setThreads', data);
+        },
+        async updateThreadData(context, data) {
+            await context.commit('setThreadData', data);
+        },
+        async updateFirebaseModal(context, data) {
+            await context.commit('setFirebaseModal', data);
+        },
     }
 })

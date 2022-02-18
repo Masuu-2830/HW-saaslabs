@@ -161,7 +161,7 @@
                         },
                         credentials: 'include',
                         body: JSON.stringify({
-                            mailboxID: this.$route.params.mailboxId,
+                            mailboxID: this.$route.params.mailboxId !== undefined ? this.$route.params.mailboxId : this.$store.state.inboxData.id,
                             content: this.editorInstance.html.get(),
                             name: this.savedReplyName
                         })

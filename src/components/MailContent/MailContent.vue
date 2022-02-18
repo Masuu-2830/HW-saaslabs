@@ -7,7 +7,7 @@
         <span class="sr-only">Loading...</span>
     </div>
     <!-- <mail-content-int v-if="!loading"></mail-content-int> -->
-    <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :sidebarOpen = "sidebarOpen"></IntegrationContainer>
+    <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :sidebarOpen = "sidebarOpen" :contactOpen = "contactOpen" :thread= "thread"></IntegrationContainer>
     <div v-if="!loading" class="d-flex flex-column justify-content-between" :style="{width: 'calc(100% - 60px - '+right+')'}">
       <mail-content-header :thread="thread"></mail-content-header>
       <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body>
@@ -27,6 +27,7 @@ import MailContentBody from './MailContentBody/MailContentBody.vue';
 import MailContentHeader from './MailContentHeader.vue';
 // import MailContentInt from './MailContentInt.vue'; .
 import IntegrationContainer from './IntegrationContainer.vue';
+// import MailContactPanel from './MailContactPanel.vue';
 export default {
   components: { MailContentBody, MailContentHeader, ChatContentBody, ChatContentReply, IntegrationContainer },
   name: "MailContent",
@@ -37,26 +38,19 @@ export default {
       thread: {},
       loading: false,
       sidebarOpen: false,
-      integration_id: 1
+      contactOpen: false,
+      integration_id: 0
     };
   },
   watch:{
         $route (to, from) {
             if(to.params.threadId !== from.params.threadId) {
                 // this.ifIntOpen = false;
-                this.right = '0px'
+                this.right = '0px';
+                this.contactOpen = false;
+                this.sidebarOpen = false;
             }
         }
-    },
-    methods: {
-      openInt() {
-        console.log("hello");
-        if(this.right == '0px') {
-            this.right = '300px';
-        } else {
-            this.right = '0px';
-        }
-      }
     },
   created() {
     bus.$on("compact", (data) => {
@@ -77,18 +71,52 @@ export default {
     bus.$on("changeThreadAttrs", (data) => {
       if(data.type == "assignment") {
         if(data.teammate == null) {
-          this.thread.data.currentAssignment.assigned = null;
-          this.thread.data.currentAssignment.me = false;
+          if(this.thread.data.currentAssignment == null) {
+            let obj = {
+              'assigned': null,
+              'me': false,
+              'assigner': this.$store.state.userInfo,
+              'time': data.log.data.at
+            }
+            this.thread.data.currentAssignment = obj;
+          } else {
+            this.thread.data.currentAssignment.assigned = null;
+            this.thread.data.currentAssignment.me = false;
+            this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
+            this.thread.data.currentAssignment.time = data.log.data.at;
+          }
         } else if(data.teammate[0].id == this.$store.state.userInfo.id) {
-          this.thread.data.currentAssignment.assigned = data.teammate[0];
-          this.thread.data.currentAssignment.me = true;
+          if(this.thread.data.currentAssignment == null) {
+            let obj = {
+              'assigned': data.teammate[0],
+              'me': true,
+              'assigner': this.$store.state.userInfo,
+              'time': data.log.data.at
+            }
+            this.thread.data.currentAssignment = obj;
+          } else {
+            this.thread.data.currentAssignment.assigned = data.teammate[0];
+            this.thread.data.currentAssignment.me = true;
+            this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
+            this.thread.data.currentAssignment.time = data.log.data.at;
+          }
         } else {
-          this.thread.data.currentAssignment.assigned = data.teammate[0];
-          this.thread.data.currentAssignment.me = false;
+          if(this.thread.data.currentAssignment == null) {
+            let obj = {
+              'assigned': data.teammate[0],
+              'me': false,
+              'assigner': this.$store.state.userInfo,
+              'time': data.log.data.at
+            }
+            this.thread.data.currentAssignment = obj;
+          } else {
+            this.thread.data.currentAssignment.assigned = data.teammate[0];
+            this.thread.data.currentAssignment.me = false;
+            this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
+            this.thread.data.currentAssignment.time = data.log.data.at;
+          }
         }
         console.log(this.thread.data.currentAssignment);
-        this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
-        this.thread.data.currentAssignment.time = data.log.data.at;
         this.thread.data.items.push(data.log);
       } else if(data.type == "tag") {
         if(data.toRemove.length > 0) {
@@ -116,22 +144,50 @@ export default {
         mail["timestamp"] = data.email.date;
         this.thread.data.items.push(mail);
         console.log(this.thread.data.items);
+      } else if(data.type == "item") {
+        let mail = {};
+        mail["data"] = data.item;
+        mail["type"] = data.item.type;
+        mail["timestamp"] = data.item.date;
+        this.thread.data.items.push(mail);
+        console.log(this.thread.data.items);
       }
     })
   },
   methods: {
+    openInt() {
+        console.log("hello");
+        if(this.right == '0px') {
+            this.right = '250px';
+        } else {
+            this.right = '0px';
+        }
+      },
     IntegrationSidebar: function (integrationID) {
       if(this.integration_id != integrationID){
           this.right = '300px';
           this.integration_id = integrationID;
-          this.sidebarOpen = true;
+          if(integrationID == 0){
+            this.sidebarOpen = false;
+            this.contactOpen = true;
+          }else{
+            this.sidebarOpen = true;
+            this.contactOpen = false;
+          }
       }else{
         if(this.right == '300px'){
           this.right = '0px';
           this.sidebarOpen = false;
+          this.contactOpen = false;
         }else{
           this.right = '300px';
-          this.sidebarOpen = true;
+          if(integrationID == 0){
+            this.sidebarOpen = false;
+            this.contactOpen = true;
+          }else{
+            this.sidebarOpen = true;
+            this.contactOpen = false;
+          }
         }
       }
     }
@@ -140,48 +196,6 @@ export default {
 </script>
 
 <style>
-/* .df-settings-ontraport.show .df-settings-link-ontraport,
-.df-settings-ontraport.show .df-settings-link-ontraport:hover,
-.df-settings-ontraport.show .df-settings-link-ontraport:focus {
-  background-color: #fff;
-  border-color: #c0ccda;
-  color: #1c273c;
-  box-shadow: none;
-}
-.df-settings-link-ontraport {
-  position: absolute;
-  top: 98px;
-  left: -44px;
-  width: 45px;
-  height: 45px;
-  background-color: #fff;
-  color: #7987a1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #c0ccda;
-  border-right-width: 0;
-  border-top-left-radius: 0.25rem;
-  border-bottom-left-radius: 0.25rem;
-  transition: all 0.2s ease-in-out;
-  z-index: 1;
-}
-@media (prefers-reduced-motion: reduce) {
-  .df-settings-link-ontraport {
-    transition: none;
-  }
-}
-.df-settings-link-ontraport:hover,
-.df-settings-link-ontraport:focus {
-  color: #1c273c;
-  border-color: #8392a5;
-  box-shadow: 0 0 10px 2px rgba(28, 39, 60, 0.1);
-}
-.df-settings-link-ontraport svg {
-  width: 20px;
-  height: 20px;
-} */
-
 body
   > div.datepicker.datepicker-dropdown.dropdown-menu.datepicker-orient-right.datepicker-orient-bottom {
   width: 200px !important;

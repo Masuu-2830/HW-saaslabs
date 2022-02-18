@@ -563,7 +563,7 @@ export default {
                   "underline",
                   "strikeThrough",
                   "insertHR",
-                  "attachReply",
+                  "attachMailReply",
                   "insertImage",
                   "clear",
                 ],

@@ -630,8 +630,9 @@
                   <span class="tx-13 tx-bold ml-2">Load more</span>
                 </a> -->
                 <a
+                  @click="createTag('quick')"
                   class="dropdown-item mt-2 quick-tag-btn"
-                  style="display: none"
+                  :style="{display: tags.findIndex(tag => tag.name == sqTag.toLowerCase().trim()) !== -1 ? 'none' : ''}"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -655,7 +656,7 @@
                     <line x1="7" y1="7" x2="7" y2="7"></line>
                   </svg>
                   <span class="tx-13 tx-bold ml-2">Quick Create</span>
-                  <span class="quickCreateLabel"></span>
+                  <span class="quickCreateLabel">"{{sqTag}}"</span>
                 </a>
                 
                 <a
@@ -842,7 +843,7 @@
                     </b-button>
                   </b-col>
                   <b-col class="float-right">
-                    <b-button @click.stop="createTag" size="xs" variant="outline-primary">
+                    <b-button @click.stop="createTag('new')" size="xs" variant="outline-primary">
                       Create
                     </b-button>
                   </b-col>
@@ -1697,39 +1698,67 @@ export default {
     changeTagColor(color) {
       this.tagColor = color
     },
-    createTag() {
+    createTag(type) {
       this.removetags = [];
       this.addtags = [];
       console.log(this.tagName, this.tagPinned, this.tagColor);
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mailboxId: this.$route.params.mailboxId, color: this.tagColor, folder: this.tagPinned, name: this.tagName, threadIds: this.selectedIds }),
-        credentials: 'include'
-      };
-      // console.log(requestOptions);
-      fetch(this.$apiBaseURL + "/tags/create.php", requestOptions)
-      .then(async response => { 
-        const data = await response.json();
-        if(data.status !== "success") {
-          const error = (data && data.message) || response.status;
-          return Promise.reject(error);
-        }
-        this.addtags.push(data.data.id);
-        bus.$emit(
-          "toggleTags",
-          data.data.threadIds,
-          this.addtags,
-          this.removetags,
-          data.data
-        );
-        this.$refs['bulk-newtag-modal'].hide();
-        this.tagName = "";
-        this.tagColor = "";
-        this.tagPinned = false;
-      }).catch(error => {
-        alert(error);
-      })
+      if(type == "new") {
+        bus.$emit("createTags", this.selectedIds, this.tagName, this.tagColor, this.tagPinned);
+      } else if(type == "quick") {
+        var items = Array("#7fc7af", "#9b59b6", "#f1c40f", "#e74c3c", "#00ff41", "#2aaccf", "#d0d7d8", "#ff3d7f", "#f7bd80");
+        var color = items[Math.floor(Math.random()*items.length)];
+        bus.$emit("createTags", this.selectedIds, this.sqTag, color, false);
+      }
+      this.$refs['bulk-newtag-modal'].hide();
+      this.tagName = "";
+      this.tagColor = "";
+      this.tagPinned = false;
+      this.sqTag = "";
+      // if(type == "new") {
+      //   requestOptions = {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({
+      //       mailboxThreadMap,
+      //       color: this.tagColor,
+      //       folder: this.tagPinned,
+      //       name: this.tagName,
+      //     }),
+      //     credentials: "include",
+      //   };
+      // } else {
+      //   var randomColor = Math.floor(Math.random()*16777215).toString(16);
+      //   requestOptions = {
+      //     method: "POST",
+      //     headers: { "Content-Type": "application/json" },
+      //     body: JSON.stringify({
+      //       mailboxThreadMap,
+      //       color: "#" + randomColor,
+      //       folder: this.tagPinned,
+      //       name: this.sqTag,
+      //     }),
+      //     credentials: "include",
+      //   };
+      // }
+      // fetch(this.$apiBaseURL + "unifiedv2/tags/createTags.php", requestOptions)
+      // .then(async response => { 
+      //   const data = await response.json();
+      //   if(data.status !== "success") {
+      //     const error = (data && data.message) || response.status;
+      //     return Promise.reject(error);
+      //   }
+      //   this.addtags.push(data.data);
+      //   bus.$emit(
+      //     "toggleTags",
+      //     this.selectedIds,
+      //     this.addtags,
+      //     this.removetags,
+      //     data.data
+      //   );
+        
+      // }).catch(error => {
+      //   alert(error);
+      // })
     },
     toggleTag(id) {
       this.removetags = [];

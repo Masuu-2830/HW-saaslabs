@@ -756,7 +756,8 @@
             <span class="tx-13 tx-bold ml-2">Load more</span>
           </a> -->
 
-          <a class="dropdown-item mt-2 quick-tag-btn" style="display: none">
+          <a @click="createTag('quick')" class="dropdown-item mt-2 quick-tag-btn"
+            :style="{display: tags.findIndex(tag => tag.name == sqTag.toLowerCase().trim()) !== -1 ? 'none' : ''}">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -779,7 +780,7 @@
               <line x1="7" y1="7" x2="7" y2="7"></line>
             </svg>
             <span class="tx-13 tx-bold ml-2">Quick Create</span>
-            <span class="quickCreateLabel"></span>
+            <span class="quickCreateLabel">"{{sqTag}}"</span>
           </a>
           <a
             class="dropdown-item mt-2 new-tag-btn"
@@ -1015,7 +1016,7 @@
                   </b-col>
                   <b-col class="float-right">
                     <b-button
-                      @click.stop="createTag"
+                      @click.stop="createTag('new')"
                       size="xs"
                       variant="outline-primary"
                     >
@@ -1590,46 +1591,20 @@ export default {
     changeTagColor(color) {
       this.tagColor = color;
     },
-    createTag() {
+    createTag(type) {
       this.removetags = [];
       this.addtags = [];
       console.log(this.tagName, this.tagPinned, this.tagColor);
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mailboxId: this.$route.params.mailboxId,
-          color: this.tagColor,
-          folder: this.tagPinned,
-          name: this.tagName,
-          threadIds: this.selectedIds,
-        }),
-        credentials: "include",
-      };
-      // console.log(requestOptions);
-      fetch(this.$apiBaseURL + "/tags/create.php", requestOptions)
-        .then(async (response) => {
-          const data = await response.json();
-          if (data.status !== "success") {
-            const error = (data && data.message) || response.status;
-            return Promise.reject(error);
-          }
-          this.addtags.push(data.data.id);
-          bus.$emit(
-            "toggleTags",
-            this.$route.params.threadId,
-            this.addtags,
-            this.removetags,
-            data.data
-          );
-          this.$refs["newtag-thread-modal"].hide();
-          this.tagName = "";
-          this.tagColor = "";
-          this.tagPinned = false;
-        })
-        .catch((error) => {
-          alert(error);
-        });
+      if(type == "new") {
+        bus.$emit("createTags", this.$route.params.threadId, this.tagName, this.tagColor, this.tagPinned);
+      } else if(type == "quick") {
+        bus.$emit("createTags", this.$route.params.threadId, this.sqTag, '', false);
+      }
+      this.$refs['newtag-thread-modal'].hide();
+      this.tagName = "";
+      this.tagColor = "";
+      this.tagPinned = false;
+      this.sqTag = "";
     },
     toggleTag(id) {
       this.removetags = [];

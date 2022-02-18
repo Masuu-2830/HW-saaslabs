@@ -17,7 +17,7 @@
     >
       <span class="sr-only">Loading...</span>
     </div>
-    <div class="emails-wrapper">
+    <div v-if="Object.keys(thread).length !== 0" class="emails-wrapper">
       <div v-for="item in thread.data.items" :key="item.timestamp">
         <mail-content-log v-if="item.type == 'log'" :item="item"></mail-content-log>
         <mail-content-comment v-else-if="item.type == 'comment'" :item="item" v-on:deleteComment="deleteComment"></mail-content-comment>
@@ -35,7 +35,7 @@
     >
       <span class="sr-only">Loading...</span>
     </div>
-    <div id="tweetReplyWindow">
+    <div v-if="Object.keys(thread).length !== 0" id="tweetReplyWindow">
       <chat-content-card-reply></chat-content-card-reply>
     </div>
   </div>

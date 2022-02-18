@@ -153,7 +153,7 @@
                 >{{ tag.name }}</span
               >
             </div>
-            <div class="d-flex align-items-center">
+            <div v-if="mail.type == 'mail'" class="d-flex align-items-center">
               <!-- <span
                 v-if="mail.email !== undefined"
                 class="tx-14 hw-thread-subject mr-2"
@@ -982,7 +982,7 @@ export default {
       bus.$emit("changeStarred", id);
     },
     deleteThread(id) {
-      this.$emit("deleteThreads", id);
+      bus.$emit("deleteThreads", id);
     },
     perDeleteThread(id) {
       this.$emit("perDeleteThreads", id);

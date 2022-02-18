@@ -99,7 +99,7 @@
               buttonsVisible: 0
             },
             'moreRich': {
-              buttons: ['insertLink', 'savedReply', 'hcArticle', 'attach', 'insertImage', 'emoticons', 'insertTable', 'fontAwesome', 'specialCharacters', 'embedly', 'insertFile', 'insertHR'],
+              buttons: ['insertLink', 'savedReply', 'hcArticle', 'attachChatReply', 'insertImage', 'emoticons', 'insertTable', 'fontAwesome', 'specialCharacters', 'embedly', 'insertFile', 'insertHR'],
               buttonsVisible: 6
             },
             // 'moreMisc': {
@@ -158,7 +158,7 @@
               'buttonsVisible': 0
             },
             'moreRich': {
-              'buttons': ['insertLink', 'savedReply', 'hcArticle', 'attach', 'insertImage', 'emoticons', 'insertTable', 'fontAwesome', 'specialCharacters', 'embedly', 'insertFile', 'insertHR'],
+              'buttons': ['insertLink', 'savedReply', 'hcArticle', 'attachChatReply', 'insertImage', 'emoticons', 'insertTable', 'fontAwesome', 'specialCharacters', 'embedly', 'insertFile', 'insertHR'],
               'buttonsVisible': 6
             },
             // 'moreMisc': {
@@ -252,15 +252,15 @@
       },
       prepareFroalaButtons(){
         const vueThis = this;
-        FroalaEditor.DefineIcon('attach', { FA5NAME: 'paperclip', template: 'font_awesome_5' });
-        FroalaEditor.RegisterCommand('attach', {
-          title: 'Insert Attachment',
-          icon: 'attach',
-          refreshAfterCallback: true,
-          callback: function () {
-            $(`#editor-uploadAttachment`).click();
-          },
-        });
+        // FroalaEditor.DefineIcon('attach', { FA5NAME: 'paperclip', template: 'font_awesome_5' });
+        // FroalaEditor.RegisterCommand('attach', {
+        //   title: 'Insert Attachment',
+        //   icon: 'attach',
+        //   refreshAfterCallback: true,
+        //   callback: function () {
+        //     $(`#editor-uploadAttachment`).click();
+        //   },
+        // });
 
         FroalaEditor.DefineIconTemplate('font_awesome_5b', '<i class="fab fa-[FA5NAME]"></i>');
 

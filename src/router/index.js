@@ -10,11 +10,6 @@ export default new Router({
   mode: 'history',
   hash: false,
   routes: [
-    // {
-    //   path: '/',
-    //   name: 'HelloWorld',
-    //   component: HelloWorld
-    // },
     {
       path: "/",
       name: 'Home',
@@ -28,25 +23,29 @@ export default new Router({
       redirect: '/:mailboxId/mine'
     },
     {
+      path: '/open/:threadId',
+      name: 'thread',
+      component: Home,
+      props: true
+    },
+    {
       path: '/:mailboxId/:type',
       name: 'type',
       component: Home,
+      props: true
     },
-    // {
-    //   path: '/:mailboxId/tag/:tagId',
-    //   name: 'tags',
-    //   component: Home,
-    // },
     {
       path: '/:mailboxId/:type/p/:pageNo',
       name: 'page',
       component: Home,
+      props: true
     },
-    {
-      path: '/:mailboxId/:type/:threadId',
-      name: 'thread',
-      component: Home,
-    },
+    // {
+    //   path: '/:mailboxId/:type/:threadId',
+    //   name: 'thread',
+    //   component: Home,
+    // },
+    
     {
       path: "/settings",
       name: 'SHome',
