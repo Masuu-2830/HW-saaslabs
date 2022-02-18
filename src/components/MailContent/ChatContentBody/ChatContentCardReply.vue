@@ -1,6 +1,15 @@
 <template>
   <div
-    class="mail-body card_compose hw-reply hw_editor card shadow-sm mb-2 bg-white"
+    v-if="item !== null"
+    class="
+      mail-body
+      card_compose
+      hw-reply hw_editor
+      card
+      shadow-sm
+      mb-2
+      bg-white
+    "
     id="reply-card"
     style="
       margin: 20px auto auto;
@@ -9,7 +18,7 @@
       border-radius: 10px;
       padding-left: 1rem;
     "
-    :style="{display: item == null ? 'none' : ''}"
+    :style="{ display: item == null ? 'none' : '' }"
   >
     <div class="d-flex justify-content-between">
       <div
@@ -415,7 +424,10 @@
     <!-- <hr style="margin-top:15px;"> -->
     <div class="row">
       <div class="col-1 hw-avat" id="hw-avatar">
-        <div class="avatar avatar mr-2" v-html="item.data.user">
+        <div
+          class="avatar avatar mr-2"
+          v-html="this.$store.state.userInfo.avatarTag"
+        >
           <!-- <span
             class="avatar-initial rounded-circle"
             style="background-color: hsl(125, 32%, 64%)"
@@ -424,7 +436,10 @@
         </div>
       </div>
       <div class="col-11" style="padding-left: 4px">
-        <div class="reply-editor-wrapper fr-basic fr-bottom" style="margin-top: 0px">
+        <div
+          class="reply-editor-wrapper fr-basic fr-bottom"
+          style="margin-top: 0px"
+        >
           <div
             id="reply-email-editor"
             class="ht-150 mg-t-15 hw_summernote"
@@ -507,156 +522,330 @@
         multiple
       />
     </div>
-    
+    <b-modal
+      id="schedule-send-modal"
+      ref="schedule-send-modal"
+      size="sm"
+      title="Pick Date & Time"
+      hide-footer
+    >
+      <div class="modal-body">
+        <div class="d-flex align-items-center justify-content-center">
+          <date-picker
+            :open.sync="newDateOpen"
+            @change="handleChange"
+            type="datetime"
+            v-model="datetime"
+            value-type="timestamp"
+            :minute-step="30"
+            :showSecond="false"
+            :default-value="
+              new Date().setHours(new Date().getHours() + 1, 0, 0, 0)
+            "
+            :disabled-date="notBeforeToday"
+            :disabled-time="notBeforeNow"
+            placeholder="Select Date & Time"
+            :clearable="false"
+          ></date-picker>
+        </div>
+        <div
+          class="d-flex align-items-center justify-content-center"
+          style="margin-top: 10px"
+        >
+          <button
+            type="button"
+            @click.stop.prevent="scheduleSend()"
+            class="btn btn-xs btn-primary bulk-select-snooze-btn"
+            :disabled="datetime == '' && true"
+          >
+            Snooze
+          </button>
+        </div>
+      </div>
+    </b-modal>
   </div>
 </template>
 <script src="froala-editor/js/plugins/file.min.js"></script>
 <script src="froala-editor/js/plugins/image.min.js"></script>
 <script>
+import DatePicker from "vue2-datepicker";
+import "vue2-datepicker/index.css";
 import { bus } from "../../../main";
 import FroalaEditor from "froala-editor";
 import "froala-editor/js/plugins.pkgd.min";
 import axios from "axios";
 import _ from "underscore";
-import AttachmentComp from '../../AttachmentComp.vue';
-import Vue from 'vue';
+import AttachmentComp from "../../AttachmentComp.vue";
+import Vue from "vue";
 export default {
   name: "ChatContentCardReply",
+  components: { DatePicker },
   data() {
     return {
-        item: null,
-        reply_body: '',
-        attachments: {},
-        files: [],
-        draftID: null,
-        threadID: this.item.threadId !== undefined ? this.item.threadId : null,
-        editorInstance: null,
-        config: {
-            enter: FroalaEditor.ENTER_DIV,
-            charCounterCount: false,
-            toolbarBottom: true,
-            border: 'none',
-            height: "120px",
-            imageUploadParam: "files[]",
-            imageUploadURL: "https://app.helpwise.io/api/uploadInlineAttachment.php",
-            imageUploadParams: {
-                mailboxID: this.$route.params.mailboxId,
-                // emailID: this.emailID,
-            },
-            imageUploadMethod: "POST",
-            imageAllowedTypes: ["jpeg", "jpg", "png"],
-            imagePasteProcess: true,
-            imageDefaultAlign: "left",
-            pastePlain: true,
-            requestWithCredentials: true,
-            events: {
-                initialized: async function () {
-                    // self.editorInstance.composer = self.composer;
-                    var editor = this;
-                    // editor.composer = self.composer;
-                    editor.type = "replyCard";
-                    // editor.mailboxID = self.$route.params.mailboxId;
-                    self.editorInstance = this;
-                    console.log("initialized");
-                    console.log(this);
-                    let attchComp = Vue.extend(AttachmentComp);
-                    let replyAttachmentList = new attchComp({
-                        propsData:{
-                            attachments: self.attachments,
-                            type: "compose"
-                        }
-                    }).$mount();
-                    // var ed = $(`#editor-uploadAttachment`).data('editor');
-                    // console.log(editor, ed);
-                    editor.$wp.append(replyAttachmentList.$el);
-                    // ed.$wp.append(replyAttachmentList.$el);
-                },
-            },
-            key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
-            toolbarButtons: [
-                "attachCardReply","scheduleReply","clear"
-            ],
+      item: null,
+      reply_body: "",
+      attachments: {},
+      files: [],
+      draftID: null,
+      threadID: null,
+      mailboxID: this.$store.state.inboxData.id,
+      inReplyTo: null,
+      editorInstance: null,
+      datetime: "",
+      newDateOpen: false,
+      config: {
+        enter: FroalaEditor.ENTER_DIV,
+        charCounterCount: false,
+        toolbarBottom: true,
+        border: "none",
+        height: "120px",
+        imageUploadParam: "files[]",
+        imageUploadURL:
+          "https://app.helpwise.io/api/uploadInlineAttachment.php",
+        imageUploadParams: {
+          mailboxID: this.$route.params.mailboxId,
+          // emailID: this.emailID,
         },
-    }
+        imageUploadMethod: "POST",
+        imageAllowedTypes: ["jpeg", "jpg", "png"],
+        imagePasteProcess: true,
+        imageDefaultAlign: "left",
+        pastePlain: true,
+        requestWithCredentials: true,
+        events: {
+          initialized: async function () {
+            // self.editorInstance.composer = self.composer;
+            var editor = this;
+            // editor.composer = self.composer;
+            editor.type = "replyCard";
+            // editor.mailboxID = self.$route.params.mailboxId;
+            self.editorInstance = this;
+            console.log("initialized", self.editorInstance);
+            console.log(this);
+            let attchComp = Vue.extend(AttachmentComp);
+            let replyAttachmentList = new attchComp({
+              propsData: {
+                attachments: self.attachments,
+                type: "replyCard",
+              },
+            }).$mount();
+            // var ed = $(`#editor-uploadAttachment`).data('editor');
+            // console.log(editor, ed);
+            editor.$wp.append(replyAttachmentList.$el);
+            // ed.$wp.append(replyAttachmentList.$el);
+          },
+        },
+        key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
+        toolbarButtons: ["attachCardReply", "scheduleReply", "clear"],
+      },
+    };
+  },
+  watch: {
+    files: "saveDraft",
+    inReplyTo: "saveDraft",
+    reply_body: function (to, from) {
+      console.log("replycardbody");
+      if (to !== from) {
+        clearTimeout(this.myGreeting);
+        this.myGreeting = setTimeout(this.saveDraft, 2000);
+      }
+    },
+  },
+  beforeMount() {
+    this.prepareFroalaButtons();
   },
   created() {
-      bus.$on('openCardReply', (data) => {
-          console.log(data);
-          this.item = data;
-      });
-      bus.$off("deleteAttachmentUpload");
-      bus.$on("deleteAttachmentUpload", (id) => {
-        console.log("event listenedd", id);
-        Vue.delete(this.attachments, id);
-        this.attachments = this.attachments.filter(i => i.id !== id);
-        console.log(this.attachments, this.files);
-      });
+    bus.$on("scheduleTweet", (data) => {
+      console.log(data);
+      this.sendMail(data);
+    });
+    bus.$on("openCardReply", (data) => {
+      console.log(data);
+      this.item = data;
+      this.threadID = data.data.threadId;
+      this.inReplyTo = data.data.id;
+    });
+    bus.$off("deleteAttachmentUpload");
+    bus.$on("deleteAttachmentUpload", (id) => {
+      console.log("event listenedd", id);
+      Vue.delete(this.attachments, id);
+      this.attachments = this.attachments.filter((i) => i.id !== id);
+      console.log(this.attachments, this.files);
+    });
   },
   methods: {
-    uploadAttachment(event) {
-      const selectedFiles = event.target.files;
-        console.log(selectedFiles);
-        const vueThis = this;
-        for (let i = 0; i < selectedFiles.length; i++) {
-          let selectedFile = selectedFiles[i];
-          let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
-          var formData = new FormData();
-          formData.append('files[]', selectedFile);
-          formData.append('mailboxID', vueThis.$route.params.mailboxId);
-          let attachmentObject = {
-            filename: selectedFile["name"],
-            filesize: selectedFile["size"],
-            progress: 0,
-            isUploaded: false,
-            extension: "pdf"
+    prepareFroalaButtons() {
+      const vueThis = this;
+      FroalaEditor.DefineIcon("scheduleReply", {
+        NAME: "clock",
+        SVG_KEY: "clock",
+      });
+      FroalaEditor.RegisterCommand("scheduleReply", {
+        title: "Schedule Reply",
+        type: "dropdown",
+        focus: false,
+        undo: false,
+        refreshAfterCallback: true,
+        options: {
+          1: "Later today (In 3 hour)",
+          2: "Tomorrow (9 am)",
+          3: "Next Monday (9 am)",
+          4: "One week",
+          5: "One month",
+          6: "Pick date & time",
+        },
+        callback: function (cmd, val) {
+          console.log(val);
+          var mom;
+          if (val == 1) {
+            mom = moment(
+              moment().add(3, "hours").format("YYYY-MM-DD hh:mm A"),
+              "YYYY-MM-DD hh:mm A"
+            );
+          } else if (val == 2) {
+            mom = moment(
+              `${moment().add(1, "day").format("YYYY-MM-DD")} 09:00 am`,
+              "YYYY-MM-DD hh:mm A"
+            );
+          } else if (val == 3) {
+            mom = moment(
+              `${moment().day(8).format("YYYY-MM-DD ")} 09:00 am`,
+              "YYYY-MM-DD hh:mm A"
+            );
+          } else if (val == 4) {
+            mom = moment().add(1, "week").minutes(0);
+          } else if (val == 5) {
+            mom = moment(
+              moment().add(1, "month").format("YYYY-MM-DD hh:mm"),
+              "YYYY-MM-DD hh:mm A"
+            );
+          } else if (val == 6) {
+            // console.log(this.datetime);
+            // mom = new Date(this.datetime);
+            // this.datetime = "";
+            vueThis.$refs["schedule-send-modal"].show();
           }
-
-          vueThis.attachments[hash] = attachmentObject;
-          Vue.delete(vueThis.attachments, hash);
-          vueThis.attachments[hash] = attachmentObject;
-          axios.request({
-            method: "post",
-            url: "https://app.helpwise.io/api/uploadAttachment.php",
-            data: formData,
-            withCredentials: true,
-            onUploadProgress: function(p){
-              let percentage = (p.loaded / p.total) * 100;
-              console.log(percentage);
-              console.log(hash);
-              console.log(vueThis.attachments);
-              vueThis.attachments[hash]["progress"] = percentage;
-            }
-          }).then((response)=>{
-            //get the attachment id
-            console.log(response);
-            console.log(hash);
-
-            let attachData = response.data.data.files[0];
-            let attachID = attachData["id"];
-
-            vueThis.attachments[attachID] = vueThis.attachments[hash];
-            Vue.delete(vueThis.attachments, hash);
-            vueThis.attachments[attachID]["isUploaded"] = true;
-            vueThis.attachments[attachID]["progress"] = 100;
-            vueThis.attachments[attachID]["filehash"] = attachData["filehash"];
-            vueThis.attachments[attachID]["filename"] = attachData["filename"];
-            vueThis.attachments[attachID]["filesize"] = attachData["filesize"];
-            vueThis.attachments[attachID]["mimeType"] = attachData["mimeType"];
-            vueThis.attachments[attachID]["extension"] = attachData["extension"];
-            vueThis.attachments[attachID]["id"] = attachID;
-            vueThis.files.push(attachID);
-            vueThis.editorInstance.attachments = vueThis.attachments;
-            console.log(vueThis.attachments, vueThis.editorInstance);
-          })
+          console.log(mom.toISOString());
+          bus.$emit("scheduleTweet", mom);
+        },
+      });
+    },
+    scheduleSend() {
+      var mom = new Date(this.datetime);
+      this.datetime = "";
+      console.log(mom.toISOString());
+      bus.$emit("scheduleTweet", mom);
+      this.$refs["schedule-send-modal"].hide();
+    },
+    handleChange(value, type) {
+      if (type === "minute") {
+        this.newDateOpen = false;
+      }
+    },
+    notBeforeToday(date) {
+      return date < new Date(new Date().setHours(0, 0, 0, 0));
+    },
+    notBeforeNow(date) {
+      return (
+        date < new Date(new Date().setHours(new Date().getHours() + 1, 0, 0, 0))
+      );
+    },
+    createBody(prop) {
+      let from = {};
+      // from[] = this.$store.state.userInfo.firstname + this.$store.state.userInfo.lastname;
+      let to = this.item.data.from;
+      let bcc = {};
+      let cc = {};
+      // let files = [];
+      // for (let i = 0; i < this.tagsTo.length; i++) {
+      //   if (this.tagsTo[i].name == undefined) {
+      //     to[this.tagsTo[i].email] = this.tagsTo[i].email;
+      //   } else {
+      //     to[this.tagsTo[i].email] = this.tagsTo[i].name;
+      //   }
+      // }
+      // for (let i = 0; i < this.tagsBCC.length; i++) {
+      //   if (this.tagsBCC[i].name == undefined) {
+      //     bcc[this.tagsBCC[i].email] = this.tagsBCC[i].email;
+      //   } else {
+      //     bcc[this.tagsBCC[i].email] = this.tagsBCC[i].name;
+      //   }
+      // }
+      // for (let i = 0; i < this.tagsCC.length; i++) {
+      //   if (this.tagsCC[i].name == undefined) {
+      //     cc[this.tagsCC[i].email] = this.tagsCC[i].email;
+      //   } else {
+      //     cc[this.tagsCC[i].email] = this.tagsCC[i].name;
+      //   }
+      // }
+      let html = this.reply_body;
+      var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
+      html = html.replace(re1, "");
+      console.log(html);
+      html = html.replace(/(<([^>]+)>)/gi, "");
+      console.log(html);
+      let body;
+      if (this.draftID == null) {
+        body = {
+          mailboxID: this.mailboxID,
+          bcc,
+          cc,
+          files: this.files,
+          from,
+          to,
+          inReplyTo: this.inReplyTo,
+          replyAll: false,
+          threadID: this.threadID,
+          html,
+        };
+      } else {
+        body = {
+          mailboxID: this.mailboxID,
+          bcc,
+          cc,
+          files: this.files,
+          from,
+          to,
+          threadID: this.threadID,
+          draftID: this.draftID,
+          inReplyTo: this.inReplyTo,
+          replyAll: false,
+          html,
+        };
+      }
+      // let text = html.replace(/(<([^>]+)>)/gi, "");
+      // // console.log(text);
+      // html &&
+      //   (body.html = `<div class=\"hwEmailWrapper\" style=\"font-family:sans-serif;font-size:0.875rem;color:#001737\">${html}</div>`);
+      // text && (body.text = text);
+      if (prop == "send") {
+        if (this.$store.state.userSettings.send == "send") {
+          body.archive = false;
+        } else {
+          body.archive = true;
         }
+      }
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        credentials: "include",
+      };
+      console.log(requestOptions.body);
+      return requestOptions;
     },
     saveDraft() {
       // this.getUserSignature();
+      const vueThis = this;
       if (this.reply_body) {
-        console.log("save");
-        this.message = "Saving Draft";
         let requestOptions = this.createBody("draft");
-        fetch(this.$apiBaseURL + "saveDraft.php", requestOptions)
+        let url;
+        if (this.item.type == "twitter") {
+          url = this.$apiBaseURL + "save-tweet-draft.php";
+        } else if (this.item.type == "fb-feed") {
+          url = this.$apiBaseURL + "save-draft-test.php";
+        }
+        fetch(url, requestOptions)
           .then(async (response) => {
             const data = await response.json();
             if (data.status !== "success") {
@@ -665,20 +854,231 @@ export default {
             }
             this.draftID = data.data.draftID;
             this.threadID = data.data.threadID;
-            this.editorInstance.draftID = data.data.draftID;
-            this.editorInstance.threadID = data.data.threadID;
-            if (this.subject !== "") {
-              this.message = this.subject;
-            } else {
-              this.message = "Draft Saved";
-            }
+            self.editorInstance.draftID = data.data.draftID;
+            self.editorInstance.mailboxID = this.mailboxID;
+            self.editorInstance.threadID = data.data.threadID;
+            console.log(
+              this.editorInstance,
+              self.editorInstance,
+              vueThis.editorInstance
+            );
           })
           .catch((error) => {
             alert(error);
           });
       }
     },
-  }
+    sendMail(sendAt) {
+      var self = this;
+      console.log("sendingg");
+      // if (this.tagsTo.length == 0) {
+      //   this.noTo = true;
+      //   return;
+      // }
+      // for (let i = 0; i < this.tagsTo.length; i++) {
+      //   if (this.tagsTo[i].tiClasses.includes("ti-invalid")) {
+      //     this.noTo = false;
+      //     this.toNotValid = true;
+      //     break;
+      //   }
+      // }
+      // for (let i = 0; i < this.tagsCC.length; i++) {
+      //   if (this.tagsCC[i].tiClasses.includes("ti-invalid")) {
+      //     this.ccNotValid = true;
+      //     break;
+      //   }
+      // }
+      // for (let i = 0; i < this.tagsBCC.length; i++) {
+      //   if (this.tagsBCC[i].tiClasses.includes("ti-invalid")) {
+      //     this.bccNotValid = true;
+      //     break;
+      //   }
+      // }
+      // if (this.toNotValid || this.ccNotValid || this.bccNotValid) return;
+      let requestOptions = this.createBody("send");
+      requestOptions.body = JSON.parse(requestOptions.body);
+      if (sendAt !== undefined) {
+        requestOptions.body["sendAt"] = sendAt;
+      }
+      console.log(requestOptions.body);
+      // fetch(this.$apiBaseURL + "send-tweet.php", requestOptions)
+      //   .then(async (response) => {
+      //     const data = await response.json();
+      //     if (data.status !== "success") {
+      //       const error = (data && data.message) || response.status;
+      //       return Promise.reject(error);
+      //     }
+      let payload = {};
+      let html = this.reply_body;
+      var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
+      html = html.replace(re1, "");
+      html = html.replace(/(<([^>]+)>)/gi, "");
+      console.log(html);
+      if (this.item.type == "twitter") {
+        // payload['id'] = data.data.messageID;
+        payload["id"] = this.draftID;
+        payload["threadId"] = this.threadID;
+        payload["text"] = html;
+        payload["snippet"] = this.reply_body;
+        payload["img"] = this.item.data.user;
+        payload["attachments"] = this.attachments;
+        payload["from"] = {};
+        payload["from"][Object.keys(this.item.data.from).toString()] =
+          this.$store.state.userInfo.firstname +
+          this.$store.state.userInfo.lastname;
+        payload["date"] = new Date().toISOString();
+        payload["isLiked"] = "0";
+        payload["isRetweeted"] = "0";
+        payload["timestamp"] = Date.now();
+        payload["type"] = "twitter";
+      } else {
+        console.log(requestOptions.body, requestOptions.body["html"]);
+        // payload['id'] = data.data.messageID;
+        payload["id"] = this.draftID;
+        payload["threadId"] = this.threadID;
+        payload["text"] = html;
+        payload["attachments"] = this.attachments;
+        payload["date"] = new Date().toISOString();
+        payload["sentBy"] = this.$store.state.userInfo;
+        payload["isPost"] = false;
+        payload["type"] = "fb-feed";
+      }
+      // payload.subject = this.subject;
+      // payload.displaySubject = this.subject;
+      // payload.from = requestOptions.body.from;
+      // payload.bcc = requestOptions.body.bcc;
+      // payload.cc = requestOptions.body.cc;
+      // payload.to = requestOptions.body.to;
+      // payload.html = requestOptions.body.html;
+      // payload.strippedHtml = requestOptions.body.html;
+      // payload.text = requestOptions.body.text;
+      // payload.snippet = requestOptions.body.text;
+      // payload.readStats = {};
+      // payload.attachments = requestOptions.body.attachments;
+      // payload.date = new Date().toISOString();
+      console.log(payload);
+      let itm = {
+        item: payload,
+        type: "item",
+      };
+      bus.$emit("changeThreadAttrs", itm);
+      this.closeCompose(this.draftID);
+      // this.show = false;
+      // this.undoMessage = data.message;
+      // $("#undo-txt").text(data.message);
+      // this.showUndo = true;
+      // this.undoInterval = setInterval(function () {
+      //   console.log(1);
+      //   self.undoTimer -= 1;
+      // }, 1000);
+      // this.undoTimeout = setTimeout(() => {
+      //   console.log(2);
+      //   clearInterval(self.undoInterval);
+      //   self.showUndo = false;
+      //   self.closeCompose(self.composer.hash);
+      //   self.undoTimer = self.$store.state.userSettings.undoTimer;
+      // }, self.$store.state.userSettings.undoTimer*1000);
+      // clearTimeout(this.undoInterval);
+      // })
+      // .catch((error) => {
+      //   alert(error);
+      // });
+    },
+    uploadAttachment(event) {
+      const selectedFiles = event.target.files;
+      console.log(selectedFiles);
+      const vueThis = this;
+      for (let i = 0; i < selectedFiles.length; i++) {
+        let selectedFile = selectedFiles[i];
+        let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
+        var formData = new FormData();
+        formData.append("files[]", selectedFile);
+        formData.append("mailboxID", vueThis.mailboxID);
+        let attachmentObject = {
+          filename: selectedFile["name"],
+          filesize: selectedFile["size"],
+          progress: 0,
+          isUploaded: false,
+          extension: "pdf",
+        };
+
+        vueThis.attachments[hash] = attachmentObject;
+        Vue.delete(vueThis.attachments, hash);
+        vueThis.attachments[hash] = attachmentObject;
+        axios
+          .request({
+            method: "post",
+            url: "https://app.helpwise.io/api/uploadAttachment.php",
+            data: formData,
+            withCredentials: true,
+            onUploadProgress: function (p) {
+              let percentage = (p.loaded / p.total) * 100;
+              console.log(percentage);
+              console.log(hash);
+              console.log(vueThis.attachments);
+              vueThis.attachments[hash]["progress"] = percentage;
+            },
+          })
+          .then((response) => {
+            //get the attachment id
+            console.log(response);
+            console.log(hash);
+
+            let attachData = response.data.data.files[0];
+            let attachID = attachData["id"];
+            console.log(attachID, attachData, vueThis.attachments);
+            vueThis.attachments[attachID] = vueThis.attachments[hash];
+            Vue.delete(vueThis.attachments, hash);
+            vueThis.attachments[attachID]["isUploaded"] = true;
+            vueThis.attachments[attachID]["progress"] = 100;
+            vueThis.attachments[attachID]["filehash"] = attachData["filehash"];
+            vueThis.attachments[attachID]["filename"] = attachData["filename"];
+            vueThis.attachments[attachID]["filesize"] = attachData["filesize"];
+            vueThis.attachments[attachID]["mimeType"] = attachData["mimeType"];
+            vueThis.attachments[attachID]["extension"] =
+              attachData["extension"];
+            vueThis.attachments[attachID]["id"] = attachID;
+            vueThis.files.push(attachID);
+            self.editorInstance.attachments = vueThis.attachments;
+            console.log(vueThis.attachments, self.editorInstance);
+          });
+      }
+    },
+    closeCompose(id) {
+      // console.log(hash, this.composer.id, hash == this.composer.id);
+      // this.show = false;
+      // if(hash == this.composer.id) {
+      this.item = null;
+      this.reply_body = "";
+      this.files = [];
+      this.attachments = {};
+      // this.uploadingFiles = [];
+      // this.filesMap = [];
+      // this.tagTo = "";
+      // this.tagCC = "";
+      // this.tagBCC = "";
+      // this.tagsTo = [];
+      // this.tagsCC = [];
+      // this.tagsBCC = [];
+      // this.autocompleteItemsTo = [];
+      // this.autocompleteItemsCC = [];
+      // this.autocompleteItemsBCC = [];
+      // this.toNotValid = false;
+      // this.ccNotValid = false;
+      // this.bccNotValid = false;
+      // this.subject = "";
+      this.threadID = null;
+      this.draftID = null;
+      this.inReplyTo = null;
+      this.mailboxID = null;
+      // this.message = "New Message";
+      // this.mail_body = this.signature();
+      // this.fromSelected = this.defaultAlias();
+      // this.compose = this.compose.filter(el => Object.keys(el) !== hash);
+      // bus.$emit("closeCompose", hash);
+      // }
+    },
+  },
 };
 </script>
 

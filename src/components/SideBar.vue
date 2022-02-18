@@ -73,7 +73,7 @@
               style="cursor: pointer"
               id="mine-label"
               class="nav-link hw-label-badge"
-              :class="this.$store.state.type == 'mine' && 'active'"
+              :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'mine' ? 'active' : '') : this.$store.state.type == 'mine' && 'active'"
             >
               <!--?xml version="1.0" encoding="utf-8"?-->
               <svg
@@ -133,7 +133,7 @@
               style="cursor: pointer"
               id="mentions-label"
               class="nav-link hw-label-badge"
-              :class="this.$store.state.type == 'mentions' && 'active'"
+              :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'mentions' ? 'active' : '') : this.$store.state.type == 'mentions' && 'active'"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -161,7 +161,7 @@
               style="cursor: pointer"
               id="discussions-label"
               class="nav-link hw-label-badge"
-              :class="this.$store.state.type == 'discussions' && 'active'"
+              :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'discussions' ? 'active' : '') : this.$store.state.type == 'discussions' && 'active'"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +192,7 @@
               style="cursor: pointer"
               id="all-label"
               class="nav-link hw-label-badge"
-              :class="this.$store.state.type == 'all' && 'active'"
+              :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'all' ? 'active' : '') : this.$store.state.type == 'all' && 'active'"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -223,7 +223,7 @@
               style="cursor: pointer"
               id="assigned-label"
               class="nav-link hw-label-badge"
-              :class="this.$store.state.type == 'assigned' && 'active'"
+              :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'assigned' ? 'active' : '') : this.$store.state.type == 'assigned' && 'active'"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -254,7 +254,7 @@
               style="cursor: pointer"
               id="unassigned-label"
               class="nav-link hw-label-badge"
-              :class="this.$store.state.type == 'unassigned' && 'active'"
+              :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'unassigned' ? 'active' : '') : this.$store.state.type == 'unassigned' && 'active'"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -283,7 +283,7 @@
               style="cursor: pointer"
               id="starred-label"
               class="nav-link hw-label-badge"
-              :class="this.$store.state.type == 'starred' && 'active'"
+              :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'starred' ? 'active' : '') : this.$store.state.type == 'starred' && 'active'"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -314,7 +314,7 @@
               style="cursor: pointer"
               id="snoozed-label"
               class="nav-link hw-label-badge"
-              :class="this.$store.state.type == 'snoozed' && 'active'"
+              :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'snoozed' ? 'active' : '') : this.$store.state.type == 'snoozed' && 'active'"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -344,7 +344,7 @@
               style="cursor: pointer"
               id="drafts-label"
               class="nav-link hw-label-badge"
-              :class="this.$store.state.type == 'drafts' && 'active'"
+              :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'drafts' ? 'active' : '') : this.$store.state.type == 'drafts' && 'active'"
               ><svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -423,7 +423,7 @@
                 style="cursor: pointer"
                 id="sent-label"
                 class="nav-link hw-label-badge"
-                :class="this.$store.state.type == 'sent' && 'active'"
+                :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'sent' ? 'active' : '') : this.$store.state.type == 'sent' && 'active'"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -448,7 +448,7 @@
                 style="cursor: pointer"
                 id="scheduled-label"
                 class="nav-link hw-label-badge"
-                :class="this.$store.state.type == 'scheduled' && 'active'"
+                :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'scheduled' ? 'active' : '') : this.$store.state.type == 'scheduled' && 'active'"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
@@ -473,7 +473,7 @@
                 style="cursor: pointer"
                 id="closed-label"
                 class="nav-link hw-label-badge"
-                :class="this.$store.state.type == 'closed' && 'active'"
+                :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'closed' ? 'active' : '') : this.$store.state.type == 'closed' && 'active'"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -498,7 +498,7 @@
                 style="cursor: pointer"
                 id="spam-label"
                 class="nav-link hw-label-badge"
-                :class="this.$store.state.type == 'spam' && 'active'"
+                :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'spam' ? 'active' : '') : this.$store.state.type == 'spam' && 'active'"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -531,7 +531,7 @@
                 style="cursor: pointer"
                 id="trash-label"
                 class="nav-link hw-label-badge"
-                :class="this.$store.state.type == 'trash' && 'active'"
+                :class="this.$route.params.type !== undefined ? (this.$route.params.type == 'trash' ? 'active' : '') : this.$store.state.type == 'trash' && 'active'"
                 ><svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"

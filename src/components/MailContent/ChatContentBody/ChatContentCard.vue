@@ -93,7 +93,7 @@
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg
               ></a>
               <a
-                v-if="item.type == 'fb-feed'"
+                v-if="item.type == 'fb-feed' && item.data.postData !== undefined"
                 target="_blank"
                 :href="item.data.postData.postLink"
                 class="mg-l-5 post_link"

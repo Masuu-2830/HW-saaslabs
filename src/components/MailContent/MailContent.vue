@@ -46,7 +46,9 @@ export default {
         $route (to, from) {
             if(to.params.threadId !== from.params.threadId) {
                 // this.ifIntOpen = false;
-                this.right = '0px'
+                this.right = '0px';
+                this.contactOpen = false;
+                this.sidebarOpen = false;
             }
         }
     },
@@ -69,18 +71,52 @@ export default {
     bus.$on("changeThreadAttrs", (data) => {
       if(data.type == "assignment") {
         if(data.teammate == null) {
-          this.thread.data.currentAssignment.assigned = null;
-          this.thread.data.currentAssignment.me = false;
+          if(this.thread.data.currentAssignment == null) {
+            let obj = {
+              'assigned': null,
+              'me': false,
+              'assigner': this.$store.state.userInfo,
+              'time': data.log.data.at
+            }
+            this.thread.data.currentAssignment = obj;
+          } else {
+            this.thread.data.currentAssignment.assigned = null;
+            this.thread.data.currentAssignment.me = false;
+            this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
+            this.thread.data.currentAssignment.time = data.log.data.at;
+          }
         } else if(data.teammate[0].id == this.$store.state.userInfo.id) {
-          this.thread.data.currentAssignment.assigned = data.teammate[0];
-          this.thread.data.currentAssignment.me = true;
+          if(this.thread.data.currentAssignment == null) {
+            let obj = {
+              'assigned': data.teammate[0],
+              'me': true,
+              'assigner': this.$store.state.userInfo,
+              'time': data.log.data.at
+            }
+            this.thread.data.currentAssignment = obj;
+          } else {
+            this.thread.data.currentAssignment.assigned = data.teammate[0];
+            this.thread.data.currentAssignment.me = true;
+            this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
+            this.thread.data.currentAssignment.time = data.log.data.at;
+          }
         } else {
-          this.thread.data.currentAssignment.assigned = data.teammate[0];
-          this.thread.data.currentAssignment.me = false;
+          if(this.thread.data.currentAssignment == null) {
+            let obj = {
+              'assigned': data.teammate[0],
+              'me': false,
+              'assigner': this.$store.state.userInfo,
+              'time': data.log.data.at
+            }
+            this.thread.data.currentAssignment = obj;
+          } else {
+            this.thread.data.currentAssignment.assigned = data.teammate[0];
+            this.thread.data.currentAssignment.me = false;
+            this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
+            this.thread.data.currentAssignment.time = data.log.data.at;
+          }
         }
         console.log(this.thread.data.currentAssignment);
-        this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
-        this.thread.data.currentAssignment.time = data.log.data.at;
         this.thread.data.items.push(data.log);
       } else if(data.type == "tag") {
         if(data.toRemove.length > 0) {
@@ -106,6 +142,13 @@ export default {
         mail["data"] = data.email;
         mail["type"] = "email";
         mail["timestamp"] = data.email.date;
+        this.thread.data.items.push(mail);
+        console.log(this.thread.data.items);
+      } else if(data.type == "item") {
+        let mail = {};
+        mail["data"] = data.item;
+        mail["type"] = data.item.type;
+        mail["timestamp"] = data.item.date;
         this.thread.data.items.push(mail);
         console.log(this.thread.data.items);
       }

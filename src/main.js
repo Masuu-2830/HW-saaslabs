@@ -30,16 +30,66 @@ Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 
 export const bus = new Vue();
-FroalaEditor.DefineIcon("scheduleReply", {
-  FA5NAME: "clock",
-  template: "font_awesome_5",
-});
-FroalaEditor.RegisterCommand("scheduleReply", {
-  title: "Schedule Reply",
-  icon: "timer",
+// FroalaEditor.DefineIcon("scheduleReply", {
+//   FA5NAME: "clock",
+//   template: "font_awesome_5",
+// });
+// FroalaEditor.RegisterCommand("scheduleReply", {
+//   title: "Schedule Reply",
+//   icon: "clock",
+//   refreshAfterCallback: true,
+//   callback: function () {
+//     // this.$wp.parents(".mail-compose").find(".editor-uploadAttachment").trigger("click");
+//   },
+// });
+FroalaEditor.DefineIcon('scheduleReply', {NAME: 'clock', SVG_KEY: 'clock'});
+FroalaEditor.RegisterCommand('scheduleReply', {
+  title: 'Schedule Reply',
+  type: 'dropdown',
+  focus: false,
+  undo: false,
   refreshAfterCallback: true,
-  callback: function () {
-    // this.$wp.parents(".mail-compose").find(".editor-uploadAttachment").trigger("click");
+  options: {
+    '1': 'Later today (In 3 hour)',
+    '2': 'Tomorrow (9 am)',
+    '3': 'Next Monday (9 am)',
+    '4': 'One week',
+    '5': 'One month',
+    '6': 'Pick date & time',
+  },
+  callback: function (cmd, val) {
+    console.log (val);
+    var mom;
+    if (val == 1) {
+      mom = moment(
+        moment().add(3, "hours").format("YYYY-MM-DD hh:mm A"),
+        "YYYY-MM-DD hh:mm A"
+      );
+    } else if (val == 2) {
+      mom = moment(
+        `${moment().add(1, "day").format("YYYY-MM-DD")} 09:00 am`,
+        "YYYY-MM-DD hh:mm A"
+      );
+    } else if (val == 3) {
+      mom = moment(
+        `${moment().day(8).format("YYYY-MM-DD ")} 09:00 am`,
+        "YYYY-MM-DD hh:mm A"
+      );
+    } else if (val == 4) {
+      mom = moment().add(1, "week").minutes(0);
+    } else if (val == 5) {
+      mom = moment(
+        moment().add(1, "month").format("YYYY-MM-DD hh:mm"),
+        "YYYY-MM-DD hh:mm A"
+      );
+    } else if (val == 6) {
+      // console.log(this.datetime);
+      // mom = new Date(this.datetime);
+      // this.datetime = "";
+      // this.$refs["snooze-thread-modal"].hide();
+    }
+    console.log(mom.toISOString());
+    bus.$emit("scheduleTweet", mom);
   },
 });
 FroalaEditor.DefineIcon("attach", {
@@ -55,16 +105,29 @@ FroalaEditor.RegisterCommand("attach", {
   },
 });
 
-FroalaEditor.DefineIcon("attachReply", {
+FroalaEditor.DefineIcon("attachMailReply", {
   FA5NAME: "paperclip",
   template: "font_awesome_5",
 });
-FroalaEditor.RegisterCommand("attachReply", {
+FroalaEditor.RegisterCommand("attachMailReply", {
   title: "Insert Attachment",
   icon: "attach",
   refreshAfterCallback: true,
   callback: function () {
     this.$wp.parents(".replyWindow").find(".editor-uploadAttachment").trigger("click");
+  },
+});
+
+FroalaEditor.DefineIcon("attachChatReply", {
+  FA5NAME: "paperclip",
+  template: "font_awesome_5",
+});
+FroalaEditor.RegisterCommand("attachChatReply", {
+  title: "Insert Attachment",
+  icon: "attach",
+  refreshAfterCallback: true,
+  callback: function () {
+    this.$wp.parents(".editor_container").find("#editor-uploadAttachment").trigger("click");
   },
 });
 
@@ -89,18 +152,36 @@ FroalaEditor.RegisterCommand("clear", {
   refreshAfterCallback: true,
   callback: function () {
     console.log(this.draftID, this.threadID);
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        mailboxId: this.mailboxID,
-        threadId: this.threadID,
-        draftId: this.draftID,
-      }),
-      credentials: "include",
-    };
+    let requestOptions = {};
+    let url = "";
+    if(this.type == 'replyCard') {
+      url = "https://app.helpwise.io/api/discard_tweet_draft.php";
+      let threadId = new Array();
+      threadId.push(this.threadID);
+      requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mailboxId: this.mailboxID,
+          threadIds: threadId,
+        }),
+        credentials: "include",
+      }
+    } else {
+      url = "https://app.helpwise.io/api/discardDraft.php";
+      requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mailboxId: this.mailboxID,
+          threadId: this.threadID,
+          draftId: this.draftID,
+        }),
+        credentials: "include",
+      }
+    }
     fetch(
-      "https://app.helpwise.io/api/discardDraft.php",
+      url,
       requestOptions
     ).then(async (response) => {
       const data = await response.json();
@@ -118,7 +199,7 @@ FroalaEditor.RegisterCommand("clear", {
         bus.$emit("closeReply", this.reply.hash);
       } else if(this.type == "replyCard") {
         console.log("replyCard from main");
-        bus.$emit("closeReplyCard", this.reply.hash);
+        bus.$emit("closeReplyCard", this.draftID);
       }
     });
   },

@@ -4,8 +4,12 @@ import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
+const dataState = createPersistedState({
+    paths: ['inboxData', 'type']
+})
+
 export const store = new Vuex.Store({
-    plugins: [createPersistedState()],
+    plugins: [dataState],
     state: {
         inboxData: {},
         userInfo: {},
@@ -17,7 +21,11 @@ export const store = new Vuex.Store({
         userSignature: {},
         aliases: {},
         stateLoaded: false,
-        type: ""
+        type: "",
+        labelId: -1,
+        threads: [],
+        threadData: {},
+        firebaseModal: ''
     },
     mutations: {
         setState: (state, data) => {
@@ -46,6 +54,26 @@ export const store = new Vuex.Store({
             console.log(data)
             state.type = data;
         },
+        setLabelId: (state, data) => {
+            console.log(data)
+            state.labelId = data;
+        },
+        setThreads: (state, data) => {
+            console.log(data)
+            state.threads = data;
+        },
+        setThreadData: (state, data) => {
+            console.log(data);
+            if(!(data.id in Object.keys(state.threadData))) {
+                state.threadData[data.data.id] = data;
+                console.log("adding new thread")
+            }
+            console.log(state.threadData);
+        },
+        setFirebaseModal: (state, data) => {
+            console.log(data);
+            state.firebaseModal = data;
+        }
     },
     actions: {
         async fetchPingDetails(context, data) {
@@ -62,6 +90,18 @@ export const store = new Vuex.Store({
         },
         async type(context, data) {
             await context.commit('setType', data);
+        },
+        async labelId(context, data) {
+            await context.commit('setLabelId', data);
+        },
+        async updateThreads(context, data) {
+            await context.commit('setThreads', data);
+        },
+        async updateThreadData(context, data) {
+            await context.commit('setThreadData', data);
+        },
+        async updateFirebaseModal(context, data) {
+            await context.commit('setFirebaseModal', data);
         },
     }
 })
