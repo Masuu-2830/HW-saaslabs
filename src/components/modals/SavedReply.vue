@@ -66,6 +66,7 @@
         data(){
             const self = this;
             return {
+                type: "",
                 createSavedReplyForm: false,
                 savedReplyName: "",
                 errorInName: false,
@@ -200,7 +201,8 @@
                 this.editorInstance.html.set("");
             },
             insertSavedReplyInEditor(id){
-                bus.$emit("modal.savedReplyInsert.click", id);
+                console.log(this.type, id);
+                bus.$emit("modal.savedReplyInsert.click", id, this.type);
                 this.closeModal();
             },
             searchSavedReply(){
@@ -218,6 +220,12 @@
         },
         created: function(){
             this.fetchSavedReplies();
+
+            bus.$on("savedReply", (type) => {
+                this.$bvModal.show('saved-reply-modal');
+                console.log(type);
+                this.type = type;
+            })
         }
     }
 </script>

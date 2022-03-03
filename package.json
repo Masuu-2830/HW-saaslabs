@@ -29,6 +29,8 @@
     "vue-cookies": "^1.7.4",
     "vue-froala-wysiwyg": "^4.0.4",
     "vue-moment": "^4.1.0",
+    "vue-phone-country-code": "^1.1.17",
+    "vue-phone-number-input": "^1.1.12",
     "vue-router": "^3.0.1",
     "vue-toastification": "^1.7.14",
     "vue-tribute": "^1.0.7",

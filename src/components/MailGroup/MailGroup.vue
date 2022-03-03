@@ -1553,6 +1553,20 @@ export default {
       // this.route = to.params.type;
       this.selectedIds = [];
       console.log(this.isThreadRefresh);
+      // if(to.mailboxId !== this.$store.state.inboxData.id) {
+      //   this.labelId = 4;
+      //     this.tagId = 0;
+      //     this.route = 'mine';
+      //     this.currPage = 1;
+      //     this.startThread = 1;
+      //     this.endThread = 1;
+      //     this.personId = 0;
+      //     this.order = "";
+      //     this.squery = "";
+      //     this.$store.dispatch("type", this.route);
+      //   this.$store.dispatch("labelId", this.labelId);
+      //   this.fetchThreads();
+      // }
       if (
         (to.params.type !== from.params.type &&
           from.params.type !== undefined) ||
@@ -2120,25 +2134,48 @@ export default {
         this.route == "drafts" &&
         this.perPageMails[objIndex].messageCount == 1
       ) {
-        console.log(this.perPageMails[objIndex].messageCount, objIndex);
-        let emailId = this.perPageMails[objIndex].id;
-        fetch(
-          this.$apiBaseURL +
-            "getEmail.php?emailID=" +
-            emailId +
-            "&mailboxID=" +
-            this.$route.params.mailboxId,
-          { credentials: "include" }
-        ).then(async (response) => {
-          const data = await response.json();
-          if (data.status !== "success") {
-            const error = (data && data.message) || response.status;
-            return Promise.reject(error);
-          }
-          let hash =
-            Date.now() + "-" + Math.floor(Math.random() * 100000000000);
-          bus.$emit("openCompose", hash, data.data.email);
-        });
+        if(this.$store.state.inboxData.type == 'mail') {
+          console.log(this.perPageMails[objIndex].messageCount, objIndex);
+          let emailId = this.perPageMails[objIndex].id;
+          fetch(
+            this.$apiBaseURL +
+              "getEmail.php?emailID=" +
+              emailId +
+              "&mailboxID=" +
+              this.$route.params.mailboxId,
+            { credentials: "include" }
+          ).then(async (response) => {
+            const data = await response.json();
+            if (data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            let hash =
+              Date.now() + "-" + Math.floor(Math.random() * 100000000000);
+            bus.$emit("openCompose", hash, 'mail', data.data.email);
+          });
+        } else if(this.$store.state.inboxData.type == 'twitter') {
+          console.log(this.perPageMails[objIndex].messageCount, objIndex);
+          let emailId = this.perPageMails[objIndex].email.id;
+          fetch(
+            this.$apiBaseURL +
+              "get-tweet.php?emailID=" +
+              emailId +
+              "&mailboxID=" +
+              this.$store.state.inboxData.id,
+            { credentials: "include" }
+          ).then(async (response) => {
+            const data = await response.json();
+            if (data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            let hash =
+              Date.now() + "-" + Math.floor(Math.random() * 100000000000);
+            bus.$emit("openTweetCompose", hash, 'twitter', data.data.email);
+          });
+        }
+        
       } else {
         bus.$emit("changeRead", id, 1);
         this.activeId = id;

@@ -153,7 +153,7 @@
                 >{{ tag.name }}</span
               >
             </div>
-            <div v-if="mail.type == 'mail'" class="d-flex align-items-center">
+            <div class="d-flex align-items-center">
               <!-- <span
                 v-if="mail.email !== undefined"
                 class="tx-14 hw-thread-subject mr-2"
@@ -162,6 +162,7 @@
                 {{ mail.email.subject ? mail.email.subject : "(no subject)" }}
               </span> -->
               <span
+                 v-if="mail.type == 'mail'"
                 class="tx-14 hw-thread-subject mr-2"
                 :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
               >
@@ -733,6 +734,7 @@
         {{ mail.email.subject ? mail.email.subject : "(no subject)" }}
       </div> -->
       <div
+        v-if="mail.type == 'mail'"
         class="tx-13 hw-thread-subject"
         style="
           width: 90%;

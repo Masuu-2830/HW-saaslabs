@@ -6,6 +6,7 @@
             <MailGroup v-if="dataLoaded && loaded" :mailbox="mailbox" />
             <MailContent />
             <compose-wrapper></compose-wrapper>
+            <tweet-compose></tweet-compose>
         </div>
 
         <HcArticles/>
@@ -23,6 +24,7 @@ import HcArticles from './modals/HcArticles.vue';
 import SavedReply from './modals/SavedReply.vue';
 import ComposeWrapper from './ComposeWrapper.vue';
 import { bus } from "../main";
+import TweetCompose from './TweetCompose.vue';
 export default {
     name: 'Home',
     components: {
@@ -33,7 +35,8 @@ export default {
         Compose,
         HcArticles,
         SavedReply,
-        ComposeWrapper
+        ComposeWrapper,
+        TweetCompose
     },
     data() {
       return {
@@ -48,6 +51,7 @@ export default {
             if(to.params.mailboxId !== from.params.mailboxId) {
                 this.fetchMailBoxData();
                 this.fetchSidebarStats();
+                this.fetchAliases();
             }
         }
     },
@@ -93,7 +97,10 @@ export default {
             await this.$store.dispatch('fetchPingDetails', data);
         },
         async fetchAliases() {
-            const response = await fetch(this.$apiBaseURL + "getFromAddresses.php?mailboxId=" + this.$route.params.mailboxId, {credentials: 'include'});
+            let url =
+                "https://app.helpwise.io/api/getFromAddresses.php?mailboxId=" +
+                (this.$route.params.mailboxId !== undefined ? this.$route.params.mailboxId : this.$store.state.inboxData.id); 
+            const response = await fetch(url, {credentials: 'include'});
             const data = await response.json();
             console.log(data);
             await this.$store.dispatch('fetchAliases', data.data);
@@ -106,7 +113,8 @@ export default {
                     const error = (data && data.message) || response.status;
                     return Promise.reject(error);
                 }
-                console.log(data);
+                console.log(data.data);
+                // await this.$store.dispatch('fetchUserSignature', data.data);
                 let signatureId = data.data[0] && data.data[0].id;
                 if (signatureId) {
                     fetch(this.$apiBaseURL + "signatures/get.php?id=" + signatureId, {credentials: "include"})
