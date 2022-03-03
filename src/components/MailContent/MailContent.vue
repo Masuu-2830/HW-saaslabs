@@ -39,7 +39,8 @@ export default {
       loading: false,
       sidebarOpen: false,
       contactOpen: false,
-      integration_id: 0
+      integration_id: 0,
+      integration_name: ''
     };
   },
   watch:{
@@ -163,10 +164,12 @@ export default {
             this.right = '0px';
         }
       },
-    IntegrationSidebar: function (integrationID) {
-      if(this.integration_id != integrationID){
+    IntegrationSidebar: function (integrationData) {
+      let integrationID = integrationData.id;
+      let intName = integrationData.lname;
+      if(this.integration_id == integrationID && this.integration_name == intName){
+        if(this.right == '0px'){
           this.right = '300px';
-          this.integration_id = integrationID;
           if(integrationID == 0){
             this.sidebarOpen = false;
             this.contactOpen = true;
@@ -174,22 +177,23 @@ export default {
             this.sidebarOpen = true;
             this.contactOpen = false;
           }
-      }else{
-        if(this.right == '300px'){
+        }else{
           this.right = '0px';
           this.sidebarOpen = false;
           this.contactOpen = false;
+        }
+      }else{
+        this.right = '300px';
+        if(integrationID == 0){
+          this.sidebarOpen = false;
+          this.contactOpen = true;
         }else{
-          this.right = '300px';
-          if(integrationID == 0){
-            this.sidebarOpen = false;
-            this.contactOpen = true;
-          }else{
-            this.sidebarOpen = true;
-            this.contactOpen = false;
-          }
+          this.sidebarOpen = true;
+          this.contactOpen = false;
         }
       }
+      this.integration_id = integrationID;
+      this.integration_name = intName;
     }
   }
 };

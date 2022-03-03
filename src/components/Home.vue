@@ -2,7 +2,7 @@
     <div class="main">
         <NavBar :mailboxes="mailboxes" />
         <div class="mail-wrapper">
-            <SideBar v-if="dataLoaded && loaded" :mailbox="mailbox" />
+            <SideBarHW v-if="dataLoaded && loaded" :mailbox="mailbox" />
             <MailGroup v-if="dataLoaded && loaded" :mailbox="mailbox" />
             <MailContent />
             <compose-wrapper></compose-wrapper>
@@ -17,7 +17,7 @@
 <script>
 import NavBar from './NavBar.vue';
 import MailGroup from './MailGroup/MailGroup.vue';
-import SideBar from './SideBar.vue';
+import SideBarHW from './SidebarHW.vue';
 import MailContent from './MailContent/MailContent.vue'
 import Compose from './Compose.vue';
 import HcArticles from './modals/HcArticles.vue';
@@ -29,7 +29,7 @@ export default {
     name: 'Home',
     components: {
         NavBar,
-        SideBar,
+        SideBarHW,
         MailGroup,
         MailContent,
         Compose,
