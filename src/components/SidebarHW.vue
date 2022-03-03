@@ -96,7 +96,7 @@
                                     <p class="mg-b-0 w-100" style="white-space: nowrap">{{labels == 'inboxes' ? option.displayName : option.name }}</p>
                                 </div>
 
-                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bookmark tx-color-03 bookmarkIcon" :class="{'isActive' : option.isItPinned}"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bookmark tx-color-03 bookmarkIcon" :class="{'isActive' : isItPinned(labels, option.id)}"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
                             </div>
                         </div>
                     </div>
@@ -366,17 +366,18 @@ export default {
             this.sections[labels][option.id] = option;
         }
 
-        this.sections[labels] = this.sections[labels];
+        this.sections["inboxes"] = this.sections.inboxes;
+        this.sections["tags"] = this.sections.tags;
 
         // this.sections[labels].push(option);
 
-        // if(labels == "inboxes"){
-        //     this.activeInboxes.push(option.id);
-        // }
+        if(labels == "inboxes"){
+            this.activeInboxes.push(option.id);
+        }
         
-        // if(labels == "tags"){
-        //     this.activeTags.push(option.id);
-        // }
+        if(labels == "tags"){
+            this.activeTags.push(option.id);
+        }
     },
     isItPinned(label, id){
         // if(this.sections[label][id]){
@@ -385,13 +386,13 @@ export default {
         //     return false;
         // }
 
-        // if(label == "inboxes"){
-        //     return this.activeInboxes.includes(id);
-        // }
+        if(label == "inboxes"){
+            return this.activeInboxes.includes(id);
+        }
         
-        // if(label == "tags"){
-        //     return this.activeTags.includes(id);
-        // }
+        if(label == "tags"){
+            return this.activeTags.includes(id);
+        }
     },
     saveSidebarPins(){
         this.sidebarViewOptionShow = false;
