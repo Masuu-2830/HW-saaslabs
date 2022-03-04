@@ -1,73 +1,70 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdn.helpwise.io/assets/theme/template/assets/css/dashforge.css">
-    <link rel="stylesheet" href="https://cdn.helpwise.io/assets/theme/template/assets/css/dashforge.mail.css">
-    <link rel="stylesheet" href="https://cdn.helpwise.io/assets/theme/template/assets/css/dashforge.profile.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdn.helpwise.io/assets/css/app.css">
-    <link rel="shortcut icon" type="image/x-icon" href="https://cdn.helpwise.io/assets/images/favicon.png">
-    <title>Helpwise</title>
-    <style>
-      .tribute-container {
-        bottom: -169px !important;
-      }
-
-      .editorContainer .fr-box.fr-basic .fr-wrapper{
-        border: none !important;
-      }
-
-      .editorContainer .fr-toolbar{
-        border: none !important;
-      }
-
-      #editorNotesTab .fr-toolbar, #editorNotesTab .fr-box.fr-basic .fr-wrapper{
-        border-top: 1px solid #ffd333;
-        background: #fef6d8;
-      }
-
-      #editorNotesTab .fr-toolbar .fr-more-toolbar.fr-expanded{
-        background: #fef6d8;
-        border-top: 1px solid #ffd333;
-        border-bottom: 1px solid #ffd333;
-      }
-
-    
-      #editorNotesTab .fr-toolbar .fr-command.fr-btn.fr-open:not(:hover):not(:focus):not(:active), #editorNotesTab .fr-desktop .fr-command:hover:not(.fr-table-cell), #editorNotesTab .fr-desktop .fr-command:focus:not(.fr-table-cell), #editorNotesTab .fr-desktop .fr-command.fr-btn-hover:not(.fr-table-cell), #editorNotesTab .fr-desktop .fr-command.fr-expanded:not(.fr-table-cell), #editorNotesTab .fr-newline, #editorNotesTab .fr-more-toolbar{
-        background: #ffd333;
-      }
-
-      .fr-toolbar.fr-bottom.fr-toolbar-open .fr-newline{
-        padding: 0px !important;
-      }
-
-      .fr-toolbar .fr-btn-grp{
-        margin: 0 !important;
-      }
-
-      
-    </style>
-      <link rel="stylesheet" href="dist/file-icon-vectors.min.css" />
-  </head>
-  <body>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-    <script src="https://cdn.helpwise.io/assets/js/libs.js?v=3"></script>
-    <!-- <script src="https://cdn.helpwise.io/assets/js/theme_lib.js"></script> -->
-    <script src="https://cdn.helpwise.io/assets/theme/template/assets/js/dashforge.js"></script>
-
-
-    <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-analytics.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-database.js"></script>
-
-    <script src="./src/firebase.js"></script>
-    <script src="./src/firebaseInit.js"></script>
-
-
-  </body>
-  </html>
-  
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdn.helpwise.io/assets/theme/template/assets/css/dashforge.css">
+        <link rel="stylesheet" href="https://cdn.helpwise.io/assets/theme/template/assets/css/dashforge.mail.css">
+        <link rel="stylesheet" href="https://cdn.helpwise.io/assets/theme/template/assets/css/dashforge.profile.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+        <link rel="stylesheet" href="https://cdn.helpwise.io/assets/css/app.css">
+        <link rel="shortcut icon" type="image/x-icon" href="https://cdn.helpwise.io/assets/images/favicon.png">
+        <title>Helpwise</title>
+        <style>
+            .tribute-container {
+                bottom: -169px !important;
+            }
+            .editorContainer .fr-box.fr-basic .fr-wrapper {
+                border: none !important;
+            }
+            .editorContainer .fr-toolbar {
+                border: none !important;
+            }
+            #editorNotesTab .fr-toolbar,
+            #editorNotesTab .fr-box.fr-basic .fr-wrapper {
+                border-top: 1px solid #ffd333;
+                background: #fef6d8;
+            }
+            #editorNotesTab .fr-toolbar .fr-more-toolbar.fr-expanded {
+                background: #fef6d8;
+                border-top: 1px solid #ffd333;
+                border-bottom: 1px solid #ffd333;
+            }
+            #editorNotesTab .fr-toolbar .fr-command.fr-btn.fr-open:not(:hover):not(:focus):not(:active),
+            #editorNotesTab .fr-desktop .fr-command:hover:not(.fr-table-cell),
+            #editorNotesTab .fr-desktop .fr-command:focus:not(.fr-table-cell),
+            #editorNotesTab .fr-desktop .fr-command.fr-btn-hover:not(.fr-table-cell),
+            #editorNotesTab .fr-desktop .fr-command.fr-expanded:not(.fr-table-cell),
+            #editorNotesTab .fr-newline,
+            #editorNotesTab .fr-more-toolbar {
+                background: #ffd333;
+            }
+            .fr-toolbar.fr-bottom.fr-toolbar-open .fr-newline {
+                padding: 0 !important;
+            }
+            .fr-toolbar .fr-btn-grp {
+                margin: 0 !important;
+            }
+        </style>
+        <link rel="stylesheet" href="dist/file-icon-vectors.min.css"/>
+    </head>
+    <body>
+        <div id="app"></div>
+        <!-- built files will be auto injected -->
+        <script src="https://cdn.helpwise.io/assets/js/libs.js?v=3"></script>
+        <!-- <script src="https://cdn.helpwise.io/assets/js/theme_lib.js"></script> -->
+        <script src="https://cdn.helpwise.io/assets/theme/template/assets/js/dashforge.js"></script>
+        <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="6fkzeuqwhculyfp"></script>
+        <script type="text/javascript" src="https://js.live.net/v7.2/OneDrive.js"></script>
+        <script src="https://cdn01.boxcdn.net/platform/elements/11.0.2/en-US/picker.js"></script>
+        <script src="https://cdn01.boxcdn.net/platform/elements/11.0.2/en-US/uploader.js"></script>
+        <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
+        <!-- <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=loadPicker"></script> -->
+        <!-- <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-analytics.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.2.0/firebase-database.js"></script> -->
+        <!-- <script src="./src/firebase.js"></script> -->
+        <!-- <script src="./src/firebaseInit.js"></script> -->
+    </body>
+</html>

@@ -29,9 +29,10 @@
             </svg>
           </router-link>
         </div>
-        <div v-if="this.$store.state.inboxData.type == 'mail'" role="group" class="btn-group btn-block">
+        <div role="group" class="btn-group btn-block">
           <button
-            @click="openCompose"
+            v-if="this.$store.state.inboxData.type == 'mail'"
+            @click="openCompose('mail')"
             class="
               tx-uppercase
               mailComposeBtn
@@ -42,26 +43,32 @@
           >
             Compose
           </button>
-          <div class="btn-group" role="group">
-            <button
-              id="composeDrop"
-              style="border-right: 2px solid #0153c7 !important"
-              type="button"
-              class="btn btn-primary btn-xs dropdown-toggle px-2"
-              data-toggle="dropdown"
-              aria-haspopup="true"
-              aria-expanded="false"
-            ></button>
-            <div
-              class="dropdown-menu composeDropMenu"
-              style="width: 30px !important"
-            >
-              <a class="dropdown-item mailComposeBtn" href=""> New Message </a>
-              <a class="dropdown-item startDiscussionBtn" href="">
-                Start Discussion
-              </a>
-            </div>
-          </div>
+          <button
+            v-if="this.$store.state.inboxData.type == 'twitter'"
+            @click="openCompose('twitter')"
+            id="mailComposeBtn"
+            class="
+              btn btn-primary btn-block
+              tx-uppercase tx-10 tx-medium tx-sans tx-spacing-4
+            "
+            style="
+              background-color: rgb(29, 161, 242);
+              border-color: rgb(29, 161, 242);
+            "
+          >
+            Tweet
+          </button>
+          <button
+            v-if="this.$store.state.inboxData.type == 'sms'"
+            @click="openCompose('sms')"
+            id="mailComposeBtn"
+            class="
+              btn btn-primary btn-block
+              tx-uppercase tx-10 tx-medium tx-sans tx-spacing-4
+            "
+          >
+            Compose
+          </button>
         </div>
       </div>
       <div class="pd-y-5 d-flex justify-content-center pos-relative">
@@ -280,12 +287,10 @@ export default {
     expandMore() {
       this.more = !this.more;
     },
-    openCompose() {
-      console.log("open")
-      let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
-      // this.$set(this.compose, hash, { id: hash });
-      bus.$emit("openCompose", hash);
-      // console.log(this.compose);
+    openCompose(type) {
+      console.log("open");
+      let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
+      bus.$emit("openCompose", hash, type);
     },
     async getInboxes(){
         const response = await fetch(this.$apiBaseURL + "mailboxes.php", {credentials: 'include'});

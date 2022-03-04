@@ -1,4 +1,8 @@
 import {store} from "./store/store";
+import firebaseAuth from 'firebase/auth';
+import firebase from 'firebase';
+// console.log(firebase)
+import { addThread, addNote, closeThread, snoozeThread, deleteThread, moveToInboxThread, toggleTags, assignThread, unsnoozeThread } from './firebase'
 
 const mailboxID = store.state.inboxData.id;
 
@@ -13,7 +17,7 @@ const firebaseConfig = {
     measurementId: "G-9MDPX07YHD"
 };
 
-// Initialize Firebase
+// // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 var firebase_app = firebase.initializeApp(firebaseConfig, `HW-inbox-${generateRandomString()}`);
 var firebase_analytics = firebase.analytics();
@@ -35,67 +39,67 @@ function initFirebase(){
 
                     socket.child(`/incoming`).on('value', function(data){
                         if(data.val()){
-                            
+                            addThread(data);
                         }
                     });
 
                     socket.child(`/outgoing`).on('value', function(data){
                         if(data.val()){
-
+                            addThread(data);
                         }
                     });
 
                     socket.child(`/notes`).on('value', function(data){
                         if(data.val()){
-
+                            addNote(data);
                         }
                     });
 
                     socket.child(`/close`).on('value', function(data){
                         if(data.val()){
-
+                            closeThread(data);
                         }
                     });
 
                     socket.child(`/snooze`).on('value', function(data){
                         if(data.val()){
-
+                            snoozeThread(data);
                         }
                     });
 
                     socket.child(`/unsnooze`).on('value', function(data){
                         if(data.val()){
-
+                            unsnoozeThread(data);
                         }
                     });
 
                     socket.child(`/delete`).on('value', function(data){
                         if(data.val()){
-
+                            deleteThread(data);
                         }
                     });
 
                     socket.child(`/addTag`).on('value', function(data){
                         if(data.val()){
-
+                            toggleTags(data);
                         }
                     });
 
                     socket.child(`/removeTag`).on('value', function(data){
                         if(data.val()){
-
+                            toggleTags(data);
                         }
                     });
 
                     socket.child(`/assign`).on('value', function(data){
                         if(data.val()){
-
+                            assignThread(data);
                         }
                     });
 
                     socket.child(`/moveToInbox`).on('value', function(data){
                         if(data.val()){
-
+                            moveToInboxThread(data);
                         }
                     });
 

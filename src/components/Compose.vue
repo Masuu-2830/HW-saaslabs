@@ -1523,8 +1523,8 @@ export default {
             multiSelect: true,
             viewType: "all",
             advanced: {
-              endpointHint: "api.onedrive.com",
-              redirectUri: "https://app.helpwise.io/onedrive.php",
+                endpointHint: "api.onedrive.com",
+                redirectUri: "https://app.helpwise.io/onedrive.php"
             },
             success: (files) => {
               let files_data = files.value;
@@ -2470,6 +2470,11 @@ export default {
 }
 
 .fr-toolbar .fr-command .fr-btn img, .fr-popup .fr-command.fr-btn img, .fr-modal .fr-command.fr-btn img {
+    margin: 8px 7px;
+    width: 16px !important;
+}
+
+.fr-toolbar .fr-command.fr-btn img, .fr-popup .fr-command.fr-btn img, .fr-modal .fr-command.fr-btn img {
     margin: 8px 7px;
     width: 16px !important;
 }

@@ -1,5 +1,3 @@
-import {store} from "./store/store";
-
 function createThread(data) {
     let thread = {
         'id': data.threadID,
@@ -20,7 +18,7 @@ function createThread(data) {
     return thread;
 }
 
-export default function addThread(data) {
+export function addThread(data) {
     var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
     var all = this.$store.state.type == 'all';
     var mine = (data.assignedTo.id == this.$store.state.userInfo.id ? true : false) && (this.$store.state.type == 'mine');
@@ -81,7 +79,7 @@ export default function addThread(data) {
     }
 }
 
-export default function addNote(data) {
+export function addNote(data) {
     var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
     var all = this.$store.state.type == 'all';
     var mine = (data.assignedTo.id == this.$store.state.userInfo.id ? true : false) && (this.$store.state.type == 'mine');
@@ -119,7 +117,7 @@ export default function addNote(data) {
     }
 }
 
-export default function closeThread(data) {
+export function closeThread(data) {
     var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
     if(inbox) {
         let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
@@ -135,7 +133,7 @@ export default function closeThread(data) {
     }
 }
 
-export default function snoozeThread(data) {
+export function snoozeThread(data) {
     var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
     if(inbox) {
         let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
@@ -151,7 +149,7 @@ export default function snoozeThread(data) {
     }
 }
 
-export default function deleteThread(data) {
+export function deleteThread(data) {
     var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
     if(inbox) {
         let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
@@ -167,7 +165,7 @@ export default function deleteThread(data) {
     }
 }
 
-export default function moveToInboxThread(data) {
+export function moveToInboxThread(data) {
     var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
     var all = this.$store.state.type == 'all';
     var mine = (data.assignedTo.id == this.$store.state.userInfo.id ? true : false) && (this.$store.state.type == 'mine');
@@ -187,7 +185,7 @@ export default function moveToInboxThread(data) {
     }
 }
 
-export default function toggleTags(data) {
+export function toggleTags(data) {
     var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
     if(inbox) {
         let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
@@ -232,7 +230,7 @@ export default function toggleTags(data) {
     }
 }
 
-export default function assignThread(data) {
+export function assignThread(data) {
     var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
     if(inbox) {
         let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
@@ -268,7 +266,7 @@ export default function assignThread(data) {
     }
 }
 
-export default function unsnoozeThread(data) {
+export function unsnoozeThread(data) {
     var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
     var all = this.$store.state.type == 'all';
     var mine = (data.thread.assignedTo.id == this.$store.state.userInfo.id ? true : false) && (this.$store.state.type == 'mine');
