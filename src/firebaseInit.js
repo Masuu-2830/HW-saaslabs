@@ -25,11 +25,12 @@ const firebaseConfig = {
 };
 // // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-var firebase_app = firebase.initializeApp(firebaseConfig, `HW-inbox-${
+export const firebase_app = firebase.initializeApp(firebaseConfig, `HW-inbox-${
     generateRandomString()
 }`);
+
 var firebase_analytics = firebase.analytics();
-export default function initFirebase() {
+export function initFirebase() {
     let userID = store.state.userInfo.id;
     let accountID = store.state.userInfo.accountID;
     fetch("https://app.helpwise.io/api/get_socket_token.php", {credentials: "include"}).then(async (response) => {
@@ -40,7 +41,7 @@ export default function initFirebase() {
         }
         let token = data.data.token;
         firebase_app.auth().signInWithCustomToken(token).then(function () {
-            var socket = firebase_app.database().ref(`/Account-${accountID}`);
+            const socket = firebase_app.database().ref(`/Account-${accountID}`);
             socket.child(`/incoming`).on('value', function (data) {
                 if (data.val()) {
                     addThread(data.val());

@@ -21,6 +21,7 @@
 
 <script>
 import { bus } from "../../main";
+import { firebase_app } from "../../firebaseInit";
 import ChatContentBody from './ChatContentBody/ChatContentBody.vue';
 import ChatContentReply from './ChatContentBody/ChatContentReply.vue';
 import MailContentBody from './MailContentBody/MailContentBody.vue';
@@ -154,6 +155,17 @@ export default {
         console.log(this.thread.data.items);
       }
     })
+  },
+  mounted(){
+    let threadID = this.$route.params.threadId;
+    const socket = firebase_app.database().ref(`/Account-${accountID}/Thread-${threadID}`);
+    // viewing user
+    socket.child("/viewing user").set({
+      id: this.$store.state.userInfo.id,
+      name: this.$store.state.userInfo.name,
+      email: this.$store.state.userInfo.email,
+      avatar: this.$store.state.userInfo.avatar
+    });
   },
   methods: {
     openInt() {

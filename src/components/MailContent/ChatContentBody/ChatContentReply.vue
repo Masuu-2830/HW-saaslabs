@@ -1,5 +1,8 @@
 <template>
   <div style="background-color: white" class="d-flex flex-column editor_container" id="threadEditorContainer">
+    <p class="typingMessageNotice tx-12 tx-italic tx-sans" v-if="typingNotice">
+      {{typingNotice}}
+    </p>
     <div class="editorContainer">
         <ul class="nav nav-line flex-row mg-l-20 mg-b-10" role="tablist" style="border-bottom: none !important;margin-top:5px;margin-bottom:5px">
             <li class="nav-item" v-if="$store.state.inboxData.type == 'mail'">
@@ -32,6 +35,7 @@
   import Vue from 'vue';
   import { bus, triggerPromptNotif } from "../../../main";
   const axios = require('axios').default;
+  import { firebase_app } from "../../../firebaseInit";
 
   export default {
     name: "ChatContentReply",
@@ -49,7 +53,10 @@
         noteEditorInstance: null,
         replyAttachments: {},
         notesAttachments: {},
+        typing: false,
         showHcModal: false,
+        defaultTypingTimer: 1000,
+        typingNotice: "",
         replyEditorConfig: {
           events: {
             initialized: async function() {
@@ -60,6 +67,7 @@
               savedReplyTribute.attach(replyFroala.el);
 
               replyFroala.events.on('keydown', function(e) {
+                self.hitFirebase("reply");
                 if (e.which == FroalaEditor.KEYCODE.ENTER && savedReplyTribute.isActive) {
                   return false;
                 }
@@ -121,6 +129,7 @@
               mentionTribute.attach(noteFroala.el);
 
               noteFroala.events.on('keydown', function(e) {
+                self.hitFirebase("notes");
                 if (e.which == FroalaEditor.KEYCODE.ENTER && mentionTribute.isActive) {
                   return false;
                 }
@@ -358,6 +367,52 @@
           })
         }
       },
+      hitFirebase(type){
+        let managerID = this.$store.state.userInfo.accountID;
+        let threadID = this.$route.params.threadId;
+
+        console.log(`/Account-${managerID}/ThreadID-${threadID}`);
+        const socket = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
+
+        if(!this.typing){
+          this.typing = true;
+          if(type == "notes"){
+            socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+          } else {
+            socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+          }
+        }
+
+        clearTimeout(typingTimer);
+        var typingTimer = setTimeout(() => {
+          console.log("----- TIMER FINISHED ---");
+          if(type == "notes"){
+            socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).remove();
+          } else {
+            socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).remove();
+          }
+        }, this.defaultTypingTimer);
+
+      },
+
+      makingTypingCard(data, type){
+        let typingType = type == "notes" ? "adding notes" : "replying";
+      
+        for(let i = 0; i < data.length; i++){
+          let user = data[i];
+          let userID = user.id;
+          let userName = user.name;
+          // let userAvatar = user.avatar;
+          // let userEmail = user.email;
+          // let userRole = user.role;
+          let prefix = "";
+          if(this.typingNotice.trim().length > 0){
+            prefix = ";";
+          }
+          this.typingNotice += `${prefix} ${userName} is ${typingType}... `;
+        }
+
+      },
       sendMessage(){
         console.log(this.$route.params);
 
@@ -515,6 +570,30 @@
       $(document).on("click", "#removeHCArticleCard", function(){
         $(this).parents(".hw_articleCard").remove();
       })
+    },
+    mounted(){
+      let managerID = this.$store.state.userInfo.accountID;
+      let threadID = this.$route.params.threadId;
+      const vueThis = this;
+      
+      console.log(`/Account-${managerID}/ThreadID-${threadID}`);
+      const socket2 = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
+
+      socket2.child(`/commenting user`).on('value', function(data){
+        console.log("----- COMMENTING USER -----");
+        if(data.val()){
+          console.log(data.val());
+          vueThis.makingTypingCard(data.val(), "notes");
+        }
+      });
+
+      socket2.child(`/replying user`).on('value', function(data){
+        console.log("----- REPLYING USER -----");
+        if(data.val()){
+          console.log(data.val());
+          vueThis.makingTypingCard(data.val(), "reply");
+        }
+      });
     }
   };
 </script>
