@@ -29,7 +29,7 @@ function initFirebase(){
     let managerID = store.state.userInfo.account_id;
 
     $.get({
-        url: '/api/get_socket_token.php',
+        url: 'https://app.helpwise.io/api/get_socket_token.php',
         success: response => {
             if (response.status == 'success') {
                 let token = response.data.token;
