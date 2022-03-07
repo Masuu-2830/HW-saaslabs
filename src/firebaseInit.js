@@ -29,73 +29,72 @@ var firebase_app = firebase.initializeApp(firebaseConfig, `HW-inbox-${
     generateRandomString()
 }`);
 var firebase_analytics = firebase.analytics();
-function initFirebase() {
-    let userID = store.state.userInfo.user_id;
-    let managerID = store.state.userInfo.account_id;
+export default function initFirebase() {
+    let userID = store.state.userInfo.id;
+    let accountID = store.state.userInfo.accountID;
     fetch("https://app.helpwise.io/api/get_socket_token.php", {credentials: "include"}).then(async (response) => {
         const data = await response.json();
         if (data.status !== "success") {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
         }
-        console.log(data);
         let token = data.data.token;
         firebase_app.auth().signInWithCustomToken(token).then(function () {
-            var socket = firebase_app.database().ref(`/Account-${managerID}/Mailbox-${mailboxID}`);
+            var socket = firebase_app.database().ref(`/Account-${accountID}`);
             socket.child(`/incoming`).on('value', function (data) {
                 if (data.val()) {
-                    addThread(data);
+                    addThread(data.val());
                 }
             });
             socket.child(`/outgoing`).on('value', function (data) {
                 if (data.val()) {
-                    addThread(data);
+                    addThread(data.val());
                 }
             });
             socket.child(`/notes`).on('value', function (data) {
                 if (data.val()) {
-                    addNote(data);
+                    addNote(data.val());
                 }
             });
             socket.child(`/close`).on('value', function (data) {
                 if (data.val()) {
-                    console.log(data);
-                    closeThread(data);
+                    console.log("close ka firebase",data.val());
+                    closeThread(data.val());
                 }
             });
             socket.child(`/snooze`).on('value', function (data) {
                 if (data.val()) {
-                    snoozeThread(data);
+                    snoozeThread(data.val());
                 }
             });
             socket.child(`/unsnooze`).on('value', function (data) {
                 if (data.val()) {
-                    unsnoozeThread(data);
+                    unsnoozeThread(data.val());
                 }
             });
             socket.child(`/delete`).on('value', function (data) {
                 if (data.val()) {
-                    deleteThread(data);
+                    deleteThread(data.val());
                 }
             });
             socket.child(`/addTag`).on('value', function (data) {
                 if (data.val()) {
-                    toggleTags(data);
+                    toggleTags(data.val());
                 }
             });
             socket.child(`/removeTag`).on('value', function (data) {
                 if (data.val()) {
-                    toggleTags(data);
+                    toggleTags(data.val());
                 }
             });
             socket.child(`/assign`).on('value', function (data) {
                 if (data.val()) {
-                    assignThread(data);
+                    assignThread(data.val());
                 }
             });
             socket.child(`/moveToInbox`).on('value', function (data) {
                 if (data.val()) {
-                    moveToInboxThread(data);
+                    moveToInboxThread(data.val());
                 }
             });
         }).catch((error) => {
@@ -103,7 +102,6 @@ function initFirebase() {
         });
     })
 }
-initFirebase();
 // function to generate random and unique strings
 function generateRandomString() {
     var text = "";
