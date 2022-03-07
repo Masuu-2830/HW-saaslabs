@@ -33,6 +33,7 @@
     export default {
         data(){
             return{
+                type: "",
                 articles: [],
                 hcSearchQuery: ""
             }
@@ -60,12 +61,17 @@
             },
             insertArticleInEditor(article){
                 console.log(article);
-                bus.$emit("modal.hcArticleInsert.click", article);
+                bus.$emit("modal.hcArticleInsert.click", article, this.type);
                 this.closeModal();
             }
         },
         created(){
             this.fetchDataForHC();
+            bus.$on("hcArticles", (type) => {
+                this.$bvModal.show("helpcenterArticlesModal");
+                console.log(type);
+                this.type = type;
+            })
         },
         computed: {
             articlesData: function(){

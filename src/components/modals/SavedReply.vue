@@ -66,6 +66,7 @@
         data(){
             const self = this;
             return {
+                type: "",
                 createSavedReplyForm: false,
                 savedReplyName: "",
                 errorInName: false,
@@ -185,7 +186,7 @@
             },
             fetchSavedReplies(){
                 fetch(
-                    `https://app.helpwise.io/api/list-saved-replies.php?mailboxID=${this.$route.params.mailboxId}`,{credentials: "include"}
+                    `https://app.helpwise.io/api/list-saved-replies.php?mailboxID=${this.$store.state.inboxData.id}`,{credentials: "include"}
                 ).then(response => response.json())
                 .then(response => {
                     // console.log(response);
@@ -200,7 +201,8 @@
                 this.editorInstance.html.set("");
             },
             insertSavedReplyInEditor(id){
-                bus.$emit("modal.savedReplyInsert.click", id);
+                console.log(this.type, id);
+                bus.$emit("modal.savedReplyInsert.click", id, this.type);
                 this.closeModal();
             },
             searchSavedReply(){
@@ -218,6 +220,12 @@
         },
         created: function(){
             this.fetchSavedReplies();
+
+            bus.$on("savedReply", (type) => {
+                this.$bvModal.show('saved-reply-modal');
+                console.log(type);
+                this.type = type;
+            })
         }
     }
 </script>

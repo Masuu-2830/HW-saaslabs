@@ -1,23 +1,23 @@
 <template>
-  <div class="d-flex flex-column editor_container" id="threadEditorContainer">
+  <div style="background-color: white" class="d-flex flex-column editor_container" id="threadEditorContainer">
     <div class="editorContainer">
         <ul class="nav nav-line flex-row mg-l-20 mg-b-10" role="tablist" style="border-bottom: none !important;margin-top:5px;margin-bottom:5px">
-            <li class="nav-item">
-              <a class="nav-link active reply-tab" data-toggle="tab" href="#editorReplyTab" role="tab" aria-controls="reply-whatsapp-tab"  @click="tabChange(0)" aria-selected="false">Reply</a>
+            <li class="nav-item" v-if="$store.state.inboxData.type == 'mail'">
+              <a class="nav-link reply-tab" :class="$store.state.inboxData.type == 'mail' && 'active'" data-toggle="tab" href="#editorReplyTab" role="tab" aria-controls="reply-whatsapp-tab"  @click="tabChange(0)" aria-selected="false">Reply</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link notes-tab" data-toggle="tab" href="#editorNotesTab" role="tab" aria-controls="notes-whatsapp-tab" @click="tabChange(1)" aria-selected="true">Note</a>
+              <a class="nav-link notes-tab" :class="$store.state.inboxData.type !== 'mail' && 'active'" data-toggle="tab" href="#editorNotesTab" role="tab" aria-controls="notes-whatsapp-tab" @click="tabChange(1)" aria-selected="true">Note</a>
             </li>
         </ul>
 
         <div class="tab-content" id="myTabContent">
-          <div class="tab-pane fade show active" id="editorReplyTab" role="tabpanel" aria-labelledby="reply-tab">
+          <div v-if="$store.state.inboxData.type == 'mail'" class="tab-pane fade" :class="$store.state.inboxData.type == 'mail' && 'show active'" id="editorReplyTab" role="tabpanel" aria-labelledby="reply-tab">
             <froala :tag="'textarea'" :config="replyEditorConfig"></froala>
-            <input type='file' style='display: none' name='files[]' @change="uploadAttachment" id='editor-uploadAttachment' multiple>
           </div>
-          <div class="tab-pane fade" id="editorNotesTab" role="tabpanel" aria-labelledby="notes-tab">
+          <div class="tab-pane fade" :class="$store.state.inboxData.type !== 'mail' && 'show active'" id="editorNotesTab" role="tabpanel" aria-labelledby="notes-tab">
             <froala :tag="'textarea'" :config="noteEditorConfig"></froala>
           </div>
+          <input type='file' style='display: none' name='files[]' @change="uploadAttachment" id='editor-uploadAttachment' multiple>
         </div>
     </div>
   </div>
@@ -43,7 +43,7 @@
     data() {
       const self = this;
       return {
-        current: 'reply',
+        current: this.$store.state.inboxData.type == 'mail' ? 'reply' : 'note',
         tempData:['a', 'b', 'v'],
         replyEditorInstance: null,
         noteEditorInstance: null,
@@ -99,7 +99,7 @@
               buttonsVisible: 0
             },
             'moreRich': {
-              buttons: ['insertLink', 'savedReply', 'hcArticle', 'attachChatReply', 'insertImage', 'emoticons', 'insertTable', 'fontAwesome', 'specialCharacters', 'embedly', 'insertFile', 'insertHR'],
+              buttons: ['insertLink', 'savedReplyCR', 'hcArticleCR', 'attachChatReply', 'insertImage', 'emoticons', 'insertTable', 'fontAwesome', 'specialCharacters', 'embedly', 'insertFile', 'insertHR'],
               buttonsVisible: 6
             },
             // 'moreMisc': {
@@ -158,7 +158,7 @@
               'buttonsVisible': 0
             },
             'moreRich': {
-              'buttons': ['insertLink', 'savedReply', 'hcArticle', 'attachChatReply', 'insertImage', 'emoticons', 'insertTable', 'fontAwesome', 'specialCharacters', 'embedly', 'insertFile', 'insertHR'],
+              'buttons': ['insertLink', 'savedReplyCR', 'hcArticleCR', 'attachChatReply', 'insertImage', 'emoticons', 'insertTable', 'fontAwesome', 'specialCharacters', 'embedly', 'insertFile', 'insertHR'],
               'buttonsVisible': 6
             },
             // 'moreMisc': {
@@ -266,7 +266,7 @@
 
         FroalaEditor.DefineIcon('savedReply', { FA5NAME: 'bookmark', template: 'font_awesome_5' });
 
-        FroalaEditor.RegisterCommand('savedReply', {
+        FroalaEditor.RegisterCommand('savedReplyCR', {
           // Button title.
           title: 'Insert Saved Reply',
           // Mark the button as a dropdown.
@@ -274,16 +274,15 @@
           refreshAfterCallback: true,
           callback: function () {
             this.selection.save();
-
+            console.log(1);
             // $(".saved-replies-btn").click();
-            vueThis.$bvModal.show('saved-reply-modal');
-
+            bus.$emit("savedReply", 'chatReply');
           }
         });
 
         FroalaEditor.DefineIcon('hcArticle', { FA5NAME: 'book', template: 'font_awesome_5' });
 
-        FroalaEditor.RegisterCommand('hcArticle', {
+        FroalaEditor.RegisterCommand('hcArticleCR', {
           title: 'Insert Help Center Article',
           icon: 'hcArticle',
           refreshAfterCallback: true,
@@ -291,8 +290,9 @@
             this.selection.save();
             let editor = this;
             vueThis.showHcModal = true;
-            console.log("----")
-            vueThis.$bvModal.show('helpcenterArticlesModal');
+            console.log("----");
+            bus.$emit("hcArticles", 'chatReply');
+            // vueThis.$bvModal.show('helpcenterArticlesModal');
           }
         });
 
@@ -470,19 +470,24 @@
         }
       });
 
-      bus.$off("modal.hcArticleInsert.click");
-      bus.$on("modal.hcArticleInsert.click", function(data){
-        let editorInstance = vueThis.current == "reply" ? vueThis.replyEditorInstance : vueThis.noteEditorInstance;
-        editorInstance.html.insert(vueThis.getArticleCard(data));
+      // bus.$off("modal.hcArticleInsert.click");
+      bus.$on("modal.hcArticleInsert.click", function(data, type){
+        console.log(type, data);
+        if(type == 'chatReply') {
+          let editorInstance = vueThis.current == "reply" ? vueThis.replyEditorInstance : vueThis.noteEditorInstance;
+          editorInstance.html.insert(vueThis.getArticleCard(data));
+        }
       })
       
-      bus.$off("modal.savedReplyInsert.click");
-      bus.$on("modal.savedReplyInsert.click", function(id){
+      // bus.$off("modal.savedReplyInsert.click");
+      bus.$on("modal.savedReplyInsert.click", function(id, type) {
+        console.log(type, id);
+        if(type == 'chatReply') {
         let editorInstance = vueThis.current == "reply" ? vueThis.replyEditorInstance : vueThis.noteEditorInstance;
 
         triggerPromptNotif("Fetching saved reply data");
         fetch(
-          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$route.params.mailboxId}&savedReplyID=${id}`,
+          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$store.state.inboxData.id}&savedReplyID=${id}`,
           {credentials: 'include'}
         ).then(response => response.json())
         .then(response => {
@@ -493,6 +498,7 @@
             triggerPromptNotif("Unable to insert Saved Reply", "error");
           }
         })
+        }
       })
 
       $(document).off("click", "#sendMessage");

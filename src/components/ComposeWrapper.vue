@@ -18,13 +18,14 @@ export default {
         }
     },
     created() {
-        bus.$on("openCompose", (data, email) => {
-            console.log("openingg",data, email);
+        bus.$on("openCompose", (hash,type, email) => {
+            console.log("openingg",hash, email);
             if(email == undefined) {
-                let obj = { hash: data };
+                let obj = { hash, type };
                 this.composers.push(obj);
             } else {
                 email["hash"] = data;
+                email["type"] = type;
                 this.composers.push(email);
             }
             this.show = true;
