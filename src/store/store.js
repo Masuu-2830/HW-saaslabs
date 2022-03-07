@@ -103,5 +103,10 @@ export const store = new Vuex.Store({
         async updateFirebaseModal(context, data) {
             await context.commit('setFirebaseModal', data);
         },
-    }
+    },
+    // getters: {
+    //     getUserInfo(state) {
+    //         return state.userInfo;
+    //     }
+    // }
 })
