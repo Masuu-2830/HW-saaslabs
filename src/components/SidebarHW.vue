@@ -252,8 +252,8 @@ export default {
           "inboxes": {},
           "tags": {},
         },
-        activeInboxes: [],
-        activeTags: [],
+        activeInboxes: {},
+        activeTags: {},
       // compose: {}
     }
   },
@@ -372,11 +372,21 @@ export default {
         // this.sections[labels].push(option);
 
         if(labels == "inboxes"){
-            this.activeInboxes.push(option.id);
+            if(this.activeInboxes[option.id]){
+                delete this.activeInboxes[option.id];
+            } else {
+                this.activeInboxes[option.id] = option;
+            }
+            this.activeInboxes = {...this.activeInboxes};
         }
         
         if(labels == "tags"){
-            this.activeTags.push(option.id);
+            if(this.activeTags[option.id]){
+                delete this.activeTags[option.id];
+            } else {
+                this.activeTags[option.id] = option;
+            }
+            this.activeTags = {...this.activeTags};
         }
     },
     isItPinned(label, id){
@@ -387,11 +397,11 @@ export default {
         // }
 
         if(label == "inboxes"){
-            return this.activeInboxes.includes(id);
+            return this.activeInboxes[id];
         }
         
         if(label == "tags"){
-            return this.activeTags.includes(id);
+            return this.activeTags[id];
         }
     },
     saveSidebarPins(){
