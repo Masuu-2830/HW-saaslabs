@@ -22,6 +22,7 @@
                 :openUpdateFormArray= "openUpdateFormArray"
                 @postData= "postData"
                 @pmIntegration= "pmIntegration"
+                :commentData = "commentData"
             />
         </div>
         <div v-if="contactOpen" :class="{open: contactOpen}" style="overflow-y: auto; overflow-x: hidden">
@@ -44,28 +45,45 @@
                 integrationName: '',
                 integrationID: '',
                 dataStatus: false,
-                openCreateFormArray: { 'candidate': false, 'customer': false, 'contact': false, 'deal':false, 'task':false, 'lead':false, 'opportunity':false, 'offer':false, 'company':false, 'card':false, 'subscriber':false, 'event': false },
-                openUpdateFormArray: { 'candidate': false, 'customer': false, 'contact': false, 'deal':false, 'task':false, 'lead':false, 'opportunity':false, 'offer':false, 'company':false, 'card':false, 'subscriber':false,'event': false },
-                errorMsg: 'Please wait for the response.'
+                openCreateFormArray: { 'candidate': false, 'customer': false, 'contact': false, 'deal':false, 'task':false, 'lead':false, 'opportunity':false, 'offer':false, 'company':false, 'card':false, 'subscriber':false, 'event': false, 'custom_field': false, 'tag': false, 'activity': false, 'comments': false },
+                openUpdateFormArray: { 'candidate': false, 'customer': false, 'contact': false, 'deal':false, 'task':false, 'lead':false, 'opportunity':false, 'offer':false, 'company':false, 'card':false, 'subscriber':false,'event': false, 'custom_field': false, 'tag': false, 'activity': false, 'comments': false },
+                errorMsg: 'Please wait for the response.',
+                commentData: {}
             }
         },
         props: ["sidebarOpen", "contactOpen", "thread"],
         components:{IntegrationData, IntegrationSidebar, MailContactPanel},
         methods: {
             openIntegration(integrationData){
-                console.log("integrationData", integrationData);
                 var mailboxID = this.$store.state.inboxData.id;
                 this.$emit("openInt", integrationData);
+                var primaryEmail = this.thread.data.contact.emails[0];
+                var primaryPhone = this.thread.data.contact.phones[0];
+                var inboxType = this.thread.data.mailboxType;
+                var threadID = this.thread.data.id;
+                var mailboxID = this.thread.data.mailbox_id;
+                var contact = {
+                    "id":this.thread.data.contact.id,
+                    "emails":[
+                        primaryEmail
+                    ],
+                    "firstname": this.thread.data.contact.firstname,
+                    "lastname": this.thread.data.contact.lastname,
+                    "phones": [
+                        primaryPhone
+                    ],
+                    "primaryEmail":primaryEmail
+                };
                 if(integrationData.lname!='contact'){
                     if(this.sidebarOpen == false){
                         let fetchUrl = '';
                         let date = moment().format("YYYY-MM-DD"); 
-                        let threadID = location.pathname.split('/')[3];
                         if(integrationData.lname == 'custom-app'){
                             let pm_data = {};
                             pm_data['mailbox_id'] = mailboxID;
                             pm_data['thread_id'] = threadID;
-                            pm_data['inbox_type'] = 'mail';
+                            pm_data['inbox_type'] = inboxType;
+                            pm_data['contact'] = contact;
                             // pm_data['contact'] = ;
                             pm_data['integration_id'] = integrationData.id;
                             fetch("https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php", {
@@ -108,11 +126,11 @@
                             });
                         }else{
                             if(integrationData.lname == 'easy-calendar' || integrationData.lname == 'google-calendar' || integrationData.lname == 'outlook-calendar'){
-                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + integrationData.id + "&date=" + date;
+                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + mailboxID + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id + "&date=" + date;
                             }else if(integrationData.lname == 'asana' || integrationData.lname == 'clickup' || integrationData.lname == 'jira' || integrationData.lname == 'trello'){
-                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + integrationData.id;
+                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + mailboxID + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id;
                             }else{
-                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + integrationData.id;
+                                fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + mailboxID + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id;
                             }
                             fetch(fetchUrl, {credentials: 'include'})
                             .then(async response => {
@@ -123,9 +141,7 @@
                                     this.errorMsg = integrationData.message;
                                 }else{
                                     this.sidebarData = integrationData2;
-                                    console.log("this", this.sidebarData);
                                     this.dataStatus = true;
-                                    console.log("123");
                                     for(const key in this.sidebarData.create){
                                         this.openCreateFormArray[key] = false;
                                     }
@@ -133,10 +149,8 @@
                                         this.openUpdateFormArray[key] = false;
                                     }
                                 }
-                                console.log("131",response);
                                 // check for error response
                                 if (response.status!=200 && response.status!='success') {
-                                    console.log("133",response);
                                     // get error message from body or default to response statusText
                                     const error = (integrationData && integrationData.message) || response.status;
                                     this.dataStatus = false;
@@ -153,12 +167,12 @@
                         if(this.integrationName!=integrationData.lname || this.integrationID!=integrationData.id){
                             let fetchUrl = '';
                             let date = moment().format("YYYY-MM-DD"); 
-                            let threadID = location.pathname.split('/')[3];
                             if(integrationData.lname == 'custom-app'){
                                 let pm_data = {};
                                 pm_data['mailbox_id'] = this.$route.params.mailboxId;
                                 pm_data['thread_id'] = threadID;
-                                pm_data['inbox_type'] = 'mail';
+                                pm_data['inbox_type'] = inboxType;
+                                pm_data['contact'] = contact;
                                 // pm_data['contact'] = ;
                                 pm_data['integration_id'] = integrationData.id;
                                 fetch("https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php", {
@@ -201,11 +215,11 @@
                                 });
                             }else{
                                 if(integrationData.lname == 'easy-calendar' || integrationData.lname == 'google-calendar' || integrationData.lname == 'outlook-calendar'){
-                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + integrationData.id + "&date=" + date;
+                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id + "&date=" + date;
                                 }else if(integrationData.lname == 'asana' || integrationData.lname == 'clickup' || integrationData.lname == 'jira' || integrationData.lname == 'trello'){
-                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=vibhor@saaslabs.co&inbox_type=mail&integration_id=" + integrationData.id;
+                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id;
                                 }else{
-                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=hello@justcall.io&inbox_type=mail&integration_id=" + integrationData.id;
+                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id;
                                 }
                                 fetch(fetchUrl, {credentials: 'include'})
                                 .then(async response => {
@@ -217,7 +231,6 @@
                                     }else{
                                         this.sidebarData = integrationData2;
                                         this.dataStatus = true;
-                                        console.log("123");
                                         for(const key in this.sidebarData.create){
                                             this.openCreateFormArray[key] = false;
                                         }
@@ -225,10 +238,8 @@
                                             this.openUpdateFormArray[key] = false;
                                         }
                                     }
-                                    console.log("131",response);
                                     // check for error response
                                     if (response.status!=200 && response.status!='success') {
-                                        console.log("133",response);
                                         // get error message from body or default to response statusText
                                         const error = (integrationData && integrationData.message) || response.status;
                                         this.dataStatus = false;
@@ -254,16 +265,32 @@
                 // }, 500);
                 let fetchUrl = '';
                 let date = moment().format("YYYY-MM-DD");
-                let mailboxID = this.$store.state.inboxData.id;
+                var primaryEmail = this.thread.data.contact.emails[0];
+                var primaryPhone = this.thread.data.contact.phones[0];
+                var inboxType = this.thread.data.mailboxType;
+                var threadID = this.thread.data.id;
+                var mailboxID = this.$store.state.inboxData.id;
+                var contact = {
+                    "id":this.thread.data.contact.id,
+                    "emails":[
+                        primaryEmail
+                    ],
+                    "firstname": this.thread.data.contact.firstname,
+                    "lastname": this.thread.data.contact.lastname,
+                    "phones": [
+                        primaryPhone
+                    ],
+                    "primaryEmail":primaryEmail
+                };
                 if(integration_name == 'custom-app'){
 
                 }else{ 
                     if(integration_name == 'easy-calendar' || integration_name == 'google-calendar' || integration_name == 'outlook-calendar'){
-                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + this.integrationID + "&date=" + date;
+                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + mailboxID + "&email="+primaryEmail+"&inbox_type="+inboxType+"&phone="+primaryPhone+"&integration_id=" + this.integrationID + "&date=" + date;
                     }else if(integration_name == 'asana' || integration_name == 'clickup' || integration_name == 'jira' || integration_name == 'trello'){
-                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + this.integrationID;
+                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + mailboxID + "&email="+primaryEmail+"&inbox_type="+inboxType+"&phone="+primaryPhone+"&integration_id=" + this.integrationID;
                     }else{
-                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + mailboxID + "&email=ayush@justcall.io&inbox_type=mail&integration_id=" + this.integrationID;
+                        fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integration_name+"/"+integration_name+".php?mailbox_id=" + mailboxID + "&email="+primaryEmail+"&inbox_type="+inboxType+"&phone="+primaryPhone+"&integration_id=" + this.integrationID;
                     }
                     fetch(fetchUrl, {
                         method: 'GET', 
@@ -276,7 +303,6 @@
                         const updateResponse = await response.json();
                         this.sidebarData = [];
                         this.sidebarData = updateResponse.data;
-                        console.log("this.sidevar", this.sidebarData);
                         // check for error response
                         if (response.status!=200 && response.status!='success') {
                             // get error message from body or default to response statusText
@@ -294,7 +320,14 @@
             pmIntegration(integrationData){
                 this.sidebarData = [];
                 this.sidebarData = integrationData;
+                let comment_data = integrationData.fetch[0].components;
+                comment_data.forEach(comment => {
+                    this.commentData[comment[0].value] = [];
+                });
             }
+            // commentData(comments){
+            //     this.commentData = comments;
+            // }
         },
         created() {
             fetch("https://app.helpwise.io/api/connected_integrations.php?mailbox_id=" + this.$store.state.inboxData.id, {credentials: 'include'})
