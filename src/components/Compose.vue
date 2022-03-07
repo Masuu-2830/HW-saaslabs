@@ -829,7 +829,7 @@ export default {
       boxAccessToken: "",
       easyCalendar: [],
       easyCalendarUser: [],
-      easycalenderObj: {},
+      easycalendarObj: {},
       show: true,
       normal: true,
       minimize: false,
@@ -1526,10 +1526,12 @@ export default {
               this.selection.save();
             }
             // $('#box-integration-modal').modal('show');
+            vueThis.$bvModal.show("box-integration-modal");
             // The current context is the editor instance.
             var filePicker = new Box.FilePicker();
             filePicker.addListener("choose", function (items) {
               // $('#box-integration-modal').modal('hide');
+              vueThis.$bvModal.hide("box-integration-modal");
               let html = "";
               for (let item of items) {
                 html += `<a href="${
@@ -1544,7 +1546,7 @@ export default {
               _this.html.insert(html);
             });
             filePicker.addListener("cancel", function () {});
-            filePicker.show("0", showBox, {
+            filePicker.show("0", vueThis.boxAccessToken, {
               container: ".boxIntegration",
               chooseButtonLabel: "Select",
             });
@@ -1620,7 +1622,7 @@ export default {
         title: "EasyCalendar",
         type: "dropdown",
         icon: "EasyCalendarIcon",
-        options: vueThis.easycalenderObj,
+        options: vueThis.easycalendarObj,
         // Callback.
         callback: function (cmd, val) {
           if (vueThis.easyCalendar.length == 0) {
@@ -2244,13 +2246,13 @@ export default {
           requestOptions.body["sendAt"] = sendAt;
         }
         console.log(requestOptions.body);
-        // fetch(this.$apiBaseURL + "send-tweet.php", requestOptions)
-        //   .then(async (response) => {
-        //     const data = await response.json();
-        //     if (data.status !== "success") {
-        //       const error = (data && data.message) || response.status;
-        //       return Promise.reject(error);
-        //     }
+        fetch(this.$apiBaseURL + "send-tweet.php", requestOptions)
+          .then(async (response) => {
+            const data = await response.json();
+            if (data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
         this.closeCompose(this.composer.hash);
         // this.undoMessage = data.message;
         // $("#undo-txt").text(data.message);
@@ -2267,22 +2269,22 @@ export default {
         //   self.undoTimer = self.$store.state.userSettings.undoTimer;
         // }, self.$store.state.userSettings.undoTimer*1000);
         // clearTimeout(this.undoInterval);
-        // })
-        // .catch((error) => {
-        //   alert(error);
-        // });
+        })
+        .catch((error) => {
+          alert(error);
+        });
       } else if (this.composer.type == "sms") {
         console.log("sendingg");
         let requestOptions = this.createBodySMS("send");
         requestOptions.body = JSON.parse(requestOptions.body);
         console.log(requestOptions.body);
-        // fetch(this.$apiBaseURL + "sms/send-sms.php", requestOptions)
-        //   .then(async (response) => {
-        //     const data = await response.json();
-        //     if (data.status !== "success") {
-        //       const error = (data && data.message) || response.status;
-        //       return Promise.reject(error);
-        //     }
+        fetch(this.$apiBaseURL + "sms/send-sms.php", requestOptions)
+          .then(async (response) => {
+            const data = await response.json();
+            if (data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
         this.closeCompose(this.composer.hash);
         // this.undoMessage = data.message;
         // $("#undo-txt").text(data.message);
@@ -2299,10 +2301,10 @@ export default {
         //   self.undoTimer = self.$store.state.userSettings.undoTimer;
         // }, self.$store.state.userSettings.undoTimer*1000);
         // clearTimeout(this.undoInterval);
-        // })
-        // .catch((error) => {
-        //   alert(error);
-        // });
+        })
+        .catch((error) => {
+          alert(error);
+        });
       }
     },
     unsendMail() {

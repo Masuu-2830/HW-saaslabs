@@ -2482,6 +2482,9 @@ export default {
       } else if (this.$route.params.type == "all") {
         this.labelId = 14;
         this.route = this.$route.params.type;
+      } else if (this.$route.params.type == "closed") {
+        this.labelId = 7;
+        this.route = this.$route.params.type;
       } else {
         this.labelId = 0;
         this.route = this.$route.params.type;
