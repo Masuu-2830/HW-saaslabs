@@ -1719,14 +1719,14 @@ export default {
       if (sendAt !== undefined) {
         requestOptions.body["sendAt"] = sendAt;
       }
-      console.log(requestOptions.body);
-      // fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
-      // .then(async response => {
-      //     const data = await response.json();
-      //     if(data.status !== "success") {
-      //       const error = (data && data.message) || response.status;
-      //       return Promise.reject(error);
-      //     }
+      console.log(requestOptions.body, requestOptions);
+      fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
+      .then(async response => {
+          const data = await response.json();
+          if(data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
       if (this.isSend == "send") {
         let payload = this.reply;
         payload.subject = this.subject;
@@ -1754,9 +1754,9 @@ export default {
       }
       // this.cancelReply();
       bus.$emit("closeReply", this.reply.hash);
-      //   }).catch(error => {
-      //   alert(error);
-      // })
+        }).catch(error => {
+        alert(error);
+      })
     },
     showCC() {
       this.isCC = true;
