@@ -172,6 +172,3 @@ export default {
 <style>
 
 </style>
-
-// ssh teamuser@inbox.helpwise.io
-// iKR+n-8]tUnq29V

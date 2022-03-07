@@ -280,7 +280,7 @@ export default {
       return this.$route.params.mailboxId
     },
     getRouteParamType(){
-      return this.$route.params.type
+      return this.$store.state.type
     }
   },
   methods: {

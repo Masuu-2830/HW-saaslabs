@@ -57,6 +57,7 @@ function initFirebase(){
 
                     socket.child(`/close`).on('value', function(data){
                         if(data.val()){
+                            console.log(data);
                             closeThread(data);
                         }
                     });

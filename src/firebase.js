@@ -37,42 +37,50 @@ export function addThread(data) {
         }
         if (this.$route.params.threadId !== undefined && (data.threadID in Object.keys(this.$store.state.threadData))) {
             if(data.inboxType == 'mail') {
-                fetch(this.$apiBaseURL + "getEmail.php?emailID=" + data.messageData.id + "&mailboxID=" + data.mailboxID, {credentials: "include"}).then(async (response) => {
-                    const data1 = await response.json();
-                    if (data1.status !== "success") {
-                        const error = (data1 && data1.message) || response.status;
-                        return Promise.reject(error);
-                    }
-                    let email = {
-                        'type': 'email',
-                        'data': data1.data.email,
+                let itemIndex = this.$store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
+                if(itemIndex == -1) {
+                    fetch(this.$apiBaseURL + "getEmail.php?emailID=" + data.messageData.id + "&mailboxID=" + data.mailboxID, {credentials: "include"}).then(async (response) => {
+                        const data1 = await response.json();
+                        if (data1.status !== "success") {
+                            const error = (data1 && data1.message) || response.status;
+                            return Promise.reject(error);
+                        }
+                        let email = {
+                            'type': 'email',
+                            'data': data1.data.email,
+                            'timestamp': Date.now()
+                        };
+                        this.$store.state.threadData[data.threadID].data.snippet = data1.data.email.snippet;
+                        this.$store.state.threadData[data.threadID].data.subject = data1.data.email.subject;
+                        if (this.$store.state.userSettings.orderThread == "asc") {
+                            this.$store.state.threadData[data.threadID].data.items.push(email);
+                        } else {
+                            this.$store.state.threadData[data.threadID].data.items.unshift(email);
+                        }
+                    });
+                }
+            } else if(data.inboxType == 'chat' || data.inboxType == 'facebook') {
+                let itemIndex = this.$store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
+                if(itemIndex == -1) {
+                    let message = {
+                        'type': data.inboxType,
+                        'data': {
+                            'id': data.messageData.id,
+                            'threadId': data.threadID,
+                            'text': data.messageData.body,
+                            'sentBy': data.messageData.sentBy,
+                            'attachments': data.messageData.attachments,
+                            'type': data.action == 'incoming' ? 0 : 1,
+                            'date': data.messageData.time,
+                            'unixTime': Date.now()
+                        },
                         'timestamp': Date.now()
                     };
                     if (this.$store.state.userSettings.orderThread == "asc") {
-                        this.$store.state.threadData[data.threadID].data.items.push(email);
+                        this.$store.state.threadData[data.threadID].data.items.push(message);
                     } else {
-                        this.$store.state.threadData[data.threadID].data.items.unshift(email);
+                        this.$store.state.threadData[data.threadID].data.items.unshift(message);
                     }
-                });
-            } else if(data.inboxType == 'chat' || data.inboxType == 'facebook') {
-                let message = {
-                    'type': data.inboxType,
-                    'data': {
-                        'id': data.messageData.id,
-                        'threadId': data.threadID,
-                        'text': data.messageData.body,
-                        'sentBy': data.messageData.sentBy,
-                        'attachments': data.messageData.attachments,
-                        'type': data.action == 'incoming' ? 0 : 1,
-                        'date': data.messageData.time,
-                        'unixTime': Date.now()
-                    },
-                    'timestamp': Date.now()
-                };
-                if (this.$store.state.userSettings.orderThread == "asc") {
-                    this.$store.state.threadData[data.threadID].data.items.push(message);
-                } else {
-                    this.$store.state.threadData[data.threadID].data.items.unshift(message);
                 }
             }
         }

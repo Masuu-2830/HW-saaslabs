@@ -826,6 +826,10 @@ export default {
     const self = this;
     console.log(self.composer.type);
     return {
+      boxAccessToken: "",
+      easyCalendar: [],
+      easyCalendarUser: [],
+      easycalenderObj: {},
       show: true,
       normal: true,
       minimize: false,
@@ -995,7 +999,13 @@ export default {
                 },
               }
             : self.composer.type == "twitter"
-            ? ["attachTweetCompose", "scheduleReply", "savedReplyC", "hcArticleC", "clear"]
+            ? [
+                "attachTweetCompose",
+                "scheduleReply",
+                "savedReplyC",
+                "hcArticleC",
+                "clear",
+              ]
             : ["attachSMSCompose", "clear"],
       },
     };
@@ -1020,7 +1030,7 @@ export default {
 
     // bus.$off("modal.hcArticleInsert.click");
     bus.$on("modal.hcArticleInsert.click", function (data, type) {
-      if(type == 'compose') {
+      if (type == "compose") {
         let editorInstance = vueThis.editorInstance;
         editorInstance.html.insert(vueThis.getArticleCard(data));
       }
@@ -1028,23 +1038,23 @@ export default {
 
     // bus.$off("modal.savedReplyInsert.click");
     bus.$on("modal.savedReplyInsert.click", function (id, type) {
-      if(type == 'compose') {
-      let editorInstance = vueThis.editorInstance;
+      if (type == "compose") {
+        let editorInstance = vueThis.editorInstance;
 
-      triggerPromptNotif("Fetching saved reply data");
-      fetch(
-        `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$store.state.inboxData.id}&savedReplyID=${id}`,
-        { credentials: "include" }
-      )
-        .then((response) => response.json())
-        .then((response) => {
-          if (response.status == "success") {
-            editorInstance.html.insert(response.data.savedReply.content);
-            triggerPromptNotif("Saved Reply Inserted", "success");
-          } else {
-            triggerPromptNotif("Unable to insert Saved Reply", "error");
-          }
-        });
+        triggerPromptNotif("Fetching saved reply data");
+        fetch(
+          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$store.state.inboxData.id}&savedReplyID=${id}`,
+          { credentials: "include" }
+        )
+          .then((response) => response.json())
+          .then((response) => {
+            if (response.status == "success") {
+              editorInstance.html.insert(response.data.savedReply.content);
+              triggerPromptNotif("Saved Reply Inserted", "success");
+            } else {
+              triggerPromptNotif("Unable to insert Saved Reply", "error");
+            }
+          });
       }
     });
   },
@@ -1093,10 +1103,59 @@ export default {
       }
     },
   },
-  beforeMount() {
+  async beforeMount() {
+    await this.fetchTokens();
     this.prepareFroalaButtons();
   },
   methods: {
+    async fetchTokens() {
+      fetch(this.$apiBaseURL + "integration-vue/box/getBoxToken.php", {
+        credentials: "include",
+      })
+        .then(async (response) => {
+          const data = await response.json();
+          if (data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          this.boxAccessToken = data.data.boxAccessToken;
+          console.log(data, this.boxAccessToken);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+      fetch(
+        this.$apiBaseURL + "integration-vue/easy-calendar/EasyCalendarList.php",
+        { credentials: "include" }
+      )
+        .then(async (response) => {
+          const data = await response.json();
+          if (data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          console.log(data);
+          this.easyCalendar = data.data.easycalendar;
+          this.easyCalendarUser = data.data.easyCalendarUser;
+          if (this.easyCalendar.length != 0) {
+            for (i = 0; i < this.easyCalendar.length; i++) {
+              this.easycalendarObj[
+                this.easyCalendar[i].calendar_url
+              ] = `<svg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 24 24' fill='${this.easyCalendar[i].color}' stroke='${this.easyCalendar[i].color}' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='feather feather-circle'><circle cx='12' cy='12' r='4'></circle></svg>${this.easyCalendar[i].personalslug}`;
+            }
+            this.easycalendarObj[
+              "add_easy_calendar"
+            ] = `<svg class='w-2 h-2' fill='none' stroke='currentColor' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' style='
+        height: 20px; margin-top: 5px;'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6v6m0 0v6m0-6h6m-6 0H6'></path></svg> Add time slots`;
+          } else {
+            this.easycalendarObj["Connect"] = "Connect EasyCalendar";
+          }
+          console.log(this.easycalendarObj);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    },
     refreshSignatureDropdownOnShow($btn, $dropdown) {
       $.get({
         url: `https://app.helpwise.io/api/signatures/list.php`,
@@ -1225,7 +1284,7 @@ export default {
         refreshAfterCallback: true,
         callback: function () {
           this.selection.save();
-          bus.$emit("savedReply", 'compose');
+          bus.$emit("savedReply", "compose");
           // $(".saved-replies-btn").click();
           // vueThis.$bvModal.show("saved-reply-modal");
         },
@@ -1245,7 +1304,7 @@ export default {
           let editor = this;
           vueThis.showHcModal = true;
           console.log("----");
-          bus.$emit("hcArticles", 'compose');
+          bus.$emit("hcArticles", "compose");
           // vueThis.$bvModal.show("helpcenterArticlesModal");
         },
       });
@@ -1457,7 +1516,8 @@ export default {
             } while (Math.abs(bytes) >= thresh && u < units.length - 1);
             return bytes.toFixed(1) + " " + units[u];
           }
-          if (false) {
+          console.log(vueThis.boxAccessToken);
+          if (!vueThis.boxAccessToken) {
             window.open("https://app.helpwise.io/settings/integrations");
           } else {
             let _this = this;
@@ -1465,15 +1525,18 @@ export default {
             if (selectionInEditor) {
               this.selection.save();
             }
-            //$('#box-integration-modal').modal('show');
+            // $('#box-integration-modal').modal('show');
             // The current context is the editor instance.
             var filePicker = new Box.FilePicker();
             filePicker.addListener("choose", function (items) {
-              //$('#box-integration-modal').modal('hide');
+              // $('#box-integration-modal').modal('hide');
               let html = "";
               for (let item of items) {
-                html += `<a href="${item.shared_link.url}" target="_blank" rel="nofollow">${item.name} 
-                    ({{humanFileSize(item.size)}})</a>&nbsp;`;
+                html += `<a href="${
+                  item.shared_link.url
+                }" target="_blank" rel="nofollow">${item.name} (${humanFileSize(
+                  item.size
+                )})</a>&nbsp;`;
               }
               if (selectionInEditor) {
                 _this.el.focus();
@@ -1481,9 +1544,9 @@ export default {
               _this.html.insert(html);
             });
             filePicker.addListener("cancel", function () {});
-            filePicker.show("0", true, {
-              //container: '.boxIntegration',
-              //chooseButtonLabel: 'Select'
+            filePicker.show("0", showBox, {
+              container: ".boxIntegration",
+              chooseButtonLabel: "Select",
             });
           }
         },
@@ -1523,8 +1586,8 @@ export default {
             multiSelect: true,
             viewType: "all",
             advanced: {
-                endpointHint: "api.onedrive.com",
-                redirectUri: "https://app.helpwise.io/onedrive.php"
+              endpointHint: "api.onedrive.com",
+              redirectUri: "https://app.helpwise.io/onedrive.php",
             },
             success: (files) => {
               let files_data = files.value;
@@ -1557,12 +1620,10 @@ export default {
         title: "EasyCalendar",
         type: "dropdown",
         icon: "EasyCalendarIcon",
-        options: {
-          easycalendarObj: "Connect EasyCalendar",
-        },
+        options: vueThis.easycalenderObj,
         // Callback.
         callback: function (cmd, val) {
-          if (easycalendar.length == 0) {
+          if (vueThis.easyCalendar.length == 0) {
             window.open("https://app.helpwise.io/settings/integrations");
           } else {
             $("#ec_slot").html("");
@@ -1579,23 +1640,25 @@ export default {
               _this.html.insert(html);
             } else {
               let _this = this;
-              $("#easy-calendar-integration-modal").modal("show");
+              // $("#easy-calendar-integration-modal").modal("show");
               appendECdata(_this);
             }
           }
         },
-        /*refreshOnShow: function ($btn, $dropdown) {
-        var ab = $("ul").find(`[data-param1='add_easy_calendar']`);
-        ab.attr('title', `Add time slots`);
-        var abc = ab.parent();
-        if (!abc.prev().is('hr')) {
+        refreshOnShow: function ($btn, $dropdown) {
+          var ab = $("ul").find(`[data-param1='add_easy_calendar']`);
+          ab.attr("title", `Add time slots`);
+          var abc = ab.parent();
+          if (!abc.prev().is("hr")) {
             $(`<hr>`).insertBefore(abc);
-        }
-        for (var i = 0; i < easycalendar.length; i++) {
-            var a = $("ul").find(`[data-param1='${easycalendar[i].calendar_url}']`);
-            a.attr('title', `${easycalendar[i].calendar_url}`);
-        }
-    }*/
+          }
+          for (var i = 0; i < easycalendar.length; i++) {
+            var a = $("ul").find(
+              `[data-param1='${easycalendar[i].calendar_url}']`
+            );
+            a.attr("title", `${easycalendar[i].calendar_url}`);
+          }
+        },
       });
     },
     scheduleSend() {
@@ -2469,13 +2532,17 @@ export default {
   right: 20px;
 }
 
-.fr-toolbar .fr-command .fr-btn img, .fr-popup .fr-command.fr-btn img, .fr-modal .fr-command.fr-btn img {
-    margin: 8px 7px;
-    width: 16px !important;
+.fr-toolbar .fr-command .fr-btn img,
+.fr-popup .fr-command.fr-btn img,
+.fr-modal .fr-command.fr-btn img {
+  margin: 8px 7px;
+  width: 16px !important;
 }
 
-.fr-toolbar .fr-command.fr-btn img, .fr-popup .fr-command.fr-btn img, .fr-modal .fr-command.fr-btn img {
-    margin: 8px 7px;
-    width: 16px !important;
+.fr-toolbar .fr-command.fr-btn img,
+.fr-popup .fr-command.fr-btn img,
+.fr-modal .fr-command.fr-btn img {
+  margin: 8px 7px;
+  width: 16px !important;
 }
 </style>

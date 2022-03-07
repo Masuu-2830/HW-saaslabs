@@ -186,7 +186,7 @@
             },
             fetchSavedReplies(){
                 fetch(
-                    `https://app.helpwise.io/api/list-saved-replies.php?mailboxID=${this.$route.params.mailboxId}`,{credentials: "include"}
+                    `https://app.helpwise.io/api/list-saved-replies.php?mailboxID=${this.$store.state.inboxData.id}`,{credentials: "include"}
                 ).then(response => response.json())
                 .then(response => {
                     // console.log(response);
