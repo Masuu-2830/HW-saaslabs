@@ -25,7 +25,8 @@ export const store = new Vuex.Store({
         labelId: -1,
         threads: [],
         threadData: {},
-        firebaseModal: ''
+        firebaseModal: '',
+        openThread: null
     },
     mutations: {
         setState: (state, data) => {
@@ -73,6 +74,9 @@ export const store = new Vuex.Store({
         setFirebaseModal: (state, data) => {
             console.log(data);
             state.firebaseModal = data;
+        },
+        setOpenThread: (state, data) => {
+            state.openThread = data;
         }
     },
     actions: {
@@ -102,6 +106,9 @@ export const store = new Vuex.Store({
         },
         async updateFirebaseModal(context, data) {
             await context.commit('setFirebaseModal', data);
+        },
+        async updateOpenThread(context, data) {
+            await context.commit('setOpenThread', data);
         },
     },
     // getters: {

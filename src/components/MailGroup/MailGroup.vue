@@ -305,6 +305,7 @@ export default {
       }
     }),
       bus.$on("broad", () => {
+        this.$store.dispatch("updateOpenThread", null);
         this.isCompact = false;
         this.activeId = "";
         if (this.isThreadRefresh) {
@@ -1743,6 +1744,7 @@ export default {
   },
   methods: {
     broad() {
+      this.$store.dispatch("updateOpenThread", null);
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
@@ -2318,6 +2320,7 @@ export default {
       console.log(data);
       if (!(id in Object.keys(await this.$store.state.threadData))) {
         this.$store.dispatch("updateThreadData", data);
+        this.$store.dispatch("updateOpenThread", id);
       }
       router.push({
         name: "thread",
