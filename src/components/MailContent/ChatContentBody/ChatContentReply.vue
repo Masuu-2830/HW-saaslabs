@@ -3,6 +3,9 @@
     <p class="typingMessageNotice tx-12 tx-italic tx-sans" v-if="typingNotice">
       {{typingNotice}}
     </p>
+    <p class="typingMessageNotice tx-12 tx-italic tx-sans" v-if="typingNotesNotice">
+      {{typingNotesNotice}}
+    </p>
     <div class="editorContainer">
         <ul class="nav nav-line flex-row mg-l-20 mg-b-10" role="tablist" style="border-bottom: none !important;margin-top:5px;margin-bottom:5px">
             <li class="nav-item" v-if="$store.state.inboxData.type == 'mail'">
@@ -53,10 +56,16 @@
         noteEditorInstance: null,
         replyAttachments: {},
         notesAttachments: {},
-        typing: false,
+        typing: {
+          reply: false,
+          notes: false
+        },
         showHcModal: false,
         defaultTypingTimer: 1000,
         typingNotice: "",
+        typingNotesNotice: "",
+        typingTimer: null,
+        typingNotesTimer: null,
         replyEditorConfig: {
           events: {
             initialized: async function() {
@@ -374,43 +383,72 @@
         console.log(`/Account-${managerID}/ThreadID-${threadID}`);
         const socket = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
 
-        if(!this.typing){
-          this.typing = true;
-          if(type == "notes"){
+        if(type == "notes"){
+          if(!this.typing.notes){
+            this.typing.notes = true;
+            socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).off("value");
             socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
-          } else {
+            this.startNotesTimer(socket);
+          }
+          if(this.typing.notes){
+            this.resetNotesTimer(socket);
+          }
+        } else {
+          if(!this.typing.reply){
+            this.typing.reply = true;
+            socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).off("value");
             socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+            this.startReplyingTimer(socket);
+          }
+
+          if(this.typing.reply){
+            this.resetReplyingTimer(socket);
           }
         }
-
-        clearTimeout(typingTimer);
-        var typingTimer = setTimeout(() => {
-          console.log("----- TIMER FINISHED ---");
-          if(type == "notes"){
-            socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).remove();
-          } else {
-            socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).remove();
-          }
-        }, this.defaultTypingTimer);
-
       },
-
+      startReplyingTimer(socket){
+        this.typingTimer = setTimeout(() => {
+          this.typing.reply = false;
+          socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).remove();
+        }, this.defaultTypingTimer);
+      },
+      startNotesTimer(socket){
+        this.typingNotesTimer = setTimeout(() => {
+          this.typing.reply = false;
+          socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).remove();
+        }, this.defaultTypingTimer);
+      },
+      resetReplyingTimer(socket){
+        clearTimeout(this.typingTimer);
+        this.startReplyingTimer(socket);
+      },
+      resetNotesTimer(socket){
+        clearTimeout(this.typingNotesTimer);
+        this.startNotesTimer(socket);
+      },
       makingTypingCard(data, type){
         let typingType = type == "notes" ? "adding notes" : "replying";
-      
-        for(let i = 0; i < data.length; i++){
-          let user = data[i];
-          let userID = user.id;
-          let userName = user.name;
-          // let userAvatar = user.avatar;
-          // let userEmail = user.email;
-          // let userRole = user.role;
-          let prefix = "";
-          if(this.typingNotice.trim().length > 0){
-            prefix = ";";
-          }
-          this.typingNotice += `${prefix} ${userName} is ${typingType}... `;
+        let noticeElem = "";
+        if(Object.keys(data).length == 0){
+          noticeElem = "";
         }
+        for (const key in data) {
+          if (Object.hasOwnProperty.call(data, key)) {
+            const user = data[key];
+            let userID = user.id;
+            let userFName = user.firstname;
+            let userLName = user.lastname;
+            let userName = `${userFName} ${userLName}`;
+            userName = userName.trim();
+            let prefix = "";
+            if(noticeElem.trim().length > 0){
+              prefix = ";";
+            }
+            noticeElem += `${prefix} ${userName} is ${typingType}... `;
+          }
+        }
+
+        type == "notes" ? this.typingNotesNotice = noticeElem : this.typingNotice = noticeElem;
 
       },
       sendMessage(){
@@ -580,18 +618,18 @@
       const socket2 = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
 
       socket2.child(`/commenting user`).on('value', function(data){
-        console.log("----- COMMENTING USER -----");
         if(data.val()){
-          console.log(data.val());
           vueThis.makingTypingCard(data.val(), "notes");
+        } else {
+          vueThis.makingTypingCard({}, "notes");
         }
       });
 
       socket2.child(`/replying user`).on('value', function(data){
-        console.log("----- REPLYING USER -----");
         if(data.val()){
-          console.log(data.val());
           vueThis.makingTypingCard(data.val(), "reply");
+        } else {
+          vueThis.makingTypingCard({}, "reply");
         }
       });
     }
@@ -653,6 +691,10 @@
   }
   .hw_removeArticle:hover{
     visibility: visible;
+  }
+
+  .typingMessageNotice{
+    margin: 5px 20px;
   }
 
 </style>
