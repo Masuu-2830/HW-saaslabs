@@ -26,7 +26,8 @@ export const store = new Vuex.Store({
         labelId: -1,
         threads: [],
         threadData: {},
-        firebaseModal: ''
+        firebaseModal: '',
+        openThread: null
     },
     mutations: {
         setState: (state, data) => {

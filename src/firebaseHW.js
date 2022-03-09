@@ -1,4 +1,6 @@
 import { bus } from "./main";
+import { store } from "./store/store";
+
 function createThread(data) {
     let thread = {
         'id': data.threadID,
@@ -29,16 +31,16 @@ export function addThread(data) {
     // if(inbox) {
         let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
         if (objIndex !== -1) {
-            this.$store.state.threads[objIndex].date = data.messageData.time;
-            this.$store.state.threads[objIndex].subject = data.messageData.subject;
-            var a = this.$store.state.threads.splice(objIndex, 1);
-            this.$store.state.threads.unshift(a[0]);
+            store.state.threads[objIndex].date = data.messageData.time;
+            store.state.threads[objIndex].subject = data.messageData.subject;
+            var a = store.state.threads.splice(objIndex, 1);
+            store.state.threads.unshift(a[0]);
         } else if(data.action == 'incoming' && (all || mine || assigned || unassigned)) {
-            this.$store.state.threads.unshift(createThread(data));
+            store.state.threads.unshift(createThread(data));
         }
-        if (store.openThread !== undefined && (data.threadID in Object.keys(this.$store.state.threadData))) {
+        if (store.state.openThread !== null && (data.threadID in Object.keys(store.state.threadData))) {
             if(data.inboxType == 'mail') {
-                let itemIndex = this.$store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
+                let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
                 if(itemIndex == -1) {
                     fetch(this.$apiBaseURL + "getEmail.php?emailID=" + data.messageData.id + "&mailboxID=" + data.mailboxID, {credentials: "include"}).then(async (response) => {
                         const data1 = await response.json();
@@ -51,17 +53,17 @@ export function addThread(data) {
                             'data': data1.data.email,
                             'timestamp': Date.now()
                         };
-                        this.$store.state.threadData[data.threadID].data.snippet = data1.data.email.snippet;
-                        this.$store.state.threadData[data.threadID].data.subject = data1.data.email.subject;
-                        if (this.$store.state.userSettings.orderThread == "asc") {
-                            this.$store.state.threadData[data.threadID].data.items.push(email);
+                        store.state.threadData[data.threadID].data.snippet = data1.data.email.snippet;
+                        store.state.threadData[data.threadID].data.subject = data1.data.email.subject;
+                        if (store.state.userSettings.orderThread == "asc") {
+                            store.state.threadData[data.threadID].data.items.push(email);
                         } else {
-                            this.$store.state.threadData[data.threadID].data.items.unshift(email);
+                            store.state.threadData[data.threadID].data.items.unshift(email);
                         }
                     });
                 }
             } else if(data.inboxType == 'chat' || data.inboxType == 'facebook') {
-                let itemIndex = this.$store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
+                let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
                 if(itemIndex == -1) {
                     let message = {
                         'type': data.inboxType,
@@ -77,10 +79,10 @@ export function addThread(data) {
                         },
                         'timestamp': Date.now()
                     };
-                    if (this.$store.state.userSettings.orderThread == "asc") {
-                        this.$store.state.threadData[data.threadID].data.items.push(message);
+                    if (store.state.userSettings.orderThread == "asc") {
+                        store.state.threadData[data.threadID].data.items.push(message);
                     } else {
-                        this.$store.state.threadData[data.threadID].data.items.unshift(message);
+                        store.state.threadData[data.threadID].data.items.unshift(message);
                     }
                 }
             }
@@ -98,13 +100,13 @@ export function addNote(data) {
     // if(inbox) {
         let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
         if (objIndex !== -1) {
-            this.$store.state.threads[objIndex].date = data.messageData.time;
-            var a = this.$store.state.threads.splice(objIndex, 1);
-            this.$store.state.threads.unshift(a[0]);
+            store.state.threads[objIndex].date = data.messageData.time;
+            var a = store.state.threads.splice(objIndex, 1);
+            store.state.threads.unshift(a[0]);
         } else if(all || mine || assigned || unassigned) {
-            this.$store.state.threads.unshift(createThread(data));
+            store.state.threads.unshift(createThread(data));
         }
-        if (store.openThread !== undefined && (data.threadID in Object.keys(this.$store.state.threadData))) {
+        if (store.state.openThread !== null && (data.threadID in Object.keys(store.state.threadData))) {
             let comment = {
                 'type': 'comment',
                 'data': {
@@ -117,148 +119,171 @@ export function addNote(data) {
                 },
                 'timestamp': Date.now()
             };
-            if (this.$store.state.userSettings.orderThread == "asc") {
-                this.$store.state.threadData[data.threadID].data.items.push(comment);
+            if (store.state.userSettings.orderThread == "asc") {
+                store.state.threadData[data.threadID].data.items.push(comment);
             } else {
-                this.$store.state.threadData[data.threadID].data.items.unshift(comment);
+                store.state.threadData[data.threadID].data.items.unshift(comment);
             }
         }
     // }
 }
 
 export function closeThread(data) {
-    // var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
+    // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
+    // console.log("inbox ka data",inbox);
     // if(inbox) {
-        let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
-        if (objIndex !== -1 && this.$store.state.type !== 'closed') {
-            this.$store.state.threads.splice(objIndex, 1);
-        } else if(objIndex == -1 && this.$store.state.type == 'closed') {
-            this.$store.state.threads.unshift(createThread(data));
+        console.log("data threads ka",data.threadID);
+        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
+        console.log("objIndex ka data",objIndex);
+        console.log("threads ka data",store.state.threads);
+        if (objIndex !== -1 && store.state.type !== 'closed') {
+            console.log("hello 142");
+            store.state.threads.splice(objIndex, 1);
+        } else if(objIndex == -1 && store.state.type == 'closed') {
+            console.log("hello 145");
+            store.state.threads.unshift(createThread(data));
         }
-        if (store.openThread == data.threadID) {
-            this.$store.dispatch('updateFirebaseModal', data.user.firstname + data.user.lastname + ' closed this conversation.');
-            // this.$bvModal.show('firebaseModal');
-            bus.$emit("firebaseModal");
+        console.log("threads ka data",store.state.threads);
+        if(store.state.openThread !== null){
+            if (store.state.openThread == data.threadID) {
+                console.log("thread open",data.user);
+                store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' closed this conversation.');
+                this.$bvModal.show('firebaseModal');
+            }
         }
     // }
 }
 
 export function snoozeThread(data) {
-    // var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
+    // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
-        let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
-        if (objIndex !== -1 && this.$store.state.type !== 'snoozed') {
-            this.$store.state.threads.splice(objIndex, 1);
-        } else if(objIndex == -1 && this.$store.state.type == 'snoozed') {
-            this.$store.state.threads.unshift(createThread(data));
+        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
+        if (objIndex !== -1 && store.state.type !== 'snoozed') {
+            store.state.threads.splice(objIndex, 1);
+        } else if(objIndex == -1 && store.state.type == 'snoozed') {
+            store.state.threads.unshift(createThread(data));
         }
-        if (store.openThread == data.threadID) {
-            this.$store.dispatch('updateFirebaseModal', data.user.firstname + data.user.lastname + ' snoozed this conversation.');
-            // this.$bvModal.show('firebaseModal');
-            bus.$emit("firebaseModal");
+        if(store.state.openThread !== null){
+            if (store.state.openThread == data.threadID) {
+                store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' snoozed this conversation.');
+                this.$bvModal.show('firebaseModal');
+            }
         }
     // }
 }
 
 export function deleteThread(data) {
-    // var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
+    // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
-        let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
-        if (objIndex !== -1 && this.$store.state.type !== 'trash') {
-            this.$store.state.threads.splice(objIndex, 1);
-        } else if(objIndex == -1 && this.$store.state.type == 'trash') {
-            this.$store.state.threads.unshift(createThread(data));
+        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
+        if (objIndex !== -1 && store.state.type !== 'trash') {
+            store.state.threads.splice(objIndex, 1);
+        } else if(objIndex == -1 && store.state.type == 'trash') {
+            store.state.threads.unshift(createThread(data));
         }
-        if (store.openThread == data.threadID) {
-            this.$store.dispatch('updateFirebaseModal', data.user.firstname + data.user.lastname + ' moved this conversation to trash.');
-            // this.$bvModal.show('firebaseModal');
-            bus.$emit("firebaseModal");
+        if (store.state.openThread == data.threadID) {
+            store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' moved this conversation to trash.');
+            this.$bvModal.show('firebaseModal');
         }
     // }
 }
 
 export function moveToInboxThread(data) {
-    // var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
-    var all = this.$store.state.type == 'all';
-    var mine = (data.assignedTo.id == this.$store.state.userInfo.id ? true : false) && (this.$store.state.type == 'mine');
-    var assigned = (data.assignedTo !== null ? true : false) && (this.$store.state.type == 'assigned');
-    var unassigned = (!assigned) && (this.$store.state.type == 'unassigned');
+    // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
+    var all = store.state.type == 'all';
+    var mine = (data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
+    var assigned = (data.assignedTo !== null ? true : false) && (store.state.type == 'assigned');
+    var unassigned = (!assigned) && (store.state.type == 'unassigned');
     // if(inbox) {
-        let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
+        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
         if (objIndex !== -1) {
-            this.$store.state.threads.splice(objIndex, 1);
+            store.state.threads.splice(objIndex, 1);
         } else if(all || mine || assigned || unassigned) {
-            this.$store.state.threads.unshift(createThread(data));
+            store.state.threads.unshift(createThread(data));
         }
-        if (store.openThread == data.threadID) {
-            this.$store.dispatch('updateFirebaseModal', data.user.firstname + data.user.lastname + ' moved this conversation to inbox.');
-            // this.$bvModal.show('firebaseModal');
-            bus.$emit("firebaseModal");
+        if (store.state.openThread == data.threadID) {
+            store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' moved this conversation to inbox.');
+            this.$bvModal.show('firebaseModal');
         }
     // }
 }
 
 export function toggleTags(data) {
-    // var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
+    console.log("data dhikhado tags ka",data);
+    // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
-        let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
+        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
+        var allTags = data.tags;
+        // var threadTagId = [];
+        // var threadDataTagId = [];
         if(objIndex !== -1) {
-            data.tags.forEach(function (tag) {
+            // store.state.threads[objIndex].tags.forEach(t => {
+            //     threadTagId.push(t.id);
+            // });
+            allTags.forEach(tag => {
                 if(data.action == 'addTag') {
-                    this.$store.state.threads[objIndex].tags.push(tag);
+                    // if(!threadTagId.includes(tag.id)){
+                        store.state.threads[objIndex].tags.push(tag);
+                    // }
                 } else if(data.action == 'removeTag') {
-                    this.$store.state.threads[objIndex].tags = this.$store.state.threads[objIndex].tags.filter(tg => tg.id !== tag.id)
+                    store.state.threads[objIndex].tags = store.state.threads[objIndex].tags.filter(tg => tg.id !== tag.id)
                 }
-            })
+            });
         }
-        if(store.openThread == data.threadID) {
-            data.tags.forEach(function (tag) {
+        if(store.state.openThread == data.threadID) {
+            console.log("data dhikhao tags ka 225",allTags);
+            // store.state.threadData[data.threadID].data.tags.forEach(t => {
+            //     threadDataTagId.push(t.id);
+            // });
+            allTags.forEach(tag => {
                 if(data.action == 'addTag') {
-                    this.$store.state.threadData[data.threadID].data.tags.push(tag);
+                    // if(!threadDataTagId.includes(tag.id)){
+                        store.state.threadData[data.threadID].data.tags.push(tag);
+                    // }
                     let log = {
                         'type': 'log',
                         'data': {
                             'type': 'tag',
                             'at': data.time,
-                            'body': data.user.firstname + data.user.lastname + ' added the tag ' + tag.name,
+                            'body': data.user.first_name + data.user.last_name + ' added the tag ' + tag.name,
                         },
                         'timestamp': Date.now()
                     };
-                    this.$store.state.threadData[data.threadID].data.items.push(log);
+                    store.state.threadData[data.threadID].data.items.push(log);
                 } else if(data.action == 'removeTag') {
-                    this.$store.state.threadData[data.threadID].data.tags = this.$store.state.threadData[data.threadID].data.tags.filter(tg => tg.id !== tag.id);
+                    store.state.threadData[data.threadID].data.tags = store.state.threadData[data.threadID].data.tags.filter(tg => tg.id !== tag.id);
                     let log = {
                         'type': 'log',
                         'data': {
                             'type': 'tag',
                             'at': data.time,
-                            'body': data.user.firstname + data.user.lastname + ' removed the tag ' + tag.name,
+                            'body': data.user.first_name + data.user.last_name + ' removed the tag ' + tag.name,
                         },
                         'timestamp': Date.now()
                     };
-                    this.$store.state.threadData[data.threadID].data.items.push(log);
+                    store.state.threadData[data.threadID].data.items.push(log);
                 }
-            })
+            });
         }
     // }
 }
 
 export function assignThread(data) {
-    // var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
+    // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
-        let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
+        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
         if(objIndex !== -1) {
-            this.$store.state.threads[objIndex].assignedTo = data.assigned;
+            store.state.threads[objIndex].assignedTo = data.assigned;
         }
-        if(store.openThread == data.threadID) {
-            this.$store.state.threadData[data.threadID].data.currentAssignment = {
+        if(store.state.openThread == data.threadID) {
+            store.state.threadData[data.threadID].data.currentAssignment = {
                 'assigned': data.assigned,
-                'me': data.assigned.id == this.$store.state.userInfo.id ? true : false,
+                'me': data.assigned.id == store.state.userInfo.id ? true : false,
                 'assigner': data.assigner,
                 'time': data.time
             };
             let body = '';
-            if(data.assigned.id == this.$store.state.userInfo.id) {
+            if(data.assigned.id == store.state.userInfo.id) {
                 body = data.assigner.firstname + data.assigner.lastname + ' assigned the conversation to themselves';
             } else if (data.assigned == null) {
                 body = data.assigner.firstname + data.assigner.lastname + ' unassigned the conversation';
@@ -274,28 +299,27 @@ export function assignThread(data) {
                 },
                 'timestamp': Date.now()
             };
-            this.$store.state.threadData[data.threadID].data.items.push(log);
+            store.state.threadData[data.threadID].data.items.push(log);
         }
     // }
 }
 
 export function unsnoozeThread(data) {
-    // var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
-    var all = this.$store.state.type == 'all';
-    var mine = (data.thread.assignedTo.id == this.$store.state.userInfo.id ? true : false) && (this.$store.state.type == 'mine');
-    var assigned = (data.thread.assignedTo !== null ? true : false) && (this.$store.state.type == 'assigned');
-    var unassigned = (!assigned) && (this.$store.state.type == 'unassigned');
+    // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
+    var all = store.state.type == 'all';
+    var mine = (data.thread.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
+    var assigned = (data.thread.assignedTo !== null ? true : false) && (store.state.type == 'assigned');
+    var unassigned = (!assigned) && (store.state.type == 'unassigned');
     // if(inbox) {
-        let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
-        if (objIndex !== -1 && this.$store.state.type == 'snoozed') {
-            this.$store.state.threads.splice(objIndex, 1);
+        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
+        if (objIndex !== -1 && store.state.type == 'snoozed') {
+            store.state.threads.splice(objIndex, 1);
         } else if(all || mine || assigned || unassigned) {
-            this.$store.state.threads.unshift(data.thread);
+            store.state.threads.unshift(data.thread);
         }
-        if (store.openThread == data.threadID) {
-            this.$store.dispatch('updateFirebaseModal', "This conversation's snooze is ended and has been moved to inbox.");
-            // this.$bvModal.show('firebaseModal');
-            bus.$emit("firebaseModal");
+        if (store.state.openThread == data.threadID) {
+            store.dispatch('updateFirebaseModal', "This conversation's snooze is ended and has been moved to inbox.");
+            this.$bvModal.show('firebaseModal');
         }
     // }
 }

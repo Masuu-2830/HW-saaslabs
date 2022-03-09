@@ -25,6 +25,7 @@ import SavedReply from './modals/SavedReply.vue';
 import ComposeWrapper from './ComposeWrapper.vue';
 import { bus } from "../main";
 import TweetCompose from './TweetCompose.vue';
+import initFirebase from "../firebaseInit.js";
 export default {
     name: 'Home',
     components: {
@@ -157,6 +158,7 @@ export default {
         data1.data.tags = data1.data.tags.sort((b,a) => b.name-a.name);
         await this.$store.dispatch('fetchPingDetails', data1);
         this.loaded = true;
+        initFirebase();
         console.log(this.loaded);
 
         const response2 = await fetch("https://app.helpwise.io/api/getAccountMailboxes.php", {credentials: 'include'});

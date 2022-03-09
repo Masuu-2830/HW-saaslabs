@@ -1744,6 +1744,7 @@ export default {
   },
   methods: {
     broad() {
+      this.$store.dispatch("updateOpenThread", null);
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
