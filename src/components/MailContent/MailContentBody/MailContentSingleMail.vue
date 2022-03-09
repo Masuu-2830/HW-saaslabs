@@ -471,7 +471,7 @@
             "
             @click.stop="reply(1)"
           >
-            <i class="fas fa-reply mr-1"></i>
+            <i class="fa fa-reply mr-1"></i>
             <span class="ml-1"> Reply</span>
           </button>
           <button
@@ -551,13 +551,14 @@ export default {
   },
   methods: {
     getFileIcon(extension, size) {
+      console.log("mail content",extension, size);
         let iconStyle = '';
         if (size) {
-            iconStyle = `style="height:${size}px;width:${size}px;"`;
+            iconStyle = `style="height:18px;width:18px;"`;
         }
 
         let ext = extension.toString().toLowerCase();
-        return `<span ${iconStyle} class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
+        return `<span class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
     },
     showDD() {
       this.showdd = !this.showdd;

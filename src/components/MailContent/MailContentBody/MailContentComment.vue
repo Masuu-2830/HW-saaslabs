@@ -60,7 +60,22 @@
                   <div class="tx-14 commentText" style="color: #222">
                     <p v-html="item.data.body"></p>
                   </div>
-                  <div class="list-group"></div>
+                  <div v-if="item.data.attachments !== undefined && Object.keys(item.data.attachments).length > 0" class="list-group" :id="'edit-comment-attachment-'+item.data.id">
+                    <a
+                      v-for="attach in item.data.attachments"
+                      :key="attach.id"
+                      :href="'https://app.helpwise.io/attachments/' + attach.id"
+                      target="_blank"
+                    >
+                      <img
+                        :src="'https://app.helpwise.io/attachments/' + attach.id"
+                        style="
+                          max-width: 640px;
+                          max-height: 650px;
+                          cursor: pointer;
+                        "
+                    /></a>
+                  </div>
                 </div>
               </div>
               <div
@@ -88,8 +103,8 @@
                   ></path>
                 </svg>
                 <b-modal
-                  :ref="'delete-modal'+item.data.id"
-                  :id="'delete-modal'+item.data.id"
+                  :ref="'delete-modal' + item.data.id"
+                  :id="'delete-modal' + item.data.id"
                   title="Are you sure to delete this comment?"
                 >
                   <div class="modal-body pd-20 pd-sm-30">
@@ -205,7 +220,11 @@ export default {
         credentials: "include",
       };
       console.log(requestOptions.body);
-      let url = this.$apiBaseURL + (this.$store.state.inboxData.type == "mail" ? "delete_comments.php" : "chat-widget/delete_comment.php");
+      let url =
+        this.$apiBaseURL +
+        (this.$store.state.inboxData.type == "mail"
+          ? "delete_comments.php"
+          : "chat-widget/delete_comment.php");
       console.log(url);
       // fetch(url, requestOptions)
       // .then(async (response) => {
@@ -214,9 +233,9 @@ export default {
       //     const error = (data && data.message) || response.status;
       //     return Promise.reject(error);
       //   }
-        this.$emit("deleteComment", this.item.data.id);
-        let ref = "delete-modal" + this.item.data.id;
-        this.$refs[ref].hide();
+      this.$emit("deleteComment", this.item.data.id);
+      let ref = "delete-modal" + this.item.data.id;
+      this.$refs[ref].hide();
       // })
       // .catch((error) => {
       //   alert(error);

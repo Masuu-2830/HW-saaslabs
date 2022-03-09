@@ -100,29 +100,33 @@ export function addNote(data) {
     // if(inbox) {
         let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
         if (objIndex !== -1) {
-            store.state.threads[objIndex].date = data.messageData.time;
+            store.state.threads[objIndex].date = data.noteData.time;
+            store.state.threads[objIndex].snippet = data.noteData.snippet;
             var a = store.state.threads.splice(objIndex, 1);
             store.state.threads.unshift(a[0]);
         } else if(all || mine || assigned || unassigned) {
             store.state.threads.unshift(createThread(data));
         }
         if (store.state.openThread !== null && (data.threadID in Object.keys(store.state.threadData))) {
-            let comment = {
-                'type': 'comment',
-                'data': {
-                    'id': data.noteData.id,
-                    'at': data.noteData.time,
-                    'body': data.noteData.body,
-                    'by': data.noteData.sentBy,
-                    'mentions': data.noteData.mentions,
-                    'attachments': data.noteData.attachments,
-                },
-                'timestamp': Date.now()
-            };
-            if (store.state.userSettings.orderThread == "asc") {
-                store.state.threadData[data.threadID].data.items.push(comment);
-            } else {
-                store.state.threadData[data.threadID].data.items.unshift(comment);
+            let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.noteData.id);
+            if(itemIndex == -1) {
+                let comment = {
+                    'type': 'comment',
+                    'data': {
+                        'id': data.noteData.id,
+                        'at': data.noteData.time,
+                        'body': data.noteData.body,
+                        'by': data.noteData.sentBy,
+                        'mentions': data.noteData.mentions,
+                        'attachments': data.noteData.attachments,
+                    },
+                    'timestamp': Date.now()
+                };
+                if (store.state.userSettings.orderThread == "asc") {
+                    store.state.threadData[data.threadID].data.items.push(comment);
+                } else {
+                    store.state.threadData[data.threadID].data.items.unshift(comment);
+                }
             }
         }
     // }

@@ -1760,7 +1760,8 @@ export default {
             self.showUndo = false;
             self.cancelReply(self.reply.hash);
             self.undoTimer = self.$store.state.userSettings.undoTimer;
-            if (this.isSend == "send") {
+          }, self.$store.state.userSettings.undoTimer * 1000);
+          if (this.isSend == "send") {
               let payload = this.reply.email;
               payload.subject = this.subject;
               payload.displaySubject = this.subject;
@@ -1773,6 +1774,7 @@ export default {
               payload.text = requestOptions.body.text;
               payload.snippet = requestOptions.body.text;
               payload.readStats = {};
+              payload.id = data.data.messageID;
               payload.attachments = this.attachments;
               payload.date = new Date().toISOString();
               console.log(payload, this.reply);
@@ -1785,7 +1787,6 @@ export default {
               bus.$emit("closeThread", this.$route.params.threadId);
               bus.$emit("broad");
             }
-          }, self.$store.state.userSettings.undoTimer * 1000);
           // this.cancelReply();
           // bus.$emit("closeReply", this.reply.hash);
         })
@@ -1816,6 +1817,8 @@ export default {
           console.log("unsending");
           this.showUndo = false;
           this.show = true;
+          console.log(this.draftID);
+          bus.$emit("removeMail", this.draftID);
         }
       );
       this.undoTimer = this.$store.state.userSettings.undoTimer;

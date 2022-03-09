@@ -915,7 +915,7 @@ export default {
       }
 
       let ext = extension.toString().toLowerCase();
-      return `<span ${iconStyle} class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
+      return `<span class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
     },
     checkBox() {
       this.checkAll = !this.checkAll;

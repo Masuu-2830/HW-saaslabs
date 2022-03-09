@@ -1717,6 +1717,7 @@ export default {
           this.squery = "";
         } else {
           this.labelId = 0;
+          console.log("Tag", to.params.type);
           this.tagId = to.params.type.substring(4);
           this.route = to.params.type;
           this.currPage = 1;
@@ -2213,6 +2214,7 @@ export default {
             isSpam: data.data.isSpam,
             isStarred: data.data.isStarred,
             order: 0,
+            type: "mail",
             snippetType: "message",
             totalEmailCount: data.data.emailCount,
             ticketNumber: data.data.ticketNumber,
