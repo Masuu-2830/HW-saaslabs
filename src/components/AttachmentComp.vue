@@ -176,11 +176,11 @@ export default {
       console.log(extension, size);
       let iconStyle = "";
       if (size) {
-        iconStyle = `style="height:${size}px;width:${size}px;"`;
+        iconStyle = `style="height:18px;width:18px;"`;
       }
 
       let ext = extension.toString().toLowerCase();
-      return `<span ${iconStyle} class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
+      return `<span style="height:18px;width:18px;" class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
     },
     deleteAttachment: function (id) {
       console.log("delete Attachment", id);

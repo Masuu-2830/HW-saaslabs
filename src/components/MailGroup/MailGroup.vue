@@ -305,6 +305,7 @@ export default {
       }
     }),
       bus.$on("broad", () => {
+        this.$store.dispatch("updateOpenThread", null);
         this.isCompact = false;
         this.activeId = "";
         if (this.isThreadRefresh) {
@@ -443,6 +444,9 @@ export default {
         var objIndex;
         for (let i in id) {
           objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          console.log("objIndex",objIndex);
+          console.log("id[i]",id[i]);
+          console.log("this.perPageMails",this.perPageMails);
           if (
             !(
               this.perPageMails[objIndex].mailboxId in
@@ -529,6 +533,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("restoreThreads", (id) => {
       let threadIDs = new Array();
@@ -636,6 +641,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+      this.selectedIds = [];
     });
     bus.$on("spamThreads", (id) => {
       let threadIDs = new Array();
@@ -738,6 +744,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("moveToInbox", (id, mailboxId) => {
       let threadIds = new Array();
@@ -841,6 +848,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("doneThreads", (id) => {
       let threadIDs = new Array();
@@ -920,6 +928,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("snoozeThread", (id, till) => {
       let threadIDs = new Array();
@@ -1023,6 +1032,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("assignThread", (id, userId) => {
       let threadIds = new Array();
@@ -1263,6 +1273,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("createTags", (id, tagName, tagColor, folder) => {
       console.log(id, tagName, tagColor, folder);
@@ -1716,6 +1727,7 @@ export default {
           this.squery = "";
         } else {
           this.labelId = 0;
+          console.log("Tag", to.params.type);
           this.tagId = to.params.type.substring(4);
           this.route = to.params.type;
           this.currPage = 1;
@@ -1743,6 +1755,7 @@ export default {
   },
   methods: {
     broad() {
+      this.$store.dispatch("updateOpenThread", null);
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
@@ -2211,6 +2224,7 @@ export default {
             isSpam: data.data.isSpam,
             isStarred: data.data.isStarred,
             order: 0,
+            type: "mail",
             snippetType: "message",
             totalEmailCount: data.data.emailCount,
             ticketNumber: data.data.ticketNumber,
@@ -2318,6 +2332,7 @@ export default {
       console.log(data);
       if (!(id in Object.keys(await this.$store.state.threadData))) {
         this.$store.dispatch("updateThreadData", data);
+        this.$store.dispatch("updateOpenThread", id);
       }
       router.push({
         name: "thread",

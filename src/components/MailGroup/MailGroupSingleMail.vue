@@ -187,7 +187,7 @@
           <div class="row">
             <div class="col-6 user-avatar">
               <div
-                v-if="mail.assignedTo !== null"
+                v-if="mail.assignedTo"
                 class="avatar avatar-xs mr-1"
                 data-toggle="tooltip"
                 :title="mail.assignedTo.firstname"
@@ -597,7 +597,7 @@
       <div
         class="row"
         style="padding-left: 20px"
-        v-if="mail.attachments !== undefined && mail.attachments.length > 0"
+        v-if="mail.attachments && mail.attachments !== undefined && mail.attachments.length > 0"
       >
         <div class="offset-lg-3 col-7 thread-attachments-list">
           <a
@@ -803,7 +803,7 @@
             ></path></svg
           ><span> </span
         ></span> -->
-        <span v-if="mail.attachments.length > 0"
+        <span v-if="mail.attachments && mail.attachments.length > 0"
           ><svg
             xmlns="http://www.w3.org/2000/svg"
             width="14"
@@ -915,7 +915,7 @@ export default {
       }
 
       let ext = extension.toString().toLowerCase();
-      return `<span ${iconStyle} class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
+      return `<span class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
     },
     checkBox() {
       this.checkAll = !this.checkAll;

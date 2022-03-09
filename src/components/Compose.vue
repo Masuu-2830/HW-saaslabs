@@ -1,7 +1,7 @@
 <template>
-  <div v-if="show">
+  <div>
     <div
-      v-if="composer.type == 'mail'"
+      v-if="show && composer.type == 'mail'"
       :id="`compose-${composer.hash}`"
       class="mail-compose hw_editor show hideMoreEditingOptions"
       :class="
@@ -349,7 +349,7 @@
                 name="mail_body"
               ></froala>
               <button
-                @click.stop.prevent="sendMail"
+                @click.stop.prevent="sendMail('nil')"
                 class="btnn btn btn-sm btn-primary fr-bt"
                 type="submit"
               >
@@ -381,7 +381,7 @@
       </div>
     </div>
     <div
-      v-if="composer.type == 'twitter'"
+      v-if="show && composer.type == 'twitter'"
       id="mailCompose"
       class="mail-compose hw_editor show"
       :class="
@@ -530,7 +530,7 @@
               name="tweet_compose_body"
             ></froala>
             <button
-              @click.stop.prevent="sendMail"
+              @click.stop.prevent="sendMail('nil')"
               class="btnn btn btn-sm btn-primary fr-bt"
               type="submit"
               style="bottom: 17px; right: 40px"
@@ -591,7 +591,7 @@
       </div>
     </div>
     <div
-      v-if="composer.type == 'sms'"
+      v-if="show && composer.type == 'sms'"
       id="smsCompose"
       class="mail-compose hw_editor show"
       :class="
@@ -754,7 +754,7 @@
                   name="sms_compose_body"
                 ></froala>
                 <button
-                  @click.stop.prevent="sendMail"
+                  @click.stop.prevent="sendMail('nil')"
                   class="btnn btn btn-sm btn-primary fr-bt"
                   type="submit"
                   style="bottom: 17px; right: 40px"
@@ -1528,28 +1528,28 @@ export default {
             // $('#box-integration-modal').modal('show');
             vueThis.$bvModal.show("box-integration-modal");
             // The current context is the editor instance.
-            var filePicker = new Box.FilePicker();
-            filePicker.addListener("choose", function (items) {
-              // $('#box-integration-modal').modal('hide');
-              vueThis.$bvModal.hide("box-integration-modal");
-              let html = "";
-              for (let item of items) {
-                html += `<a href="${
-                  item.shared_link.url
-                }" target="_blank" rel="nofollow">${item.name} (${humanFileSize(
-                  item.size
-                )})</a>&nbsp;`;
-              }
-              if (selectionInEditor) {
-                _this.el.focus();
-              }
-              _this.html.insert(html);
-            });
-            filePicker.addListener("cancel", function () {});
-            filePicker.show("0", vueThis.boxAccessToken, {
-              container: ".boxIntegration",
-              chooseButtonLabel: "Select",
-            });
+            // var filePicker = new Box.FilePicker();
+            // filePicker.addListener("choose", function (items) {
+            //   // $('#box-integration-modal').modal('hide');
+            //   vueThis.$bvModal.hide("box-integration-modal");
+            //   let html = "";
+            //   for (let item of items) {
+            //     html += `<a href="${
+            //       item.shared_link.url
+            //     }" target="_blank" rel="nofollow">${item.name} (${humanFileSize(
+            //       item.size
+            //     )})</a>&nbsp;`;
+            //   }
+            //   if (selectionInEditor) {
+            //     _this.el.focus();
+            //   }
+            //   _this.html.insert(html);
+            // });
+            // filePicker.addListener("cancel", function () {});
+            // filePicker.show("0", vueThis.boxAccessToken, {
+            //   container: ".boxIntegration",
+            //   chooseButtonLabel: "Select",
+            // });
           }
         },
       });
@@ -1651,14 +1651,15 @@ export default {
           var ab = $("ul").find(`[data-param1='add_easy_calendar']`);
           ab.attr("title", `Add time slots`);
           var abc = ab.parent();
+          console.log(ab, abc);
           if (!abc.prev().is("hr")) {
             $(`<hr>`).insertBefore(abc);
           }
-          for (var i = 0; i < easycalendar.length; i++) {
+          for (var i = 0; i < vueThis.easyCalendar.length; i++) {
             var a = $("ul").find(
-              `[data-param1='${easycalendar[i].calendar_url}']`
+              `[data-param1='${vueThis.easyCalendar[i].calendar_url}']`
             );
-            a.attr("title", `${easycalendar[i].calendar_url}`);
+            a.attr("title", `${vueThis.easyCalendar[i].calendar_url}`);
           }
         },
       });
@@ -2207,9 +2208,10 @@ export default {
         if (this.toNotValid || this.ccNotValid || this.bccNotValid) return;
         let requestOptions = this.createBodyMail("send");
         requestOptions.body = JSON.parse(requestOptions.body);
-        if (sendAt !== undefined) {
+        if (sendAt !== 'nil') {
           requestOptions.body["sendAt"] = sendAt;
         }
+        requestOptions.body = JSON.stringify(requestOptions.body);
         console.log(requestOptions.body);
         fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
           .then(async (response) => {
@@ -2253,26 +2255,26 @@ export default {
               const error = (data && data.message) || response.status;
               return Promise.reject(error);
             }
-        this.closeCompose(this.composer.hash);
-        // this.undoMessage = data.message;
-        // $("#undo-txt").text(data.message);
-        // this.showUndo = true;
-        // this.undoInterval = setInterval(function () {
-        //   console.log(1);
-        //   self.undoTimer -= 1;
-        // }, 1000);
-        // this.undoTimeout = setTimeout(() => {
-        //   console.log(2);
-        //   clearInterval(self.undoInterval);
-        //   self.showUndo = false;
-        //   self.closeCompose(self.composer.hash);
-        //   self.undoTimer = self.$store.state.userSettings.undoTimer;
-        // }, self.$store.state.userSettings.undoTimer*1000);
-        // clearTimeout(this.undoInterval);
-        })
-        .catch((error) => {
-          alert(error);
-        });
+            this.closeCompose(this.composer.hash);
+            // this.undoMessage = data.message;
+            // $("#undo-txt").text(data.message);
+            // this.showUndo = true;
+            // this.undoInterval = setInterval(function () {
+            //   console.log(1);
+            //   self.undoTimer -= 1;
+            // }, 1000);
+            // this.undoTimeout = setTimeout(() => {
+            //   console.log(2);
+            //   clearInterval(self.undoInterval);
+            //   self.showUndo = false;
+            //   self.closeCompose(self.composer.hash);
+            //   self.undoTimer = self.$store.state.userSettings.undoTimer;
+            // }, self.$store.state.userSettings.undoTimer*1000);
+            // clearTimeout(this.undoInterval);
+          })
+          .catch((error) => {
+            alert(error);
+          });
       } else if (this.composer.type == "sms") {
         console.log("sendingg");
         let requestOptions = this.createBodySMS("send");
@@ -2285,26 +2287,26 @@ export default {
               const error = (data && data.message) || response.status;
               return Promise.reject(error);
             }
-        this.closeCompose(this.composer.hash);
-        // this.undoMessage = data.message;
-        // $("#undo-txt").text(data.message);
-        // this.showUndo = true;
-        // this.undoInterval = setInterval(function () {
-        //   console.log(1);
-        //   self.undoTimer -= 1;
-        // }, 1000);
-        // this.undoTimeout = setTimeout(() => {
-        //   console.log(2);
-        //   clearInterval(self.undoInterval);
-        //   self.showUndo = false;
-        //   self.closeCompose(self.composer.hash);
-        //   self.undoTimer = self.$store.state.userSettings.undoTimer;
-        // }, self.$store.state.userSettings.undoTimer*1000);
-        // clearTimeout(this.undoInterval);
-        })
-        .catch((error) => {
-          alert(error);
-        });
+            this.closeCompose(this.composer.hash);
+            // this.undoMessage = data.message;
+            // $("#undo-txt").text(data.message);
+            // this.showUndo = true;
+            // this.undoInterval = setInterval(function () {
+            //   console.log(1);
+            //   self.undoTimer -= 1;
+            // }, 1000);
+            // this.undoTimeout = setTimeout(() => {
+            //   console.log(2);
+            //   clearInterval(self.undoInterval);
+            //   self.showUndo = false;
+            //   self.closeCompose(self.composer.hash);
+            //   self.undoTimer = self.$store.state.userSettings.undoTimer;
+            // }, self.$store.state.userSettings.undoTimer*1000);
+            // clearTimeout(this.undoInterval);
+          })
+          .catch((error) => {
+            alert(error);
+          });
       }
     },
     unsendMail() {

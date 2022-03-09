@@ -42,61 +42,127 @@ export function initFirebase() {
         let token = data.data.token;
         firebase_app.auth().signInWithCustomToken(token).then(function () {
             const socket = firebase_app.database().ref(`/Account-${accountID}`);
+            var incomingFlag = false;
+            var outgoingFlag = false;
+            var notesFlag = false;
+            var closeFlag = false;
+            var snoozeFlag = false;
+            var unsnoozeFlag = false;
+            var deleteFlag = false;
+            var addTagFlag = false;
+            var removeTagFlag = false;
+            var assignFlag = false;
+            var moveToInboxFlag = false;
             socket.child(`/incoming`).on('value', function (data) {
-                if (data.val()) {
-                    addThread(data.val());
-                }
+                // if(incomingFlag){
+                    if (data.val()) {
+                        addThread(data.val());
+                        // incomingFlag = false;
+                    }
+                // }else{
+                //     incomingFlag = true;
+                // }
             });
             socket.child(`/outgoing`).on('value', function (data) {
-                if (data.val()) {
-                    addThread(data.val());
-                }
+                // if(outgoingFlag == true){
+                    if (data.val()) {
+                        addThread(data.val());
+                        // outgoingFlag = false;
+                    }
+                // }else{
+                //     outgoingFlag = true;
+                // }
             });
             socket.child(`/notes`).on('value', function (data) {
-                if (data.val()) {
-                    addNote(data.val());
-                }
+                // if(notesFlag == true){
+                    if (data.val()) {
+                        addNote(data.val());
+                        // notesFlag = false;
+                    }
+                // }else{
+                //     notesFlag = true;
+                // }
             });
             socket.child(`/close`).on('value', function (data) {
-                if (data.val()) {
-                    console.log("close ka firebase",data.val());
-                    closeThread(data.val());
-                }
+                // if(closeFlag == true){
+                    if (data.val()) {
+                        console.log("close ka firebase",data.val());
+                        closeThread(data.val());
+                        // closeFlag = false;
+                    }
+                // }else{
+                //     closeFlag = true;
+                // }
             });
             socket.child(`/snooze`).on('value', function (data) {
-                if (data.val()) {
-                    snoozeThread(data.val());
-                }
+                // if(snoozeFlag == true){
+                    if (data.val()) {
+                        snoozeThread(data.val());
+                        // snoozeFlag = false;
+                    }
+                // }else{
+                //     snoozeFlag = true;
+                // }
             });
             socket.child(`/unsnooze`).on('value', function (data) {
-                if (data.val()) {
-                    unsnoozeThread(data.val());
-                }
+                // if(unsnoozeFlag == true){
+                    if (data.val()) {
+                        unsnoozeThread(data.val());
+                        // unsnoozeFlag = false;
+                    }
+                // }else{
+                //     unsnoozeFlag = true;
+                // }
             });
             socket.child(`/delete`).on('value', function (data) {
-                if (data.val()) {
-                    deleteThread(data.val());
-                }
+                // if(deleteFlag == true){
+                    if (data.val()) {
+                        deleteThread(data.val());
+                        // deleteFlag = false;
+                    }
+                // }else{
+                //     deleteFlag = true;
+                // }
             });
             socket.child(`/addTag`).on('value', function (data) {
-                if (data.val()) {
-                    toggleTags(data.val());
-                }
+                // if(addTagFlag == true){
+                    if (data.val()) {
+                        toggleTags(data.val());
+                        // addTagFlag = false;
+                    }
+                // }else{
+                //     addTagFlag = true;
+                // }
             });
             socket.child(`/removeTag`).on('value', function (data) {
-                if (data.val()) {
-                    toggleTags(data.val());
-                }
+                // if(removeTagFlag == true){
+                    if (data.val()) {
+                        toggleTags(data.val());
+                        // removeTagFlag = false;
+                    }
+                // }else{
+                //     removeTagFlag = true;
+                // }
             });
             socket.child(`/assign`).on('value', function (data) {
-                if (data.val()) {
-                    assignThread(data.val());
-                }
+                // if(assignFlag == true){
+                    if (data.val()) {
+                        assignThread(data.val());
+                        // assignFlag = false;
+                    }
+                // }else{
+                //     assignFlag = true;
+                // }
             });
             socket.child(`/moveToInbox`).on('value', function (data) {
-                if (data.val()) {
-                    moveToInboxThread(data.val());
-                }
+                // if(moveToInboxFlag == true){
+                    if (data.val()) {
+                        moveToInboxThread(data.val());
+                        // moveToInboxFlag = false;
+                    }
+                // }else{
+                //     moveToInboxFlag = true;
+                // }
             });
         }).catch((error) => {
             alert(error);

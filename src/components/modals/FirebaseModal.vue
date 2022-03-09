@@ -31,6 +31,11 @@
                 bus.$emit("broad");
             },
         },
+        created: function(){
+            bus.$on("firebaseModal", () => {
+                this.$bvModal.show('firebaseModal');
+            })
+        }
     }
 </script>
 

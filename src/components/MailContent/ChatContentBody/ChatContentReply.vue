@@ -7,24 +7,72 @@
       {{typingNotesNotice}}
     </p>
     <div class="editorContainer">
-        <ul class="nav nav-line flex-row mg-l-20 mg-b-10" role="tablist" style="border-bottom: none !important;margin-top:5px;margin-bottom:5px">
-            <li class="nav-item" v-if="$store.state.inboxData.type == 'mail'">
-              <a class="nav-link reply-tab" :class="$store.state.inboxData.type == 'mail' && 'active'" data-toggle="tab" href="#editorReplyTab" role="tab" aria-controls="reply-whatsapp-tab"  @click="tabChange(0)" aria-selected="false">Reply</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link notes-tab" :class="$store.state.inboxData.type !== 'mail' && 'active'" data-toggle="tab" href="#editorNotesTab" role="tab" aria-controls="notes-whatsapp-tab" @click="tabChange(1)" aria-selected="true">Note</a>
-            </li>
-        </ul>
+      <ul
+        class="nav nav-line flex-row mg-l-20 mg-b-10"
+        role="tablist"
+        style="
+          border-bottom: none !important;
+          margin-top: 5px;
+          margin-bottom: 5px;
+        "
+      >
+        <li class="nav-item" v-if="$store.state.inboxData.type == '!mail'">
+          <a
+            class="nav-link reply-tab"
+            :class="$store.state.inboxData.type !== 'mail' && 'active'"
+            data-toggle="tab"
+            href="#editorReplyTab"
+            role="tab"
+            aria-controls="reply-whatsapp-tab"
+            @click="tabChange(0)"
+            aria-selected="false"
+            >Reply</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link notes-tab"
+            :class="$store.state.inboxData.type == 'mail' && 'active'"
+            data-toggle="tab"
+            href="#editorNotesTab"
+            role="tab"
+            aria-controls="notes-whatsapp-tab"
+            @click="tabChange(1)"
+            aria-selected="true"
+            >Note</a
+          >
+        </li>
+      </ul>
 
-        <div class="tab-content" id="myTabContent">
-          <div v-if="$store.state.inboxData.type == 'mail'" class="tab-pane fade" :class="$store.state.inboxData.type == 'mail' && 'show active'" id="editorReplyTab" role="tabpanel" aria-labelledby="reply-tab">
-            <froala :tag="'textarea'" :config="replyEditorConfig"></froala>
-          </div>
-          <div class="tab-pane fade" :class="$store.state.inboxData.type !== 'mail' && 'show active'" id="editorNotesTab" role="tabpanel" aria-labelledby="notes-tab">
-            <froala :tag="'textarea'" :config="noteEditorConfig"></froala>
-          </div>
-          <input type='file' style='display: none' name='files[]' @change="uploadAttachment" id='editor-uploadAttachment' multiple>
+      <div class="tab-content" id="myTabContent">
+        <div
+          v-if="$store.state.inboxData.type !== 'mail'"
+          class="tab-pane fade"
+          :class="$store.state.inboxData.type !== 'mail' && 'show active'"
+          id="editorReplyTab"
+          role="tabpanel"
+          aria-labelledby="reply-tab"
+        >
+          <froala :tag="'textarea'" v-model="chat" name="chat" :config="replyEditorConfig"></froala>
         </div>
+        <div
+          class="tab-pane fade"
+          :class="$store.state.inboxData.type == 'mail' && 'show active'"
+          id="editorNotesTab"
+          role="tabpanel"
+          aria-labelledby="notes-tab"
+        >
+          <froala :tag="'textarea'" v-model="note" name="note" :config="noteEditorConfig"></froala>
+        </div>
+        <input
+          type="file"
+          style="display: none"
+          name="files[]"
+          @change="uploadAttachment"
+          id="editor-uploadAttachment"
+          multiple
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -56,6 +104,8 @@
         noteEditorInstance: null,
         replyAttachments: {},
         notesAttachments: {},
+        note: "",
+        chat: "",
         typing: {
           reply: false,
           notes: false
@@ -80,284 +130,404 @@
                 if (e.which == FroalaEditor.KEYCODE.ENTER && savedReplyTribute.isActive) {
                   return false;
                 }
-              }, true);
+              },
+              true
+            );
 
-              let attchComp = Vue.extend(AttachmentComp);
-              let replyAttachmentList = new attchComp({
-                propsData:{
-                  attachments: self.replyAttachments
-                }
-              }).$mount();
-              
-              replyFroala.$wp.append(replyAttachmentList.$el);
+            let attchComp = Vue.extend(AttachmentComp);
+            let replyAttachmentList = new attchComp({
+              propsData: {
+                attachments: self.replyAttachments,
+              },
+            }).$mount();
 
-              replyFroala.$tb.append(`
+            replyFroala.$wp.append(replyAttachmentList.$el);
+
+            replyFroala.$tb.append(`
                 <div class="fr-btn-grp fr-float-right">
                   <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="sendMessage">Send</button>
-                </div>`
-              );
-             
-            }
+                </div>`);
           },
-          placeholderText: "Enter your reply here.... You can use # to insert saved replies",
-          charCounterCount: false,
-          toolbarBottom: true,
-          key: 'fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==',
-          heightMin: 100,
-          heightMax: 290,
-          // toolbarButtons: [['bold', 'italic', 'underline', 'strikeThrough', 'insertHR'], ['my_dropdown', 'clear', 'insert', 'savedReply'], ['undo', 'redo', 'selectAll']],
-          toolbarButtons: {
-            moreText: {
-              buttons: ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', 'textColor', 'backgroundColor', 'inlineClass', 'inlineStyle', 'clearFormatting'],
-              buttonsVisible: 0
-            },
-            moreParagraph: {
-              buttons: ['alignLeft', 'alignCenter', 'formatOLSimple', 'alignRight', 'alignJustify', 'formatOL', 'formatUL', 'paragraphFormat', 'paragraphStyle', 'lineHeight', 'outdent', 'indent', 'quote'],
-              buttonsVisible: 0
-            },
-            'moreRich': {
-              buttons: ['insertLink', 'savedReplyCR', 'hcArticleCR', 'attachChatReply', 'insertImage', 'emoticons', 'insertTable', 'fontAwesome', 'specialCharacters', 'embedly', 'insertFile', 'insertHR'],
-              buttonsVisible: 6
-            },
-            // 'moreMisc': {
-            //   'buttons': ['undo', 'redo', 'fullscreen', 'print', 'getPDF', 'spellChecker', 'selectAll', 'html', 'help']
-            // }
-          },
-          // htmlAllowedEmptyTags: ['textarea', 'a', 'iframe', 'object', 'video', 'style', 'script', '.fa', '.fr-emoticon', '.fr-inner', 'path', 'line', 'hr', 'span', 'p', 'circle'],
-          htmlAllowedTags: ['.*'],
-          htmlAllowedAttrs: ['.*'],
-          htmlRemoveTags: ['script'],
-          quickInsertTags: ['']
         },
-        noteEditorConfig: {
-          events: {
-            initialized: async function() {
-              const noteFroala = this;
-              self.noteEditorInstance = this;
-              let mentionTribute = await self.callApi1();
-              mentionTribute.attach(noteFroala.el);
+        placeholderText:
+          "Enter your reply here.... You can use # to insert saved replies",
+        charCounterCount: false,
+        toolbarBottom: true,
+        key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
+        heightMin: 100,
+        heightMax: 290,
+        // toolbarButtons: [['bold', 'italic', 'underline', 'strikeThrough', 'insertHR'], ['my_dropdown', 'clear', 'insert', 'savedReply'], ['undo', 'redo', 'selectAll']],
+        toolbarButtons: {
+          moreText: {
+            buttons: [
+              "bold",
+              "italic",
+              "underline",
+              "strikeThrough",
+              "subscript",
+              "superscript",
+              "fontFamily",
+              "fontSize",
+              "textColor",
+              "backgroundColor",
+              "inlineClass",
+              "inlineStyle",
+              "clearFormatting",
+            ],
+            buttonsVisible: 0,
+          },
+          moreParagraph: {
+            buttons: [
+              "alignLeft",
+              "alignCenter",
+              "formatOLSimple",
+              "alignRight",
+              "alignJustify",
+              "formatOL",
+              "formatUL",
+              "paragraphFormat",
+              "paragraphStyle",
+              "lineHeight",
+              "outdent",
+              "indent",
+              "quote",
+            ],
+            buttonsVisible: 0,
+          },
+          moreRich: {
+            buttons: [
+              "insertLink",
+              "savedReplyCR",
+              "hcArticleCR",
+              "attachChatReply",
+              "insertImage",
+              "emoticons",
+              "insertTable",
+              "fontAwesome",
+              "specialCharacters",
+              "embedly",
+              "insertFile",
+              "insertHR",
+            ],
+            buttonsVisible: 6,
+          },
+          // 'moreMisc': {
+          //   'buttons': ['undo', 'redo', 'fullscreen', 'print', 'getPDF', 'spellChecker', 'selectAll', 'html', 'help']
+          // }
+        },
+        // htmlAllowedEmptyTags: ['textarea', 'a', 'iframe', 'object', 'video', 'style', 'script', '.fa', '.fr-emoticon', '.fr-inner', 'path', 'line', 'hr', 'span', 'p', 'circle'],
+        htmlAllowedTags: [".*"],
+        htmlAllowedAttrs: [".*"],
+        htmlRemoveTags: ["script"],
+        quickInsertTags: [""],
+      },
+      noteEditorConfig: {
+        events: {
+          initialized: async function () {
+            const noteFroala = this;
+            self.noteEditorInstance = this;
+            let mentionTribute = await self.callApi1();
+            mentionTribute.attach(noteFroala.el);
 
-              noteFroala.events.on('keydown', function(e) {
-                self.hitFirebase("notes");
-                if (e.which == FroalaEditor.KEYCODE.ENTER && mentionTribute.isActive) {
+            noteFroala.events.on(
+              "keydown",
+              function (e) {
+                if (
+                  e.which == FroalaEditor.KEYCODE.ENTER &&
+                  mentionTribute.isActive
+                ) {
                   return false;
                 }
-              }, true);
+              },
+              true
+            );
 
-              let attchComp = Vue.extend(AttachmentComp);
-              let notesAttachmentList = new attchComp({
-                propsData : {
-                  attachments: self.notesAttachments
-                }
-              }).$mount();
-              noteFroala.$wp.append(notesAttachmentList.$el);
+            let attchComp = Vue.extend(AttachmentComp);
+            let notesAttachmentList = new attchComp({
+              propsData: {
+                attachments: self.notesAttachments,
+              },
+            }).$mount();
+            noteFroala.$wp.append(notesAttachmentList.$el);
 
-              noteFroala.$tb.append(`
+            noteFroala.$tb.append(`
                 <div class="fr-btn-grp fr-float-right">
                   <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="sendNotes">Add Note</button>
-                </div>`
-              );
-
-            }
+                </div>`);
           },
-          placeholderText: "Add your notes here.. You can use @ to mention your teammates",
-          charCounterCount: false,
-          toolbarBottom: true,
-          key: 'fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==',
-          heightMin: 100,
-          heightMax: 290,
-          toolbarButtons: {
-            'moreText': {
-              'buttons': ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'fontFamily', 'fontSize', 'textColor', 'backgroundColor', 'inlineClass', 'inlineStyle', 'clearFormatting'],
-              'buttonsVisible': 0
-            },
-            'moreParagraph': {
-              'buttons': ['alignLeft', 'alignCenter', 'formatOLSimple', 'alignRight', 'alignJustify', 'formatOL', 'formatUL', 'paragraphFormat', 'paragraphStyle', 'lineHeight', 'outdent', 'indent', 'quote'],
-              'buttonsVisible': 0
-            },
-            'moreRich': {
-              'buttons': ['insertLink', 'savedReplyCR', 'hcArticleCR', 'attachChatReply', 'insertImage', 'emoticons', 'insertTable', 'fontAwesome', 'specialCharacters', 'embedly', 'insertFile', 'insertHR'],
-              'buttonsVisible': 6
-            },
-            // 'moreMisc': {
-            //   'buttons': ['undo', 'redo', 'fullscreen', 'print', 'getPDF', 'spellChecker', 'selectAll', 'html', 'help']
-            // }
+        },
+        placeholderText:
+          "Add your notes here.. You can use @ to mention your teammates",
+        charCounterCount: false,
+        toolbarBottom: true,
+        key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
+        heightMin: 100,
+        heightMax: 290,
+        toolbarButtons: {
+          moreText: {
+            buttons: [
+              "bold",
+              "italic",
+              "underline",
+              "strikeThrough",
+              "subscript",
+              "superscript",
+              "fontFamily",
+              "fontSize",
+              "textColor",
+              "backgroundColor",
+              "inlineClass",
+              "inlineStyle",
+              "clearFormatting",
+            ],
+            buttonsVisible: 0,
           },
-          quickInsertTags: ['']
-          
-        }
-      };
+          moreParagraph: {
+            buttons: [
+              "alignLeft",
+              "alignCenter",
+              "formatOLSimple",
+              "alignRight",
+              "alignJustify",
+              "formatOL",
+              "formatUL",
+              "paragraphFormat",
+              "paragraphStyle",
+              "lineHeight",
+              "outdent",
+              "indent",
+              "quote",
+            ],
+            buttonsVisible: 0,
+          },
+          moreRich: {
+            buttons: [
+              "insertLink",
+              "savedReplyCR",
+              "hcArticleCR",
+              "attachChatReply",
+              "insertImage",
+              "emoticons",
+              "insertTable",
+              "fontAwesome",
+              "specialCharacters",
+              "embedly",
+              "insertFile",
+              "insertHR",
+            ],
+            buttonsVisible: 6,
+          },
+          // 'moreMisc': {
+          //   'buttons': ['undo', 'redo', 'fullscreen', 'print', 'getPDF', 'spellChecker', 'selectAll', 'html', 'help']
+          // }
+        },
+        quickInsertTags: [""],
+      },
+    };
+  },
+  methods: {
+    async callApi() {
+      const response = await fetch(
+        this.$apiBaseURL +
+          "get-teammates.php?mailboxID=" +
+          this.$store.state.inboxData.id,
+        { credentials: "include" }
+      );
+      const data = await response.json();
+      console.log(data);
+      return this.createTribute(data);
     },
-    methods: {
-      async callApi() {
-        const response = await fetch(this.$apiBaseURL + "get-teammates.php?mailboxID=" + this.$route.params.mailboxId, {credentials: 'include'});
-        const data = await response.json();
-        console.log(data);
-        return this.createTribute(data);
-      },
-      async callApi1() {
-        console.log("calling api 2");
-        const response = await fetch(this.$apiBaseURL + "get-teammates.php?mailboxID=" + this.$route.params.mailboxId, {credentials: 'include'});
-        const data = await response.json();
-        console.log(data);
-        return this.createTribute1(data.data.teammates);
-      },
-      createTribute(data) {
-        console.log("creating tribute 1");
+    async callApi1() {
+      console.log("calling api 2");
+      const response = await fetch(
+        this.$apiBaseURL +
+          "get-teammates.php?mailboxID=" +
+          this.$store.state.inboxData.id,
+        { credentials: "include" }
+      );
+      const data = await response.json();
+      console.log(data);
+      return this.createTribute1(data.data.teammates);
+    },
+    createTribute(data) {
+      console.log("creating tribute 1");
       //   console.log(this.editorInstance);
-          var tribute = new Tribute({
-            trigger: '#',
+      var tribute = new Tribute({
+        trigger: "#",
+        values: data,
+        lookup: "username",
+        fillAttr: "firstname",
+        selectTemplate: function (item) {
+          return (
+            `<span contenteditable="false" class="mention-h fr-deletable fr-tribute">#` +
+            item.original.firstname +
+            "</span>"
+          );
+        },
+        noMatchTemplate: function () {
+          return '<span style:"visibility: hidden;"></span>';
+        },
+      });
+      console.log(tribute);
+      return tribute;
+    },
+    createTribute1(data) {
+      console.log("creating tribute 2");
+      var tribute = new Tribute({
+        collection: [
+          // {
+          //   trigger: "@",
+          //   values: [
+          //     { key: "masood", value: "Masood" },
+          //     { key: "kunal", value: "Kunal Kumar" },
+          //     { key: "gatti", value: "Gatti Ramya" },
+          //     { key: "mayank", value: "Mayank Banga" },
+          //     { key: "ayush", value: "Ayush Rastogi" },
+          //     { key: "vibhor", value: "Vibhor Agarwal" },
+          //   ],
+          //   selectTemplate: function (item) {
+          //     return (
+          //       `<span contenteditable="false" class="mention fr-deletable fr-tribute">@` +
+          //       item.original.value +
+          //       "</span>"
+          //     );
+          //   },
+          //   noMatchTemplate: function () {
+          //     return '<span style:"visibility: hidden;"></span>';
+          //   },
+          // },
+          {
+            trigger: "@",
             values: data,
-            lookup: 'username',
-            fillAttr: 'firstname',
-            selectTemplate: function(item) {
-              return `<span contenteditable="false" class="mention-h fr-deletable fr-tribute">#` + item.original.firstname + "</span>"
+            lookup: "username",
+            fillAttr: "firstname",
+            selectTemplate: function (item) {
+              return (
+                `<span contenteditable="false" class="mention-h fr-deletable fr-tribute">@` +
+                item.original.firstname +
+                "</span>"
+              );
             },
             noMatchTemplate: function () {
               return '<span style:"visibility: hidden;"></span>';
             },
-          });
-          console.log(tribute);
-        return tribute;
-      },
-      createTribute1(data) {
-        console.log("creating tribute 2");
-          var tribute = new Tribute({
-            collection: [
-              {
-                trigger: '@',
-                values: [
-                          { key: 'masood', value: 'Masood' },
-                          { key: 'kunal', value: 'Kunal Kumar' },
-                          { key: 'gatti', value: 'Gatti Ramya' },
-                          { key: 'mayank', value: 'Mayank Banga' },
-                          { key: 'ayush', value: 'Ayush Rastogi' },
-                          { key: 'vibhor', value: 'Vibhor Agarwal' }
-                        ],
-                selectTemplate: function(item) {
-                  return `<span contenteditable="false" class="mention fr-deletable fr-tribute">@` +
-                          item.original.value +
-                          "</span>"
-                },
-                noMatchTemplate: function () {
-                  return '<span style:"visibility: hidden;"></span>';
-                }
-              },
-              {
-                trigger: '#',
-                values: data,
-                lookup: 'username',
-                fillAttr: 'firstname',
-                selectTemplate: function(item) {
-                  return `<span contenteditable="false" class="mention-h fr-deletable fr-tribute">#` + item.original.firstname + "</span>"
-                },
-                noMatchTemplate: function () {
-                  return '<span style:"visibility: hidden;"></span>';
-                }
-              }
-            ]
-          });
-        return tribute;
-      },
-      tabChange(props) {
-        if(props == 1) {
-          this.current = "notes";
-          $(".editorContainer").addClass("noteMode");
-        } else {
-          this.current = "reply";
-          $(".editorContainer").removeClass("noteMode");
-        }
-      },
-      prepareFroalaButtons(){
-        const vueThis = this;
-        // FroalaEditor.DefineIcon('attach', { FA5NAME: 'paperclip', template: 'font_awesome_5' });
-        // FroalaEditor.RegisterCommand('attach', {
-        //   title: 'Insert Attachment',
-        //   icon: 'attach',
-        //   refreshAfterCallback: true,
-        //   callback: function () {
-        //     $(`#editor-uploadAttachment`).click();
-        //   },
-        // });
+          },
+        ],
+      });
+      return tribute;
+    },
+    tabChange(props) {
+      if (props == 1) {
+        this.current = "notes";
+        $(".editorContainer").addClass("noteMode");
+      } else {
+        this.current = "reply";
+        $(".editorContainer").removeClass("noteMode");
+      }
+    },
+    prepareFroalaButtons() {
+      const vueThis = this;
+      // FroalaEditor.DefineIcon('attach', { FA5NAME: 'paperclip', template: 'font_awesome_5' });
+      // FroalaEditor.RegisterCommand('attach', {
+      //   title: 'Insert Attachment',
+      //   icon: 'attach',
+      //   refreshAfterCallback: true,
+      //   callback: function () {
+      //     $(`#editor-uploadAttachment`).click();
+      //   },
+      // });
 
-        FroalaEditor.DefineIconTemplate('font_awesome_5b', '<i class="fab fa-[FA5NAME]"></i>');
+      FroalaEditor.DefineIconTemplate(
+        "font_awesome_5b",
+        '<i class="fab fa-[FA5NAME]"></i>'
+      );
 
-        FroalaEditor.DefineIcon('savedReply', { FA5NAME: 'bookmark', template: 'font_awesome_5' });
+      FroalaEditor.DefineIcon("savedReply", {
+        FA5NAME: "bookmark",
+        template: "font_awesome_5",
+      });
 
-        FroalaEditor.RegisterCommand('savedReplyCR', {
-          // Button title.
-          title: 'Insert Saved Reply',
-          // Mark the button as a dropdown.
-          icon: 'savedReply',
-          refreshAfterCallback: true,
-          callback: function () {
-            this.selection.save();
-            console.log(1);
-            // $(".saved-replies-btn").click();
-            bus.$emit("savedReply", 'chatReply');
-          }
-        });
+      FroalaEditor.RegisterCommand("savedReplyCR", {
+        // Button title.
+        title: "Insert Saved Reply",
+        // Mark the button as a dropdown.
+        icon: "savedReply",
+        refreshAfterCallback: true,
+        callback: function () {
+          this.selection.save();
+          console.log(1);
+          // $(".saved-replies-btn").click();
+          bus.$emit("savedReply", "chatReply");
+        },
+      });
 
-        FroalaEditor.DefineIcon('hcArticle', { FA5NAME: 'book', template: 'font_awesome_5' });
+      FroalaEditor.DefineIcon("hcArticle", {
+        FA5NAME: "book",
+        template: "font_awesome_5",
+      });
 
-        FroalaEditor.RegisterCommand('hcArticleCR', {
-          title: 'Insert Help Center Article',
-          icon: 'hcArticle',
-          refreshAfterCallback: true,
-          callback: function () {
-            this.selection.save();
-            let editor = this;
-            vueThis.showHcModal = true;
-            console.log("----");
-            bus.$emit("hcArticles", 'chatReply');
-            // vueThis.$bvModal.show('helpcenterArticlesModal');
-          }
-        });
+      FroalaEditor.RegisterCommand("hcArticleCR", {
+        title: "Insert Help Center Article",
+        icon: "hcArticle",
+        refreshAfterCallback: true,
+        callback: function () {
+          this.selection.save();
+          let editor = this;
+          vueThis.showHcModal = true;
+          console.log("----");
+          bus.$emit("hcArticles", "chatReply");
+          // vueThis.$bvModal.show('helpcenterArticlesModal');
+        },
+      });
 
-        FroalaEditor.RegisterCommand('send', {
-          title: 'Send',
-        });
+      FroalaEditor.RegisterCommand("send", {
+        title: "Send",
+      });
 
-        FroalaEditor.RegisterShortcut(13, 'send', 'send', 'Enter', false, false);
-      },
-      uploadAttachment(event){
-        const selectedFiles = event.target.files;
-        const vueThis = this;
-        for (let i = 0; i < selectedFiles.length; i++) {
-          let selectedFile = selectedFiles[i];
-          let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
-          var formData = new FormData();
-          formData.append('files[]', selectedFile);
-          formData.append('mailboxID', vueThis.$route.params.mailboxId);
-          let attachmentData = {
-            filename: selectedFile["name"],
-            filesize: selectedFile["size"],
-            progress: 0,
-            isUploaded: false
-          }
+      FroalaEditor.RegisterShortcut(13, "send", "send", "Enter", false, false);
+    },
+    uploadAttachment(event) {
+      const selectedFiles = event.target.files;
+      const vueThis = this;
+      for (let i = 0; i < selectedFiles.length; i++) {
+        let selectedFile = selectedFiles[i];
+        let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
+        var formData = new FormData();
+        formData.append("files[]", selectedFile);
+        formData.append("mailboxID", vueThis.$route.params.mailboxId);
+        let attachmentData = {
+          filename: selectedFile["name"],
+          filesize: selectedFile["size"],
+          progress: 0,
+          isUploaded: false,
+        };
 
-          let attachmentObject = vueThis.current == "reply" ? vueThis.replyAttachments : vueThis.notesAttachments;
+        let attachmentObject =
+          vueThis.current == "reply"
+            ? vueThis.replyAttachments
+            : vueThis.notesAttachments;
 
-          console.log(attachmentObject);
+        console.log(attachmentObject);
 
-          attachmentObject[hash] = attachmentData;
-          Vue.delete(attachmentObject, hash);
-          attachmentObject[hash] = attachmentData;
-          
-          console.log(attachmentObject);
+        attachmentObject[hash] = attachmentData;
+        Vue.delete(attachmentObject, hash);
+        attachmentObject[hash] = attachmentData;
 
-          axios.request({
+        console.log(attachmentObject);
+
+        axios
+          .request({
             method: "post",
             url: "https://app.helpwise.io/api/uploadAttachment.php",
             data: formData,
             withCredentials: true,
-            onUploadProgress: function(p){
+            onUploadProgress: function (p) {
               let percentage = (p.loaded / p.total) * 100;
               console.log(percentage);
               attachmentObject[hash]["progress"] = percentage;
-            }
+            },
           })
-          .then((response)=>{
+          .then((response) => {
             //get the attachment id
 
             let attachData = response.data.data.files[0];
@@ -376,126 +546,214 @@
           })
         }
       },
-      hitFirebase(type){
-        let managerID = this.$store.state.userInfo.accountID;
-        let threadID = this.$route.params.threadId;
+    hitFirebase(type){
+      let managerID = this.$store.state.userInfo.accountID;
+      let threadID = this.$route.params.threadId;
 
-        console.log(`/Account-${managerID}/ThreadID-${threadID}`);
-        const socket = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
+      console.log(`/Account-${managerID}/ThreadID-${threadID}`);
+      const socket = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
 
-        if(type == "notes"){
-          if(!this.typing.notes){
-            this.typing.notes = true;
-            socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).off("value");
-            socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
-            this.startNotesTimer(socket);
-          }
-          if(this.typing.notes){
-            this.resetNotesTimer(socket);
-          }
-        } else {
-          if(!this.typing.reply){
-            this.typing.reply = true;
-            socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).off("value");
-            socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
-            this.startReplyingTimer(socket);
-          }
-
-          if(this.typing.reply){
-            this.resetReplyingTimer(socket);
-          }
+      if(type == "notes"){
+        if(!this.typing.notes){
+          this.typing.notes = true;
+          socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).off("value");
+          socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+          this.startNotesTimer(socket);
         }
-      },
-      startReplyingTimer(socket){
-        this.typingTimer = setTimeout(() => {
-          this.typing.reply = false;
-          socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).remove();
-        }, this.defaultTypingTimer);
-      },
-      startNotesTimer(socket){
-        this.typingNotesTimer = setTimeout(() => {
-          this.typing.reply = false;
-          socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).remove();
-        }, this.defaultTypingTimer);
-      },
-      resetReplyingTimer(socket){
-        clearTimeout(this.typingTimer);
-        this.startReplyingTimer(socket);
-      },
-      resetNotesTimer(socket){
-        clearTimeout(this.typingNotesTimer);
-        this.startNotesTimer(socket);
-      },
-      makingTypingCard(data, type){
-        let typingType = type == "notes" ? "adding notes" : "replying";
-        let noticeElem = "";
-        if(Object.keys(data).length == 0){
-          noticeElem = "";
+        if(this.typing.notes){
+          this.resetNotesTimer(socket);
         }
-        for (const key in data) {
-          if (Object.hasOwnProperty.call(data, key)) {
-            const user = data[key];
-            let userID = user.id;
-            let userFName = user.firstname;
-            let userLName = user.lastname;
-            let userName = `${userFName} ${userLName}`;
-            userName = userName.trim();
-            let prefix = "";
-            if(noticeElem.trim().length > 0){
-              prefix = ";";
-            }
-            noticeElem += `${prefix} ${userName} is ${typingType}... `;
-          }
+      } else {
+        if(!this.typing.reply){
+          this.typing.reply = true;
+          socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).off("value");
+          socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+          this.startReplyingTimer(socket);
         }
 
-        type == "notes" ? this.typingNotesNotice = noticeElem : this.typingNotice = noticeElem;
+        if(this.typing.reply){
+          this.resetReplyingTimer(socket);
+        }
+      }
+    },
+    startReplyingTimer(socket){
+      this.typingTimer = setTimeout(() => {
+        this.typing.reply = false;
+        socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).remove();
+      }, this.defaultTypingTimer);
+    },
+    startNotesTimer(socket){
+      this.typingNotesTimer = setTimeout(() => {
+        this.typing.reply = false;
+        socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).remove();
+      }, this.defaultTypingTimer);
+    },
+    resetReplyingTimer(socket){
+      clearTimeout(this.typingTimer);
+      this.startReplyingTimer(socket);
+    },
+    resetNotesTimer(socket){
+      clearTimeout(this.typingNotesTimer);
+      this.startNotesTimer(socket);
+    },
+    makingTypingCard(data, type){
+      let typingType = type == "notes" ? "adding notes" : "replying";
+      let noticeElem = "";
+      if(Object.keys(data).length == 0){
+        noticeElem = "";
+      }
+      for (const key in data) {
+        if (Object.hasOwnProperty.call(data, key)) {
+          const user = data[key];
+          let userID = user.id;
+          let userFName = user.firstname;
+          let userLName = user.lastname;
+          let userName = `${userFName} ${userLName}`;
+          userName = userName.trim();
+          let prefix = "";
+          if(noticeElem.trim().length > 0){
+            prefix = ";";
+          }
+          noticeElem += `${prefix} ${userName} is ${typingType}... `;
+        }
+      }
 
-      },
-      sendMessage(){
-        console.log(this.$route.params);
+      type == "notes" ? this.typingNotesNotice = noticeElem : this.typingNotice = noticeElem;
 
-        const editor = this.current == "reply" ?  this.replyEditorInstance : this.noteEditorInstance;
-        let attachmentKeys = Object.keys(this.replyAttachments);
-        let attachmentIDs = attachmentKeys.filter(attachmentKey => !attachmentKey.includes("-"));
+    },
+    sendMessage() {
+      
+      let attachmentKeys = Object.keys(this.notesAttachments);
+      let attachmentIDs = attachmentKeys.filter(
+        (attachmentKey) => !attachmentKey.includes("-")
+      );
 
-        
-        let messageData = {
-          mailboxID: this.$route.params.mailboxId,
-          mailboxId: this.$route.params.mailboxId,
-          threadID: this.$route.params.threadId,
-          threadId: this.$route.params.threadId,
-          message: editor.html.get(),
-          attachmentId: attachmentIDs
-        };
+      let message = this.chat
+        .replace(/(<p)/gim, "<div")
+        .replace(/<\/p>/gim, "</div>");
+      let messageData = {
+        mailboxID: this.$store.state.inboxData.id,
+        to: this.$route.params.threadId,
+        type: 1,
+        message,
+        time: new Date().toISOString(),
+      };
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(messageData),
+        credentials: "include",
+      };
+      fetch(this.$apiBaseURL + "chat-widget/sendInboxMessage-unified-v2", requestOptions)
+        .then(async (response) => {
+          const data = await response.json();
+          if (data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          // editor.html = "";
+          let payload = {
+            "id": data.data.comment.id,
+            "body": this.note,
+            "by": this.$store.state.userInfo,
+            "attachments": this.notesAttachments,
+            "at": new Date().toISOString()
+          };
+          let message = {
+            message: payload,
+            type: "comment",
+          };
+          console.log(message);
+          bus.$emit("changeThreadAttrs", message);
+          this.note = "";
+          this.notesAttachments = {};
+        })
+        .catch((error) => {
+          alert(error);
+        });
 
-        console.log(messageData);
+      console.log(messageData);
+    },
+    sendNotes() {
+      const editor =
+        this.current == "reply"
+          ? this.replyEditorInstance
+          : this.noteEditorInstance;
+      let attachmentKeys = Object.keys(this.notesAttachments);
+      let attachmentIDs = attachmentKeys.filter(
+        (attachmentKey) => !attachmentKey.includes("-")
+      );
 
-      },
-      sendNotes(){
-        console.log("kjfhksadjhfjshadjklfh");
-      },
-      getArticleCardEmail(article) {
-          let $imgHtml = "";
-          let topBorder = "border-top: 2px solid #0847a0; border-radius: 2px;";
-          let $articleCountHtml = "";
-          if (article.featured_img) {
-              $imgHtml = `
+      let message = this.note
+        .replace(/(<p)/gim, "<div")
+        .replace(/<\/p>/gim, "</div>");
+      let messageData = {
+        mailboxID: this.$store.state.inboxData.id,
+        threadID: this.$route.params.threadId,
+        mentionUserIDs: [],
+        message,
+        attachmentIDs,
+      };
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(messageData),
+        credentials: "include",
+      };
+      fetch(this.$apiBaseURL + "addNote.php", requestOptions)
+        .then(async (response) => {
+          const data = await response.json();
+          if (data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          // editor.html = "";
+          let payload = {
+            "id": data.data.comment.id,
+            "body": this.note,
+            "by": this.$store.state.userInfo,
+            "attachments": this.notesAttachments,
+            "at": new Date().toISOString()
+          };
+          let comment = {
+            comment: payload,
+            type: "comment",
+          };
+          console.log(comment);
+          bus.$emit("changeThreadAttrs", comment);
+          this.note = "";
+          this.notesAttachments = {};
+        })
+        .catch((error) => {
+          alert(error);
+        });
+
+      console.log(messageData);
+    },
+    getArticleCardEmail(article) {
+      let $imgHtml = "";
+      let topBorder = "border-top: 2px solid #0847a0; border-radius: 2px;";
+      let $articleCountHtml = "";
+      if (article.featured_img) {
+        $imgHtml = `
               <div style="height: 200px; width: 100%">
                   <img src="${article.featured_img}" style="height: 200px; width: 100%; margin-left: 0px; margin-right: 0px; max-width: 100%;"></img>
-              </div>`
-              topBorder = "";
-          } else if (article.icon) {
-              topBorder = "";
-              $articleCountHtml = `
+              </div>`;
+        topBorder = "";
+      } else if (article.icon) {
+        topBorder = "";
+        $articleCountHtml = `
                   <div style="padding: 5px 10px; background-color: #0847a0;">
                       <p style="font-size: 12px; color: white; margin: 0">This collection contains ${article.count} Articles</p>
                   </div>
-              `
-          }
+              `;
+      }
 
-          // #0847a0 106af6
-          return `
-              <div class="hw_articleCard" id="hw_articleCard-${article.id}" contenteditable="false" style="
+      // #0847a0 106af6
+      return `
+              <div class="hw_articleCard" id="hw_articleCard-${
+                article.id
+              }" contenteditable="false" style="
                   position: relative;display: flex;
                   flex-direction: column;
                   min-width: 0;
@@ -507,7 +765,9 @@
                   max-width: 50%;
                   width: fit-content;
               ">
-                  <a href="${article.url}" target="_blank" contenteditable="false" style="color: inherit;text-decoration: none;display: block;${topBorder}" class="hw_articleCardBodyContainer">
+                  <a href="${
+                    article.url
+                  }" target="_blank" contenteditable="false" style="color: inherit;text-decoration: none;display: block;${topBorder}" class="hw_articleCardBodyContainer">
 
                       <div class="hw_removeArticleCard" style="position: absolute;right: 5px;top: 5px; background: white; border-radius: 50%; padding: 3px; z-index: 1000; display:none; height: 18px; width:18px;">
                           <svg xmlns="http://www.w3.org/2000/svg" style="color: #566476;fill: rgba(27, 46, 75, 0.06); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x "><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -516,8 +776,12 @@
                       ${$imgHtml}
 
                       <div class="hw_articleCardBody" style="padding-top: 10px;padding-bottom: 10px;padding-left: 20px;padding-right: 20px;flex-grow: 1;flex-shrink: 1;flex-basis: auto;">
-                          <h6 class="hw_articleCardTitle" style="margin-bottom: 0.4rem;font-size: 0.875rem;font-weight: 600;line-height: 1.25;color:#0847a0;margin-top: 0; ${article.icon ? "text-align: center" : ""}">${article.title}</h6>
-                          <p style="margin-top: 0; color:#9da8b7;" class="hw_articleCardText">${article.description}</p>
+                          <h6 class="hw_articleCardTitle" style="margin-bottom: 0.4rem;font-size: 0.875rem;font-weight: 600;line-height: 1.25;color:#0847a0;margin-top: 0; ${
+                            article.icon ? "text-align: center" : ""
+                          }">${article.title}</h6>
+                          <p style="margin-top: 0; color:#9da8b7;" class="hw_articleCardText">${
+                            article.description
+                          }</p>
                       </div>
 
                       ${$articleCountHtml}
@@ -525,14 +789,13 @@
               </div>
               <div></div>
           `;
-      },
-      getArticleCard(article){
-
-        let $descHtml = "";
-        if(article.description){
-          $descHtml = `<p style="margin-top: 0;" class="hw_articleCardText">${article.description}</p>`;
-        }
-        return `
+    },
+    getArticleCard(article) {
+      let $descHtml = "";
+      if (article.description) {
+        $descHtml = `<p style="margin-top: 0;" class="hw_articleCardText">${article.description}</p>`;
+      }
+      return `
           <div class="hw_articleCard" id="hw_articleCard-${article.id}" style="display: flex;flex-direction: row;word-wrap: break-word;background-color:#fff;border: 1px solid rgba(72, 94, 144, 0.16);border-radius: 0.25rem;width: fit-content;">
             <a href="${article.url}" target="_blank" contenteditable="false" style="color: inherit;text-decoration: none;display: block;" class="hw_articleCardBodyContainer">
               <div class="hw_articleCardBody" style="padding-top: 10px;padding-bottom: 10px;padding-left: 20px;padding-right: 20px;flex-grow: 1;flex-shrink: 1;flex-basis: auto;">
@@ -547,36 +810,42 @@
             </div>
           </div>
         `;
+    },
+  },
+  beforeMount() {
+    this.prepareFroalaButtons();
+  },
+  created() {
+    const vueThis = this;
+
+    bus.$off("deleteAttachmentUpload");
+    bus.$on("deleteAttachmentUpload", (id) => {
+      console.log("event listened", id);
+      if (id) {
+        Vue.delete(vueThis.attachments, id);
       }
-    },
-    beforeMount() {
-      this.prepareFroalaButtons()
-    },
-    created(){
-      const vueThis = this;
+    });
 
-      bus.$off("deleteAttachmentUpload");
-      bus.$on("deleteAttachmentUpload", (id) => {
-        console.log("event listened", id);
-        if(id){
-          Vue.delete(vueThis.attachments, id);
-        }
-      });
+    // bus.$off("modal.hcArticleInsert.click");
+    bus.$on("modal.hcArticleInsert.click", function (data, type) {
+      console.log(type, data);
+      if (type == "chatReply") {
+        let editorInstance =
+          vueThis.current == "reply"
+            ? vueThis.replyEditorInstance
+            : vueThis.noteEditorInstance;
+        editorInstance.html.insert(vueThis.getArticleCard(data));
+      }
+    });
 
-      // bus.$off("modal.hcArticleInsert.click");
-      bus.$on("modal.hcArticleInsert.click", function(data, type){
-        console.log(type, data);
-        if(type == 'chatReply') {
-          let editorInstance = vueThis.current == "reply" ? vueThis.replyEditorInstance : vueThis.noteEditorInstance;
-          editorInstance.html.insert(vueThis.getArticleCard(data));
-        }
-      })
-      
-      // bus.$off("modal.savedReplyInsert.click");
-      bus.$on("modal.savedReplyInsert.click", function(id, type) {
-        console.log(type, id);
-        if(type == 'chatReply') {
-        let editorInstance = vueThis.current == "reply" ? vueThis.replyEditorInstance : vueThis.noteEditorInstance;
+    // bus.$off("modal.savedReplyInsert.click");
+    bus.$on("modal.savedReplyInsert.click", function (id, type) {
+      console.log(type, id);
+      if (type == "chatReply") {
+        let editorInstance =
+          vueThis.current == "reply"
+            ? vueThis.replyEditorInstance
+            : vueThis.noteEditorInstance;
 
         triggerPromptNotif("Fetching saved reply data");
         fetch(

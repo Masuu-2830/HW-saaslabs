@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :id="`replyWindow-${reply.hash}`" class="replyWindow">
+    <div v-if="show" :id="`replyWindow-${reply.hash}`" class="replyWindow">
       <div class="replyBanner bg-primary tx-white d-none">
         <span class="msg"></span>
         <button class="btn editDraft tx-white float-right btn-sm py-0">
@@ -438,7 +438,7 @@
                 name="mail_body"
               ></froala>
               <button
-                @click.stop.prevent="sendMail"
+                @click.stop.prevent="sendMail('nil')"
                 class="btnn btn btn-sm btn-primary fr-bt"
                 type="submit"
               >
@@ -526,6 +526,20 @@
         </div>
       </div>
     </div>
+    <div
+      class="card"
+      id="undo-container"
+      style="max-width: 100%; z-index: 9999999"
+      :style="{ display: showUndo ? 'block' : 'none' }"
+    >
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-center">
+          <span id="undo-txt">{{ undoMessage }}</span>
+          <span class="ml-2" id="undo-btn" @click="unsendMail"> Undo </span>
+          <span id="email-timer" class="pd-l-10">{{ undoTimer }}</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script src="froala-editor/js/plugins/file.min.js"></script>
@@ -556,6 +570,8 @@ export default {
       attachments:
         this.reply.attachments !== undefined ? this.reply.attachments : {},
       files: [],
+      showUndo: false,
+      undoMessage: "Email Sent.",
       undoTimer: this.$store.state.userSettings.undoTimer,
       isSend: this.$store.state.userSettings.send,
       tagTo: "",
@@ -727,7 +743,7 @@ export default {
     });
     // bus.$off("modal.hcArticleInsert.click");
     bus.$on("modal.hcArticleInsert.click", function (data, type) {
-      if(type == 'mailReply') {
+      if (type == "mailReply") {
         let editorInstance = vueThis.editorInstance;
         editorInstance.html.insert(vueThis.getArticleCard(data));
       }
@@ -735,23 +751,23 @@ export default {
 
     // bus.$off("modal.savedReplyInsert.click");
     bus.$on("modal.savedReplyInsert.click", function (id, type) {
-      if(type == 'mailReply') {
-      let editorInstance = vueThis.editorInstance;
+      if (type == "mailReply") {
+        let editorInstance = vueThis.editorInstance;
 
-      triggerPromptNotif("Fetching saved reply data");
-      fetch(
-        `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$store.state.inboxData.id}&savedReplyID=${id}`,
-        { credentials: "include" }
-      )
-        .then((response) => response.json())
-        .then((response) => {
-          if (response.status == "success") {
-            editorInstance.html.insert(response.data.savedReply.content);
-            triggerPromptNotif("Saved Reply Inserted", "success");
-          } else {
-            triggerPromptNotif("Unable to insert Saved Reply", "error");
-          }
-        });
+        triggerPromptNotif("Fetching saved reply data");
+        fetch(
+          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$store.state.inboxData.id}&savedReplyID=${id}`,
+          { credentials: "include" }
+        )
+          .then((response) => response.json())
+          .then((response) => {
+            if (response.status == "success") {
+              editorInstance.html.insert(response.data.savedReply.content);
+              triggerPromptNotif("Saved Reply Inserted", "success");
+            } else {
+              triggerPromptNotif("Unable to insert Saved Reply", "error");
+            }
+          });
       }
     });
   },
@@ -884,7 +900,7 @@ export default {
         refreshAfterCallback: true,
         callback: function () {
           this.selection.save();
-          bus.$emit("savedReply", 'mailReply');
+          bus.$emit("savedReply", "mailReply");
           // $(".saved-replies-btn").click();
           // vueThis.$bvModal.show("saved-reply-modal");
         },
@@ -904,7 +920,7 @@ export default {
           let editor = this;
           vueThis.showHcModal = true;
           console.log("----");
-          bus.$emit("hcArticles", 'mailReply');
+          bus.$emit("hcArticles", "mailReply");
           // vueThis.$bvModal.show("helpcenterArticlesModal");
         },
       });
@@ -1689,6 +1705,7 @@ export default {
       }
     },
     sendMail(sendAt) {
+      var self = this;
       console.log("sendin");
       if (this.tagsTo.length == 0) {
         this.noTo = true;
@@ -1716,47 +1733,95 @@ export default {
       if (this.toNotValid || this.ccNotValid || this.bccNotValid) return;
       let requestOptions = this.createBody("send");
       requestOptions.body = JSON.parse(requestOptions.body);
-      if (sendAt !== undefined) {
+      if (sendAt !== "nil") {
         requestOptions.body["sendAt"] = sendAt;
       }
-      console.log(requestOptions.body, requestOptions);
+      requestOptions.body = JSON.stringify(requestOptions.body);
+      console.log(sendAt, requestOptions.body, requestOptions);
       fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
-      .then(async response => {
+        .then(async (response) => {
           const data = await response.json();
-          if(data.status !== "success") {
+          if (data.status !== "success") {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-      if (this.isSend == "send") {
-        let payload = this.reply;
-        payload.subject = this.subject;
-        payload.displaySubject = this.subject;
-        payload.from = requestOptions.body.from;
-        payload.bcc = requestOptions.body.bcc;
-        payload.cc = requestOptions.body.cc;
-        payload.to = requestOptions.body.to;
-        payload.html = requestOptions.body.html;
-        payload.strippedHtml = requestOptions.body.html;
-        payload.text = requestOptions.body.text;
-        payload.snippet = requestOptions.body.text;
-        payload.readStats = {};
-        payload.attachments = requestOptions.body.attachments;
-        payload.date = new Date().toISOString();
-        console.log(payload, this.reply);
-        let email = {
-          email: payload,
-          type: "email",
-        };
-        bus.$emit("changeThreadAttrs", email);
-      } else {
-        bus.$emit("closeThread", this.$route.params.threadId);
-        bus.$emit("broad");
-      }
-      // this.cancelReply();
-      bus.$emit("closeReply", this.reply.hash);
-        }).catch(error => {
-        alert(error);
-      })
+          requestOptions.body = JSON.parse(requestOptions.body);
+          this.show = false;
+          this.undoMessage = data.message;
+          $("#undo-txt").text(data.message);
+          this.showUndo = true;
+          this.undoInterval = setInterval(function () {
+            console.log(1);
+            self.undoTimer -= 1;
+          }, 1000);
+          this.undoTimeout = setTimeout(() => {
+            console.log(2);
+            clearInterval(self.undoInterval);
+            self.showUndo = false;
+            self.cancelReply(self.reply.hash);
+            self.undoTimer = self.$store.state.userSettings.undoTimer;
+          }, self.$store.state.userSettings.undoTimer * 1000);
+          if (this.isSend == "send") {
+              let payload = this.reply.email;
+              payload.subject = this.subject;
+              payload.displaySubject = this.subject;
+              payload.from = requestOptions.body.from;
+              payload.bcc = requestOptions.body.bcc;
+              payload.cc = requestOptions.body.cc;
+              payload.to = requestOptions.body.to;
+              payload.html = requestOptions.body.html;
+              payload.strippedHtml = requestOptions.body.html;
+              payload.text = requestOptions.body.text;
+              payload.snippet = requestOptions.body.text;
+              payload.readStats = {};
+              payload.id = data.data.messageID;
+              payload.attachments = this.attachments;
+              payload.date = new Date().toISOString();
+              console.log(payload, this.reply);
+              let email = {
+                email: payload,
+                type: "email",
+              };
+              bus.$emit("changeThreadAttrs", email);
+            } else {
+              bus.$emit("closeThread", this.$route.params.threadId);
+              bus.$emit("broad");
+            }
+          // this.cancelReply();
+          // bus.$emit("closeReply", this.reply.hash);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    },
+    unsendMail() {
+      clearInterval(this.undoInterval);
+      clearTimeout(this.undoTimeout);
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: this.draftID,
+          mailboxId: this.$store.state.inboxData.id,
+          threadId: this.threadID,
+        }),
+        credentials: "include",
+      };
+      fetch(this.$apiBaseURL + "undoSend.php", requestOptions).then(
+        async (response) => {
+          const data = await response.json();
+          if (data.status !== "success") {
+            const error = (data && data.message) || response.status;
+            return Promise.reject(error);
+          }
+          console.log("unsending");
+          this.showUndo = false;
+          this.show = true;
+          console.log(this.draftID);
+          bus.$emit("removeMail", this.draftID);
+        }
+      );
+      this.undoTimer = this.$store.state.userSettings.undoTimer;
     },
     showCC() {
       this.isCC = true;
@@ -1958,8 +2023,10 @@ export default {
   right: 20px;
 }
 
-.fr-toolbar .fr-command .fr-btn img, .fr-popup .fr-command.fr-btn img, .fr-modal .fr-command.fr-btn img {
-    margin: 8px 7px;
-    width: 16px !important;
+.fr-toolbar .fr-command .fr-btn img,
+.fr-popup .fr-command.fr-btn img,
+.fr-modal .fr-command.fr-btn img {
+  margin: 8px 7px;
+  width: 16px !important;
 }
 </style>
