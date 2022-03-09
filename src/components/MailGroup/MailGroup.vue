@@ -444,6 +444,9 @@ export default {
         var objIndex;
         for (let i in id) {
           objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
+          console.log("objIndex",objIndex);
+          console.log("id[i]",id[i]);
+          console.log("this.perPageMails",this.perPageMails);
           if (
             !(
               this.perPageMails[objIndex].mailboxId in
@@ -530,6 +533,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("restoreThreads", (id) => {
       let threadIDs = new Array();
@@ -637,6 +641,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+      this.selectedIds = [];
     });
     bus.$on("spamThreads", (id) => {
       let threadIDs = new Array();
@@ -739,6 +744,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("moveToInbox", (id, mailboxId) => {
       let threadIds = new Array();
@@ -842,6 +848,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("doneThreads", (id) => {
       let threadIDs = new Array();
@@ -921,6 +928,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("snoozeThread", (id, till) => {
       let threadIDs = new Array();
@@ -1024,6 +1032,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("assignThread", (id, userId) => {
       let threadIds = new Array();
@@ -1264,6 +1273,7 @@ export default {
         .catch((error) => {
           alert(error);
         });
+        this.selectedIds = [];
     });
     bus.$on("createTags", (id, tagName, tagColor, folder) => {
       console.log(id, tagName, tagColor, folder);

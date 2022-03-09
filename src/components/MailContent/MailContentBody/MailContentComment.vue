@@ -58,7 +58,7 @@
                   "
                 >
                   <div class="tx-14 commentText" style="color: #222">
-                    <p v-html="item.data.body"></p>
+                    <p v-html="item.data.body" style="margin-bottom: 0px;"></p>
                   </div>
                   <div class="list-group"></div>
                 </div>
