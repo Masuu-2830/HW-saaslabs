@@ -11,6 +11,7 @@ const dataState = createPersistedState({
 export const store = new Vuex.Store({
     plugins: [dataState],
     state: {
+        openThread: null,
         inboxData: {},
         userInfo: {},
         userSettings: {},
@@ -73,6 +74,9 @@ export const store = new Vuex.Store({
         setFirebaseModal: (state, data) => {
             console.log(data);
             state.firebaseModal = data;
+        },
+        setOpenThread: (state, data) => {
+            state.openThread = data;
         }
     },
     actions: {
@@ -95,6 +99,7 @@ export const store = new Vuex.Store({
             await context.commit('setLabelId', data);
         },
         async updateThreads(context, data) {
+            // Vue.$bvModal.show('firebaseModal');
             await context.commit('setThreads', data);
         },
         async updateThreadData(context, data) {
@@ -102,6 +107,9 @@ export const store = new Vuex.Store({
         },
         async updateFirebaseModal(context, data) {
             await context.commit('setFirebaseModal', data);
+        },
+        async updateOpenThread(context, data) {
+            await context.commit('setOpenThread', data);
         },
     }
 })

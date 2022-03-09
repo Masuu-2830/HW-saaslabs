@@ -41,7 +41,7 @@ function initFirebase() {
         console.log(data);
         let token = data.data.token;
         firebase_app.auth().signInWithCustomToken(token).then(function () {
-            var socket = firebase_app.database().ref(`/Account-${managerID}/Mailbox-${mailboxID}`);
+            var socket = firebase_app.database().ref(`/Account-${managerID}`);
             socket.child(`/incoming`).on('value', function (data) {
                 if (data.val()) {
                     addThread(data);

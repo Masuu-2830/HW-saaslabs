@@ -1,6 +1,5 @@
 <template>
   <div
-    v-if=""
     class="
       mail-body
       hwEmail
