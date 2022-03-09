@@ -158,14 +158,16 @@ export default {
   },
   mounted(){
     let threadID = this.$route.params.threadId;
-    const socket = firebase_app.database().ref(`/Account-${accountID}/Thread-${threadID}`);
+    let managerID = this.$store.state.userInfo.accountID;
+    const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
     // viewing user
-    socket.child("/viewing user").set({
-      id: this.$store.state.userInfo.id,
-      name: this.$store.state.userInfo.name,
-      email: this.$store.state.userInfo.email,
-      avatar: this.$store.state.userInfo.avatar
-    });
+    socket.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+  },
+  beforeUnmount(){
+    let managerID = this.$store.state.userInfo.accountID;
+    let threadID = this.$route.params.threadId;
+    const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
+    socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
   },
   methods: {
     openInt() {

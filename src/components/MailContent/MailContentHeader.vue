@@ -94,7 +94,9 @@
         >
           <div class="d-flex p-1" id="participants-avatar-wrapper">
             <div
-              v-html="userInfo.avatarTag"
+              v-for="viewingUser in viewingUsers"
+              :key="viewingUser.id"
+              v-html="viewingUser.avatarTag"
               class="avatar avatar-xxs"
               style="margin-right: -3px"
             ></div>
@@ -1430,6 +1432,7 @@
 
 <script>
 import { bus } from "../../main";
+import { firebase_app } from "../../firebaseInit"
 import DatePicker from "vue2-datepicker";
 import "vue2-datepicker/index.css";
 export default {
@@ -1451,6 +1454,7 @@ export default {
       tagColor: "",
       datetime: "",
       newDateOpen: false,
+      viewingUsers: "",
     };
   },
   computed: {
@@ -1496,6 +1500,18 @@ export default {
       }
       // return this.teammates.filter((item) => item.id !== this.userInfo.id);
     },
+  },
+  mounted(){
+    let managerID = this.$store.state.userInfo.accountID;
+    let threadID = this.$route.params.threadId;
+    const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
+    // let viewingUserFlag = false;
+    socket.child("/viewing user").on("value", (snapshot) => {
+      console.log("-------- VIEWING USERS --------", snapshot.val());
+      if(snapshot.val()){
+        this.viewingUsers = snapshot.val();
+      }
+    });
   },
   methods: {
     backThread() {
