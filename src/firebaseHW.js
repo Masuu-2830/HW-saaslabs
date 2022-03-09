@@ -17,16 +17,18 @@ function createThread(data) {
         'assignedTo': data.assignedTo,
         'attachments': (data.action == 'incoming' || data.action == 'outgoing') ? data.messageData.attachments : null,
         'date': (data.action == 'incoming' || data.action == 'outgoing') ? data.messageData.time : data.time,
+        'displayContact': data.displayContact
     }
     return thread;
 }
 
 export function addThread(data) {
-    // var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
-    var all = this.$store.state.type == 'all';
-    var mine = (data.assignedTo.id == this.$store.state.userInfo.id ? true : false) && (this.$store.state.type == 'mine');
-    var assigned = (data.assignedTo !== null ? true : false) && (this.$store.state.type == 'assigned');
-    var unassigned = (!assigned) && (this.$store.state.type == 'unassigned');
+    console.log("data dhikhao add thread",data);
+    var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
+    var all = store.state.type == 'all';
+    var mine = (data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
+    var assigned = (data.assignedTo.length != 0 ? true : false) && (store.state.type == 'assigned');
+    var unassigned = (!assigned) && (store.state.type == 'unassigned');
 
     // if(inbox) {
         let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
@@ -91,15 +93,16 @@ export function addThread(data) {
 }
 
 export function addNote(data) {
-    // var inbox = data.mailboxID == this.$store.state.inboxData.id ? true : false;
-    var all = this.$store.state.type == 'all';
-    var mine = (data.assignedTo.id == this.$store.state.userInfo.id ? true : false) && (this.$store.state.type == 'mine');
-    var assigned = (data.assignedTo !== null ? true : false) && (this.$store.state.type == 'assigned');
-    var unassigned = (!assigned) && (this.$store.state.type == 'unassigned');
-
-    // if(inbox) {
-        let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == data.threadID);
+    console.log("data dhikhao",data);
+    var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
+    var all = store.state.type == 'all';
+    var assigned = (data.assignedTo ? true : false) && (store.state.type == 'assigned');
+    var mine = (assigned && data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
+    var unassigned = (!assigned) && (store.state.type == 'unassigned');
+    if(inbox) {
+        let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
         if (objIndex !== -1) {
+            console.log("store.state.threads[objIndex]",store.state.threads[objIndex]);
             store.state.threads[objIndex].date = data.noteData.time;
             store.state.threads[objIndex].snippet = data.noteData.snippet;
             var a = store.state.threads.splice(objIndex, 1);
@@ -107,88 +110,96 @@ export function addNote(data) {
         } else if(all || mine || assigned || unassigned) {
             store.state.threads.unshift(createThread(data));
         }
-        if (store.state.openThread !== null && (data.threadID in Object.keys(store.state.threadData))) {
-            let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.noteData.id);
-            if(itemIndex == -1) {
-                let comment = {
-                    'type': 'comment',
-                    'data': {
-                        'id': data.noteData.id,
-                        'at': data.noteData.time,
-                        'body': data.noteData.body,
-                        'by': data.noteData.sentBy,
-                        'mentions': data.noteData.mentions,
-                        'attachments': data.noteData.attachments,
-                    },
-                    'timestamp': Date.now()
-                };
-                if (store.state.userSettings.orderThread == "asc") {
-                    store.state.threadData[data.threadID].data.items.push(comment);
-                } else {
-                    store.state.threadData[data.threadID].data.items.unshift(comment);
-                }
+        
+        if (store.state.openThread == data.threadID) {
+            let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
+                if(itemIndex == -1) {
+            let comment = {
+                'type': 'comment',
+                'data': {
+                    'id': data.noteData.id,
+                    'at': data.noteData.time,
+                    'body': data.noteData.body,
+                    'by': data.noteData.sentBy,
+                    'mentions': data.noteData.mentions,
+                    'attachments': data.noteData.attachments,
+                },
+                'timestamp': Date.now()
+            };
+            console.log("comment",comment);
+            console.log("store.state.threadData",store.state.threadData[data.threadID]);
+            if (store.state.userSettings.orderThread == "asc") {
+                store.state.threadData[data.threadID].data.items.push(comment);
+            } else {
+                store.state.threadData[data.threadID].data.items.unshift(comment);
             }
         }
-    // }
+        }
+    }
 }
 
 export function closeThread(data) {
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // console.log("inbox ka data",inbox);
     // if(inbox) {
-        console.log("data threads ka",data.threadID);
-        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
-        console.log("objIndex ka data",objIndex);
-        console.log("threads ka data",store.state.threads);
+    console.log("data threads ka",data.threadID);
+    var allThreads = data.threadID;
+    allThreads.forEach(thread => {
+        console.log("thread id",thread);
+        // let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
+        let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
         if (objIndex !== -1 && store.state.type !== 'closed') {
-            console.log("hello 142");
             store.state.threads.splice(objIndex, 1);
         } else if(objIndex == -1 && store.state.type == 'closed') {
-            console.log("hello 145");
             store.state.threads.unshift(createThread(data));
         }
-        console.log("threads ka data",store.state.threads);
         if(store.state.openThread !== null){
-            if (store.state.openThread == data.threadID) {
-                console.log("thread open",data.user);
+            if (store.state.openThread == thread) {
                 store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' closed this conversation.');
                 this.$bvModal.show('firebaseModal');
             }
         }
+    });
     // }
 }
 
 export function snoozeThread(data) {
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
-        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
-        if (objIndex !== -1 && store.state.type !== 'snoozed') {
-            store.state.threads.splice(objIndex, 1);
-        } else if(objIndex == -1 && store.state.type == 'snoozed') {
-            store.state.threads.unshift(createThread(data));
-        }
-        if(store.state.openThread !== null){
-            if (store.state.openThread == data.threadID) {
-                store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' snoozed this conversation.');
-                this.$bvModal.show('firebaseModal');
+        var allThreads = data.threadID;
+        allThreads.forEach(thread => {
+            let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
+            if (objIndex !== -1 && store.state.type !== 'snoozed') {
+                store.state.threads.splice(objIndex, 1);
+            } else if(objIndex == -1 && store.state.type == 'snoozed') {
+                store.state.threads.unshift(createThread(data));
             }
-        }
+            if(store.state.openThread !== null){
+                if (store.state.openThread == data.thread) {
+                    store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' snoozed this conversation.');
+                    this.$bvModal.show('firebaseModal');
+                }
+            }
+        });
     // }
 }
 
 export function deleteThread(data) {
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
-        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
+    var allThreads = data.threadID;
+    allThreads.forEach(thread => {
+        let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
         if (objIndex !== -1 && store.state.type !== 'trash') {
             store.state.threads.splice(objIndex, 1);
         } else if(objIndex == -1 && store.state.type == 'trash') {
             store.state.threads.unshift(createThread(data));
         }
-        if (store.state.openThread == data.threadID) {
+        if (store.state.openThread == thread) {
             store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' moved this conversation to trash.');
             this.$bvModal.show('firebaseModal');
         }
+    });
     // }
 }
 
@@ -199,16 +210,19 @@ export function moveToInboxThread(data) {
     var assigned = (data.assignedTo !== null ? true : false) && (store.state.type == 'assigned');
     var unassigned = (!assigned) && (store.state.type == 'unassigned');
     // if(inbox) {
-        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
+    var allThreads = data.threadID;
+    allThreads.forEach(thread => {
+        let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
         if (objIndex !== -1) {
             store.state.threads.splice(objIndex, 1);
         } else if(all || mine || assigned || unassigned) {
             store.state.threads.unshift(createThread(data));
         }
-        if (store.state.openThread == data.threadID) {
+        if (store.state.openThread == data.thread) {
             store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' moved this conversation to inbox.');
             this.$bvModal.show('firebaseModal');
         }
+    });
     // }
 }
 
@@ -216,34 +230,38 @@ export function toggleTags(data) {
     console.log("data dhikhado tags ka",data);
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
-        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
+    var allThreads = data.threadID;
+    allThreads.forEach(thread => {
+        let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
         var allTags = data.tags;
-        // var threadTagId = [];
-        // var threadDataTagId = [];
+        var threadTagId = [];
+        var threadDataTagId = [];
         if(objIndex !== -1) {
-            // store.state.threads[objIndex].tags.forEach(t => {
-            //     threadTagId.push(t.id);
-            // });
+            store.state.threads[objIndex].tags.forEach(t => {
+                threadTagId.push(t.id);
+            });
             allTags.forEach(tag => {
                 if(data.action == 'addTag') {
-                    // if(!threadTagId.includes(tag.id)){
+                    if(!threadTagId.includes(tag.id)){
                         store.state.threads[objIndex].tags.push(tag);
-                    // }
+                    }
                 } else if(data.action == 'removeTag') {
-                    store.state.threads[objIndex].tags = store.state.threads[objIndex].tags.filter(tg => tg.id !== tag.id)
+                    // if(threadTagId.includes(tag.id)){
+                        store.state.threads[objIndex].tags = store.state.threads[objIndex].tags.filter(tg => tg.id !== tag.id)
+                    // }
                 }
             });
         }
         if(store.state.openThread == data.threadID) {
             console.log("data dhikhao tags ka 225",allTags);
-            // store.state.threadData[data.threadID].data.tags.forEach(t => {
-            //     threadDataTagId.push(t.id);
-            // });
+            store.state.threadData[data.threadID].data.tags.forEach(t => {
+                threadDataTagId.push(t.id);
+            });
             allTags.forEach(tag => {
                 if(data.action == 'addTag') {
-                    // if(!threadDataTagId.includes(tag.id)){
+                    if(!threadDataTagId.includes(tag.id)){
                         store.state.threadData[data.threadID].data.tags.push(tag);
-                    // }
+                    }
                     let log = {
                         'type': 'log',
                         'data': {
@@ -269,18 +287,21 @@ export function toggleTags(data) {
                 }
             });
         }
+    });
     // }
 }
 
 export function assignThread(data) {
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
-        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
+    var allThreads = data.threadID;
+    allThreads.forEach(thread => {
+        let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
         if(objIndex !== -1) {
             store.state.threads[objIndex].assignedTo = data.assigned;
         }
-        if(store.state.openThread == data.threadID) {
-            store.state.threadData[data.threadID].data.currentAssignment = {
+        if(store.state.openThread == thread) {
+            store.state.threadData[thread].data.currentAssignment = {
                 'assigned': data.assigned,
                 'me': data.assigned.id == store.state.userInfo.id ? true : false,
                 'assigner': data.assigner,
@@ -288,11 +309,11 @@ export function assignThread(data) {
             };
             let body = '';
             if(data.assigned.id == store.state.userInfo.id) {
-                body = data.assigner.firstname + data.assigner.lastname + ' assigned the conversation to themselves';
+                body = data.assigner.first_name + data.assigner.last_name + ' assigned the conversation to themselves';
             } else if (data.assigned == null) {
-                body = data.assigner.firstname + data.assigner.lastname + ' unassigned the conversation';
+                body = data.assigner.first_name + data.assigner.last_name + ' unassigned the conversation';
             } else {
-                body = data.assigner.firstname + data.assigner.lastname + ' assigned the conversation to ' + data.assigned.firstname + data.assigned.lastname;
+                body = data.assigner.first_name + data.assigner.last_name + ' assigned the conversation to ' + data.assigned.first_name + data.assigned.last_name;
             }
             let log = {
                 'type': 'log',
@@ -303,8 +324,9 @@ export function assignThread(data) {
                 },
                 'timestamp': Date.now()
             };
-            store.state.threadData[data.threadID].data.items.push(log);
+            store.state.threadData[thread].data.items.push(log);
         }
+    });
     // }
 }
 
@@ -315,15 +337,18 @@ export function unsnoozeThread(data) {
     var assigned = (data.thread.assignedTo !== null ? true : false) && (store.state.type == 'assigned');
     var unassigned = (!assigned) && (store.state.type == 'unassigned');
     // if(inbox) {
-        let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
+    var allThreads = data.threadID;
+    allThreads.forEach(thread => {
+        let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
         if (objIndex !== -1 && store.state.type == 'snoozed') {
             store.state.threads.splice(objIndex, 1);
         } else if(all || mine || assigned || unassigned) {
             store.state.threads.unshift(data.thread);
         }
-        if (store.state.openThread == data.threadID) {
+        if (store.state.openThread == thread) {
             store.dispatch('updateFirebaseModal', "This conversation's snooze is ended and has been moved to inbox.");
             this.$bvModal.show('firebaseModal');
         }
+    });
     // }
 }

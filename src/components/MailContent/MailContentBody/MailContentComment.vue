@@ -58,7 +58,7 @@
                   "
                 >
                   <div class="tx-14 commentText" style="color: #222">
-                    <p v-html="item.data.body"></p>
+                    <p v-html="item.data.body" style="margin-bottom: 0px;"></p>
                   </div>
                   <div v-if="item.data.attachments !== undefined && Object.keys(item.data.attachments).length > 0" class="list-group" :id="'edit-comment-attachment-'+item.data.id">
                     <a
