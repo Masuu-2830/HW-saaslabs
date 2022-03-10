@@ -1309,11 +1309,12 @@ export default {
         },
       });
       FroalaEditor.DefineIcon("scheduleReply", {
-        NAME: "clock",
-        SVG_KEY: "clock",
+        FA5NAME: "clock",
+        template: "font_awesome_5",
       });
       FroalaEditor.RegisterCommand("scheduleReply", {
         title: "Schedule Reply",
+        icon: "scheduleReply",
         type: "dropdown",
         focus: false,
         undo: false,

@@ -275,17 +275,18 @@
               <button
                 class="reply-btn btn replyIconBtn px-1"
                 data-toggle="tooltip"
-                title=""
+                title="Reply"
                 data-original-title="Reply"
-                @click="reply"
+                @click.stop="reply(1)"
               >
-                <i class="fas fa-reply"></i>
+                <i class="fa fa-reply"></i>
               </button>
               <button
                 v-if="Object.keys(item.data.cc).length !== 0"
                 class="reply-all-btn btn replyIconBtn px-1"
                 data-toggle="tooltip"
                 title="Reply All"
+                @click.stop="reply(2)"
               >
                 <i class="fas fa-reply-all"></i>
               </button>
@@ -413,10 +414,17 @@
       <hr style="margin-top: 0px !important; margin-bottom: 0px !important" />
 
       <div
+        v-if="item.data.html"
         class="email-html pl-2"
         style="padding-top: 10px; padding-bottom: 10px"
         v-html="item.data.html"
       ></div>
+      <pre
+        v-else
+        class="email-html pl-2"
+        style="padding-top: 10px; padding-bottom: 10px"
+        v-html="item.data.text"
+      ></pre>
       <div
         class="card-footer d-flex flex-column justify-content-start p-2"
         style="padding-left: 0px !important; padding-right: 0px !important"

@@ -16,7 +16,7 @@
           margin-bottom: 5px;
         "
       >
-        <li class="nav-item" v-if="$store.state.inboxData.type == '!mail'">
+        <li class="nav-item" v-if="$store.state.inboxData.type !== 'mail'">
           <a
             class="nav-link reply-tab"
             :class="$store.state.inboxData.type !== 'mail' && 'active'"
@@ -623,7 +623,7 @@
     },
     sendMessage() {
       
-      let attachmentKeys = Object.keys(this.notesAttachments);
+      let attachmentKeys = Object.keys(this.replyAttachments);
       let attachmentIDs = attachmentKeys.filter(
         (attachmentKey) => !attachmentKey.includes("-")
       );
@@ -637,6 +637,7 @@
         type: 1,
         message,
         time: new Date().toISOString(),
+        attachmentIDs
       };
       const requestOptions = {
         method: "POST",
@@ -653,20 +654,24 @@
           }
           // editor.html = "";
           let payload = {
-            "id": data.data.comment.id,
-            "body": this.note,
-            "by": this.$store.state.userInfo,
-            "attachments": this.notesAttachments,
-            "at": new Date().toISOString()
+            "id": data.data.message_id,
+            "text": data.data.body,
+            "sentBy": data.data.sent_by,
+            "attachments": this.replyAttachments,
+            "date": data.data.message_time,
+            "threadId": this.$route.params.threadId,
+            "type": 1,
+            "unixTime": new Date(),
+            "deliveryStatus": data.data.delivery_status
           };
           let message = {
             message: payload,
-            type: "comment",
+            type: "chat",
           };
           console.log(message);
           bus.$emit("changeThreadAttrs", message);
-          this.note = "";
-          this.notesAttachments = {};
+          this.chat = "";
+          this.replyAttachments = {};
         })
         .catch((error) => {
           alert(error);
@@ -675,10 +680,7 @@
       console.log(messageData);
     },
     sendNotes() {
-      const editor =
-        this.current == "reply"
-          ? this.replyEditorInstance
-          : this.noteEditorInstance;
+      
       let attachmentKeys = Object.keys(this.notesAttachments);
       let attachmentIDs = attachmentKeys.filter(
         (attachmentKey) => !attachmentKey.includes("-")

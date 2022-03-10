@@ -1561,23 +1561,25 @@ export default {
   watch: {
     $route(to, from) {
       console.log(to.params.type, from.params.type);
-      // this.route = to.params.type;
       this.selectedIds = [];
       console.log(this.isThreadRefresh);
-      // if(to.mailboxId !== this.$store.state.inboxData.id) {
-      //   this.labelId = 4;
-      //     this.tagId = 0;
-      //     this.route = 'mine';
-      //     this.currPage = 1;
-      //     this.startThread = 1;
-      //     this.endThread = 1;
-      //     this.personId = 0;
-      //     this.order = "";
-      //     this.squery = "";
-      //     this.$store.dispatch("type", this.route);
-      //   this.$store.dispatch("labelId", this.labelId);
-      //   this.fetchThreads();
-      // }
+      console.log(to.params.mailboxId, this.$store.state.inboxData.id)
+      if(to.params.mailboxId !== undefined && (to.params.mailboxId != this.$store.state.inboxData.id)) {
+        console.log("CHanging inbox")
+        this.labelId = 4;
+          this.tagId = 0;
+          this.route = 'mine';
+          this.currPage = 1;
+          this.startThread = 1;
+          this.endThread = 1;
+          this.personId = 0;
+          this.order = "";
+          this.squery = "";
+          this.$store.dispatch("type", this.route);
+        this.$store.dispatch("labelId", this.labelId);
+        bus.$emit("broad")
+        this.fetchThreads();
+      }
       if (
         (to.params.type !== from.params.type &&
           from.params.type !== undefined) ||
@@ -2349,7 +2351,7 @@ export default {
         let url =
           this.$apiBaseURL +
           "unifiedv2/getThreads.php?mailboxIDs[]=" +
-          this.$route.params.mailboxId +
+          this.$store.state.inboxData.id +
           "&page=" +
           this.currPage +
           "&labelID=" +
@@ -2407,7 +2409,7 @@ export default {
         let url =
           this.$apiBaseURL +
           "unifiedv2/getThreads.php?mailboxIDs[]=" +
-          this.$route.params.mailboxId +
+          this.$store.state.inboxData.id +
           "&page=" +
           this.currPage +
           "&labelID=" +
