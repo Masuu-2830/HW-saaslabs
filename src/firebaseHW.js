@@ -92,6 +92,7 @@ export function addThread(data) {
 }
 
 export function addNote(data) {
+    // hello
     console.log("data dhikhao",data);
     var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     var all = store.state.type == 'all';
