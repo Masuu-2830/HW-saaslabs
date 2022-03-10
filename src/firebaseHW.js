@@ -1,3 +1,4 @@
+import { bus } from "./main";
 import { store } from "./store/store";
 
 function createThread(data) {
@@ -112,24 +113,27 @@ export function addNote(data) {
         }
         
         if (store.state.openThread == data.threadID) {
-            let comment = {
-                'type': 'comment',
-                'data': {
-                    'id': data.noteData.id,
-                    'at': data.noteData.time,
-                    'body': data.noteData.body,
-                    'by': data.noteData.sentBy,
-                    'mentions': data.noteData.mentions,
-                    'attachments': data.noteData.attachments,
-                },
-                'timestamp': Date.now()
-            };
-            console.log("comment",comment);
-            console.log("store.state.threadData",store.state.threadData[data.threadID]);
-            if (store.state.userSettings.orderThread == "asc") {
-                store.state.threadData[data.threadID].data.items.push(comment);
-            } else {
-                store.state.threadData[data.threadID].data.items.unshift(comment);
+            let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
+            if(itemIndex == -1) {
+                let comment = {
+                    'type': 'comment',
+                    'data': {
+                        'id': data.noteData.id,
+                        'at': data.noteData.time,
+                        'body': data.noteData.body,
+                        'by': data.noteData.sentBy,
+                        'mentions': data.noteData.mentions,
+                        'attachments': data.noteData.attachments,
+                    },
+                    'timestamp': Date.now()
+                };
+                console.log("comment",comment);
+                console.log("store.state.threadData",store.state.threadData[data.threadID]);
+                if (store.state.userSettings.orderThread == "asc") {
+                    store.state.threadData[data.threadID].data.items.push(comment);
+                } else {
+                    store.state.threadData[data.threadID].data.items.unshift(comment);
+                }
             }
         }
     // }

@@ -340,5 +340,3 @@ export const triggerPromptNotif = (component, type = "", timeout=3000) => {
     rtl: false
   });
 }
-
-// xwuFgeqrSRKZTucFBGmh

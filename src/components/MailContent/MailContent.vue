@@ -69,6 +69,10 @@ export default {
     bus.$on("broad", () => {
       this.display = "none";
     });
+    bus.$on("removeMail", (id) => {
+      console.log(id);
+      this.thread.data.items = this.thread.data.items.filter(item => item.data.id !== id);
+    })
     bus.$on("changeThreadAttrs", (data) => {
       if(data.type == "assignment") {
         if(data.teammate == null) {
@@ -145,7 +149,15 @@ export default {
         mail["timestamp"] = data.email.date;
         this.thread.data.items.push(mail);
         console.log(this.thread.data.items);
-      } else if(data.type == "item") {
+      } else if(data.type == "comment") {
+        let comment = {};
+        comment["data"] = data.comment;
+        comment["type"] = "comment";
+        comment["timestamp"] = data.comment.at;
+        this.thread.data.items.push(comment);
+        console.log(this.thread.data.items);
+      }
+       else if(data.type == "item") {
         let mail = {};
         mail["data"] = data.item;
         mail["type"] = data.item.type;
