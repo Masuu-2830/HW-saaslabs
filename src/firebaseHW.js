@@ -26,12 +26,13 @@ export function addThread(data) {
     console.log("data dhikhao add thread",data);
     var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     var all = store.state.type == 'all';
-    var mine = (data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
-    var assigned = (data.assignedTo.length != 0 ? true : false) && (store.state.type == 'assigned');
+    var assigned = (data.assignedTo ? true : false) && (store.state.type == 'assigned');
+    var mine = (assigned && data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
     var unassigned = (!assigned) && (store.state.type == 'unassigned');
 
     // if(inbox) {
         let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
+        console.log("objIndex",objIndex);
         if (objIndex !== -1) {
             store.state.threads[objIndex].date = data.messageData.time;
             store.state.threads[objIndex].subject = data.messageData.subject;
@@ -40,7 +41,7 @@ export function addThread(data) {
         } else if(data.action == 'incoming' && (all || mine || assigned || unassigned)) {
             store.state.threads.unshift(createThread(data));
         }
-        if (store.state.openThread !== null && (data.threadID in Object.keys(store.state.threadData))) {
+        if (store.state.openThread == data.threadID) {
             if(data.inboxType == 'mail') {
                 let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
                 if(itemIndex == -1) {
