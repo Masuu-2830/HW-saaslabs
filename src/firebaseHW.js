@@ -150,7 +150,8 @@ export function closeThread(data) {
         if (store.state.openThread !== null) {
             if (store.state.openThread == thread) {
                 store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' closed this conversation.');
-                this.$bvModal.show('firebaseModal');
+                // this.$bvModal.show(""'firebaseModal');
+                bus.$emit("firebaseModal")
             }
         }
     });
@@ -170,7 +171,8 @@ export function snoozeThread(data) {
         if (store.state.openThread !== null) {
             if (store.state.openThread == data.thread) {
                 store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' snoozed this conversation.');
-                this.$bvModal.show('firebaseModal');
+                // this.$bvModal.show('firebaseModal');
+                bus.$emit("firebaseModal")
             }
         }
     });
@@ -189,7 +191,8 @@ export function deleteThread(data) {
         }
         if (store.state.openThread == thread) {
             store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' moved this conversation to trash.');
-            this.$bvModal.show('firebaseModal');
+            // this.$bvModal.show('firebaseModal');
+            bus.$emit("firebaseModal")
         }
     });
     // }
@@ -210,7 +213,8 @@ export function moveToInboxThread(data) { // var inbox = data.mailboxID == store
         }
         if (store.state.openThread == data.thread) {
             store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' moved this conversation to inbox.');
-            this.$bvModal.show('firebaseModal');
+            // this.$bvModal.show('firebaseModal');
+            bus.$emit("firebaseModal")
         }
     });
     // }
@@ -332,7 +336,8 @@ export function unsnoozeThread(data) { // var inbox = data.mailboxID == store.st
         }
         if (store.state.openThread == thread) {
             store.dispatch('updateFirebaseModal', "This conversation's snooze is ended and has been moved to inbox.");
-            this.$bvModal.show('firebaseModal');
+            // this.$bvModal.show('firebaseModal');
+            bus.$emit("firebaseModal")
         }
     });
     // }
