@@ -29,7 +29,7 @@ export function addThread(data) {
     var assigned = (data.assignedTo.length != 0 ? true : false) && (store.state.type == 'assigned');
     var unassigned = (!assigned) && (store.state.type == 'unassigned');
 
-    if(inbox) {
+    // if(inbox) {
         let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
         if (objIndex !== -1) {
             store.state.threads[objIndex].date = data.messageData.time;
@@ -88,7 +88,7 @@ export function addThread(data) {
                 }
             }
         }
-    }
+    // }
 }
 
 export function addNote(data) {
@@ -99,7 +99,7 @@ export function addNote(data) {
     var assigned = (data.assignedTo ? true : false) && (store.state.type == 'assigned');
     var mine = (assigned && data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
     var unassigned = (!assigned) && (store.state.type == 'unassigned');
-    if(inbox) {
+    // if(inbox) {
         let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
         if (objIndex !== -1) {
             console.log("store.state.threads[objIndex]",store.state.threads[objIndex]);
@@ -132,7 +132,7 @@ export function addNote(data) {
                 store.state.threadData[data.threadID].data.items.unshift(comment);
             }
         }
-    }
+    // }
 }
 
 export function closeThread(data) {
