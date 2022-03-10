@@ -299,7 +299,7 @@ export default {
         this.inboxes = data.data.mailboxes; 
     },
     filterOptionResults(){
-        //  This is somethings
+        //  This is somethi
         if(this.searchSidebarViewOptions.trim().length > 0){
             let filteredTags = this.tags.filter(tag => {
                 return tag.name.toLowerCase().includes(this.searchSidebarViewOptions.toLowerCase())
