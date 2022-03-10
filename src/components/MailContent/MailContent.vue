@@ -149,6 +149,13 @@ export default {
         mail["timestamp"] = data.email.date;
         this.thread.data.items.push(mail);
         console.log(this.thread.data.items);
+      } else if(data.type == "chat") {
+        let chat = {};
+        chat["data"] = data.message;
+        chat["type"] = "chat";
+        chat["timestamp"] = data.message.unixTime;
+        this.thread.data.items.push(chat);
+        console.log(this.thread.data.items);
       } else if(data.type == "comment") {
         let comment = {};
         comment["data"] = data.comment;

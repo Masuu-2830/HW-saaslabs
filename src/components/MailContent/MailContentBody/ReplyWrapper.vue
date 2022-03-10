@@ -46,7 +46,7 @@ export default {
                 console.log(this.thread.data.drafts);
             for(let i = 0; i < this.thread.data.drafts.length; i++) {
                 let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
-                let obj = { hash: hash, id: this.thread.data.drafts[i].id, type: this.thread.data.drafts[i].replyAll ? 2 : 1, email: this.thread.data.drafts[i] };
+                let obj = { hash: hash, draftId: this.thread.data.drafts[i].id, type: this.thread.data.drafts[i].replyAll ? 2 : 1, email: this.thread.data.drafts[i] };
                 this.replies.push(obj);
             }
             }

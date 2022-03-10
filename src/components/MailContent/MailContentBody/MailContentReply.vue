@@ -608,7 +608,7 @@ export default {
         this.reply.type == 2 && Object.keys(this.reply.email.bcc).length > 0
           ? true
           : false,
-      draftID: this.reply.email.id !== undefined ? this.reply.email.id : null,
+      draftID: this.reply.draftId !== undefined ? this.reply.draftId : null,
       threadID:
         this.reply.email.threadId !== undefined
           ? this.reply.email.threadId
@@ -925,11 +925,12 @@ export default {
         },
       });
       FroalaEditor.DefineIcon("scheduleReply", {
-        NAME: "clock",
-        SVG_KEY: "clock",
+        FA5NAME: "clock",
+        template: "font_awesome_5",
       });
       FroalaEditor.RegisterCommand("scheduleReply", {
         title: "Schedule Reply",
+        icon: "scheduleReply",
         type: "dropdown",
         focus: false,
         undo: false,
@@ -1813,14 +1814,15 @@ export default {
           if (data.status !== "success") {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
+            triggerPromptNotif(data.message, "error");
           }
           console.log("unsending");
-          this.showUndo = false;
           this.show = true;
           console.log(this.draftID);
           bus.$emit("removeMail", this.draftID);
         }
       );
+      this.showUndo = false;
       this.undoTimer = this.$store.state.userSettings.undoTimer;
     },
     showCC() {
@@ -2018,9 +2020,9 @@ export default {
   cursor: pointer;
 
   float: right;
-  bottom: 8px;
+  bottom: 23px;
   position: absolute;
-  right: 20px;
+  right: 25px;
 }
 
 .fr-toolbar .fr-command .fr-btn img,

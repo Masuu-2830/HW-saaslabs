@@ -24,7 +24,8 @@
           <div
             class="message-name d-flex justify-content-end align-items-center"
             style="margin-right: 10px"
-            v-on:mouseover="showDelete" v-on:mouseleave="hideDelete"
+            v-on:mouseover="showDelete"
+            v-on:mouseleave="hideDelete"
           >
             <div
               class="hw_message_delete align-items-center pd-5"
@@ -32,7 +33,7 @@
               :class="showDel ? 'd-flex' : 'd-none'"
             >
               <svg
-              v-b-modal="'deleteMes-modal' + item.data.id"
+                v-b-modal="'deleteMes-modal' + item.data.id"
                 style="color: #8392a5"
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -51,42 +52,42 @@
                 ></path>
               </svg>
               <b-modal
-                  :ref="'deleteMes-modal'+item.data.id"
-                  :id="'deleteMes-modal'+item.data.id"
-                  title="Attention!!!"
-                >
-                  <div class="modal-body pd-20 pd-sm-30">
-                    <span id="modal-text"
-                      >You want to delete this message. Are you sure?</span
-                    >
-                  </div>
-                  <template
-                    class="align-items-center justify-content-between"
-                    #modal-footer="{ cancel }"
+                :ref="'deleteMes-modal' + item.data.id"
+                :id="'deleteMes-modal' + item.data.id"
+                title="Attention!!!"
+              >
+                <div class="modal-body pd-20 pd-sm-30">
+                  <span id="modal-text"
+                    >You want to delete this message. Are you sure?</span
                   >
-                    <b-row class="text-center" align-v="center">
-                      <b-col class="float-left">
-                        <b-button
-                          size="xs"
-                          variant="outline-secondary"
-                          @click="cancel()"
-                        >
-                          No
-                        </b-button>
-                      </b-col>
-                      <!-- Button with custom close trigger value -->
-                      <b-col class="float-right">
-                        <b-button
-                          @click="deleteMessage"
-                          size="xs"
-                          variant="outline-success"
-                        >
-                          Yes
-                        </b-button>
-                      </b-col>
-                    </b-row>
-                  </template>
-                </b-modal>
+                </div>
+                <template
+                  class="align-items-center justify-content-between"
+                  #modal-footer="{ cancel }"
+                >
+                  <b-row class="text-center" align-v="center">
+                    <b-col class="float-left">
+                      <b-button
+                        size="xs"
+                        variant="outline-secondary"
+                        @click="cancel()"
+                      >
+                        No
+                      </b-button>
+                    </b-col>
+                    <!-- Button with custom close trigger value -->
+                    <b-col class="float-right">
+                      <b-button
+                        @click="deleteMessage"
+                        size="xs"
+                        variant="outline-success"
+                      >
+                        Yes
+                      </b-button>
+                    </b-col>
+                  </b-row>
+                </template>
+              </b-modal>
             </div>
             <div
               class="
@@ -133,6 +134,20 @@
                     v-html="item.data.text"
                   ></span>
                 </div>
+                <br />
+                <div v-if="item.data.attachment !== undefined && item.data.attachment.length > 0" class="d-flex align-items-end">
+                  <i
+                    class="fas fa-paperclip mg-r-2 pd-b-5 tx-color-03 tx-14"
+                  ></i>
+                  <a v-for="attach in item.data.attachment" :key="attach.id"
+                    :href="attach.url"
+                    target="_blank"
+                    class="btn btn-link pd-0"
+                    style="text-decoration: underline"
+                  >
+                    {{attach.name}}
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -151,7 +166,7 @@
                 color: #989898;
               "
               :data_date="item.data.date"
-              >{{ item.timestamp | moment("from", "now", true) }}</span
+              >{{ item.data.date | moment("from", "now", true) }}</span
             >
             <span
               v-if="!show"
@@ -163,7 +178,7 @@
                 color: #989898;
               "
               :data_date="item.data.date"
-              >{{ item.timestamp | moment("MMM D, YYYY hh:mm a") }}</span
+              >{{ item.data.date | moment("MMM D, YYYY hh:mm a") }}</span
             >
           </div>
         </div>

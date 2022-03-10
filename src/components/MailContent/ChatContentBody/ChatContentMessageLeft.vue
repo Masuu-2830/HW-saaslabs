@@ -70,6 +70,26 @@
                 ></span>
               </div>
             </div>
+            <br />
+            <div
+              v-if="
+                item.data.attachment !== undefined &&
+                item.data.attachment.length > 0
+              "
+              class="d-flex align-items-end"
+            >
+              <i class="fas fa-paperclip mg-r-2 pd-b-5 tx-color-03 tx-14"></i>
+              <a
+                v-for="attach in item.data.attachment"
+                :key="attach.id"
+                :href="attach.url"
+                target="_blank"
+                class="btn btn-link pd-0"
+                style="text-decoration: underline"
+              >
+                {{ attach.name }}
+              </a>
+            </div>
           </div>
           <div
             class="d-flex"
@@ -86,7 +106,7 @@
                 color: #989898;
               "
               :data_date="item.data.date"
-              >{{ item.timestamp | moment("from", "now", true) }}</span
+              >{{ item.data.date | moment("from", "now", true) }}</span
             >
             <span
               v-if="!show"
@@ -98,7 +118,7 @@
                 color: #989898;
               "
               :data_date="item.data.date"
-              >{{ this.item.timestamp | moment("MMM D, YYYY hh:mm a") }}</span
+              >{{ item.data.date | moment("MMM D, YYYY hh:mm a") }}</span
             >
           </div>
         </div>
