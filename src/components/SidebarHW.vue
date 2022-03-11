@@ -266,6 +266,9 @@ export default {
   },
     async beforeMount() {
         await this.getInboxes();
+
+        await this.getUserSidebarPins();
+
         this.sidebarViewOptionsList = {
             inboxes: this.inboxes,
             tags: this.tags,
@@ -297,6 +300,46 @@ export default {
         const data = await response.json();
         console.log(data);
         this.inboxes = data.data.mailboxes; 
+    },
+    async getUserSidebarPins(){
+        let response = await fetch(this.$apiBaseURL + "getUserSidebarPins.php", {credentials: 'include'});
+        response = await response.json();
+        if(response.status == "success"){
+            let sidebarPins = response.data;
+            let pinInboxes = sidebarPins.inboxes;
+            let pinTags = sidebarPins.tags;
+
+            for(let i = 0; i < this.inboxes.length; i++){
+                let inbox = this.inboxes[i];
+                if(pinInboxes.includes(inbox.id + "")){
+                    this.activeInboxes[inbox.id] = inbox;
+                    this.sections["inboxes"][inbox.id] = inbox;
+                }
+            }
+
+            let tags = this.tags;
+            
+            for(let i = 0; i < tags.length; i++){
+                let tag = tags[i];
+                if(pinTags.includes(tag.id + "")){
+                    this.activeTags[tag.id] = tag;
+                    this.sections["tags"][tag.id] = tag;
+                }
+            }
+
+            console.log(this.activeInboxes);
+            console.log(this.activeTags);
+
+            this.activeInboxes = this.activeInboxes;
+            this.activeTags = this.activeTags;
+
+            this.sections["inboxes"] = this.sections.inboxes;
+            this.sections["tags"] = this.sections.tags;
+
+            this.sections = {...this.sections};
+
+        }
+        
     },
     filterOptionResults(){
         //  This is somethi
@@ -364,7 +407,6 @@ export default {
         return icon;
     },
     pinThisOption(labels, option){
-        console.log(labels, option);
 
         if(this.sections[labels][option.id]){
             delete this.sections[labels][option.id];
@@ -410,8 +452,26 @@ export default {
             return this.activeTags[id];
         }
     },
-    saveSidebarPins(){
+    async saveSidebarPins(){
         this.sidebarViewOptionShow = false;
+        let pins = {
+            inboxes: Object.keys(this.activeInboxes),
+            tags: Object.keys(this.activeTags)
+        };
+
+        let response = await fetch("https://app.helpwise.io/api/setUserSidebarPins.php.php", {
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({
+                pins
+            })
+        });
+
+        response = await response.json();
+
+        if(response.status == "success"){
+            this.$toast.success("Settings saved successfully");
+        }
     }
   }
 };
