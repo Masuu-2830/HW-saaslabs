@@ -152,8 +152,8 @@ export function closeThread(data) {
         }
         if (store.state.openThread !== null) {
             if (store.state.openThread == thread) {
-                store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' closed this conversation.');
-                this.$bvModal.show('firebaseModal');
+                store.dispatch('updateFirebaseModal', data.user.first_name + ' ' + data.user.last_name + ' closed this conversation.');
+                bus.$emit('firebaseModal');
             }
         }
     });
@@ -172,8 +172,8 @@ export function snoozeThread(data) {
         }
         if (store.state.openThread !== null) {
             if (store.state.openThread == data.thread) {
-                store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' snoozed this conversation.');
-                this.$bvModal.show('firebaseModal');
+                store.dispatch('updateFirebaseModal', data.user.first_name + ' ' + data.user.last_name + ' snoozed this conversation.');
+                bus.$emit('firebaseModal');
             }
         }
     });
@@ -191,17 +191,17 @@ export function deleteThread(data) {
             store.state.threads.unshift(createThread(data));
         }
         if (store.state.openThread == thread) {
-            store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' moved this conversation to trash.');
-            this.$bvModal.show('firebaseModal');
+            store.dispatch('updateFirebaseModal', data.user.first_name + ' ' + data.user.last_name + ' moved this conversation to trash.');
+            bus.$emit('firebaseModal');
         }
     });
     // }
 }
 export function moveToInboxThread(data) { // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     var all = store.state.type == 'all';
-    var mine = (data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
-    var assigned = (data.assignedTo !== null ? true : false) && (store.state.type == 'assigned');
-    var unassigned = (! assigned) && (store.state.type == 'unassigned');
+    var assigned = (data.assignedTo ? true : false) && (store.state.type == 'assigned');
+    var mine = (assigned && data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
+    var unassigned = (!assigned) && (store.state.type == 'unassigned');
     // if(inbox) {
     var allThreads = data.threadID;
     allThreads.forEach(thread => {
@@ -212,8 +212,8 @@ export function moveToInboxThread(data) { // var inbox = data.mailboxID == store
             store.state.threads.unshift(createThread(data));
         }
         if (store.state.openThread == data.thread) {
-            store.dispatch('updateFirebaseModal', data.user.first_name + data.user.last_name + ' moved this conversation to inbox.');
-            this.$bvModal.show('firebaseModal');
+            store.dispatch('updateFirebaseModal', data.user.first_name + ' ' + data.user.last_name + ' moved this conversation to inbox.');
+            bus.$emit('firebaseModal');
         }
     });
     // }
@@ -298,9 +298,9 @@ export function assignThread(data) {
                 'time': data.time
             };
             let body = '';
-            if (data.assigned.id == store.state.userInfo.id) {
+            if (data.assigned && data.assigned.id == store.state.userInfo.id) {
                 body = data.assigner.first_name + data.assigner.last_name + ' assigned the conversation to themselves';
-            } else if (data.assigned == null) {
+            } else if (!data.assigned) {
                 body = data.assigner.first_name + data.assigner.last_name + ' unassigned the conversation';
             } else {
                 body = data.assigner.first_name + data.assigner.last_name + ' assigned the conversation to ' + data.assigned.first_name + data.assigned.last_name;
@@ -321,9 +321,9 @@ export function assignThread(data) {
 }
 export function unsnoozeThread(data) { // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     var all = store.state.type == 'all';
-    var mine = (data.thread.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
-    var assigned = (data.thread.assignedTo !== null ? true : false) && (store.state.type == 'assigned');
-    var unassigned = (! assigned) && (store.state.type == 'unassigned');
+    var assigned = (data.thread.assignedTo ? true : false) && (store.state.type == 'assigned');
+    var mine = (assigned && data.thread.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
+    var unassigned = (!assigned) && (store.state.type == 'unassigned');
     // if(inbox) {
     var allThreads = data.threadID;
     allThreads.forEach(thread => {
@@ -335,7 +335,7 @@ export function unsnoozeThread(data) { // var inbox = data.mailboxID == store.st
         }
         if (store.state.openThread == thread) {
             store.dispatch('updateFirebaseModal', "This conversation's snooze is ended and has been moved to inbox.");
-            this.$bvModal.show('firebaseModal');
+            bus.$emit('firebaseModal');
         }
     });
     // }

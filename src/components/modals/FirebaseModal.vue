@@ -31,8 +31,9 @@
                 bus.$emit("broad");
             },
         },
-        created: function(){
+        created(){
             bus.$on("firebaseModal", () => {
+                console.log("trigger hua kya?");
                 this.$bvModal.show('firebaseModal');
             })
         }
