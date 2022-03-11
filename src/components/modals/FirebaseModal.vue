@@ -31,7 +31,7 @@
                 bus.$emit("broad");
             },
         },
-        created: function(){
+        created(){
             bus.$on("firebaseModal", () => {
                 this.$bvModal.show('firebaseModal');
             })

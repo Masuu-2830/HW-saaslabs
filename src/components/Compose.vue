@@ -1836,7 +1836,7 @@ export default {
       let signature = this.$store.state.userSignature.body;
       if (!signature) return "";
       let body = signature.replace(/^.*?<body[^>]*>(.*?)<\/body>.*?$/i, "$1");
-      console.log(body);
+      // console.log(body);
       let html = "";
       let sign = `<div>${body}</div>`;
       // let signatureText = sign.text();

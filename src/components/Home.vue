@@ -8,7 +8,7 @@
             <compose-wrapper></compose-wrapper>
             <tweet-compose></tweet-compose>
         </div>
-
+        <firebase-modal></firebase-modal>
         <HcArticles/>
         <SavedReply/>
     </div>
@@ -20,6 +20,7 @@ import MailGroup from './MailGroup/MailGroup.vue';
 import SideBarHW from './SidebarHW.vue';
 import MailContent from './MailContent/MailContent.vue'
 import Compose from './Compose.vue';
+import FirebaseModal from "./modals/FirebaseModal.vue"
 import HcArticles from './modals/HcArticles.vue';
 import SavedReply from './modals/SavedReply.vue';
 import ComposeWrapper from './ComposeWrapper.vue';
@@ -37,7 +38,8 @@ export default {
         HcArticles,
         SavedReply,
         ComposeWrapper,
-        TweetCompose
+        TweetCompose,
+        FirebaseModal
     },
     data() {
       return {
