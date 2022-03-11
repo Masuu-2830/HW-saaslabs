@@ -229,13 +229,9 @@
             let mentionTribute = await self.callApi1();
             mentionTribute.attach(noteFroala.el);
 
-            noteFroala.events.on(
-              "keydown",
-              function (e) {
-                if (
-                  e.which == FroalaEditor.KEYCODE.ENTER &&
-                  mentionTribute.isActive
-                ) {
+            noteFroala.events.on("keydown",function (e) {
+              self.hitFirebase("notes");
+                if (e.which == FroalaEditor.KEYCODE.ENTER && mentionTribute.isActive) {
                   return false;
                 }
               },
@@ -889,6 +885,7 @@
       const socket2 = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
 
       socket2.child(`/commenting user`).on('value', function(data){
+        console.log("--------- NOTES ---------", data.val());
         if(data.val()){
           vueThis.makingTypingCard(data.val(), "notes");
         } else {
