@@ -16,10 +16,10 @@
           margin-bottom: 5px;
         "
       >
-        <li class="nav-item" v-if="$store.state.inboxData.type !== 'mail'">
+        <li class="nav-item" v-if="this.thread.data.mailboxType !== 'mail'">
           <a
             class="nav-link reply-tab"
-            :class="$store.state.inboxData.type !== 'mail' && 'active'"
+            :class="this.thread.data.mailboxType !== 'mail' && 'active'"
             data-toggle="tab"
             href="#editorReplyTab"
             role="tab"
@@ -32,7 +32,7 @@
         <li class="nav-item">
           <a
             class="nav-link notes-tab"
-            :class="$store.state.inboxData.type == 'mail' && 'active'"
+            :class="this.thread.data.mailboxType == 'mail' && 'active'"
             data-toggle="tab"
             href="#editorNotesTab"
             role="tab"
@@ -46,9 +46,9 @@
 
       <div class="tab-content" id="myTabContent">
         <div
-          v-if="$store.state.inboxData.type !== 'mail'"
+          v-if="this.thread.data.mailboxType !== 'mail'"
           class="tab-pane fade"
-          :class="$store.state.inboxData.type !== 'mail' && 'show active'"
+          :class="this.thread.data.mailboxType !== 'mail' && 'show active'"
           id="editorReplyTab"
           role="tabpanel"
           aria-labelledby="reply-tab"
@@ -57,7 +57,7 @@
         </div>
         <div
           class="tab-pane fade"
-          :class="$store.state.inboxData.type == 'mail' && 'show active'"
+          :class="this.thread.data.mailboxType == 'mail' && 'show active'"
           id="editorNotesTab"
           role="tabpanel"
           aria-labelledby="notes-tab"
@@ -90,6 +90,7 @@
 
   export default {
     name: "ChatContentReply",
+    props: ["thread"],
     components: {
       // VueTribute,
       FroalaEditor,
@@ -98,7 +99,7 @@
     data() {
       const self = this;
       return {
-        current: this.$store.state.inboxData.type == 'mail' ? 'reply' : 'note',
+        current: this.thread.data.mailboxType == 'mail' ? 'reply' : 'note',
         tempData:['a', 'b', 'v'],
         replyEditorInstance: null,
         noteEditorInstance: null,
@@ -326,7 +327,7 @@
       const response = await fetch(
         this.$apiBaseURL +
           "get-teammates.php?mailboxID=" +
-          this.$store.state.inboxData.id,
+          this.thread.data.mailbox_id,
         { credentials: "include" }
       );
       const data = await response.json();
@@ -338,7 +339,7 @@
       const response = await fetch(
         this.$apiBaseURL +
           "get-teammates.php?mailboxID=" +
-          this.$store.state.inboxData.id,
+          this.thread.data.mailbox_id,
         { credentials: "include" }
       );
       const data = await response.json();
@@ -628,7 +629,7 @@
         .replace(/(<p)/gim, "<div")
         .replace(/<\/p>/gim, "</div>");
       let messageData = {
-        mailboxID: this.$store.state.inboxData.id,
+        mailboxID: this.thread.data.mailbox_id,
         to: this.$route.params.threadId,
         type: 1,
         message,
@@ -686,7 +687,7 @@
         .replace(/(<p)/gim, "<div")
         .replace(/<\/p>/gim, "</div>");
       let messageData = {
-        mailboxID: this.$store.state.inboxData.id,
+        mailboxID: this.thread.data.mailbox_id,
         threadID: this.$route.params.threadId,
         mentionUserIDs: [],
         message,
@@ -847,7 +848,7 @@
 
         triggerPromptNotif("Fetching saved reply data");
         fetch(
-          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$store.state.inboxData.id}&savedReplyID=${id}`,
+          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vuethis.thread.data.mailbox_id}&savedReplyID=${id}`,
           {credentials: 'include'}
         ).then(response => response.json())
         .then(response => {

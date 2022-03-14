@@ -23,7 +23,7 @@
           class="form-control"
           v-model="squery"
           v-on:keyup.enter="submit"
-          :placeholder="'Search '+this.$store.state.inboxData.name"
+          :placeholder="'Search'"
         />
         <a
           class="collapsed"

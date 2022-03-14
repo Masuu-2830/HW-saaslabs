@@ -2,6 +2,7 @@
   <div
     class="mail-content flex-row-reverse justify-content-between"
     :style="{ display: display }"
+    v-if="Object.keys(thread).length !== 0"
   >
     <div v-if="loading" id="thread-spinner" class="spinner-border text-primary" role="status" style="position: absolute; top: 50%; left: 50%;">
         <span class="sr-only">Loading...</span>
@@ -10,10 +11,12 @@
     <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :sidebarOpen = "sidebarOpen" :contactOpen = "contactOpen" :thread= "thread"></IntegrationContainer>
     <div v-if="!loading" class="d-flex flex-column justify-content-between" :style="{width: 'calc(100% - 60px - '+right+')'}">
       <mail-content-header :thread="thread"></mail-content-header>
-      <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body>
-      <chat-content-body v-if="this.$store.state.inboxData.type !== 'mail'" :thread="thread"></chat-content-body>
+      <!-- <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body> -->
+      <mail-content-body v-if="thread.data.mailboxType == 'mail'" :thread="thread"></mail-content-body>
+      <!-- <chat-content-body v-if="this.$store.state.inboxData.type !== 'mail'" :thread="thread"></chat-content-body> -->
+      <chat-content-body v-if="thread.data.mailboxType !== 'mail'" :thread="thread"></chat-content-body>
       <!-- <chat-content-body></chat-content-body> -->
-      <chat-content-reply></chat-content-reply>
+      <chat-content-reply :thread="thread"></chat-content-reply>
       <!-- <mail-content-add-note v-if="!loading"></mail-content-add-note> -->
     </div>
   </div>

@@ -3,7 +3,7 @@
     <div class="mail-sidebar-body ps--active-y">
       <div class="pd-20" style="padding-bottom: 25px">
         <div class="d-flex justify-content-between align-items-start">
-          <h5 id="mailbox-title">{{ this.$store.state.inboxData.name }}</h5>
+          <h5 id="mailbox-title" v-if="this.mailbox.displayName">{{ this.mailbox.displayName }}</h5>
           <router-link
             to="settings"
             id="mailbox-settings-link"
@@ -74,7 +74,7 @@
         </div>
         <div role="group" class="btn-group btn-block">
           <button
-            v-if="this.$store.state.inboxData.type == 'mail'"
+            v-if="this.mailbox.type == 'mail'"
             @click="openCompose('mail')"
             class="
               tx-uppercase
@@ -87,7 +87,7 @@
             Compose
           </button>
           <button
-            v-if="this.$store.state.inboxData.type == 'twitter'"
+            v-if="this.mailbox.type == 'twitter'"
             @click="openCompose('twitter')"
             id="mailComposeBtn"
             class="
@@ -102,7 +102,7 @@
             Tweet
           </button>
           <button
-            v-if="this.$store.state.inboxData.type == 'sms'"
+            v-if="this.mailbox.type == 'sms'"
             @click="openCompose('sms')"
             id="mailComposeBtn"
             class="
@@ -265,6 +265,7 @@ export default {
     }
   },
     async beforeMount() {
+        console.log("this.mailbox",this.mailbox);
         await this.getInboxes();
 
         await this.getUserSidebarPins();
@@ -304,6 +305,7 @@ export default {
     async getUserSidebarPins(){
         let response = await fetch(this.$apiBaseURL + "getUserSidebarPins.php", {credentials: 'include'});
         response = await response.json();
+        console.log("response dhikhana",response.data);
         if(response.status == "success"){
             let sidebarPins = response.data;
             let pinInboxes = sidebarPins.inboxes;
