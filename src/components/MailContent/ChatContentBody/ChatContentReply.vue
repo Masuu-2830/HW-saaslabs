@@ -1,9 +1,11 @@
 <template>
-  <div
-    style="background-color: white"
-    class="d-flex flex-column editor_container"
-    id="threadEditorContainer"
-  >
+  <div style="background-color: white" class="d-flex flex-column editor_container" id="threadEditorContainer">
+    <p class="typingMessageNotice tx-12 tx-italic tx-sans" v-if="typingNotice">
+      {{typingNotice}}
+    </p>
+    <p class="typingMessageNotice tx-12 tx-italic tx-sans" v-if="typingNotesNotice">
+      {{typingNotesNotice}}
+    </p>
     <div class="editorContainer">
       <ul
         class="nav nav-line flex-row mg-l-20 mg-b-10"
@@ -76,50 +78,56 @@
 </template>
 
 <script>
-import FroalaEditor from "froala-editor";
-// import VueTribute from "vue-tribute";
-import Tribute from "tributejs";
-import AttachmentComp from "../../AttachmentComp.vue";
-// import HcArticles from './modals/HcArticles.vue';
-import Vue from "vue";
-import { bus, triggerPromptNotif } from "../../../main";
-const axios = require("axios").default;
+  import FroalaEditor from 'froala-editor';
+  // import VueTribute from "vue-tribute";
+  import Tribute from "tributejs";
+  import AttachmentComp from '../../AttachmentComp.vue';
+  // import HcArticles from './modals/HcArticles.vue';
+  import Vue from 'vue';
+  import { bus, triggerPromptNotif } from "../../../main";
+  const axios = require('axios').default;
+  import { firebase_app } from "../../../firebaseInit";
 
-export default {
-  name: "ChatContentReply",
-  components: {
-    // VueTribute,
-    FroalaEditor,
-    // HcArticles
-  },
-  data() {
-    const self = this;
-    return {
-      note: "",
-      chat: "",
-      current: this.$store.state.inboxData.type !== "mail" ? "reply" : "note",
-      tempData: ["a", "b", "v"],
-      replyEditorInstance: null,
-      noteEditorInstance: null,
-      replyAttachments: {},
-      notesAttachments: {},
-      showHcModal: false,
-      replyEditorConfig: {
-        events: {
-          initialized: async function () {
-            const replyFroala = this;
-            self.replyEditorInstance = this;
+  export default {
+    name: "ChatContentReply",
+    components: {
+      // VueTribute,
+      FroalaEditor,
+      // HcArticles
+    },
+    data() {
+      const self = this;
+      return {
+        current: this.$store.state.inboxData.type == 'mail' ? 'reply' : 'note',
+        tempData:['a', 'b', 'v'],
+        replyEditorInstance: null,
+        noteEditorInstance: null,
+        replyAttachments: {},
+        notesAttachments: {},
+        note: "",
+        chat: "",
+        typing: {
+          reply: false,
+          notes: false
+        },
+        showHcModal: false,
+        defaultTypingTimer: 1000,
+        typingNotice: "",
+        typingNotesNotice: "",
+        typingTimer: null,
+        typingNotesTimer: null,
+        replyEditorConfig: {
+          events: {
+            initialized: async function() {
+              const replyFroala = this;
+              self.replyEditorInstance = this;
 
-            let savedReplyTribute = await self.callApi();
-            savedReplyTribute.attach(replyFroala.el);
+              let savedReplyTribute = await self.callApi();
+              savedReplyTribute.attach(replyFroala.el);
 
-            replyFroala.events.on(
-              "keydown",
-              function (e) {
-                if (
-                  e.which == FroalaEditor.KEYCODE.ENTER &&
-                  savedReplyTribute.isActive
-                ) {
+              replyFroala.events.on('keydown', function(e) {
+                self.hitFirebase("reply");
+                if (e.which == FroalaEditor.KEYCODE.ENTER && savedReplyTribute.isActive) {
                   return false;
                 }
               },
@@ -221,13 +229,9 @@ export default {
             let mentionTribute = await self.callApi1();
             mentionTribute.attach(noteFroala.el);
 
-            noteFroala.events.on(
-              "keydown",
-              function (e) {
-                if (
-                  e.which == FroalaEditor.KEYCODE.ENTER &&
-                  mentionTribute.isActive
-                ) {
+            noteFroala.events.on("keydown",function (e) {
+              self.hitFirebase("notes");
+                if (e.which == FroalaEditor.KEYCODE.ENTER && mentionTribute.isActive) {
                   return false;
                 }
               },
@@ -535,8 +539,83 @@ export default {
             attachmentObject[attachID]["mimeType"] = attachData["mimeType"];
             attachmentObject[attachID]["extension"] = attachData["extension"];
             attachmentObject[attachID]["id"] = attachID;
-          });
+          })
+        }
+      },
+    hitFirebase(type){
+      let managerID = this.$store.state.userInfo.accountID;
+      let threadID = this.$route.params.threadId;
+
+      console.log(`/Account-${managerID}/ThreadID-${threadID}`);
+      const socket = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
+
+      if(type == "notes"){
+        if(!this.typing.notes){
+          this.typing.notes = true;
+          socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).off("value");
+          socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+          this.startNotesTimer(socket);
+        }
+        if(this.typing.notes){
+          this.resetNotesTimer(socket);
+        }
+      } else {
+        if(!this.typing.reply){
+          this.typing.reply = true;
+          socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).off("value");
+          socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+          this.startReplyingTimer(socket);
+        }
+
+        if(this.typing.reply){
+          this.resetReplyingTimer(socket);
+        }
       }
+    },
+    startReplyingTimer(socket){
+      this.typingTimer = setTimeout(() => {
+        this.typing.reply = false;
+        socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).remove();
+      }, this.defaultTypingTimer);
+    },
+    startNotesTimer(socket){
+      this.typingNotesTimer = setTimeout(() => {
+        this.typing.reply = false;
+        socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).remove();
+      }, this.defaultTypingTimer);
+    },
+    resetReplyingTimer(socket){
+      clearTimeout(this.typingTimer);
+      this.startReplyingTimer(socket);
+    },
+    resetNotesTimer(socket){
+      clearTimeout(this.typingNotesTimer);
+      this.startNotesTimer(socket);
+    },
+    makingTypingCard(data, type){
+      let typingType = type == "notes" ? "adding notes" : "replying";
+      let noticeElem = "";
+      if(Object.keys(data).length == 0){
+        noticeElem = "";
+      }
+      for (const key in data) {
+        if (Object.hasOwnProperty.call(data, key)) {
+          const user = data[key];
+          let userID = user.id;
+          let userFName = user.firstname;
+          let userLName = user.lastname;
+          let userName = `${userFName} ${userLName}`;
+          userName = userName.trim();
+          let prefix = "";
+          if(noticeElem.trim().length > 0){
+            prefix = ";";
+          }
+          noticeElem += `${prefix} ${userName} is ${typingType}... `;
+        }
+      }
+
+      type == "notes" ? this.typingNotesNotice = noticeElem : this.typingNotice = noticeElem;
+
     },
     sendMessage() {
       
@@ -769,92 +848,121 @@ export default {
         triggerPromptNotif("Fetching saved reply data");
         fetch(
           `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$store.state.inboxData.id}&savedReplyID=${id}`,
-          { credentials: "include" }
-        )
-          .then((response) => response.json())
-          .then((response) => {
-            if (response.status == "success") {
-              editorInstance.html.insert(response.data.savedReply.content);
-              triggerPromptNotif("Saved Reply Inserted", "success");
-            } else {
-              triggerPromptNotif("Unable to insert Saved Reply", "error");
-            }
-          });
-      }
-    });
+          {credentials: 'include'}
+        ).then(response => response.json())
+        .then(response => {
+          if(response.status == "success"){
+            editorInstance.html.insert(response.data.savedReply.content);
+            triggerPromptNotif("Saved Reply Inserted", "success");
+          } else {
+            triggerPromptNotif("Unable to insert Saved Reply", "error");
+          }
+        })
+        }
+      })
 
-    $(document).off("click", "#sendMessage");
-    $(document).on("click", "#sendMessage", function () {
-      vueThis.sendMessage();
-    });
+      $(document).off("click", "#sendMessage");
+      $(document).on("click", "#sendMessage", function(){
+        vueThis.sendMessage();
+      });
 
-    $(document).off("click", "#sendNotes");
-    $(document).on("click", "#sendNotes", function () {
-      vueThis.sendNotes();
-    });
+      $(document).off("click", "#sendNotes");
+      $(document).on("click", "#sendNotes", function(){
+        vueThis.sendNotes();
+      });
 
-    $(document).off("click", "#removeHCArticleCard");
-    $(document).on("click", "#removeHCArticleCard", function () {
-      $(this).parents(".hw_articleCard").remove();
-    });
-  },
-};
+      $(document).off("click", "#removeHCArticleCard");
+      $(document).on("click", "#removeHCArticleCard", function(){
+        $(this).parents(".hw_articleCard").remove();
+      })
+    },
+    mounted(){
+      let managerID = this.$store.state.userInfo.accountID;
+      let threadID = this.$route.params.threadId;
+      const vueThis = this;
+      
+      console.log(`/Account-${managerID}/ThreadID-${threadID}`);
+      const socket2 = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
+
+      socket2.child(`/commenting user`).on('value', function(data){
+        console.log("--------- NOTES ---------", data.val());
+        if(data.val()){
+          vueThis.makingTypingCard(data.val(), "notes");
+        } else {
+          vueThis.makingTypingCard({}, "notes");
+        }
+      });
+
+      socket2.child(`/replying user`).on('value', function(data){
+        if(data.val()){
+          vueThis.makingTypingCard(data.val(), "reply");
+        } else {
+          vueThis.makingTypingCard({}, "reply");
+        }
+      });
+    }
+  };
 </script>
 
 <style scoped>
-.form {
-  bottom: 0%;
-}
+  .form {
+    bottom: 0%;
+  }
 
-.mention {
-  color: #009be5 !important;
-  background-color: #dbf2ff !important;
-  padding: 0 4px;
-}
+  .mention {
+    color: #009be5 !important;
+    background-color: #dbf2ff !important;
+    padding: 0 4px;
+  }
 
-.mention-h {
-  color: blue !important;
-  background-color: #dbf2ff !important;
-  padding: 0 4px;
-}
-.btnn {
-  font-size: 14px;
-  color: white;
-  /* padding: 7px; */
-  width: 70px;
-  border-radius: 5px;
-  cursor: pointer;
+  .mention-h {
+    color: blue !important;
+    background-color: #dbf2ff !important;
+    padding: 0 4px;
+  }
+  .btnn {
+    font-size: 14px;
+    color: white;
+    /* padding: 7px; */
+    width: 70px;
+    border-radius: 5px;
+    cursor: pointer;
 
-  float: right;
-  bottom: 17px;
-  position: absolute;
-  right: 100px;
-}
+    float: right;
+    bottom: 17px;
+    position: absolute;
+    right: 100px;
+  }
 
-.nav-link.active {
-  color: #0168fa;
-}
+  .nav-link.active {
+    color: #0168fa;
+  }
 
-.editorContainer {
-  margin: 10px 20px;
-  background-color: white;
-  border-radius: 10px;
-  /* overflow: hidden; */
-  border: 1px solid #0168fa;
-}
+  .editorContainer{
+    margin: 10px 20px;
+    background-color: white;
+    border-radius: 10px;
+    /* overflow: hidden; */
+    border: 1px solid #0168fa;
+  }
 
-.editorContainer.noteMode {
-  background: #fef6d8;
-}
+  .editorContainer.noteMode{
+    background: #fef6d8;
+  }
 
-.editorContainer:hover {
-  box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.16);
-}
+  .editorContainer:hover {
+    box-shadow: 0 0 10px 2px rgba(0,0,0,0.16);
+  }
 
-#removeHCArticleCard {
-  visibility: hidden;
-}
-.hw_removeArticle:hover {
-  visibility: visible;
-}
+  #removeHCArticleCard{
+    visibility: hidden;
+  }
+  .hw_removeArticle:hover{
+    visibility: visible;
+  }
+
+  .typingMessageNotice{
+    margin: 5px 20px;
+  }
+
 </style>

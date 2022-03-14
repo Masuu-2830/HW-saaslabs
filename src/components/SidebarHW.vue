@@ -28,6 +28,49 @@
               ></path>
             </svg>
           </router-link>
+          <div class="pd-y-5 d-flex justify-content-center pos-relative">
+            <button class="btn btn-link pd-0 mg-5 sidebarViewOptionButton" :class="{'open': sidebarViewOptionShow}" style="color: #566476;" @click="sidebarViewOptionShow = !sidebarViewOptionShow"><svg style="height: 16px; width: 16px" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></button>
+            <div class="pos-absolute d-flex flex-column" style="/* width: 100%; */ max-width: 300px; top: 100%; left: 50%; background: white; box-shadow: rgba(0,0,0,0.16) 0 0 10px 2px; padding: 10px; border-radius: 5px; z-index: 99999; max-height: calc(55vh + 100px)" v-if="sidebarViewOptionShow">
+                <div class="d-flex w-100">
+                    <div class="search-form pd-b-10 bd-b mg-b-10 w-100">
+                        <input type="search" class="form-control" placeholder="Search" @keyup="filterOptionResults" v-model="searchSidebarViewOptions">
+                        <button class="btn" type="button" @click="filterOptionResults">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="optionContainer" style="max-height: 55vh; overflow: auto; padding-right: 20px;">
+                    <div class="d-flex flex-column w-100" v-for="(list, labels) in sidebarViewOptionsListFiltered" :key="labels">
+                        <p class="tx-color-03 tx-14 mg-b-5 mg-y-15 tx-uppercase pd-x-5" v-if="list.length > 0">{{labels}}</p>
+                        <div 
+                            class="d-flex justify-content-between w-100"
+                            v-for="option in list"
+                            :key="option.id"
+                            @click="pinThisOption(labels, option)"
+                        >
+                            <div class="pd-5 mg-b-5 w-100 d-flex justify-content-between" v-if="(option.displayName && option.displayName.trim().length > 0) || (option.name && option.name.trim().length > 0)">
+                                <div class="tx-color-01 mg-r-15 mg-b-0 d-flex">
+                                    <div class="tagIcon" v-if="labels == 'tags'">
+                                        <svg xmlns="http://www.w3.org/2000/svg" :style="'color:'+option.color" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag mg-r-5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                                    </div>
+                                    <div class="tx-color-01 mg-r-10 mg-b-0 d-flex">
+                                        <div class="inboxIcon" v-if="labels == 'inboxes'" v-html="getInboxIcon(option.type)">
+                                        </div>
+                                    </div>
+                                    <p class="mg-b-0 w-100" style="white-space: nowrap">{{labels == 'inboxes' ? option.displayName : option.name }}</p>
+                                </div>
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bookmark tx-color-03 bookmarkIcon" :class="{'isActive' : isItPinned(labels, option.id)}"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex w-100 bd-t mg-t-10 pd-t-10 justify-content-between">
+                    <button class="btn btn-outline-secondary btn-xs" @click="sidebarViewOptionShow = !sidebarViewOptionShow">Cancel</button>
+                    <button class="btn btn-primary btn-xs" @click="saveSidebarPins">Save</button>
+                </div>
+            </div>
+          </div>
         </div>
         <div role="group" class="btn-group btn-block">
           <button
@@ -70,49 +113,6 @@
             Compose
           </button>
         </div>
-      </div>
-      <div class="pd-y-5 d-flex justify-content-center pos-relative">
-          <button class="btn btn-outline-secondary" @click="sidebarViewOptionShow = !sidebarViewOptionShow">View option</button>
-            <div class="pos-absolute d-flex flex-column" style="/* width: 100%; */ max-width: 300px; top: 100%; left: 50%; background: white; box-shadow: rgba(0,0,0,0.16) 0 0 10px 2px; padding: 10px; border-radius: 5px; z-index: 99999; max-height: calc(55vh + 100px)" v-if="sidebarViewOptionShow">
-                <div class="d-flex w-100">
-                    <div class="search-form pd-b-10 bd-b mg-b-10 w-100">
-                        <input type="search" class="form-control" placeholder="Search" @keyup="filterOptionResults" v-model="searchSidebarViewOptions">
-                        <button class="btn" type="button" @click="filterOptionResults">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="optionContainer" style="max-height: 55vh; overflow: auto; padding-right: 20px;">
-                    <div class="d-flex flex-column w-100" v-for="(list, labels) in sidebarViewOptionsListFiltered" :key="labels">
-                        <p class="tx-color-03 tx-14 mg-b-5 mg-y-15 tx-uppercase pd-x-5" v-if="list.length > 0">{{labels}}</p>
-                        <div 
-                            class="d-flex justify-content-between w-100"
-                            v-for="option in list"
-                            :key="option.id"
-                            @click="pinThisOption(labels, option)"
-                        >
-                            <div class="pd-5 mg-b-5 w-100 d-flex justify-content-between" v-if="(option.displayName && option.displayName.trim().length > 0) || (option.name && option.name.trim().length > 0)">
-                                <div class="tx-color-01 mg-r-15 mg-b-0 d-flex">
-                                    <div class="tagIcon" v-if="labels == 'tags'">
-                                        <svg xmlns="http://www.w3.org/2000/svg" :style="'color:'+option.color" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag mg-r-5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-                                    </div>
-                                    <div class="tx-color-01 mg-r-10 mg-b-0 d-flex">
-                                        <div class="inboxIcon" v-if="labels == 'inboxes'" v-html="getInboxIcon(option.type)">
-                                        </div>
-                                    </div>
-                                    <p class="mg-b-0 w-100" style="white-space: nowrap">{{labels == 'inboxes' ? option.displayName : option.name }}</p>
-                                </div>
-
-                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bookmark tx-color-03 bookmarkIcon" :class="{'isActive' : isItPinned(labels, option.id)}"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex w-100 bd-t mg-t-10 pd-t-10 justify-content-between">
-                    <button class="btn btn-outline-secondary btn-xs" @click="sidebarViewOptionShow = !sidebarViewOptionShow">Cancel</button>
-                    <button class="btn btn-primary btn-xs" @click="saveSidebarPins">Save</button>
-                </div>
-            </div>
       </div>
       <div class="pd-b-10 pd-l-10">
         <div id="nav-links-container" class="pd-r-10">
@@ -266,6 +266,9 @@ export default {
   },
     async beforeMount() {
         await this.getInboxes();
+
+        await this.getUserSidebarPins();
+
         this.sidebarViewOptionsList = {
             inboxes: this.inboxes,
             tags: this.tags,
@@ -298,7 +301,48 @@ export default {
         console.log(data);
         this.inboxes = data.data.mailboxes; 
     },
+    async getUserSidebarPins(){
+        let response = await fetch(this.$apiBaseURL + "getUserSidebarPins.php", {credentials: 'include'});
+        response = await response.json();
+        if(response.status == "success"){
+            let sidebarPins = response.data;
+            let pinInboxes = sidebarPins.inboxes;
+            let pinTags = sidebarPins.tags;
+
+            for(let i = 0; i < this.inboxes.length; i++){
+                let inbox = this.inboxes[i];
+                if(pinInboxes.includes(inbox.id + "")){
+                    this.activeInboxes[inbox.id] = inbox;
+                    this.sections["inboxes"][inbox.id] = inbox;
+                }
+            }
+
+            let tags = this.tags;
+            
+            for(let i = 0; i < tags.length; i++){
+                let tag = tags[i];
+                if(pinTags.includes(tag.id + "")){
+                    this.activeTags[tag.id] = tag;
+                    this.sections["tags"][tag.id] = tag;
+                }
+            }
+
+            console.log(this.activeInboxes);
+            console.log(this.activeTags);
+
+            this.activeInboxes = this.activeInboxes;
+            this.activeTags = this.activeTags;
+
+            this.sections["inboxes"] = this.sections.inboxes;
+            this.sections["tags"] = this.sections.tags;
+
+            this.sections = {...this.sections};
+
+        }
+        
+    },
     filterOptionResults(){
+        //  This is somethi
         if(this.searchSidebarViewOptions.trim().length > 0){
             let filteredTags = this.tags.filter(tag => {
                 return tag.name.toLowerCase().includes(this.searchSidebarViewOptions.toLowerCase())
@@ -363,7 +407,6 @@ export default {
         return icon;
     },
     pinThisOption(labels, option){
-        console.log(labels, option);
 
         if(this.sections[labels][option.id]){
             delete this.sections[labels][option.id];
@@ -409,8 +452,26 @@ export default {
             return this.activeTags[id];
         }
     },
-    saveSidebarPins(){
+    async saveSidebarPins(){
         this.sidebarViewOptionShow = false;
+        let pins = {
+            inboxes: Object.keys(this.activeInboxes),
+            tags: Object.keys(this.activeTags)
+        };
+
+        let response = await fetch("https://app.helpwise.io/api/setUserSidebarPins.php.php", {
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify({
+                pins
+            })
+        });
+
+        response = await response.json();
+
+        if(response.status == "success"){
+            this.$toast.success("Settings saved successfully");
+        }
     }
   }
 };
@@ -426,6 +487,15 @@ export default {
     .bookmarkIcon.isActive{
         stroke: green;
         fill: green;
+    }
+
+    .sidebarViewOptionButton{
+        /* transform: rotateZ(0deg);
+        transition: transform 250ms ease; */
+    }
+
+    .sidebarViewOptionButton.open{
+        /* transform: rotateZ(45deg); */
     }
 
 </style>

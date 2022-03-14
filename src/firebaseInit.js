@@ -25,11 +25,12 @@ const firebaseConfig = {
 };
 // // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-var firebase_app = firebase.initializeApp(firebaseConfig, `HW-inbox-${
+export const firebase_app = firebase.initializeApp(firebaseConfig, `HW-inbox-${
     generateRandomString()
 }`);
+
 var firebase_analytics = firebase.analytics();
-export default function initFirebase() {
+export function initFirebase() {
     let userID = store.state.userInfo.id;
     let accountID = store.state.userInfo.accountID;
     fetch("https://app.helpwise.io/api/get_socket_token.php", {credentials: "include"}).then(async (response) => {
