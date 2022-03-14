@@ -1523,6 +1523,332 @@
                         </div>
                     </div>
 
+                    <!-- Component for Thuosci -->
+                    <div class="pd-y-10" v-if= "sidebar.type == 'thuosci'">
+                        <div class="integration-collapse-body shadow-sm bg-white rounded" style="border-style: solid;border-width: thin;border-color: rgb(210, 210, 210);">
+                            <div class="collapse-header row custom-header" style="cursor: pointer;">
+                                <div v-if="sidebar.class != 'order'" class="col-8">
+                                    <p class="pd-l-13 pd-t-15 pd-b-10 mg-b-0">
+                                        <i :class="sidebar.icon"></i>
+                                        <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:5px;margin-right:5px;">{{ sidebar.title }}</span>
+                                        <!-- <i v-if="sidebar.update==1 && sidebar.component_type=='single'" class="fas fa-xs fa-pen" :class="integrationName + '_' + sidebar.class + '_edit_button'" @click="openUpdateForm(sidebar.class, sidebar.components[0], integrationName)"></i> -->
+                                    </p>  
+                                </div>
+                                <div v-else class="col-8">
+                                    <div class="col-8">
+                                        <p class="pd-l-13 pd-t-15 pd-b-10 mg-b-0">
+                                            <i :class="sidebar.icon"></i>
+                                            <span class="text-truncate" style="max-width:135px;display:inline_block;white-space:initial;margin-left:5px;margin-right:5px;">{{ sidebar.title }}</span>
+                                            <!-- <i v-if="sidebar.update==1 && sidebar.component_type=='single'" class="fas fa-xs fa-pen" :class="integrationName + '_' + sidebar.class + '_edit_button'" @click="openUpdateForm(sidebar.class, sidebar.components[0], integrationName)"></i> -->
+                                        </p> 
+                                    </div>
+                                    <div class="col-4">
+                                        <p class="pd-r-10 text-right">{{ sidebar.count }}</p>
+                                    </div> 
+                                </div>
+                                <div class="col-4 pd-t-15" @click="collapseHeader('.' + sidebar.class + '_integration_collapsible')">
+                                    <p class="integration_collapse_header pd-r-10 text-right">
+                                        <i class="fas fa-caret-up" :class="sidebar.class + '_integration_collapsible_caret'" style="color: silver;border-radius:5px;"></i>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="pd-l-0 pd-b-1 collapse show" :class="sidebar.class + '_integration_collapsible'"  style="word-wrap: break-word;line-height: 1.5;">
+                                
+                                <!-- Single Component -->
+                                <div v-if="sidebar.component_type == 'single'" class="col s12">
+                                    <p v-for= "(component, index) in sidebar.components[0]"
+                                        :key = "index"
+                                    >
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='email' || component.type=='dropdown_api') && component.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">
+                                            {{ component.label }}
+                                        </span>
+                                        <br v-if="(component.type=='text' || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='tags' || component.type=='tags' || component.type=='email' || component.type=='dropdown_api') && component.show == 1">
+                                        <span v-if="(component.type=='text'  || component.type=='dropdown' || component.type=='date' || component.type=='time' || component.type=='datetime' || component.type=='number' || component.type=='email' || component.type=='dropdown_api') && component.show == 1" style="color:#4f5d6b;font-size:13px;">
+                                            {{component.value ? component.value : 'No ' + component.label}}
+                                        </span>
+                                        <span v-else-if="component.type=='link' && component.show == 1">
+                                            <a :href="component.value" target="_blank">{{component.label}}
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                </svg>
+                                            </a>
+                                        </span>
+                                        <span v-else-if="(component.type=='button' || component.type=='api_button') && component.show == 1">
+                                            <button type="button" class="mb-2 btn btn-xs btn-primary" :class="component.class" @click="buttonFunction(component.api, integrationName, integrationID, sidebar.components[0], '')">{{ component.label }}</button>
+                                        </span>
+                                        <span v-else-if="component.type=='link_button' && component.show == 1">
+                                            <a :href="component.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="component.class">{{ component.label }}</button></a>
+                                        </span>
+                                        <span v-else-if="component.type=='tags' && component.show == 1">
+                                            <span v-for= "(tag, index) in component.value"
+                                            :key= "index"
+                                            >
+                                                <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                            </span>
+                                        </span>
+                                        <span v-else-if="(component.type=='single_component' || component.type=='multiple_component') && component.show == 1">
+                                            <div class="collapse-body shadow-sm bg-white rounded mg-y-10" style="border-style: solid; border-width: thin; border-color: rgb(210, 210, 210);">
+                                                <div class="collapse-header row custom-header" style="cursor: pointer;">
+                                                    <div class="col-8">
+                                                        <p class="pd-l-13 pd-t-15 pd-b-10 mg-b-0">
+                                                            {{ component.label }}
+                                                        </p>  
+                                                    </div>
+                                                    <div class="col-4 pd-t-15" @click="collapseHeader('.' + component.class + sidebar.components[0][0].value + '_integration_collapsible')">
+                                                        <p class="integration_collapse_header pd-r-10 text-right">
+                                                            <i class="fas fa-caret-up" :class="component.class +  sidebar.components[0][0].value + '_integration_collapsible_caret'" style="color: silver;border-radius:5px;"></i>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="pd-l-0 pd-b-1 collapse show" :class="component.class + sidebar.components[0][0].value + '_integration_collapsible'"  style="word-wrap: break-word;line-height: 1.5;">
+                                                    <!-- Single Component -->
+                                                    <div v-if="component.type == 'single_component'" class="col s12">
+                                                        <p v-for= "(comp, index) in component.value"
+                                                            :key = "index"
+                                                        >
+                                                            <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list' || comp.type=='email') && comp.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ comp.label }}</span><br v-if="(comp.type=='text' || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='tags' || comp.type=='list' || comp.type=='email') && comp.show == 1">
+                                                            <span v-if="(comp.type=='text'  || comp.type=='dropdown' || comp.type=='date' || comp.type=='time' || comp.type=='datetime' || comp.type=='number' || comp.type=='email') && comp.show == 1" style="color:#4f5d6b;font-size:13px;">{{comp.value ? comp.value : 'No ' + comp.label}}</span>
+                                                            <span v-else-if="comp.type=='link' && comp.show == 1">
+                                                                <a :href="comp.value" target="_blank">{{comp.label}}
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                                        <polyline points="15 3 21 3 21 9"></polyline>
+                                                                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                    </svg>
+                                                                </a>
+                                                            </span>
+                                                            <span v-else-if="(comp.type=='button' || comp.type=='api_button') && comp.show == 1">
+                                                                <button type="button" class="mb-2 btn btn-xs btn-primary" :class="comp.class" @click="buttonFunction(comp.api, integrationName, integrationID, component, '')">{{ comp.label }}</button>
+                                                            </span>
+                                                            <span v-else-if="comp.type=='link_button' && comp.show == 1">
+                                                                <a :href="comp.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="comp.class">{{ comp.label }}</button></a>
+                                                            </span>
+                                                            <span v-else-if="comp.type=='tags' && comp.show == 1">
+                                                                <span v-for= "(tag, index) in comp.value"
+                                                                :key= "index"
+                                                                >
+                                                                    <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                                                </span>
+                                                            </span>
+                                                        </p>                  
+                                                    </div>
+
+                                                    <!-- Multiple Component -->
+                                                    <div v-else-if="component.type == 'multiple_component'" class="pd-5">
+                                                        <div class="card rounded mg-b-10" v-for= "(compo, index) in component.value"
+                                                        :key= "index"
+                                                        >
+                                                            <div class="d-flex align-items-center justify-content-between bg-gray-100" style="padding: 15px;">
+                                                                <span style="font-size:13px;">{{ compo[1].value }}</span>    
+                                                                <div>
+                                                                    <!-- <span style="cursor:pointer;" :class="integrationName + '_edit_' + sidebar.class + '_button'" class="mg-r-10" v-if="sidebar.update == 1" @click="openUpdateForm(sidebar.class, component, integrationName)"><i class="fas fa-pen fa-xs"></i></span> -->
+                                                                    <span style="cursor:pointer;" @click="collapseHeader('.' + integrationName + '_' + component.class + '_' + compo[0].value)">
+                                                                        <i class="fas fa-caret-down" :class="integrationName + '_' + component.class + '_' + compo[0].value + '_caret'" style="color: silver;border-radius:5px;"></i>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="mg-l-10 mg-r-10 collapse" :class="integrationName + '_' + component.class + '_' + compo[0].value">
+                                                                <p v-for= "(com, index) in compo"
+                                                                    :key = "index"
+                                                                >   
+                                                                    <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags' || com.type=='list') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags' || com.type=='list') && com.show == 1">
+                                                                    <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
+                                                                    <span v-else-if="com.type=='link' && com.show == 1">
+                                                                        <a :href="com.value" target="_blank">{{com.label}}
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                                                <polyline points="15 3 21 3 21 9"></polyline>
+                                                                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                                            </svg>
+                                                                        </a>
+                                                                    </span>
+                                                                    <span v-else-if="com.type=='link_button' && com.show == 1">
+                                                                        <a :href="com.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="com.class">{{ com.label }}</button></a>
+                                                                    </span>
+                                                                    <span v-else-if="com.type=='tags' && com.show == 1">
+                                                                        <span v-for= "(tag, index) in com.value"
+                                                                        :key= "index"
+                                                                        >
+                                                                            <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                                                        </span>
+                                                                    </span>
+                                                                </p>  
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>  
+                                        </span>
+                                    </p>                  
+                                </div>
+
+                                <!-- Multiple Component -->
+                                <div v-else-if="sidebar.component_type == 'multiple'" class="pd-5">
+                                    <div class="card" style="border-left: none; border-right: none; border-radius: 0px;" v-for= "(component, index) in sidebar.components"
+                                        :key= "index"
+                                    >
+                                        <div class="d-flex align-items-center justify-content-between" style="padding: 15px;">
+                                            <span style="font-size:13px;">{{ component[0].value }}</span>    
+                                            <div>
+                                                <!-- <span style="cursor:pointer;" :class="integrationName + '_edit_' + sidebar.class + '_button'" class="mg-r-10" v-if="sidebar.update == 1" @click="openUpdateForm(sidebar.class, component, integrationName)"><i class="fas fa-pen fa-xs"></i></span> -->
+                                                <span style="cursor:pointer;" @click="collapseHeader('.' + integrationName + '_' + sidebar.class + '_' + component[0].value)"><i class="fas fa-caret-down" :class="integrationName + '_' + sidebar.class + '_' + component[0].value + '_caret'" style="color: silver;border-radius:5px;"></i></span>
+                                            </div>
+                                        </div>
+                                        <div class="mg-l-10 mg-r-10 collapse" :class="integrationName + '_' + sidebar.class + '_' + component[0].value">
+                                            <p v-for= "(com, index) in component"
+                                                :key = "index"
+                                            >   
+                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='dropdown_api' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags') && com.show == 1" style="color:#999da0ad;font-size:13px;" class="mg-t-5">{{ com.label }}</span><br v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='dropdown_api' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number' || com.type=='tags') && com.show == 1">
+                                                <span v-if= "(com.type=='text' || com.type=='dropdown' || com.type=='dropdown_api' || com.type=='date' || com.type=='time' || com.type=='datetime' || com.type=='number') && com.show == 1" style="color:#4f5d6b;font-size:13px;">{{com.value ? com.value : 'No ' + com.label}}</span>
+                                                <span v-else-if="com.type=='link' && com.show == 1">
+                                                    <a :href="com.value" target="_blank">{{com.label}}
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                                                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                            <polyline points="15 3 21 3 21 9"></polyline>
+                                                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                                                        </svg>
+                                                    </a>
+                                                </span>
+                                                <span v-else-if="com.type=='link_button' && com.show == 1">
+                                                    <a :href="com.value" target="_blank"><button type="button" class="mb-2 btn btn-xs btn-secondary" :class="com.class">{{ com.label }}</button></a>
+                                                </span>
+                                                <span v-else-if="com.type=='tags' && com.show == 1">
+                                                    <span v-for= "(tag, index) in com.value"
+                                                    :key= "index"
+                                                    >
+                                                        <span style="background-color:#737e8a; color:white; margin-left:0.125rem; margin-right:0.125rem;" class="badge badge-pill">{{ tag }}</span><br>
+                                                    </span>
+                                                </span>
+                                                <span v-else-if="(com.type=='single_component' || com.type=='multiple_component' || com.type=='no_component')">
+                                                    <div class="card mg-12" style="border-radius: 10px; border-width: 1.5px; border-color: #297acf; margin-bottom: 10px;">
+                                                        <div class="d-flex align-items-center justify-content-center" style="padding: 10px;">
+                                                            <a :href="'https://internal.thuocsi.vn/cs/ticket/new?orderId=' + component[0].value" target="_blank">
+                                                                <span style="cursor:pointer; margin-right: 4px;"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1d74cf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg></span>
+                                                                <span style="font-size:13px; color: #297acf; font-weight: 100; cursor:pointer;">Add New Ticket</span>
+                                                            </a>
+                                                        </div>   
+                                                    </div>
+                                                    <!-- Multiple Component -->
+                                                    <div v-if="com.type == 'multiple_component' && com.value.length!=0" class="pd-5">
+                                                        <div class="card mg-12" style="border-radius: 10px; border-width: 1.5px; border-color: #cad6e6;border-left-width: 3px; border-left-color: #768aa0; margin-bottom: 10px;" v-for= "(compo, index) in com.value"
+                                                        :key= "index"
+                                                        >
+                                                            <div class="d-flex align-items-center justify-content-between" style="padding: 10px;">
+                                                                <span style="font-size:13px;">{{ compo[1].value }}</span>
+                                                                <div>    
+                                                                    <span style="color:#4f5d6b;font-size:12px;">{{ compo[4].value }}</span>
+                                                                    <span class="view-order-ticket" style="cursor:pointer;" @click="openThucosiModal(compo)"><svg xmlns="http://www.w3.org/2000/svg" title="" width="15" height="15" data-toggle="tooltip" viewBox="0 0 24 24" fill="none" stroke="#f7c179" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></span>
+                                                                    <span style="cursor:pointer;"><a :href="'https://internal.thuocsi.vn/cs/ticket/my-ticket?ticketCode='+compo[1].value" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#84aed9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-right-circle"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></span>
+                                                                </div>   
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                            </p>  
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- No Component -->
+                                <div v-if="sidebar.component_type == 'no'" class="col s12" :class="'no_' + sidebar.class + '_component'">
+                                    <p style="color:#4f5d6b;">{{ sidebar.text }}</p>
+                                    <p v-if="sidebarData.create[sidebar.class] && !openCreateFormArrayInternal[sidebar.class]" style="color:#0168fa; cursor:pointer;" @click="openCreateForm(sidebar.class)">Create new {{ sidebar.class }}</p>
+                                </div>
+
+                                <!-- Create Form -->
+                                <div class="col s12 pd-x-0" :class="integrationName + '_create_' + sidebar.class + '_form'" v-if="sidebarData.create[sidebar.class] && openCreateFormArrayInternal[sidebar.class]">
+                                    <form :class="'create_'+sidebar.class+'_form_field'">
+                                        <fieldset class="form-fieldset pd-x-10" style="border: none;">
+
+                                            <div v-for = "(createComponent, index) in sidebarData.create[sidebar.class].components"
+                                                :key = "index"
+                                                class="form-group">
+                                                <label v-if="createComponent.type!='button' && createComponent.type!='input_field' && createComponent.type!='add_field'" class="d-block">{{ createComponent.label }}</label>
+                                                <input v-if="createComponent.type == 'text' || createComponent.type == 'number'" min="0" :max="createComponent.type == 'number' ? createComponent.max : ''" :type="createComponent.type" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class"
+                                                :placeholder="createComponent.placeholder">
+                                                <input v-else-if="createComponent.type == 'email'" type="email" class="form-control" :class="integrationName + '_create_' + sidebar.class + '_' + createComponent.class" :value="createComponent.value" readonly="true">
+                                                <select v-if="createComponent.type == 'dropdown'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class">
+                                                    <option v-for= "(option, index) in createComponent.dropdown"
+                                                    :key= "index"
+                                                    :value="option.value">{{ option.label }}
+                                                    </option>
+                                                </select>
+                                                <select v-if="createComponent.type == 'dropdown_api'" class="form-control custom-select" :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" @change="callRandomApi(integrationName, createComponent.class, createComponent.api, integrationID, createComponent.attributes, createComponent.email, $event, 'create', sidebar.class, createComponent.type, '')">
+                                                    <option v-for= "(option, index) in createComponent.dropdown"
+                                                    :key= "index"
+                                                    :value="option.value">{{ option.label }}
+                                                    </option>
+                                                </select>
+                                                <span v-if="createComponent.type=='button'">
+                                                    <div :class="'create_'+ sidebar.class + '_' + createComponent.class + '_div'">
+                                                        <div v-for= "(dropdownValue, index) in randomDropdown"
+                                                        :key= "index"
+                                                        >
+                                                            <div v-if="dropdownValue!=''" class="mg-t-10 d-flex align-items-center justify-content-between">
+                                                                <div class="form-group pd-l-0" style="width: -webkit-fill-available;">
+                                                                    <label class="d-block">{{ capitalizeFirstLetter(createComponent.class) }} {{ index + 1 }}</label>
+                                                                    <input type="text" :name="'create_'+createComponent.name" :value="dropdownValue" class="form-control" readonly>
+                                                                </div>
+                                                                <div class="form-group mg-b-0 pd-l-10">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index, dropdownValue)">
+                                                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                                    </svg>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" class="mb-2 btn btn-xs btn-primary" :class="createComponent.class" @click="addRandomData(createComponent, integrationName, integrationID, sidebar.class, 'create','create_'+ sidebar.class + '_' + createComponent.class + '_div')">{{ createComponent.label }}</button>
+                                                </span>
+                                                <span v-if="createComponent.type=='add_field'">
+                                                    <div :class="'create_'+ sidebar.class + '_' + createComponent.class + '_div'">
+                                                        <div v-for= "(emailValue, index) in guestEmails"
+                                                        :key= "index"
+                                                        class="d-flex align-items-center justify-content-between">
+                                                            <div class="form-group pd-l-0" style="width: -webkit-fill-available;">
+                                                                <label class="d-block">{{ capitalizeFirstLetter(createComponent.class) }} {{ index + 1 }}</label>
+                                                                <input type="text" class="form-control" :placeholder="createComponent.placeholder" :name="'create_'+createComponent.name" :value="emailValue">
+                                                            </div>
+                                                            <div class="form-group mg-b-0 pd-l-10">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" @click="removeRandomData(index, emailValue)">
+                                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" class="mb-2 btn btn-xs btn-primary" :class="createComponent.class" @click="addRandomData(createComponent, integrationName, integrationID, sidebar.class, 'create','create_'+ sidebar.class + '_' + createComponent.class + '_div')">{{ createComponent.label }}</button>
+                                                </span>
+                                                <span v-else-if="createComponent.type=='date'">
+                                                    <date-picker :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" :open.sync="newDateOpen" @change="handleChange" type="date" v-model="date" value-type="timestamp" :showMinute="false" :showSecond="false" :default-value="new Date()" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date" :clearable="false" style="width: 100%;"></date-picker>
+                                                </span>
+                                                <span v-else-if="createComponent.type=='time'">
+                                                    <date-picker :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" :open.sync="newTimeOpen" @change="handleChange2" type="time" v-model="time" value-type="timestamp" :showSecond="false" :disabled-time="notBeforeNow" placeholder="Select Time" :clearable="false" style="width: 100%;"></date-picker>
+                                                </span>
+                                                <span v-else-if="createComponent.type=='datetime'">
+                                                    <date-picker :class="integrationName + '_create_' + sidebar.class + '_'  + createComponent.class" :open.sync="newDateOpen" @change="handleChange" type="datetime" v-model="datetime" value-type="timestamp" :minute-step="1" :showSecond="false" :default-value="new Date().setHours(new Date().getHours() + 1, 0, 0, 0)" :disabled-date="notBeforeToday" :disabled-time="notBeforeNow" placeholder="Select Date & Time" :clearable="false" style="width: 100%;"></date-picker>
+                                                </span>
+                                                <div class="invalid-feedback" :class="integrationName + '-create-' + sidebar.class + '-' + createComponent.class + '-error'"></div>
+                                            </div>
+                                            
+                                            <div :class="integrationName + '-create-' + sidebar.class + '-btn-progress'" style="display: flex; justify-content: space-between;">
+                                                <button type="button"
+                                                    class="btn btn-xs btn-primary" @click="createData(sidebar.class, sidebarData.create[sidebar.class].components, integrationName, integrationID)">Create {{sidebar.class}}
+                                                </button>
+                                                <button type="button"
+                                                    class="btn btn-xs btn-secondary" @click="openCreateForm(sidebar.class)">Cancel
+                                                </button>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -1741,8 +2067,29 @@ export default {
                     $(`.${int_name}-create-${className}-${identifier}-error`).text(`${identifier_label} cannot be empty`);
                     flag=1;
                 }else{
-                    $(`.${int_name}_create_${className}_${identifier}`).removeClass('is-invalid');
-                    $(`.${int_name}-create-${className}-${identifier}-error`).text('');
+                    if(component.required == 1 && component.type == 'number'){
+                        if(identifier_value < 0 || (component.max!='' && identifier_value > component.max)){
+                            $(`.${int_name}_create_${className}_${identifier}`).removeClass('is-valid').addClass('is-invalid');
+                            $(`.${int_name}-create-${className}-${identifier}-error`).text(`Please enter valid ${identifier_label}`);
+                            flag=1;
+                        }else{
+                            $(`.${int_name}_create_${className}_${identifier}`).removeClass('is-invalid');
+                            $(`.${int_name}-create-${className}-${identifier}-error`).text('');
+                        }
+                    }else if(component.required == 1 && component.type == 'datetime1'){
+                        let identifier_value1 = $(`.${int_name}_create_${className}_start_date`).children().children().val();
+                        if(moment(identifier_value1).format("X") >= moment(identifier_value).format("X")){
+                            $(`.${int_name}_create_${className}_${identifier}`).removeClass('is-valid').addClass('is-invalid');
+                            $(`.${int_name}-create-${className}-${identifier}-error`).text(`End time must be greater than Start time`);
+                            flag=1;
+                        }else{
+                            $(`.${int_name}_create_${className}_${identifier}`).removeClass('is-invalid');
+                            $(`.${int_name}-create-${className}-${identifier}-error`).text('');
+                        }
+                    }else{
+                        $(`.${int_name}_create_${className}_${identifier}`).removeClass('is-invalid');
+                        $(`.${int_name}-create-${className}-${identifier}-error`).text('');
+                    }
                 }
                 createFormData[identifier] = identifier_value;
                 if(component.type == 'button' || component.type == 'add_field'){
@@ -1791,17 +2138,17 @@ export default {
                         const error = (createResponse && createResponse.message) || response.status;
                         return Promise.reject(error);
                     }
+                    this.openCreateFormArrayInternal[className] = false;
+                    this.randomData = {};
+                    this.randomDropdown = [];
+                    this.guestEmails = [];
+                    this.arrayObject = [];
+                    this.$emit("postData", int_name);
                 })
                 .catch(error => {
                     this.errorMessage = error;
                     console.error("There was an error!", error);
                 });
-                this.openCreateFormArrayInternal[className] = false;
-                this.randomData = {};
-                this.randomDropdown = [];
-                this.guestEmails = [];
-                this.arrayObject = [];
-                this.$emit("postData", int_name);
             }
         },
         updateData(className, components, int_name, int_id){
@@ -1820,8 +2167,29 @@ export default {
                     $(`.${int_name}-edit-${className}-${identifier}-error`).text(`${identifier_label} cannot be empty`);
                     flag=1;
                 }else{
-                    $(`.${int_name}_edit_${className}_${identifier}`).removeClass('is-invalid');
-                    $(`.${int_name}-edit-${className}-${identifier}-error`).text('');
+                    if(component.required == 1 && component.type == 'number'){
+                        if(identifier_value < 0 || (component.max!='' && identifier_value > component.max)){
+                            $(`.${int_name}_edit_${className}_${identifier}`).removeClass('is-valid').addClass('is-invalid');
+                            $(`.${int_name}-edit-${className}-${identifier}-error`).text(`Please enter valid ${identifier_label}`);
+                            flag=1;
+                        }else{
+                            $(`.${int_name}_edit_${className}_${identifier}`).removeClass('is-invalid');
+                            $(`.${int_name}-edit-${className}-${identifier}-error`).text('');
+                        }
+                    }else if(component.required == 1 && component.type == 'datetime1'){
+                        let identifier_value1 = $(`.${int_name}_edit_${className}_start_date`).children().children().val();
+                        if(moment(identifier_value1).format("X") >= moment(identifier_value).format("X")){
+                            $(`.${int_name}_edit_${className}_${identifier}`).removeClass('is-valid').addClass('is-invalid');
+                            $(`.${int_name}-edit-${className}-${identifier}-error`).text(`End time must be greater than Start time`);
+                            flag=1;
+                        }else{
+                            $(`.${int_name}_edit_${className}_${identifier}`).removeClass('is-invalid');
+                            $(`.${int_name}-edit-${className}-${identifier}-error`).text('');
+                        }
+                    }else{
+                        $(`.${int_name}_edit_${className}_${identifier}`).removeClass('is-invalid');
+                        $(`.${int_name}-edit-${className}-${identifier}-error`).text('');
+                    }
                 }
                 updateFormData[identifier] = identifier_value;
                 if(component.type == 'button' || component.type == 'add_field'){
