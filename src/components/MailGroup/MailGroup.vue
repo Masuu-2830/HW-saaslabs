@@ -2252,9 +2252,10 @@ export default {
       let url =
         this.$apiBaseURL +
         "unifiedv2/getThreads.php?mailboxIDs[]=" +
-        (this.$route.params.mailboxId !== undefined
-          ? this.$route.params.mailboxId
-          : this.$store.state.inboxData.id) +
+        // (this.$route.params.mailboxId !== undefined
+        //   ? this.$route.params.mailboxId
+        //   : this.$store.state.inboxData.id) +
+        (this.$route.params.mailboxId !== undefined ? (this.$route.params.mailboxId == "me" ? "" : this.$route.params.mailboxId) : (this.$store.state.inboxData.id !== undefined ? this.$store.state.inboxData.id : "")) +
         "&page=" +
         this.currPage +
         "&labelID=" +

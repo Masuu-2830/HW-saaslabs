@@ -12,7 +12,7 @@ import {
     assignThread,
     unsnoozeThread
 } from './firebaseHW'
-const mailboxID = store.state.inboxData.id;
+// const mailboxID = store.state.inboxData.id;
 const firebaseConfig = {
     apiKey: "AIzaSyCCXmvojmIn-QkRKBP-ySP_CaUxNJTXDC0",
     authDomain: "helpwise-websocket-4752f.firebaseapp.com",

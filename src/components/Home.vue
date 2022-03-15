@@ -26,7 +26,7 @@ import SavedReply from './modals/SavedReply.vue';
 import ComposeWrapper from './ComposeWrapper.vue';
 import { bus } from "../main";
 import TweetCompose from './TweetCompose.vue';
-import { initFirebase } from "../firebaseInit.js";
+import initFirebase from "../firebaseInit.js";
 export default {
     name: 'Home',
     components: {
@@ -68,7 +68,8 @@ export default {
             let url =
                 this.$apiBaseURL +
                 "mailboxes.php?mailboxID=" +
-                (this.$route.params.mailboxId !== undefined ? this.$route.params.mailboxId : this.$store.state.inboxData.id); 
+                // (this.$route.params.mailboxId !== undefined ? this.$route.params.mailboxId : this.$store.state.inboxData.id); 
+                (this.$route.params.mailboxId !== undefined ? (this.$route.params.mailboxId == "me" ? "" : this.$route.params.mailboxId) : (this.$store.state.inboxData.id !== undefined ? this.$store.state.inboxData.id : "")); 
             const response = await fetch(url, {credentials: 'include'});
             const data = await response.json();
             console.log(data);
@@ -152,7 +153,7 @@ export default {
         console.log(this.$route.params.mailboxId, this.$route.params.type, this.$route.params.threadId, this.$store.state.inboxData.id,);
         let url =
                 "https://app.helpwise.io/api/ping.php?mailboxID=" +
-                (this.$route.params.mailboxId !== undefined ? this.$route.params.mailboxId : this.$store.state.inboxData.id); 
+                (this.$route.params.mailboxId !== undefined ? (this.$route.params.mailboxId == "me" ? "" : this.$route.params.mailboxId) : (this.$store.state.inboxData.id !== undefined ? this.$store.state.inboxData.id : "")); 
         const response1 = await fetch(url, {credentials: 'include'});
         const data1 = await response1.json();
         console.log(data1);
