@@ -580,6 +580,7 @@ import Vue from "vue";
 export default {
   name: "ChatContentCardReply",
   components: { DatePicker },
+  props: ["mailboxID"],
   data() {
     const self = this;
     return {
@@ -589,7 +590,6 @@ export default {
       files: [],
       draftID: null,
       threadID: null,
-      mailboxID: this.$store.state.inboxData.id,
       inReplyTo: null,
       editorInstance: null,
       datetime: "",
@@ -604,7 +604,7 @@ export default {
         imageUploadURL:
           "https://app.helpwise.io/api/uploadInlineAttachment.php",
         imageUploadParams: {
-          mailboxID: this.$route.params.mailboxId,
+          mailboxID: this.mailboxID,
           // emailID: this.emailID,
         },
         imageUploadMethod: "POST",
@@ -692,7 +692,7 @@ export default {
 
       triggerPromptNotif("Fetching saved reply data");
       fetch(
-        `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.$store.state.inboxData.id}&savedReplyID=${id}`,
+        `https://app.helpwise.io/api/savedReplies/get?mailboxID=${this.mailboxID}&savedReplyID=${id}`,
         { credentials: "include" }
       )
         .then((response) => response.json())

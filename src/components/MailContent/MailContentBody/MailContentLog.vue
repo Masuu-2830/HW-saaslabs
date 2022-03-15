@@ -1,9 +1,9 @@
 <template>
   <div
     v-if="
-      this.$store.state.inboxData.type == 'mail' ||
-      this.$store.state.inboxData.type == 'chat' ||
-      this.$store.state.inboxData.type == 'sms'
+      this.mailboxType == 'mail' ||
+      this.mailboxType == 'chat' ||
+      this.mailboxType == 'sms'
     "
     class="tx-12 thread-log row text-center assignment-log"
     style="padding-right: 40px"
@@ -72,6 +72,7 @@ export default {
   name: "MailContentLog",
   props: {
     item: Object,
+    mailboxType: String
   },
   data() {
     return {

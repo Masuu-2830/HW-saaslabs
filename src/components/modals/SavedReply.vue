@@ -130,10 +130,6 @@
                 } else {
                     this.errorInName = false;
                 }
-                
-                console.log($(`<div>${this.editorInstance.html.get()}</div>`).text(), $(`<div>${this.editorInstance.html.get()}</div>`).text().length);
-
-                console.log($(`<div>${this.editorInstance.html.get()}</div>`).find('img').length);
 
                 if($(`<div>${this.editorInstance.html.get()}</div>`).text().length == 0 && $(`<div>${this.editorInstance.html.get()}</div>`).find('img').length == 0){
                     this.errorInEditor = true;
@@ -147,10 +143,10 @@
                 if (!this.checkFormValidity()) {
                     return
                 }
-                console.log({
-                    name: this.savedReplyName,
-                    text: this.editorInstance.html.get()
-                });
+                // console.log({
+                //     name: this.savedReplyName,
+                //     text: this.editorInstance.html.get()
+                // });
                 this.isCreating = true;
                 const vueThis = this;
                 fetch(
@@ -169,7 +165,6 @@
                     }
                 ).then(response => response.json())
                 .then(response => {
-                    console.log("------ ", response);
                     if(response.status == success){
                         this.isCreating = false;
                         vueThis.$nextTick(() => {
@@ -185,11 +180,14 @@
                 this.editorInstance.html.insert(`{{${value}}}`);
             },
             fetchSavedReplies(){
-                fetch(
-                    `https://app.helpwise.io/api/list-saved-replies.php?mailboxID=${this.$store.state.inboxData.id}`,{credentials: "include"}
+                let fetchURL = 'https://app.helpwise.io/api/list-saved-replies.php';
+                if((this.$route.params.mailboxId && this.$route.params.mailboxId!='me') || (this.$store.state.inboxData && this.$store.state.inboxData.id)){
+                    let mailboxID = this.$route.params.mailboxId!='me' ? this.$route.params.mailboxId : this.$store.state.inboxData.id;
+                    fetchURL = `https://app.helpwise.io/api/list-saved-replies.php?mailboxID=${mailboxID}`;
+                }
+                fetch(fetchURL,{credentials: "include"}
                 ).then(response => response.json())
                 .then(response => {
-                    // console.log(response);
                     this.originalSavedReplies = response.data.savedReplies;
                     this.savedReplies = response.data.savedReplies;
                 })
@@ -201,7 +199,6 @@
                 this.editorInstance.html.set("");
             },
             insertSavedReplyInEditor(id){
-                console.log(this.type, id);
                 bus.$emit("modal.savedReplyInsert.click", id, this.type);
                 this.closeModal();
             },
@@ -223,7 +220,6 @@
 
             bus.$on("savedReply", (type) => {
                 this.$bvModal.show('saved-reply-modal');
-                console.log(type);
                 this.type = type;
             })
         }

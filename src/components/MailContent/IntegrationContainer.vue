@@ -55,7 +55,6 @@
         components:{IntegrationData, IntegrationSidebar, MailContactPanel},
         methods: {
             openIntegration(integrationData){
-                var mailboxID = this.$store.state.inboxData.id;
                 this.$emit("openInt", integrationData);
                 var primaryEmail = this.thread.data.contact.emails[0];
                 var primaryPhone = this.thread.data.contact.phones[0];
@@ -173,7 +172,7 @@
                             let date = moment().format("YYYY-MM-DD"); 
                             if(integrationData.lname == 'custom-app'){
                                 let pm_data = {};
-                                pm_data['mailbox_id'] = this.$route.params.mailboxId;
+                                pm_data['mailbox_id'] = this.thread.data.mailbox_id;
                                 pm_data['thread_id'] = threadID;
                                 pm_data['inbox_type'] = inboxType;
                                 pm_data['contact'] = contact;
@@ -219,11 +218,11 @@
                                 });
                             }else{
                                 if(integrationData.lname == 'easy-calendar' || integrationData.lname == 'google-calendar' || integrationData.lname == 'outlook-calendar'){
-                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id + "&date=" + date + "&contactID=" + contactID;
+                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.thread.data.mailbox_id + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id + "&date=" + date + "&contactID=" + contactID;
                                 }else if(integrationData.lname == 'asana' || integrationData.lname == 'clickup' || integrationData.lname == 'jira' || integrationData.lname == 'trello'){
-                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id + "&contactID=" + contactID;
+                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.thread.data.mailbox_id + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id + "&contactID=" + contactID;
                                 }else{
-                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.$route.params.mailboxId + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id + "&contactID=" + contactID;
+                                    fetchUrl = "https://app.helpwise.io/api/integration-vue/"+integrationData.lname+"/"+integrationData.lname+".php?mailbox_id=" + this.thread.data.mailbox_id + "&email=" + primaryEmail + "&phone=" + primaryPhone + "&inbox_type=" + inboxType + "&integration_id=" + integrationData.id + "&contactID=" + contactID;
                                 }
                                 fetch(fetchUrl, {credentials: 'include'})
                                 .then(async response => {
@@ -276,7 +275,7 @@
                 }
                 var inboxType = this.thread.data.mailboxType;
                 var threadID = this.thread.data.id;
-                var mailboxID = this.$store.state.inboxData.id;
+                var mailboxID = this.thread.data.mailbox_id;
                 var contactID = this.thread.data.contact.id;
                 if(integration_name == 'custom-app'){
 
@@ -326,7 +325,7 @@
             // }
         },
         created() {
-            fetch("https://app.helpwise.io/api/connected_integrations.php?mailbox_id=" + this.$store.state.inboxData.id, {credentials: 'include'})
+            fetch("https://app.helpwise.io/api/connected_integrations.php?mailbox_id=" + this.thread.data.mailbox_id, {credentials: 'include'})
             .then(async response => {
                 const data = await response.json();
                 let data2 = data.data;

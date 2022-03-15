@@ -6,7 +6,7 @@
             <MailGroup v-if="dataLoaded && loaded" :mailbox="mailbox" />
             <MailContent />
             <compose-wrapper></compose-wrapper>
-            <tweet-compose></tweet-compose>
+            <!-- <tweet-compose></tweet-compose> -->
         </div>
         <firebase-modal></firebase-modal>
         <HcArticles/>
@@ -65,15 +65,20 @@ export default {
     },
     methods: {
         async fetchSidebarStats() {
-            let url =
+            var url =
                 this.$apiBaseURL +
-                "mailboxes.php?mailboxID=" +
-                // (this.$route.params.mailboxId !== undefined ? this.$route.params.mailboxId : this.$store.state.inboxData.id); 
-                (this.$route.params.mailboxId !== undefined ? (this.$route.params.mailboxId == "me" ? "" : this.$route.params.mailboxId) : (this.$store.state.inboxData.id !== undefined ? this.$store.state.inboxData.id : "")); 
+                "mailboxes.php?mailboxID=" + this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me';
+            if(this.$route.params.mailboxId == 'me'){
+                url = this.$apiBaseURL + "/unified/stats.php";
+            }
             const response = await fetch(url, {credentials: 'include'});
             const data = await response.json();
             console.log(data);
-            this.mailbox = data.data.mailbox;
+            if(this.$route.params.mailboxId == 'me'){
+                this.mailbox = data.data;
+            }else{
+                this.mailbox = data.data.mailbox;
+            }
             this.dataLoaded = true;
         },
         async fetchMailBoxes() {
@@ -90,9 +95,7 @@ export default {
         },
         async fetchMailBoxData() {
             console.log(this.$route.params.mailboxId);
-            let url =
-                "https://app.helpwise.io/api/ping.php?mailboxID=" +
-                (this.$route.params.mailboxId !== undefined ? this.$route.params.mailboxId : this.$store.state.inboxData.id); 
+            let url ="https://app.helpwise.io/api/ping.php?mailboxID=" +this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me'; 
             const response = await fetch(url, {credentials: 'include'});
             const data = await response.json();
             console.log(data);
@@ -101,9 +104,7 @@ export default {
             await this.$store.dispatch('fetchPingDetails', data);
         },
         async fetchAliases() {
-            let url =
-                "https://app.helpwise.io/api/getFromAddresses.php?mailboxId=" +
-                (this.$route.params.mailboxId !== undefined ? this.$route.params.mailboxId : this.$store.state.inboxData.id); 
+            let url ="https://app.helpwise.io/api/getFromAddresses.php?mailboxId=" + this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me'; 
             const response = await fetch(url, {credentials: 'include'});
             const data = await response.json();
             console.log(data);
@@ -147,13 +148,17 @@ export default {
         this.fetchAliases();
         this.fetchUserSignature();
         // this.fetchContacts();
-        document.title = "Helpwise (" + this.mailbox.stats.mine + ")";
+        console.log("this.mailbox ka count",this.mailbox);
+        if(this.$route.params.mailboxId == 'me'){
+            document.title = "Helpwise (" + this.mailbox.mine + ")";
+        }else{
+            document.title = "Helpwise (" + this.mailbox.stats.mine + ")";
+        }
     },
     async beforeCreate() {
-        console.log(this.$route.params.mailboxId, this.$route.params.type, this.$route.params.threadId, this.$store.state.inboxData.id,);
-        let url =
-                "https://app.helpwise.io/api/ping.php?mailboxID=" +
-                (this.$route.params.mailboxId !== undefined ? (this.$route.params.mailboxId == "me" ? "" : this.$route.params.mailboxId) : (this.$store.state.inboxData.id !== undefined ? this.$store.state.inboxData.id : "")); 
+        console.log(this.$route.params);
+        console.log("this dhikhao",this);
+        let url ="https://app.helpwise.io/api/ping.php?mailboxID=" + this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me'; 
         const response1 = await fetch(url, {credentials: 'include'});
         const data1 = await response1.json();
         console.log(data1);
