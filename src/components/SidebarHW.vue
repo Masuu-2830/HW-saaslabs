@@ -112,6 +112,19 @@
           >
             Compose
           </button>
+          <button
+            v-if="this.mailbox.type == 'universal'"
+            @click="openCompose('universalMail')"
+            class="
+              tx-uppercase
+              mailComposeBtn
+              tx-10 tx-medium tx-sans tx-spacing-4
+              btn btn-primary
+            "
+            style="border-right: 2px solid #0153c7 !important"
+          >
+            Compose
+          </button>
         </div>
       </div>
       <div class="pd-b-10 pd-l-10">
