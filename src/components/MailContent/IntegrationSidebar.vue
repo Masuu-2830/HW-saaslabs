@@ -1861,7 +1861,7 @@ import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
 export default {
     components: { DatePicker },
-    props: ["sidebarData", "integrationName", "dataStatus","openCreateFormArray","openUpdateFormArray", "integrationID", "errorMsg", "commentData"],
+    props: ["sidebarData", "integrationName", "dataStatus","openCreateFormArray","openUpdateFormArray", "integrationID", "errorMsg", "commentData", "thread"],
     data(){
         return {
             formData: {},
@@ -2143,7 +2143,20 @@ export default {
                     this.randomDropdown = [];
                     this.guestEmails = [];
                     this.arrayObject = [];
-                    this.$emit("postData", int_name);
+                    if(int_name == 'easy-calendar' || int_name == 'google-calendar' || int_name == 'outlook-calendar'){
+                        let calendarData = {
+                            "int_name": int_name,
+                            "int_id": int_id,
+                            "date": $(`.${int_name}_search_event`).children().children().val(),
+                            "contactID": this.thread.data.contact.id,
+                            "email": this.thread.data.contact.emails[0],
+                            "inboxType": this.thread.data.mailboxType,
+                            "mailbox_id": this.thread.data.mailbox_id
+                        };
+                        this.$emit('calendarIntegration',calendarData);
+                    }else{
+                        this.$emit("postData", int_name);
+                    }
                 })
                 .catch(error => {
                     this.errorMessage = error;
@@ -2427,9 +2440,18 @@ export default {
             }
         },
         searchEvent(value, type) {
-            if (type === 'minute') {
-                this.searchDateOpen = false;
-            }
+            console.log("value",value);
+            this.searchDateOpen = false;
+            let calendarData = {
+                "int_name": this.integrationName,
+                "int_id": this.integrationID,
+                "date": moment(value).format("YYYY-MM-DD"),
+                "contactID": this.thread.data.contact.id,
+                "email": this.thread.data.contact.emails[0],
+                "inboxType": this.thread.data.mailboxType,
+                "mailbox_id": this.thread.data.mailbox_id
+            };
+            this.$emit('calendarIntegration',calendarData);
         },
         handleChange(value, type) {
             if (type === 'minute') {

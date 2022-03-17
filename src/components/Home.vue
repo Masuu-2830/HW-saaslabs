@@ -66,6 +66,15 @@ export default {
       this.fetchSidebarStats();
     });
   },
+  watch:{
+      $route (to, from) {
+          if(to.params.mailboxId && to.params.mailboxId !== from.params.mailboxId) {
+              this.fetchMailBoxData();
+              this.fetchSidebarStats();
+              this.fetchAliases();
+          }
+      }
+  },
   methods: {
     async fetchSidebarStats() {
       var url =
@@ -106,10 +115,7 @@ export default {
     async fetchMailBoxData() {
       console.log(this.$route.params.mailboxId);
       let url =
-        "https://app.helpwise.io/api/ping.php?mailboxID=" +
-          this.$route.params.mailboxId ||
-        (this.$store.inboxData && this.$store.inboxData.id) ||
-        "me";
+        "https://app.helpwise.io/api/ping.php?mailboxID=" + this.$route.params.mailboxId || (this.$store.inboxData && this.$store.inboxData.id) || "me";
       const response = await fetch(url, { credentials: "include" });
       const data = await response.json();
       console.log(data);
@@ -135,45 +141,28 @@ export default {
       await this.$store.dispatch("fetchAliases", data.data);
     },
     fetchUserSignature() {
-      fetch(
-        this.$apiBaseURL +
-          "signatures/list.php?mailboxId=" +
-          this.$route.params.mailboxId,
-        { credentials: "include" }
-      )
-        .then(async (response) => {
+      fetch(this.$apiBaseURL + "signatures/list.php?mailboxId=" + this.$route.params.mailboxId, {credentials: "include"})
+      .then(async response => { 
           const data = await response.json();
           if (data.status !== "success") {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          console.log(data.data);
-          // await this.$store.dispatch('fetchUserSignature', data.data);
-          let signatureId = data.data[0] && data.data[0].id;
-          if (signatureId) {
-            fetch(this.$apiBaseURL + "signatures/get.php?id=" + signatureId, {
-              credentials: "include",
-            })
-              .then(async (response) => {
-                const data = await response.json();
-                if (data.status !== "success") {
-                  const error = (data && data.message) || response.status;
-                  return Promise.reject(error);
-                }
-                console.log(data);
-                let signature = data.data.signature;
-                console.log(signature);
-                await this.$store.dispatch("fetchUserSignature", signature);
-              })
-              .catch((error) => {
-                alert(error);
-              });
-          }
-        })
-        .catch((error) => {
-          alert(error);
-        });
+          console.log(data);
+          let signature = data.data.signature;
+          console.log(signature);
+          await this.$store.dispatch("fetchUserSignature", signature);
+      })
+      .catch((error) => {
+        alert(error);
+      });
     },
+    async fetchContacts() {
+          const response = await fetch(this.$apiBaseURL + "contacts.php", {credentials: 'include'});
+          const data = await response.json();
+          console.log(data);
+          // this.mailboxes = data.data.mailboxes;
+      },
   },
   async beforeMount() {
     await this.fetchSidebarStats();
