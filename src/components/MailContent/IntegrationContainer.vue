@@ -20,8 +20,10 @@
                 :errorMsg= "errorMsg"
                 :openCreateFormArray= "openCreateFormArray"
                 :openUpdateFormArray= "openUpdateFormArray"
+                :thread= "thread"
                 @postData= "postData"
                 @pmIntegration= "pmIntegration"
+                @calendarIntegration= "calendarIntegration"
                 :commentData = "commentData"
             />
         </div>
@@ -320,9 +322,39 @@
                     this.commentData[comment[0].value] = [];
                 });
             },
-            // commentData(comments){
-            //     this.commentData = comments;
-            // }
+            calendarIntegration(calendarData){
+                console.log("calendarData dhikhao",calendarData);
+                fetch("https://app.helpwise.io/api/integration-vue/"+calendarData.int_name+"/"+calendarData.int_name+".php?mailbox_id=" + calendarData.mailbox_id + "&email=" + calendarData.email + "&inbox_type=" + calendarData.inboxType + "&integration_id=" + calendarData.int_id + "&date=" + calendarData.date + "&contactID=" + calendarData.contactID, {credentials: 'include'})
+                .then(async response => {
+                    const integrationData = await response.json();
+                    let integrationData2 = integrationData.data;
+                    if(integrationData2.length == 0){
+                        this.dataStatus = false;
+                        this.errorMsg = integrationData.message;
+                    }else{
+                        this.sidebarData = integrationData2;
+                        this.dataStatus = true;
+                        for(const key in this.sidebarData.create){
+                            this.openCreateFormArray[key] = false;
+                        }
+                        for(const key in this.sidebarData.update){
+                            this.openUpdateFormArray[key] = false;
+                        }
+                    }
+                    // check for error response
+                    if (response.status!=200 && response.status!='success') {
+                        // get error message from body or default to response statusText
+                        const error = (integrationData && integrationData.message) || response.status;
+                        this.dataStatus = false;
+                        this.errorMsg = error;
+                        return Promise.reject(error);
+                    }
+                })
+                .catch(error => {
+                    this.errorMsg = error;
+                    this.dataStatus = false;
+                });
+            }
         },
         created() {
             fetch("https://app.helpwise.io/api/connected_integrations.php?mailbox_id=" + this.thread.data.mailbox_id, {credentials: 'include'})

@@ -1545,7 +1545,10 @@ export default {
       if (this.reply.html !== undefined) {
         return this.reply.html;
       }
-      let signature = this.$store.state.userSignature.body;
+      let signature = '';
+      if(this.$store.state.userSignature){
+        signature = this.$store.state.userSignature.body;
+      }
       if (!signature) return "";
       let body = signature.replace(/^.*?<body[^>]*>(.*?)<\/body>.*?$/i, "$1");
       console.log(body);
@@ -2054,5 +2057,10 @@ export default {
 .fr-modal .fr-command.fr-btn img {
   margin: 8px 7px;
   width: 16px !important;
+}
+
+.fr-sticky-on{
+  position: relative;
+  z-index: 10;
 }
 </style>
