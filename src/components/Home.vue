@@ -51,7 +51,7 @@ export default {
     },
     watch:{
         $route (to, from) {
-            if(to.params.mailboxId !== from.params.mailboxId) {
+            if(to.params.mailboxId && to.params.mailboxId !== from.params.mailboxId) {
                 this.fetchMailBoxData();
                 this.fetchSidebarStats();
                 this.fetchAliases();
@@ -104,7 +104,7 @@ export default {
             await this.$store.dispatch('fetchPingDetails', data);
         },
         async fetchAliases() {
-            let url ="https://app.helpwise.io/api/getFromAddresses.php?mailboxId=" + this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me'; 
+            let url ="https://app.helpwise.io/api/unified/getFromAddresses.php?mailboxId=" + this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me'; 
             const response = await fetch(url, {credentials: 'include'});
             const data = await response.json();
             console.log(data);
