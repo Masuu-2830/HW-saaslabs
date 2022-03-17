@@ -34,13 +34,13 @@
         width: 45px;
         height: 45px;
         background: transparent;
-        /* color: #7987a1; */
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all .3s cubic-bezier(.4,0,.2,1);
         z-index: 1;
         border-radius: 50%;
+        margin-bottom: 2px;
     }
     @media (prefers-reduced-motion: reduce) {
         .integrations-settings-sidebar {

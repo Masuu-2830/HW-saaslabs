@@ -139,7 +139,13 @@
               <RouterLink
                   v-for="(option, index) in sectionValues"
                   :key="index"
-                  :to="{name: 'type', params:{type: option.type, mailboxId: getMailboxID}}"
+                  :to="{
+                      name: 'type', 
+                      params:{
+                          type: sectionName == 'tags' ? option.id : option.type, 
+                          mailboxId: sectionName == 'me' ? 'me' : sectionName == 'tags' ? 'tags' : option.id,
+                        }
+                    }"
               >
                   <p
                       style="cursor: pointer"
@@ -198,6 +204,7 @@ export default {
                   name: 'Mine',
                   type: 'mine',
                   stats: 'mine',
+                  mailboxId: "me",
                   icon: `
                       <svg style="stroke-width: 25px" version="1.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 492 492" xml:space="preserve">
                           <g id="Master_Layer_2"></g>
@@ -236,6 +243,7 @@ export default {
                   name: 'Mentions',
                   type: 'mentions',
                   stats: 'mentions',
+                  mailboxId: "me",
                   icon: `
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-at-sign">
                           <circle cx="12" cy="12" r="4"></circle>
@@ -247,6 +255,7 @@ export default {
                   name: 'Starred',
                   type: 'starred',
                   stats: 'starred',
+                  mailboxId: "me",
                   icon: `
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star">
                           <polygon
@@ -259,6 +268,7 @@ export default {
                   name: 'All',
                   type: 'all',
                   stats: 'inbox',
+                  mailboxId: "me",
                   icon: `
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-inbox">
                           <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>

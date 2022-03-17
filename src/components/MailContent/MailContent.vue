@@ -54,6 +54,16 @@ export default {
                 this.right = '0px';
                 this.contactOpen = false;
                 this.sidebarOpen = false;
+                
+                let toThreadId = to.params.threadId;
+                let fromThreadId = from.params.threadId;
+                let managerID = this.$store.state.userInfo.accountID;
+
+                const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${fromThreadId}`);
+                socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
+
+                const socket2 = firebase_app.database().ref(`/Account-${managerID}/Thread-${toThreadId}`);
+                socket2.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
             }
         }
     },
@@ -179,25 +189,17 @@ export default {
       }
     })
   },
-  beforeMount(){
-    console.log("----- BEFORE MOUNT -----");
+  mounted(){
     let threadID = this.$route.params.threadId;
     let managerID = this.$store.state.userInfo.accountID;
-    socket.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
     const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
-    // viewing user
-    console.log("--- VIEWING user socket ---", `/Account-${managerID}/Thread-${threadID}`);
     socket.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
   },
   beforeUnmount(){
-    console.log("----- BEFORE UN-MOUNT -----");
     let managerID = this.$store.state.userInfo.accountID;
     let threadID = this.$route.params.threadId;
     const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
     socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
-  },
-  mounted() {
-    console.log("----- MOUNTED -----");
   },
   methods: {
     openInt() {
