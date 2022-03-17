@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      v-if="show && composer.type == 'mail'"
+      v-if="show && (composer.type == 'mail' || composer.type == 'universalMail')"
       :id="`compose-${composer.hash}`"
       class="mail-compose hw_editor show hideMoreEditingOptions"
       :class="
@@ -161,7 +161,7 @@
               <b-form-select v-model="fromSelected" class="mb-3">
                 <b-form-select-option
                   v-for="fromOption in fromOptions"
-                  :key="fromOption.id"
+                  :key="fromOption.email"
                   :value="fromOption"
                   >{{ fromOption.name }} &lt;{{
                     fromOption.email
@@ -344,7 +344,7 @@
             <form class="form">
               <froala
                 :tag="'textarea'"
-                :config="config"
+                :config="configMail"
                 v-model="mail_body"
                 name="mail_body"
               ></froala>
@@ -525,7 +525,7 @@
           <form class="form">
             <froala
               :tag="'textarea'"
-              :config="config"
+              :config="configTwitter"
               v-model="tweet_compose_body"
               name="tweet_compose_body"
             ></froala>
@@ -591,7 +591,7 @@
       </div>
     </div>
     <div
-      v-if="show && composer.type == 'sms'"
+      v-if="show && (composer.type == 'sms' || composer.type == 'universalSms')"
       id="smsCompose"
       class="mail-compose hw_editor show"
       :class="
@@ -732,6 +732,25 @@
           class="mail-compose-body"
           style="padding-top: 0px; padding-bottom: 10px"
         >
+        <div
+            v-if="composer.type == 'universalSms'"
+            :style="{ display: fromOptions.length > 1 ? 'block' : 'none' }"
+            class="email-from-container align-items-center d-flex"
+          >
+            <div>From</div>
+            <div class="flex-grow-1 pt-2 pl-2" style="max-width: 80%">
+              <b-form-select v-model="fromSelected" class="mb-3">
+                <b-form-select-option
+                  v-for="fromOption in fromOptions"
+                  :key="fromOption.email"
+                  :value="fromOption"
+                  >{{ fromOption.name }} &lt;{{
+                    fromOption.email
+                  }}&gt;</b-form-select-option
+                >
+              </b-form-select>
+            </div>
+          </div>
           <div class="composeBodyWrapper">
             <div class="composeBody">
               <div class="to-number-container" style="margin-bottom: 10px">
@@ -749,7 +768,7 @@
               <form class="form">
                 <froala
                   :tag="'textarea'"
-                  :config="config"
+                  :config="configSms"
                   v-model="sms_compose_body"
                   name="sms_compose_body"
                 ></froala>
@@ -835,7 +854,7 @@ export default {
       minimize: false,
       maximize: false,
       showUndo: false,
-      message: self.composer.type == "mail" ? "New Message" : "New Tweet",
+      message: self.composer.type == "mail" || self.composer.type == "universalMail" ? "New Message" : "New Tweet",
       undoMessage: "Email Sent.",
       fromOptions: this.aliases(),
       fromSelected: this.defaultAlias(),
@@ -886,6 +905,372 @@ export default {
       mailboxID: this.$store.state.inboxData.id,
       inReplyTo: null,
       editorInstance: null,
+      configMail: {
+        enter: FroalaEditor.ENTER_DIV,
+        placeholderText: "Type something",
+        charCounterCount: false,
+        toolbarBottom: true,
+        height: "220px",
+        imageUploadParam: "files[]",
+        imageUploadURL:
+          "https://app.helpwise.io/api/uploadInlineAttachment.php",
+        imageUploadParams: {
+          mailboxID: this.$route.params.mailboxId,
+          emailID: this.emailID,
+        },
+        imageUploadMethod: "POST",
+        imageAllowedTypes: ["jpeg", "jpg", "png"],
+        imagePasteProcess: true,
+        imageDefaultAlign: "left",
+        pastePlain: true,
+        requestWithCredentials: true,
+        events: {
+          initialized: async function () {
+            // self.editorInstance.composer = self.composer;
+            var editor = this;
+            editor.composer = self.composer;
+            // self.refreshSignatureDropdownOnShow(this,$btn, $dropdown);
+            editor.type = "compose"
+              // self.composer.type == "mail"
+              //   ? "compose"
+              //   : self.composer.type == "twitter"
+              //   ? "tweetCompose"
+              //   : "smsCompose";
+            editor.mailboxID = self.$route.params.mailboxId;
+            self.editorInstance = this;
+            console.log("initialized", self.composer.type);
+            console.log(this);
+            let attchComp = Vue.extend(AttachmentComp);
+            let replyAttachmentList = new attchComp({
+              propsData: {
+                attachments: self.attachments,
+                type: "compose",
+              },
+            }).$mount();
+            // var ed = $(`#editor-uploadAttachment`).data('editor');
+            // console.log(editor, ed);
+            editor.$wp.append(replyAttachmentList.$el);
+            // ed.$wp.append(replyAttachmentList.$el);
+          },
+        },
+        key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
+        toolbarButtons:
+          self.composer.type == "mail" || self.composer.type == "universalMail"
+            ? {
+                moreText: {
+                  buttons: [
+                    "bold",
+                    "italic",
+                    "underline",
+                    "strikeThrough",
+                    "subscript",
+                    "superscript",
+                    "fontFamily",
+                    "fontSize",
+                    "textColor",
+                    "backgroundColor",
+                    "inlineClass",
+                    "inlineStyle",
+                    "clearFormatting",
+                  ],
+                  buttonsVisible: 0,
+                },
+                moreParagraph: {
+                  buttons: [
+                    "alignLeft",
+                    "alignCenter",
+                    "formatOLSimple",
+                    "alignRight",
+                    "alignJustify",
+                    "formatOL",
+                    "formatUL",
+                    "paragraphFormat",
+                    "paragraphStyle",
+                    "lineHeight",
+                    "outdent",
+                    "indent",
+                    "quote",
+                  ],
+                  buttonsVisible: 0,
+                },
+                moreRich: {
+                  buttons: [
+                    "insertLink",
+                    "insertImage",
+                    "gdrive",
+                    "Dropbox",
+                    "box",
+                    "OneDrive",
+                    "EasyCalendar",
+                  ],
+                  buttonsVisible: 0,
+                },
+                moreMisc: {
+                  buttons: [
+                    "scheduleReply",
+                    "savedReplyC",
+                    "hcArticleC",
+                    "attach",
+                    "signatureBtn",
+                    "clear",
+                  ],
+                  buttonsVisible: "all",
+                },
+              }
+            : self.composer.type == "twitter"
+            ? [
+                "attachTweetCompose",
+                "scheduleReply",
+                "savedReplyC",
+                "hcArticleC",
+                "clear",
+              ]
+            : ["attachSMSCompose", "clear"],
+      },
+      configTwitter: {
+        enter: FroalaEditor.ENTER_DIV,
+        placeholderText: "Type something",
+        charCounterCount: false,
+        toolbarBottom: true,
+        height: "220px",
+        imageUploadParam: "files[]",
+        imageUploadURL:
+          "https://app.helpwise.io/api/uploadInlineAttachment.php",
+        imageUploadParams: {
+          mailboxID: this.$route.params.mailboxId,
+          emailID: this.emailID,
+        },
+        imageUploadMethod: "POST",
+        imageAllowedTypes: ["jpeg", "jpg", "png"],
+        imagePasteProcess: true,
+        imageDefaultAlign: "left",
+        pastePlain: true,
+        requestWithCredentials: true,
+        events: {
+          initialized: async function () {
+            // self.editorInstance.composer = self.composer;
+            var editor = this;
+            editor.composer = self.composer;
+            // self.refreshSignatureDropdownOnShow(this,$btn, $dropdown);
+            editor.type =
+              self.composer.type == "tweetCompose"
+                // ? "compose"
+                // : self.composer.type == "twitter"
+                // ? "tweetCompose"
+                // : "smsCompose";
+            editor.mailboxID = self.$route.params.mailboxId;
+            self.editorInstance = this;
+            console.log("initialized", self.composer.type);
+            console.log(this);
+            let attchComp = Vue.extend(AttachmentComp);
+            let replyAttachmentList = new attchComp({
+              propsData: {
+                attachments: self.attachments,
+                type: "compose",
+              },
+            }).$mount();
+            // var ed = $(`#editor-uploadAttachment`).data('editor');
+            // console.log(editor, ed);
+            editor.$wp.append(replyAttachmentList.$el);
+            // ed.$wp.append(replyAttachmentList.$el);
+          },
+        },
+        key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
+        toolbarButtons:
+          self.composer.type == "mail" || self.composer.type == "universalMail"
+            ? {
+                moreText: {
+                  buttons: [
+                    "bold",
+                    "italic",
+                    "underline",
+                    "strikeThrough",
+                    "subscript",
+                    "superscript",
+                    "fontFamily",
+                    "fontSize",
+                    "textColor",
+                    "backgroundColor",
+                    "inlineClass",
+                    "inlineStyle",
+                    "clearFormatting",
+                  ],
+                  buttonsVisible: 0,
+                },
+                moreParagraph: {
+                  buttons: [
+                    "alignLeft",
+                    "alignCenter",
+                    "formatOLSimple",
+                    "alignRight",
+                    "alignJustify",
+                    "formatOL",
+                    "formatUL",
+                    "paragraphFormat",
+                    "paragraphStyle",
+                    "lineHeight",
+                    "outdent",
+                    "indent",
+                    "quote",
+                  ],
+                  buttonsVisible: 0,
+                },
+                moreRich: {
+                  buttons: [
+                    "insertLink",
+                    "insertImage",
+                    "gdrive",
+                    "Dropbox",
+                    "box",
+                    "OneDrive",
+                    "EasyCalendar",
+                  ],
+                  buttonsVisible: 0,
+                },
+                moreMisc: {
+                  buttons: [
+                    "scheduleReply",
+                    "savedReplyC",
+                    "hcArticleC",
+                    "attach",
+                    "signatureBtn",
+                    "clear",
+                  ],
+                  buttonsVisible: "all",
+                },
+              }
+            : self.composer.type == "twitter"
+            ? [
+                "attachTweetCompose",
+                "scheduleReply",
+                "savedReplyC",
+                "hcArticleC",
+                "clear",
+              ]
+            : ["attachSMSCompose", "clear"],
+      },
+      configSms: {
+        enter: FroalaEditor.ENTER_DIV,
+        placeholderText: "Type something",
+        charCounterCount: false,
+        toolbarBottom: true,
+        height: "220px",
+        imageUploadParam: "files[]",
+        imageUploadURL:
+          "https://app.helpwise.io/api/uploadInlineAttachment.php",
+        imageUploadParams: {
+          mailboxID: this.$route.params.mailboxId,
+          emailID: this.emailID,
+        },
+        imageUploadMethod: "POST",
+        imageAllowedTypes: ["jpeg", "jpg", "png"],
+        imagePasteProcess: true,
+        imageDefaultAlign: "left",
+        pastePlain: true,
+        requestWithCredentials: true,
+        events: {
+          initialized: async function () {
+            // self.editorInstance.composer = self.composer;
+            var editor = this;
+            editor.composer = self.composer;
+            // self.refreshSignatureDropdownOnShow(this,$btn, $dropdown);
+            editor.type = "smsCompose";
+              // self.composer.type == "mail"
+              //   ? "compose"
+              //   : self.composer.type == "twitter"
+              //   ? "tweetCompose"
+              //   : "smsCompose";
+            editor.mailboxID = self.$route.params.mailboxId;
+            self.editorInstance = this;
+            console.log("initialized", self.composer.type);
+            console.log(this);
+            let attchComp = Vue.extend(AttachmentComp);
+            let replyAttachmentList = new attchComp({
+              propsData: {
+                attachments: self.attachments,
+                type: "compose",
+              },
+            }).$mount();
+            // var ed = $(`#editor-uploadAttachment`).data('editor');
+            // console.log(editor, ed);
+            editor.$wp.append(replyAttachmentList.$el);
+            // ed.$wp.append(replyAttachmentList.$el);
+          },
+        },
+        key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
+        toolbarButtons:
+          // self.composer.type == "mail" || self.composer.type == "universalMail"
+          //   ? {
+          //       moreText: {
+          //         buttons: [
+          //           "bold",
+          //           "italic",
+          //           "underline",
+          //           "strikeThrough",
+          //           "subscript",
+          //           "superscript",
+          //           "fontFamily",
+          //           "fontSize",
+          //           "textColor",
+          //           "backgroundColor",
+          //           "inlineClass",
+          //           "inlineStyle",
+          //           "clearFormatting",
+          //         ],
+          //         buttonsVisible: 0,
+          //       },
+          //       moreParagraph: {
+          //         buttons: [
+          //           "alignLeft",
+          //           "alignCenter",
+          //           "formatOLSimple",
+          //           "alignRight",
+          //           "alignJustify",
+          //           "formatOL",
+          //           "formatUL",
+          //           "paragraphFormat",
+          //           "paragraphStyle",
+          //           "lineHeight",
+          //           "outdent",
+          //           "indent",
+          //           "quote",
+          //         ],
+          //         buttonsVisible: 0,
+          //       },
+          //       moreRich: {
+          //         buttons: [
+          //           "insertLink",
+          //           "insertImage",
+          //           "gdrive",
+          //           "Dropbox",
+          //           "box",
+          //           "OneDrive",
+          //           "EasyCalendar",
+          //         ],
+          //         buttonsVisible: 0,
+          //       },
+          //       moreMisc: {
+          //         buttons: [
+          //           "scheduleReply",
+          //           "savedReplyC",
+          //           "hcArticleC",
+          //           "attach",
+          //           "signatureBtn",
+          //           "clear",
+          //         ],
+          //         buttonsVisible: "all",
+          //       },
+          //     }
+          //   : self.composer.type == "twitter"
+          //   ? [
+          //       "attachTweetCompose",
+          //       "scheduleReply",
+          //       "savedReplyC",
+          //       "hcArticleC",
+          //       "clear",
+          //     ]
+             ["attachSMSCompose", "clear"],
+      },
       config: {
         enter: FroalaEditor.ENTER_DIV,
         placeholderText: "Type something",
@@ -936,7 +1321,7 @@ export default {
         },
         key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
         toolbarButtons:
-          self.composer.type == "mail"
+          self.composer.type == "mail" || self.composer.type == "universalMail"
             ? {
                 moreText: {
                   buttons: [
@@ -1793,20 +2178,33 @@ export default {
     aliases() {
       let aliases = this.$store.state.aliases.addresses;
       let aliasesArr = new Array();
-      for (let i = 0; i < aliases.length; i++) {
-        if (aliases[i].isDefault) {
-          this.fromSelected = {
+      if(this.$store.state.inboxData.type == "universal") {
+        console.log("aliases retrieve for univ", aliases)
+        for(const alias in aliases) {
+          console.log(alias);
+          for(let j = 0; j < aliases[alias].length; j++) {
+            aliases[alias][j]['id'] = alias;
+            console.log(aliases[alias][j])
+            aliasesArr.push(aliases[alias][j]);
+          }
+        }
+      } else {
+        for (let i = 0; i < aliases.length; i++) {
+          if (aliases[i].isDefault) {
+            this.fromSelected = {
+              id: i,
+              email: aliases[i].email,
+              name: aliases[i].name,
+            };
+          }
+          aliasesArr.push({
             id: i,
             email: aliases[i].email,
             name: aliases[i].name,
-          };
+          });
         }
-        aliasesArr.push({
-          id: i,
-          email: aliases[i].email,
-          name: aliases[i].name,
-        });
       }
+      
       console.log(aliasesArr);
       return aliasesArr;
     },
@@ -1819,9 +2217,20 @@ export default {
           }
         }
       } else {
-        for (let i = 0; i < aliases.length; i++) {
-          if (aliases[i].isDefault) {
-            return { id: i, email: aliases[i].email, name: aliases[i].name };
+        if(this.$store.state.inboxData.type == "universal") {
+          for(const alias in aliases) {
+            for(let j = 0; j < aliases[alias].length; j++) {
+              if (aliases[alias][j].isDefault) {
+                aliases[alias][j]['id'] = alias;
+                return aliases[alias][j];
+              }
+            }
+          }
+        } else {
+          for (let i = 0; i < aliases.length; i++) {
+            if (aliases[i].isDefault) {
+              return { id: i, email: aliases[i].email, name: aliases[i].name };
+            }
           }
         }
       }
@@ -1962,10 +2371,17 @@ export default {
       let html = this.mail_body;
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
-      let body;
+      let body, mailboxID;
+      if(this.$route.params.mailboxId !== undefined && this.$route.params.mailboxId !== 'me') {
+        mailboxID = this.$route.params.mailboxId;
+      } else if(this.$store.state.inboxData.id !== undefined && this.$store.state.inboxData.id !== 'me') {
+        mailboxID = this.$store.state.inboxData.id;
+      } else {
+        mailboxID = this.fromSelected.id;
+      }
       if (this.threadID == null) {
         body = {
-          mailboxID: this.$route.params.mailboxId,
+          mailboxID,
           bcc,
           cc,
           files: this.files,
@@ -1976,7 +2392,7 @@ export default {
         };
       } else {
         body = {
-          mailboxID: this.$route.params.mailboxId,
+          mailboxID,
           bcc,
           cc,
           files: this.files,
@@ -2080,8 +2496,16 @@ export default {
       console.log(html);
       html = html.replace(/(<([^>]+)>)/gi, "");
       console.log(html);
+      let mailboxID;
+      if(this.$route.params.mailboxId !== undefined && this.$route.params.mailboxId !== 'me') {
+        mailboxID = this.$route.params.mailboxId;
+      } else if(this.$store.state.inboxData.id !== undefined && this.$store.state.inboxData.id !== 'me') {
+        mailboxID = this.$store.state.inboxData.id;
+      } else {
+        mailboxID = this.fromSelected.id;
+      }
       let body = {
-        mailboxID: this.mailboxID,
+        mailboxID,
         to,
         attachmentID: this.files,
         // threadID: this.threadID,
@@ -2110,7 +2534,15 @@ export default {
     },
     saveDraft() {
       // this.getUserSignature();
-      if (this.composer.type == "mail") {
+      if(this.composer.type == "universalMail" || this.composer.type == "universalSms") {
+        console.log(this.fromSelected);
+        if(this.composer.type == "universalMail" && this.fromSelected.type == "sms") {
+          this.composer.type = "universalSms"
+        } else if(this.composer.type == "universalSms" && this.fromSelected.type == "mail") {
+          this.composer.type = "universalMail"
+        }
+      }
+      if (this.composer.type == "mail" || this.composer.type == "universalMail") {
         if (
           this.tagsTo.length > 0 ||
           this.tagsCC.length > 0 ||
@@ -2122,7 +2554,7 @@ export default {
           console.log("save", this.composer.hash);
           this.message = "Saving Draft";
           let requestOptions, url;
-          if (this.composer.type == "mail") {
+          if (this.composer.type == "mail" || this.composer.type == "universalMail") {
             requestOptions = this.createBodyMail("draft");
             url = this.$apiBaseURL + "saveDraft.php";
           }
@@ -2181,7 +2613,7 @@ export default {
     },
     sendMail(sendAt) {
       var self = this;
-      if (this.composer.type == "mail") {
+      if (this.composer.type == "mail" || this.composer.type == 'universalMail') {
         console.log("sendingg");
         if (this.tagsTo.length == 0) {
           this.noTo = true;
@@ -2281,7 +2713,19 @@ export default {
         let requestOptions = this.createBodySMS("send");
         requestOptions.body = JSON.parse(requestOptions.body);
         console.log(requestOptions.body);
-        fetch(this.$apiBaseURL + "sms/send-sms.php", requestOptions)
+        let url;
+        if(this.fromSelected.subtype == 'sms') {
+          url = this.$apiBaseURL + "sms/sendSmsUnifiedLive.php";
+        } else if(this.fromSelected.subtype == 'plivo') {
+          this.$apiBaseURL + "plivo/sendSmsUnifiedLive.php"
+        } else if(this.fromSelected.subtype == 'ringcentral') {
+          this.$apiBaseURL + "ringcentral/sendSmsUnifiedLive.php"
+        } else if(this.fromSelected.subtype == 'justcall') {
+          this.$apiBaseURL + "justcall/sendSmsUnifiedLive.php"
+        } else if(this.fromSelected.subtype == 'dialpad') {
+          this.$apiBaseURL + "dialpad/sendSmsUnifiedLive.php"
+        }
+        fetch(url, requestOptions)
           .then(async (response) => {
             const data = await response.json();
             if (data.status !== "success") {
@@ -2313,12 +2757,20 @@ export default {
     unsendMail() {
       clearInterval(this.undoInterval);
       clearTimeout(this.undoTimeout);
+      let mailboxID;
+      if(this.$route.params.mailboxId !== undefined && this.$route.params.mailboxId !== 'me') {
+        mailboxID = this.$route.params.mailboxId;
+      } else if(this.$store.state.inboxData.id !== undefined && this.$store.state.inboxData.id !== 'me') {
+        mailboxID = this.$store.state.inboxData.id;
+      } else {
+        mailboxID = this.fromSelected.id;
+      }
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: this.draftID,
-          mailboxId: this.$route.params.mailboxId,
+          mailboxId: mailboxID,
           threadId: this.threadID,
         }),
         credentials: "include",

@@ -32,7 +32,7 @@ export default new Router({
       path: '/:mailboxId/:type',
       name: 'type',
       component: Home,
-      props: true
+      props: true,
     },
     {
       path: '/:mailboxId/:type/p/:pageNo',
