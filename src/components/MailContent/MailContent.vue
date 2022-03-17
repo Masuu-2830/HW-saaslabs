@@ -58,6 +58,7 @@ export default {
         }
     },
   created() {
+    console.log("----- CREATED -----");
     bus.$on("compact", (data) => {
       this.display = "flex";
       this.right = '0px';
@@ -178,18 +179,25 @@ export default {
       }
     })
   },
-  mounted(){
+  beforeMount(){
+    console.log("----- BEFORE MOUNT -----");
     let threadID = this.$route.params.threadId;
     let managerID = this.$store.state.userInfo.accountID;
+    socket.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
     const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
     // viewing user
+    console.log("--- VIEWING user socket ---", `/Account-${managerID}/Thread-${threadID}`);
     socket.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
   },
   beforeUnmount(){
+    console.log("----- BEFORE UN-MOUNT -----");
     let managerID = this.$store.state.userInfo.accountID;
     let threadID = this.$route.params.threadId;
     const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
     socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
+  },
+  mounted() {
+    console.log("----- MOUNTED -----");
   },
   methods: {
     openInt() {
