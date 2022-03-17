@@ -14,7 +14,7 @@ export default new Router({
       path: "/",
       name: 'Home',
       component: Home,
-      redirect: '204420/mine'
+      redirect: 'me/mine'
     },
     {
       path: '/:mailboxId',

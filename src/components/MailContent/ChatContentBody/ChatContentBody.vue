@@ -36,7 +36,7 @@
       <span class="sr-only">Loading...</span>
     </div>
     <div v-if="Object.keys(thread).length !== 0" id="tweetReplyWindow">
-      <chat-content-card-reply></chat-content-card-reply>
+      <chat-content-card-reply :mailboxType="thread.data.mailbox_id"></chat-content-card-reply>
     </div>
   </div>
 </template>
