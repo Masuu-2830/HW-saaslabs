@@ -26,7 +26,7 @@ import SavedReply from "./modals/SavedReply.vue";
 import ComposeWrapper from "./ComposeWrapper.vue";
 import { bus } from "../main";
 import TweetCompose from "./TweetCompose.vue";
-import initFirebase from "../firebaseInit.js";
+import { initFirebase } from "../firebaseInit.js";
 export default {
   name: "Home",
   components: {
