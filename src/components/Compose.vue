@@ -1,7 +1,9 @@
 <template>
   <div>
     <div
-      v-if="show && (composer.type == 'mail' || composer.type == 'universalMail')"
+      v-if="
+        show && (composer.type == 'mail' || composer.type == 'universalMail')
+      "
       :id="`compose-${composer.hash}`"
       class="mail-compose hw_editor show hideMoreEditingOptions"
       :class="
@@ -732,7 +734,7 @@
           class="mail-compose-body"
           style="padding-top: 0px; padding-bottom: 10px"
         >
-        <div
+          <div
             v-if="composer.type == 'universalSms'"
             :style="{ display: fromOptions.length > 1 ? 'block' : 'none' }"
             class="email-from-container align-items-center d-flex"
@@ -854,7 +856,10 @@ export default {
       minimize: false,
       maximize: false,
       showUndo: false,
-      message: self.composer.type == "mail" || self.composer.type == "universalMail" ? "New Message" : "New Tweet",
+      message:
+        self.composer.type == "mail" || self.composer.type == "universalMail"
+          ? "New Message"
+          : "New Tweet",
       undoMessage: "Email Sent.",
       fromOptions: this.aliases(),
       fromSelected: this.defaultAlias(),
@@ -930,15 +935,28 @@ export default {
             var editor = this;
             editor.composer = self.composer;
             // self.refreshSignatureDropdownOnShow(this,$btn, $dropdown);
-            editor.type = "compose"
-              // self.composer.type == "mail"
-              //   ? "compose"
-              //   : self.composer.type == "twitter"
-              //   ? "tweetCompose"
-              //   : "smsCompose";
-            editor.mailboxID = self.$route.params.mailboxId;
+            editor.type = "compose";
+            // self.composer.type == "mail"
+            //   ? "compose"
+            //   : self.composer.type == "twitter"
+            //   ? "tweetCompose"
+            //   : "smsCompose";
+            if (
+              self.$route.params.mailboxId !== undefined &&
+              self.$route.params.mailboxId !== "me"
+            ) {
+              editor.mailboxID = self.$route.params.mailboxId;
+            } else if (
+              self.$store.state.inboxData.id !== undefined &&
+              self.$store.state.inboxData.id !== "me"
+            ) {
+              editor.mailboxID = self.$store.state.inboxData.id;
+            } else {
+              editor.mailboxID = self.fromSelected.id;
+            }
+            // editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
-            console.log("initialized", self.composer.type);
+            console.log("initialized", self.composer.type, self.editorInstance);
             console.log(this);
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
@@ -1052,12 +1070,11 @@ export default {
             var editor = this;
             editor.composer = self.composer;
             // self.refreshSignatureDropdownOnShow(this,$btn, $dropdown);
-            editor.type =
-              self.composer.type == "tweetCompose"
-                // ? "compose"
-                // : self.composer.type == "twitter"
-                // ? "tweetCompose"
-                // : "smsCompose";
+            editor.type = self.composer.type == "tweetCompose";
+            // ? "compose"
+            // : self.composer.type == "twitter"
+            // ? "tweetCompose"
+            // : "smsCompose";
             editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
             console.log("initialized", self.composer.type);
@@ -1175,11 +1192,11 @@ export default {
             editor.composer = self.composer;
             // self.refreshSignatureDropdownOnShow(this,$btn, $dropdown);
             editor.type = "smsCompose";
-              // self.composer.type == "mail"
-              //   ? "compose"
-              //   : self.composer.type == "twitter"
-              //   ? "tweetCompose"
-              //   : "smsCompose";
+            // self.composer.type == "mail"
+            //   ? "compose"
+            //   : self.composer.type == "twitter"
+            //   ? "tweetCompose"
+            //   : "smsCompose";
             editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
             console.log("initialized", self.composer.type);
@@ -1269,7 +1286,7 @@ export default {
           //       "hcArticleC",
           //       "clear",
           //     ]
-             ["attachSMSCompose", "clear"],
+          ["attachSMSCompose", "clear"],
       },
       config: {
         enter: FroalaEditor.ENTER_DIV,
@@ -2178,13 +2195,13 @@ export default {
     aliases() {
       let aliases = this.$store.state.aliases.addresses;
       let aliasesArr = new Array();
-      if(this.$store.state.inboxData.type == "universal") {
-        console.log("aliases retrieve for univ", aliases)
-        for(const alias in aliases) {
+      if (this.$store.state.inboxData.type == "universal") {
+        console.log("aliases retrieve for univ", aliases);
+        for (const alias in aliases) {
           console.log(alias);
-          for(let j = 0; j < aliases[alias].length; j++) {
-            aliases[alias][j]['id'] = alias;
-            console.log(aliases[alias][j])
+          for (let j = 0; j < aliases[alias].length; j++) {
+            aliases[alias][j]["id"] = alias;
+            console.log(aliases[alias][j]);
             aliasesArr.push(aliases[alias][j]);
           }
         }
@@ -2204,7 +2221,7 @@ export default {
           });
         }
       }
-      
+
       console.log(aliasesArr);
       return aliasesArr;
     },
@@ -2217,11 +2234,11 @@ export default {
           }
         }
       } else {
-        if(this.$store.state.inboxData.type == "universal") {
-          for(const alias in aliases) {
-            for(let j = 0; j < aliases[alias].length; j++) {
+        if (this.$store.state.inboxData.type == "universal") {
+          for (const alias in aliases) {
+            for (let j = 0; j < aliases[alias].length; j++) {
               if (aliases[alias][j].isDefault) {
-                aliases[alias][j]['id'] = alias;
+                aliases[alias][j]["id"] = alias;
                 return aliases[alias][j];
               }
             }
@@ -2372,9 +2389,15 @@ export default {
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
       let body, mailboxID;
-      if(this.$route.params.mailboxId !== undefined && this.$route.params.mailboxId !== 'me') {
+      if (
+        this.$route.params.mailboxId !== undefined &&
+        this.$route.params.mailboxId !== "me"
+      ) {
         mailboxID = this.$route.params.mailboxId;
-      } else if(this.$store.state.inboxData.id !== undefined && this.$store.state.inboxData.id !== 'me') {
+      } else if (
+        this.$store.state.inboxData.id !== undefined &&
+        this.$store.state.inboxData.id !== "me"
+      ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
         mailboxID = this.fromSelected.id;
@@ -2497,9 +2520,15 @@ export default {
       html = html.replace(/(<([^>]+)>)/gi, "");
       console.log(html);
       let mailboxID;
-      if(this.$route.params.mailboxId !== undefined && this.$route.params.mailboxId !== 'me') {
+      if (
+        this.$route.params.mailboxId !== undefined &&
+        this.$route.params.mailboxId !== "me"
+      ) {
         mailboxID = this.$route.params.mailboxId;
-      } else if(this.$store.state.inboxData.id !== undefined && this.$store.state.inboxData.id !== 'me') {
+      } else if (
+        this.$store.state.inboxData.id !== undefined &&
+        this.$store.state.inboxData.id !== "me"
+      ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
         mailboxID = this.fromSelected.id;
@@ -2534,15 +2563,28 @@ export default {
     },
     saveDraft() {
       // this.getUserSignature();
-      if(this.composer.type == "universalMail" || this.composer.type == "universalSms") {
-        console.log(this.fromSelected);
-        if(this.composer.type == "universalMail" && this.fromSelected.type == "sms") {
-          this.composer.type = "universalSms"
-        } else if(this.composer.type == "universalSms" && this.fromSelected.type == "mail") {
-          this.composer.type = "universalMail"
+      if (
+        this.composer.type == "universalMail" ||
+        this.composer.type == "universalSms"
+      ) {
+        console.log(this.fromSelected, this.editorInstance);
+        this.editorInstance.mailboxID = this.fromSelected.id;
+        if (
+          this.composer.type == "universalMail" &&
+          this.fromSelected.type == "sms"
+        ) {
+          this.composer.type = "universalSms";
+        } else if (
+          this.composer.type == "universalSms" &&
+          this.fromSelected.type == "mail"
+        ) {
+          this.composer.type = "universalMail";
         }
       }
-      if (this.composer.type == "mail" || this.composer.type == "universalMail") {
+      if (
+        this.composer.type == "mail" ||
+        this.composer.type == "universalMail"
+      ) {
         if (
           this.tagsTo.length > 0 ||
           this.tagsCC.length > 0 ||
@@ -2554,7 +2596,10 @@ export default {
           console.log("save", this.composer.hash);
           this.message = "Saving Draft";
           let requestOptions, url;
-          if (this.composer.type == "mail" || this.composer.type == "universalMail") {
+          if (
+            this.composer.type == "mail" ||
+            this.composer.type == "universalMail"
+          ) {
             requestOptions = this.createBodyMail("draft");
             url = this.$apiBaseURL + "saveDraft.php";
           }
@@ -2613,7 +2658,10 @@ export default {
     },
     sendMail(sendAt) {
       var self = this;
-      if (this.composer.type == "mail" || this.composer.type == 'universalMail') {
+      if (
+        this.composer.type == "mail" ||
+        this.composer.type == "universalMail"
+      ) {
         console.log("sendingg");
         if (this.tagsTo.length == 0) {
           this.noTo = true;
@@ -2641,7 +2689,7 @@ export default {
         if (this.toNotValid || this.ccNotValid || this.bccNotValid) return;
         let requestOptions = this.createBodyMail("send");
         requestOptions.body = JSON.parse(requestOptions.body);
-        if (sendAt !== 'nil') {
+        if (sendAt !== "nil") {
           requestOptions.body["sendAt"] = sendAt;
         }
         requestOptions.body = JSON.stringify(requestOptions.body);
@@ -2714,16 +2762,16 @@ export default {
         requestOptions.body = JSON.parse(requestOptions.body);
         console.log(requestOptions.body);
         let url;
-        if(this.fromSelected.subtype == 'sms') {
+        if (this.fromSelected.subtype == "sms") {
           url = this.$apiBaseURL + "sms/sendSmsUnifiedLive.php";
-        } else if(this.fromSelected.subtype == 'plivo') {
-          this.$apiBaseURL + "plivo/sendSmsUnifiedLive.php"
-        } else if(this.fromSelected.subtype == 'ringcentral') {
-          this.$apiBaseURL + "ringcentral/sendSmsUnifiedLive.php"
-        } else if(this.fromSelected.subtype == 'justcall') {
-          this.$apiBaseURL + "justcall/sendSmsUnifiedLive.php"
-        } else if(this.fromSelected.subtype == 'dialpad') {
-          this.$apiBaseURL + "dialpad/sendSmsUnifiedLive.php"
+        } else if (this.fromSelected.subtype == "plivo") {
+          this.$apiBaseURL + "plivo/sendSmsUnifiedLive.php";
+        } else if (this.fromSelected.subtype == "ringcentral") {
+          this.$apiBaseURL + "ringcentral/sendSmsUnifiedLive.php";
+        } else if (this.fromSelected.subtype == "justcall") {
+          this.$apiBaseURL + "justcall/sendSmsUnifiedLive.php";
+        } else if (this.fromSelected.subtype == "dialpad") {
+          this.$apiBaseURL + "dialpad/sendSmsUnifiedLive.php";
         }
         fetch(url, requestOptions)
           .then(async (response) => {
@@ -2758,9 +2806,15 @@ export default {
       clearInterval(this.undoInterval);
       clearTimeout(this.undoTimeout);
       let mailboxID;
-      if(this.$route.params.mailboxId !== undefined && this.$route.params.mailboxId !== 'me') {
+      if (
+        this.$route.params.mailboxId !== undefined &&
+        this.$route.params.mailboxId !== "me"
+      ) {
         mailboxID = this.$route.params.mailboxId;
-      } else if(this.$store.state.inboxData.id !== undefined && this.$store.state.inboxData.id !== 'me') {
+      } else if (
+        this.$store.state.inboxData.id !== undefined &&
+        this.$store.state.inboxData.id !== "me"
+      ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
         mailboxID = this.fromSelected.id;
