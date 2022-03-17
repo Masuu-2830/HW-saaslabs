@@ -581,7 +581,7 @@
     },
     startNotesTimer(socket){
       this.typingNotesTimer = setTimeout(() => {
-        this.typing.reply = false;
+        this.typing.notes = false;
         socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).remove();
       }, this.defaultTypingTimer);
     },

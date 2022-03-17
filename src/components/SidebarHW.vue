@@ -474,7 +474,7 @@ export default {
             tags: Object.keys(this.activeTags)
         };
 
-        let response = await fetch("https://app.helpwise.io/api/setUserSidebarPins.php.php", {
+        let response = await fetch("https://app.helpwise.io/api/setUserSidebarPins.php", {
             method: 'POST',
             credentials: 'include',
             body: JSON.stringify({

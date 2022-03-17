@@ -181,7 +181,7 @@
             },
             fetchSavedReplies(){
                 let fetchURL = 'https://app.helpwise.io/api/list-saved-replies.php';
-                if((this.$route.params.mailboxId && this.$route.params.mailboxId!='me') || (this.$store.state.inboxData && this.$store.state.inboxData.id)){
+                if((this.$route.params.mailboxId && this.$route.params.mailboxId!='me') || (this.$store.state.inboxData && this.$store.state.inboxData.id!='me')){
                     let mailboxID = this.$route.params.mailboxId!='me' ? this.$route.params.mailboxId : this.$store.state.inboxData.id;
                     fetchURL = `https://app.helpwise.io/api/list-saved-replies.php?mailboxID=${mailboxID}`;
                 }
