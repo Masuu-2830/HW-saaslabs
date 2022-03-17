@@ -1472,19 +1472,27 @@ export default {
     aliases() {
       let aliases = this.$store.state.aliases.addresses;
       let aliasesArr = new Array();
-      for (let i = 0; i < aliases.length; i++) {
-        if (aliases[i].isDefault) {
-          this.fromSelected = {
+      if (this.$store.state.inboxData.type == "universal") {
+        let addresses = aliases[this.reply.mailboxId];
+        for (let i = 0; i < addresses.length; i++) {
+          aliasesArr.push(addresses[i]);
+        }
+        console.log(addresses);
+      } else {
+        for (let i = 0; i < aliases.length; i++) {
+          if (aliases[i].isDefault) {
+            this.fromSelected = {
+              id: i,
+              email: aliases[i].email,
+              name: aliases[i].name,
+            };
+          }
+          aliasesArr.push({
             id: i,
             email: aliases[i].email,
             name: aliases[i].name,
-          };
+          });
         }
-        aliasesArr.push({
-          id: i,
-          email: aliases[i].email,
-          name: aliases[i].name,
-        });
       }
       console.log(aliasesArr);
       return aliasesArr;
@@ -1498,9 +1506,18 @@ export default {
         //   }
         // }
       } else {
-        for (let i = 0; i < aliases.length; i++) {
-          if (aliases[i].isDefault) {
-            return { id: i, email: aliases[i].email, name: aliases[i].name };
+        if (this.$store.state.inboxData.type == "universal") {
+          let addresses = aliases[this.reply.mailboxId];
+          for (let i = 0; i < addresses.length; i++) {
+            if(addresses[i].isDefault) {
+              return addresses[i];
+            }
+          }
+        } else {
+          for (let i = 0; i < aliases.length; i++) {
+            if (aliases[i].isDefault) {
+              return { id: i, email: aliases[i].email, name: aliases[i].name };
+            }
           }
         }
       }
@@ -1628,10 +1645,17 @@ export default {
       let html = this.mail_body;
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
-      let body;
+      let body, mailboxID;
+      if(this.$route.params.mailboxId !== undefined && this.$route.params.mailboxId !== 'me') {
+        mailboxID = this.$route.params.mailboxId;
+      } else if(this.$store.state.inboxData.id !== undefined && this.$store.state.inboxData.id !== 'me') {
+        mailboxID = this.$store.state.inboxData.id;
+      } else {
+        mailboxID = this.reply.mailboxId;
+      }
       if (this.draftID == null) {
         body = {
-          mailboxID: this.$store.state.inboxData.id,
+          mailboxID,
           bcc,
           cc,
           files: this.files,
@@ -1644,7 +1668,7 @@ export default {
         };
       } else {
         body = {
-          mailboxID: this.$store.state.inboxData.id,
+          mailboxID,
           bcc,
           cc,
           files: this.files,
@@ -1763,31 +1787,31 @@ export default {
             self.undoTimer = self.$store.state.userSettings.undoTimer;
           }, self.$store.state.userSettings.undoTimer * 1000);
           if (this.isSend == "send") {
-              let payload = this.reply.email;
-              payload.subject = this.subject;
-              payload.displaySubject = this.subject;
-              payload.from = requestOptions.body.from;
-              payload.bcc = requestOptions.body.bcc;
-              payload.cc = requestOptions.body.cc;
-              payload.to = requestOptions.body.to;
-              payload.html = requestOptions.body.html;
-              payload.strippedHtml = requestOptions.body.html;
-              payload.text = requestOptions.body.text;
-              payload.snippet = requestOptions.body.text;
-              payload.readStats = {};
-              payload.id = data.data.messageID;
-              payload.attachments = this.attachments;
-              payload.date = new Date().toISOString();
-              console.log(payload, this.reply);
-              let email = {
-                email: payload,
-                type: "email",
-              };
-              bus.$emit("changeThreadAttrs", email);
-            } else {
-              bus.$emit("closeThread", this.$route.params.threadId);
-              bus.$emit("broad");
-            }
+            let payload = this.reply.email;
+            payload.subject = this.subject;
+            payload.displaySubject = this.subject;
+            payload.from = requestOptions.body.from;
+            payload.bcc = requestOptions.body.bcc;
+            payload.cc = requestOptions.body.cc;
+            payload.to = requestOptions.body.to;
+            payload.html = requestOptions.body.html;
+            payload.strippedHtml = requestOptions.body.html;
+            payload.text = requestOptions.body.text;
+            payload.snippet = requestOptions.body.text;
+            payload.readStats = {};
+            payload.id = data.data.messageID;
+            payload.attachments = this.attachments;
+            payload.date = new Date().toISOString();
+            console.log(payload, this.reply);
+            let email = {
+              email: payload,
+              type: "email",
+            };
+            bus.$emit("changeThreadAttrs", email);
+          } else {
+            bus.$emit("closeThread", this.$route.params.threadId);
+            bus.$emit("broad");
+          }
           // this.cancelReply();
           // bus.$emit("closeReply", this.reply.hash);
         })
