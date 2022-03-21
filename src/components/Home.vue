@@ -140,23 +140,53 @@ export default {
       console.log(data);
       await this.$store.dispatch("fetchAliases", data.data);
     },
+    // fetchUserSignature() {
+    //   fetch(this.$apiBaseURL + "signatures/list.php?mailboxId=" + this.$route.params.mailboxId, {credentials: "include"})
+    //   .then(async response => { 
+    //       const data = await response.json();
+    //       if (data.status !== "success") {
+    //         const error = (data && data.message) || response.status;
+    //         return Promise.reject(error);
+    //       }
+    //       console.log(data);
+    //       let signature = data.data.signature;
+    //       console.log(signature);
+    //       await this.$store.dispatch("fetchUserSignature", signature);
+    //   })
+    //   .catch((error) => {
+    //     alert(error);
+    //   });
+    // },
     fetchUserSignature() {
-      fetch(this.$apiBaseURL + "signatures/list.php?mailboxId=" + this.$route.params.mailboxId, {credentials: "include"})
-      .then(async response => { 
-          const data = await response.json();
-          if (data.status !== "success") {
-            const error = (data && data.message) || response.status;
-            return Promise.reject(error);
-          }
-          console.log(data);
-          let signature = data.data.signature;
-          console.log(signature);
-          await this.$store.dispatch("fetchUserSignature", signature);
-      })
-      .catch((error) => {
-        alert(error);
-      });
-    },
+            fetch(this.$apiBaseURL + "signatures/list.php?mailboxId=" + this.$route.params.mailboxId, {credentials: "include"})
+            .then(async response => { 
+                const data = await response.json();
+                if(data.status !== "success") {
+                    const error = (data && data.message) || response.status;
+                    return Promise.reject(error);
+                }
+                console.log(data);
+                let signatureId = data.data[0] && data.data[0].id;
+                if (signatureId) {
+                    fetch(this.$apiBaseURL + "signatures/get.php?id=" + signatureId, {credentials: "include"})
+                    .then(async response => { 
+                        const data = await response.json();
+                        if(data.status !== "success") {
+                        const error = (data && data.message) || response.status;
+                        return Promise.reject(error);
+                        }
+                        console.log(data);
+                        let signature = data.data.signature;
+                        console.log(signature);
+                        await this.$store.dispatch('fetchUserSignature', signature);
+                    }).catch(error => {
+                    alert(error);
+                    })
+                }
+                }).catch(error => {
+                alert(error);
+            })
+        },
     async fetchContacts() {
           const response = await fetch(this.$apiBaseURL + "contacts.php", {credentials: 'include'});
           const data = await response.json();
