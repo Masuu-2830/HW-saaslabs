@@ -73,8 +73,9 @@
               style="padding-bottom: 7px; max-height: 400px; overflow-y: auto"
             >
               <li class="nav-sub-item">
+                <router-link :to="{ name: 'mailbox', params: {mailboxId: 'me'}}">
                 <a
-                  href="https://app.helpwise.io/inbox/me/mine"
+                  
                   class="
                     nav-sub-link
                     flex-column
@@ -92,6 +93,7 @@
                     >
                   </div></a
                 >
+                </router-link>
               </li>
               <li class="nav-sub-item">
                 <a
