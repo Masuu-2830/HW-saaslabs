@@ -437,13 +437,13 @@
                 v-model="mail_body"
                 name="mail_body"
               ></froala>
-              <button
+              <!-- <button
                 @click.stop.prevent="sendMail('nil')"
                 class="btnn btn btn-sm btn-primary fr-bt"
                 type="submit"
               >
                 {{ isSend == "send" ? "Send" : "Send and Close" }}
-              </button>
+              </button> -->
               <!-- <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:30px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="reply-push-btn">Send</button> -->
             </form>
           </div>
@@ -662,6 +662,17 @@ export default {
             // var ed = $(`#reply-uploadAttachment`).data('editor');
             console.log(editor);
             editor.$wp.append(replyAttachmentList.$el);
+            if (self.isSend) {
+              editor.$tb.append(`
+                <div class="fr-btn-grp fr-float-right">
+                  <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="sendReply">Send</button>
+                </div>`);
+            } else {
+              editor.$tb.append(`
+                <div class="fr-btn-grp fr-float-right">
+                  <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="sendReply">Send and Close</button>
+                </div>`);
+            }
             // ed.$wp.append(replyAttachmentList.$el);
           },
         },
@@ -732,6 +743,11 @@ export default {
   },
   created() {
     const vueThis = this;
+
+    $(document).off("click", "#sendReply");
+    $(document).on("click", "#sendReply", function () {
+      vueThis.sendMail("nil");
+    });
     bus.$off("deleteAttachmentUpload");
     bus.$on("deleteAttachmentUpload", (id) => {
       console.log("event listenedd", id);
@@ -1509,7 +1525,7 @@ export default {
         if (this.$store.state.inboxData.type == "universal") {
           let addresses = aliases[this.reply.mailboxId];
           for (let i = 0; i < addresses.length; i++) {
-            if(addresses[i].isDefault) {
+            if (addresses[i].isDefault) {
               return addresses[i];
             }
           }
@@ -1545,8 +1561,8 @@ export default {
       if (this.reply.html !== undefined) {
         return this.reply.html;
       }
-      let signature = '';
-      if(this.$store.state.userSignature){
+      let signature = "";
+      if (this.$store.state.userSignature) {
         signature = this.$store.state.userSignature.body;
       }
       if (!signature) return "";
@@ -1649,9 +1665,15 @@ export default {
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
       let body, mailboxID;
-      if(this.$route.params.mailboxId !== undefined && this.$route.params.mailboxId !== 'me') {
+      if (
+        this.$route.params.mailboxId !== undefined &&
+        this.$route.params.mailboxId !== "me"
+      ) {
         mailboxID = this.$route.params.mailboxId;
-      } else if(this.$store.state.inboxData.id !== undefined && this.$store.state.inboxData.id !== 'me') {
+      } else if (
+        this.$store.state.inboxData.id !== undefined &&
+        this.$store.state.inboxData.id !== "me"
+      ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
         mailboxID = this.reply.mailboxId;
@@ -2059,8 +2081,13 @@ export default {
   width: 16px !important;
 }
 
-.fr-sticky-on{
+.fr-sticky-on {
   position: relative;
   z-index: 10;
+}
+
+.fr-sticky-on + .fr-sticky-dummy,
+.fr-sticky-box > .fr-sticky-dummy {
+  display: none;
 }
 </style>
