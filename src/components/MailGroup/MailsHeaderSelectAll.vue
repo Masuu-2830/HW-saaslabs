@@ -1295,6 +1295,7 @@
         <div
           id="right-toolbar-container"
           class="d-flex align-items-center justify-content-between"
+          :class="$store.state.openThread !== null && 'flex-grow-1'"
         >
           <div
             class="
