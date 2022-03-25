@@ -517,10 +517,206 @@
           </div>
         </div>
 
-        
+        <div
+          v-if="
+            id !== '' &&
+            thread.data.mailboxType == 'chat' &&
+            contact.data !== null
+          "
+          class="d-flex flex-column mg-b-15"
+        >
+          <label
+            class="tx-sans tx-12 tx-spacing-1 tx-color-03"
+            for="chatUser_contact_type"
+            >Type</label
+          >
+          <label
+            class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+            id="chatUser_contact_type"
+            >{{ contact.data.contact.type }}</label
+          >
+        </div>
+
+        <div
+          v-if="
+            id !== '' &&
+            thread.data.mailboxType == 'chat' &&
+            contact.data !== null
+          "
+          class="d-flex flex-column mg-b-15"
+        >
+          <label
+            class="tx-sans tx-12 tx-spacing-1 tx-color-03"
+            for="chatUser_contact_first_seen"
+            >First Seen</label
+          >
+          <label
+            class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+            id="chatUser_contact_first_seen"
+            >{{ contact.data.contact.firstSeen | moment("from", "now") }}</label
+          >
+        </div>
+
+        <div
+          v-if="
+            id !== '' &&
+            thread.data.mailboxType == 'chat' &&
+            contact.data !== null
+          "
+          class="d-flex flex-column mg-b-15"
+        >
+          <label
+            class="tx-sans tx-12 tx-spacing-1 tx-color-03"
+            for="chatUser_contact_last_seen"
+            >Last Seen</label
+          >
+          <label
+            class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+            id="chatUser_contact_last_seen"
+            >{{ contact.data.contact.lastSeen }}</label
+          >
+        </div>
+
+        <div
+          v-if="
+            id !== '' &&
+            thread.data.mailboxType == 'chat' &&
+            contact.data !== null
+          "
+          class="d-flex flex-column mg-b-15"
+        >
+          <label
+            class="tx-sans tx-12 tx-spacing-1 tx-color-03"
+            for="chatUser_contact_user_id"
+            >User Id</label
+          >
+          <label
+            class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+            id="chatUser_contact_user_id"
+            >{{ contact.data.contact.user_id }}</label
+          >
+        </div>
       </div>
 
-      
+      <div v-if="thread.data.mailboxType == 'chat' && contact.data !== null" class="chatUser-extras-window mg-b-10">
+        <div class="collapse-body shadow-sm bg-white rounded bd">
+          <div
+            class="collapse-header row collapsed"
+            data-toggle="collapse"
+            href="#chatUser_extras_details"
+            role="button"
+            aria-expanded="false"
+            aria-controls="chatUser_extras_details"
+            style="height: 50px; cursor: pointer"
+          >
+            <div class="col-10">
+              <p class="pd-l-13 pd-t-15 tx-bold">See More Details</p>
+            </div>
+            <div class="col-1 pd-0 d-flex align-items-center">
+              <p class="chatUser_collapse_header pd-0 mg-b-0">
+                <i
+                  class="fas fa-caret-down"
+                  style="color: silver; border-radius: 5px"
+                ></i>
+              </p>
+            </div>
+          </div>
+          <div
+            id="chatUser_extras_details"
+            class="chatUser_collapsible pd-b-1 pd-x-12 collapse"
+            style="overflow-wrap: break-word; line-height: 1.5"
+          >
+            <div class="d-flex flex-column mg-b-15">
+              <label class="tx-sans tx-11 tx-spacing-1 tx-color-03">Plan</label>
+              <label
+                class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+              >{{ contact.data.extras.Plan }}</label>
+            </div>
+
+            <div class="d-flex flex-column mg-b-15">
+              <label class="tx-sans tx-11 tx-spacing-1 tx-color-03"
+                >Operating System</label
+              >
+              <label class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+                >{{ contact.data.extras['Operating System'] }}</label
+              >
+            </div>
+
+            <div class="d-flex flex-column mg-b-15">
+              <label class="tx-sans tx-11 tx-spacing-1 tx-color-03"
+                >Browser Information</label
+              >
+              <label class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+                >{{ contact.data.extras['Browser Information'] }}</label
+              >
+            </div>
+
+            <div class="d-flex flex-column mg-b-15">
+              <label class="tx-sans tx-11 tx-spacing-1 tx-color-03"
+                >Referrer</label
+              >
+              <label class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+                >{{ contact.data.extras['Referrer'] == 'UNKNOWN' ? '--' : contact.data.extras['Referrer'] }}</label
+              >
+            </div>
+
+            <div class="d-flex flex-column mg-b-15">
+              <label class="tx-sans tx-11 tx-spacing-1 tx-color-03"
+                >UTM Campaign</label
+              >
+              <label
+                class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+              >{{ contact.data.extras['UTM Campaign'] == 'UNKNOWN' ? '--' : contact.data.extras['UTM Campaign'] }}</label>
+            </div>
+
+            <div class="d-flex flex-column mg-b-15">
+              <label class="tx-sans tx-11 tx-spacing-1 tx-color-03"
+                >UTM Source</label
+              >
+              <label
+                class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+              >{{ contact.data.extras['UTM Source'] == 'UNKNOWN' ? '--' : contact.data.extras['UTM Source'] }}</label>
+            </div>
+
+            <div class="d-flex flex-column mg-b-15">
+              <label class="tx-sans tx-11 tx-spacing-1 tx-color-03"
+                >UTM Device</label
+              >
+              <label
+                class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+              >{{ contact.data.extras['UTM Device'] == 'UNKNOWN' ? '--' : contact.data.extras['UTM Device'] }}</label>
+            </div>
+
+            <div class="d-flex flex-column mg-b-15">
+              <label class="tx-sans tx-11 tx-spacing-1 tx-color-03"
+                >UTM Term</label
+              >
+              <label
+                class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+              >{{ contact.data.extras['UTM Term'] == 'UNKNOWN' ? '--' : contact.data.extras['UTM Term'] }}</label>
+            </div>
+
+            <div class="d-flex flex-column mg-b-15">
+              <label class="tx-sans tx-11 tx-spacing-1 tx-color-03"
+                >UTM Content</label
+              >
+              <label
+                class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+              >{{ contact.data.extras['UTM Content'] == 'UNKNOWN' ? '--' : contact.data.extras['UTM Content'] }}</label>
+            </div>
+
+            <div class="d-flex flex-column mg-b-15">
+              <label class="tx-sans tx-11 tx-spacing-1 tx-color-03"
+                >UTM Medium</label
+              >
+              <label
+                class="tx-sans tx-13 tx-spacing-1 tx-color-01 mg-0"
+              >{{ contact.data.extras['UTM Medium'] == 'UNKNOWN' ? '--' : contact.data.extras['UTM Medium'] }}</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div
         v-if="thread.data.mailboxType == 'chat' && contact.data !== null"
         class="chatUser-recent-pages-window mg-b-20"
