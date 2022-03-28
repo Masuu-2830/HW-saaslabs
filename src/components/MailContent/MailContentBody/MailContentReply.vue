@@ -614,8 +614,8 @@ export default {
           ? this.reply.email.threadId
           : this.$route.params.threadId,
       inReplyTo:
-        this.reply.email.inReplyTo !== undefined
-          ? this.reply.email.inReplyTo
+        this.reply.email.id !== undefined
+          ? this.reply.email.id
           : null,
       editorInstance: null,
       config: {

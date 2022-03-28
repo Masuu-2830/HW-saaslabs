@@ -2,7 +2,7 @@
   <div
     v-if="this.$store.state.stateLoaded"
     class="mail-group-header justify-content-center"
-    style="top: 55px; height: 40px"
+    style="position: relative; height: 40px; border-top: 1px solid rgba(72, 94, 144, 0.16); border-bottom: none"
   >
     <div
       class="row flex-column d-flex"

@@ -14,6 +14,7 @@
       <span class="sr-only">Loading...</span>
     </div>
     <mails-header-search-box v-on:squery="ssquery"></mails-header-search-box>
+    <mails-type-filter></mails-type-filter>
     <mails-header-select-all
       :selectedIds="selectedIds"
       :tagsInAll="tagsInAll"
@@ -36,7 +37,7 @@
     <div
       v-if="!loading"
       class="mail-group-body bd-y"
-      style="overflow-y: auto; overflow-x: hidden; background-color: white"
+      style="overflow-y: auto; overflow-x: hidden; background-color: white; position: relative; top: 0px; height: 100%"
     >
       <div v-if="this.$store.state.threads.length !== 0" id="threads-list">
         <div
@@ -156,11 +157,13 @@ import router from "../../router";
 import MailGroupSingleMail from "./MailGroupSingleMail.vue";
 import MailsHeaderSearchBox from "./MailsHeaderSearchBox.vue";
 import MailsHeaderSelectAll from "./MailsHeaderSelectAll.vue";
+import MailsTypeFilter from './MailsTypeFilter.vue';
 export default {
   components: {
     MailsHeaderSearchBox,
     MailsHeaderSelectAll,
     MailGroupSingleMail,
+    MailsTypeFilter,
   },
   name: "MailGroup",
   props: {
