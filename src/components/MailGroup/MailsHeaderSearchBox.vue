@@ -1,5 +1,5 @@
 <template>
-  <div class="mail-group-header">
+  <div class="mail-group-header" style="position: relative">
       <div class="search-form">
         <svg
           xmlns="http://www.w3.org/2000/svg"

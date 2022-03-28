@@ -4,17 +4,40 @@
     :style="{ display: display }"
     v-if="Object.keys(thread).length !== 0"
   >
-    <div v-if="loading" id="thread-spinner" class="spinner-border text-primary" role="status" style="position: absolute; top: 50%; left: 50%;">
-        <span class="sr-only">Loading...</span>
+    <div
+      v-if="loading"
+      id="thread-spinner"
+      class="spinner-border text-primary"
+      role="status"
+      style="position: absolute; top: 50%; left: 50%"
+    >
+      <span class="sr-only">Loading...</span>
     </div>
     <!-- <mail-content-int v-if="!loading"></mail-content-int> -->
-    <IntegrationContainer v-if="!loading" @openInt = "IntegrationSidebar" :sidebarOpen = "sidebarOpen" :contactOpen = "contactOpen" :thread= "thread"></IntegrationContainer>
-    <div v-if="!loading" class="d-flex flex-column justify-content-between" :style="{width: 'calc(100% - 60px - '+right+')'}">
+    <IntegrationContainer
+      v-if="!loading"
+      @openInt="IntegrationSidebar"
+      :sidebarOpen="sidebarOpen"
+      :contactOpen="contactOpen"
+      :thread="thread"
+      :contact="contactData"
+    ></IntegrationContainer>
+    <div
+      v-if="!loading"
+      class="d-flex flex-column justify-content-between"
+      :style="{ width: 'calc(100% - 60px - ' + right + ')' }"
+    >
       <mail-content-header :thread="thread"></mail-content-header>
       <!-- <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body> -->
-      <mail-content-body v-if="thread.data.mailboxType == 'mail'" :thread="thread"></mail-content-body>
+      <mail-content-body
+        v-if="thread.data.mailboxType == 'mail'"
+        :thread="thread"
+      ></mail-content-body>
       <!-- <chat-content-body v-if="this.$store.state.inboxData.type !== 'mail'" :thread="thread"></chat-content-body> -->
-      <chat-content-body v-if="thread.data.mailboxType !== 'mail'" :thread="thread"></chat-content-body>
+      <chat-content-body
+        v-if="thread.data.mailboxType !== 'mail'"
+        :thread="thread"
+      ></chat-content-body>
       <!-- <chat-content-body></chat-content-body> -->
       <chat-content-reply :thread="thread"></chat-content-reply>
       <!-- <mail-content-add-note v-if="!loading"></mail-content-add-note> -->
@@ -23,28 +46,35 @@
 </template>
 
 <script>
-import { bus } from "../../main";
+import { bus, triggerPromptNotif } from "../../main";
 import { firebase_app } from "../../firebaseInit";
-import ChatContentBody from './ChatContentBody/ChatContentBody.vue';
-import ChatContentReply from './ChatContentBody/ChatContentReply.vue';
-import MailContentBody from './MailContentBody/MailContentBody.vue';
-import MailContentHeader from './MailContentHeader.vue';
+import ChatContentBody from "./ChatContentBody/ChatContentBody.vue";
+import ChatContentReply from "./ChatContentBody/ChatContentReply.vue";
+import MailContentBody from "./MailContentBody/MailContentBody.vue";
+import MailContentHeader from "./MailContentHeader.vue";
 // import MailContentInt from './MailContentInt.vue'; .
-import IntegrationContainer from './IntegrationContainer.vue';
+import IntegrationContainer from "./IntegrationContainer.vue";
 // import MailContactPanel from './MailContactPanel.vue';
 export default {
-  components: { MailContentBody, MailContentHeader, ChatContentBody, ChatContentReply, IntegrationContainer },
+  components: {
+    MailContentBody,
+    MailContentHeader,
+    ChatContentBody,
+    ChatContentReply,
+    IntegrationContainer,
+  },
   name: "MailContent",
   data() {
     return {
       display: "none",
-      right: '0px',
+      right: "0px",
       thread: {},
+      contactData: null,
       loading: false,
       sidebarOpen: false,
       contactOpen: false,
       integration_id: 0,
-      integration_name: ''
+      integration_name: "",
     };
   },
   watch:{
@@ -66,17 +96,19 @@ export default {
                 socket2.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
             }
         }
-    },
+  },
   created() {
     console.log("----- CREATED -----");
     bus.$on("compact", (data) => {
       this.display = "flex";
-      this.right = '0px';
-      if(data == null) {
+      this.right = "0px";
+      if (data == null) {
         this.loading = true;
         console.log(this.loading);
       } else {
+        console.log(contactData);
         this.thread = data;
+        this.contactData = contactData;
         this.loading = false;
         console.log(this.loading);
       }
@@ -86,100 +118,108 @@ export default {
     });
     bus.$on("removeMail", (id) => {
       console.log(id);
-      this.thread.data.items = this.thread.data.items.filter(item => item.data.id !== id);
-    })
+      this.thread.data.items = this.thread.data.items.filter(
+        (item) => item.data.id !== id
+      );
+    });
     bus.$on("changeThreadAttrs", (data) => {
-      if(data.type == "assignment") {
-        if(data.teammate == null) {
-          if(this.thread.data.currentAssignment == null) {
+      if (data.type == "assignment") {
+        if (data.teammate == null) {
+          if (this.thread.data.currentAssignment == null) {
             let obj = {
-              'assigned': null,
-              'me': false,
-              'assigner': this.$store.state.userInfo,
-              'time': data.log.data.at
-            }
+              assigned: null,
+              me: false,
+              assigner: this.$store.state.userInfo,
+              time: data.log.data.at,
+            };
             this.thread.data.currentAssignment = obj;
           } else {
             this.thread.data.currentAssignment.assigned = null;
             this.thread.data.currentAssignment.me = false;
-            this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
+            this.thread.data.currentAssignment.assigner =
+              this.$store.state.userInfo;
             this.thread.data.currentAssignment.time = data.log.data.at;
           }
-        } else if(data.teammate[0].id == this.$store.state.userInfo.id) {
-          if(this.thread.data.currentAssignment == null) {
+        } else if (data.teammate[0].id == this.$store.state.userInfo.id) {
+          if (this.thread.data.currentAssignment == null) {
             let obj = {
-              'assigned': data.teammate[0],
-              'me': true,
-              'assigner': this.$store.state.userInfo,
-              'time': data.log.data.at
-            }
+              assigned: data.teammate[0],
+              me: true,
+              assigner: this.$store.state.userInfo,
+              time: data.log.data.at,
+            };
             this.thread.data.currentAssignment = obj;
           } else {
             this.thread.data.currentAssignment.assigned = data.teammate[0];
             this.thread.data.currentAssignment.me = true;
-            this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
+            this.thread.data.currentAssignment.assigner =
+              this.$store.state.userInfo;
             this.thread.data.currentAssignment.time = data.log.data.at;
           }
         } else {
-          if(this.thread.data.currentAssignment == null) {
+          if (this.thread.data.currentAssignment == null) {
             let obj = {
-              'assigned': data.teammate[0],
-              'me': false,
-              'assigner': this.$store.state.userInfo,
-              'time': data.log.data.at
-            }
+              assigned: data.teammate[0],
+              me: false,
+              assigner: this.$store.state.userInfo,
+              time: data.log.data.at,
+            };
             this.thread.data.currentAssignment = obj;
           } else {
             this.thread.data.currentAssignment.assigned = data.teammate[0];
             this.thread.data.currentAssignment.me = false;
-            this.thread.data.currentAssignment.assigner = this.$store.state.userInfo;
+            this.thread.data.currentAssignment.assigner =
+              this.$store.state.userInfo;
             this.thread.data.currentAssignment.time = data.log.data.at;
           }
         }
         console.log(this.thread.data.currentAssignment);
         this.thread.data.items.push(data.log);
-      } else if(data.type == "tag") {
-        if(data.toRemove.length > 0) {
-          for(let i = 0; i < data.toRemove.length; i++) {
-            this.thread.data.tags = this.thread.data.tags.filter(tag => tag.id !== data.toRemove[i]);
+      } else if (data.type == "tag") {
+        if (data.toRemove.length > 0) {
+          for (let i = 0; i < data.toRemove.length; i++) {
+            this.thread.data.tags = this.thread.data.tags.filter(
+              (tag) => tag.id !== data.toRemove[i]
+            );
           }
         }
-        if(data.toAdd.length > 0) {
-          for(let i = 0; i < data.toAdd.length; i++) {
-            if(!this.thread.data.tags.some(el => el.id === data.toAdd[i].id))
-            this.thread.data.tags.push(data.toAdd[i]);
+        if (data.toAdd.length > 0) {
+          for (let i = 0; i < data.toAdd.length; i++) {
+            if (!this.thread.data.tags.some((el) => el.id === data.toAdd[i].id))
+              this.thread.data.tags.push(data.toAdd[i]);
           }
         }
-        if(data.logs.length > 0) {
-          for(let i = 0; i < data.logs.length; i++) {
+        if (data.logs.length > 0) {
+          for (let i = 0; i < data.logs.length; i++) {
             this.thread.data.items.push(data.logs[i]);
           }
         }
-      } else if(data.type == "moveConv") {
-        this.thread.data.items = this.thread.data.items.filter(item => item.data.id !== data.id);
-      } else if(data.type == "email") {
+      } else if (data.type == "moveConv") {
+        this.thread.data.items = this.thread.data.items.filter(
+          (item) => item.data.id !== data.id
+        );
+      } else if (data.type == "email") {
         let mail = {};
         mail["data"] = data.email;
         mail["type"] = "email";
         mail["timestamp"] = data.email.date;
         this.thread.data.items.push(mail);
         console.log(this.thread.data.items);
-      } else if(data.type == "chat") {
+      } else if (data.type == "chat") {
         let chat = {};
         chat["data"] = data.message;
         chat["type"] = "chat";
         chat["timestamp"] = data.message.unixTime;
         this.thread.data.items.push(chat);
         console.log(this.thread.data.items);
-      } else if(data.type == "comment") {
+      } else if (data.type == "comment") {
         let comment = {};
         comment["data"] = data.comment;
         comment["type"] = "comment";
         comment["timestamp"] = data.comment.at;
         this.thread.data.items.push(comment);
         console.log(this.thread.data.items);
-      }
-       else if(data.type == "item") {
+      } else if (data.type == "item") {
         let mail = {};
         mail["data"] = data.item;
         mail["type"] = data.item.type;
@@ -187,61 +227,66 @@ export default {
         this.thread.data.items.push(mail);
         console.log(this.thread.data.items);
       }
-    })
+    });
   },
-  mounted(){
+  mounted() {
     let threadID = this.$route.params.threadId;
     let managerID = this.$store.state.userInfo.accountID;
     const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
     socket.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
   },
-  beforeUnmount(){
+  beforeUnmount() {
     let managerID = this.$store.state.userInfo.accountID;
     let threadID = this.$route.params.threadId;
-    const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
+    const socket = firebase_app
+      .database()
+      .ref(`/Account-${managerID}/Thread-${threadID}`);
     socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
   },
   methods: {
     openInt() {
-        console.log("hello");
-        if(this.right == '0px') {
-            this.right = '250px';
-        } else {
-            this.right = '0px';
-        }
-      },
+      console.log("hello");
+      if (this.right == "0px") {
+        this.right = "250px";
+      } else {
+        this.right = "0px";
+      }
+    },
     IntegrationSidebar: function (integrationData) {
       let integrationID = integrationData.id;
       let intName = integrationData.lname;
-      if(this.integration_id == integrationID && this.integration_name == intName){
-        if(this.right == '0px'){
-          this.right = '300px';
-          if(integrationID == 0){
+      if (
+        this.integration_id == integrationID &&
+        this.integration_name == intName
+      ) {
+        if (this.right == "0px") {
+          this.right = "300px";
+          if (integrationID == 0) {
             this.sidebarOpen = false;
             this.contactOpen = true;
-          }else{
+          } else {
             this.sidebarOpen = true;
             this.contactOpen = false;
           }
-        }else{
-          this.right = '0px';
+        } else {
+          this.right = "0px";
           this.sidebarOpen = false;
           this.contactOpen = false;
         }
-      }else{
-        this.right = '300px';
-        if(integrationID == 0){
+      } else {
+        this.right = "300px";
+        if (integrationID == 0) {
           this.sidebarOpen = false;
           this.contactOpen = true;
-        }else{
+        } else {
           this.sidebarOpen = true;
           this.contactOpen = false;
         }
       }
       this.integration_id = integrationID;
       this.integration_name = intName;
-    }
-  }
+    },
+  },
 };
 </script>
 

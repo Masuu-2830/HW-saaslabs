@@ -614,8 +614,8 @@ export default {
           ? this.reply.email.threadId
           : this.$route.params.threadId,
       inReplyTo:
-        this.reply.email.inReplyTo !== undefined
-          ? this.reply.email.inReplyTo
+        this.reply.email.id !== undefined
+          ? this.reply.email.id
           : null,
       editorInstance: null,
       config: {
@@ -1355,14 +1355,29 @@ export default {
         }
         if (this.reply.type == 2 || prop == 2) {
           let aliases = this.$store.state.aliases.addresses;
-          for (var key in this.reply.email.to) {
-            if (!aliases.some((el) => el.email == key)) {
-              let obj = {};
-              obj["email"] = key;
-              obj["name"] = this.reply.email.to[key];
-              obj["text"] = this.reply.email.to[key] + " (" + key + ")";
-              obj["tiClasses"] = ["ti-valid"];
-              to.push(obj);
+          if (this.$store.state.inboxData.type == "universal") {
+            let alias = aliases[this.reply.mailboxId];
+            console.log(alias);
+            for (var key in this.reply.email.to) {
+              if (!alias.some((el) => el.email == key)) {
+                let obj = {};
+                obj["email"] = key;
+                obj["name"] = this.reply.email.to[key];
+                obj["text"] = this.reply.email.to[key] + " (" + key + ")";
+                obj["tiClasses"] = ["ti-valid"];
+                to.push(obj);
+              }
+            }
+          } else {
+            for (var key in this.reply.email.to) {
+              if (!aliases.some((el) => el.email == key)) {
+                let obj = {};
+                obj["email"] = key;
+                obj["name"] = this.reply.email.to[key];
+                obj["text"] = this.reply.email.to[key] + " (" + key + ")";
+                obj["tiClasses"] = ["ti-valid"];
+                to.push(obj);
+              }
             }
           }
         }
@@ -1375,14 +1390,29 @@ export default {
       console.log(this.reply.type);
       if (this.reply.type == 2 || prop == 2) {
         let aliases = this.$store.state.aliases.addresses;
-        for (var key in this.reply.email.cc) {
-          if (!aliases.some((el) => el.email == key)) {
-            let obj = {};
-            obj["email"] = key;
-            obj["name"] = this.reply.email.cc[key];
-            obj["text"] = this.reply.email.cc[key] + " (" + key + ")";
-            obj["tiClasses"] = ["ti-valid"];
-            cc.push(obj);
+        if (this.$store.state.inboxData.type == "universal") {
+          let alias = aliases[this.reply.mailboxId];
+          console.log(alias);
+          for (var key in this.reply.email.cc) {
+            if (!alias.some((el) => el.email == key)) {
+              let obj = {};
+              obj["email"] = key;
+              obj["name"] = this.reply.email.cc[key];
+              obj["text"] = this.reply.email.cc[key] + " (" + key + ")";
+              obj["tiClasses"] = ["ti-valid"];
+              cc.push(obj);
+            }
+          }
+        } else {
+          for (var key in this.reply.email.cc) {
+            if (!aliases.some((el) => el.email == key)) {
+              let obj = {};
+              obj["email"] = key;
+              obj["name"] = this.reply.email.cc[key];
+              obj["text"] = this.reply.email.cc[key] + " (" + key + ")";
+              obj["tiClasses"] = ["ti-valid"];
+              cc.push(obj);
+            }
           }
         }
       }
@@ -1397,14 +1427,29 @@ export default {
       let bcc = [];
       if (this.reply.type == 2 || prop == 2) {
         let aliases = this.$store.state.aliases.addresses;
-        for (var key in this.reply.email.bcc) {
-          if (!aliases.some((el) => el.email == key)) {
-            let obj = {};
-            obj["email"] = key;
-            obj["name"] = this.reply.email.bcc[key];
-            obj["text"] = this.reply.email.bcc[key] + " (" + key + ")";
-            obj["tiClasses"] = ["ti-valid"];
-            bcc.push(obj);
+        if (this.$store.state.inboxData.type == "universal") {
+          let alias = aliases[this.reply.mailboxId];
+          console.log(alias);
+          for (var key in this.reply.email.to) {
+            if (!alias.some((el) => el.email == key)) {
+              let obj = {};
+              obj["email"] = key;
+              obj["name"] = this.reply.email.bcc[key];
+              obj["text"] = this.reply.email.bcc[key] + " (" + key + ")";
+              obj["tiClasses"] = ["ti-valid"];
+              bcc.push(obj);
+            }
+          }
+        } else {
+          for (var key in this.reply.email.bcc) {
+            if (!aliases.some((el) => el.email == key)) {
+              let obj = {};
+              obj["email"] = key;
+              obj["name"] = this.reply.email.bcc[key];
+              obj["text"] = this.reply.email.bcc[key] + " (" + key + ")";
+              obj["tiClasses"] = ["ti-valid"];
+              bcc.push(obj);
+            }
           }
         }
       }
