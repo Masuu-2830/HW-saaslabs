@@ -42,127 +42,128 @@ export function initFirebase() {
         let token = data.data.token;
         firebase_app.auth().signInWithCustomToken(token).then(function () {
             const socket = firebase_app.database().ref(`/Account-${accountID}`);
-            var incomingFlag = false;
-            var outgoingFlag = false;
-            var notesFlag = false;
-            var closeFlag = false;
-            var snoozeFlag = false;
-            var unsnoozeFlag = false;
-            var deleteFlag = false;
-            var addTagFlag = false;
-            var removeTagFlag = false;
-            var assignFlag = false;
-            var moveToInboxFlag = false;
+            let incomingFlag = false;
+            let outgoingFlag = false;
+            let notesFlag = false;
+            let closeFlag = false;
+            let snoozeFlag = false;
+            let unsnoozeFlag = false;
+            let deleteFlag = false;
+            let addTagFlag = false;
+            let removeTagFlag = false;
+            let assignFlag = false;
+            let moveToInboxFlag = false;
+
             socket.child(`/incoming`).on('value', function (data) {
-                // if(incomingFlag){
+                if(incomingFlag){
                     if (data.val()) {
                         addThread(data.val());
-                        // incomingFlag = false;
+                        incomingFlag = true;
                     }
-                // }else{
-                //     incomingFlag = true;
-                // }
+                }else{
+                    incomingFlag = true;
+                }
             });
             socket.child(`/outgoing`).on('value', function (data) {
-                // if(outgoingFlag == true){
+                if(outgoingFlag){
                     if (data.val()) {
                         addThread(data.val());
-                        // outgoingFlag = false;
+                        outgoingFlag = true;
                     }
-                // }else{
-                //     outgoingFlag = true;
-                // }
+                }else{
+                    outgoingFlag = true;
+                }
             });
             socket.child(`/notes`).on('value', function (data) {
-                // if(notesFlag == true){
+                if(notesFlag){
                     if (data.val()) {
                         addNote(data.val());
-                        // notesFlag = false;
+                        notesFlag = true;
                     }
-                // }else{
-                //     notesFlag = true;
-                // }
+                }else{
+                    notesFlag = true;
+                }
             });
             socket.child(`/close`).on('value', function (data) {
-                // if(closeFlag == true){
+                if(closeFlag){
                     if (data.val()) {
                         console.log("close ka firebase",data.val());
                         closeThread(data.val());
-                        // closeFlag = false;
+                        closeFlag = true;
                     }
-                // }else{
-                //     closeFlag = true;
-                // }
+                }else{
+                    closeFlag = true;
+                }
             });
             socket.child(`/snooze`).on('value', function (data) {
-                // if(snoozeFlag == true){
+                if(snoozeFlag){
                     if (data.val()) {
                         snoozeThread(data.val());
-                        // snoozeFlag = false;
+                        snoozeFlag = true;
                     }
-                // }else{
-                //     snoozeFlag = true;
-                // }
+                }else{
+                    snoozeFlag = true;
+                }
             });
             socket.child(`/unsnooze`).on('value', function (data) {
-                // if(unsnoozeFlag == true){
+                if(unsnoozeFlag){
                     if (data.val()) {
                         unsnoozeThread(data.val());
-                        // unsnoozeFlag = false;
+                        unsnoozeFlag = true;
                     }
-                // }else{
-                //     unsnoozeFlag = true;
-                // }
+                }else{
+                    unsnoozeFlag = true;
+                }
             });
             socket.child(`/delete`).on('value', function (data) {
-                // if(deleteFlag == true){
+                if(deleteFlag){
                     if (data.val()) {
                         deleteThread(data.val());
-                        // deleteFlag = false;
+                        deleteFlag = true;
                     }
-                // }else{
-                //     deleteFlag = true;
-                // }
+                }else{
+                    deleteFlag = true;
+                }
             });
             socket.child(`/addTag`).on('value', function (data) {
-                // if(addTagFlag == true){
+                if(addTagFlag){
                     if (data.val()) {
                         toggleTags(data.val());
-                        // addTagFlag = false;
+                        addTagFlag = true;
                     }
-                // }else{
-                //     addTagFlag = true;
-                // }
+                }else{
+                    addTagFlag = true;
+                }
             });
             socket.child(`/removeTag`).on('value', function (data) {
-                // if(removeTagFlag == true){
+                if(removeTagFlag){
                     if (data.val()) {
                         toggleTags(data.val());
-                        // removeTagFlag = false;
+                        removeTagFlag = true;
                     }
-                // }else{
-                //     removeTagFlag = true;
-                // }
+                }else{
+                    removeTagFlag = true;
+                }
             });
             socket.child(`/assign`).on('value', function (data) {
-                // if(assignFlag == true){
+                if(assignFlag){
                     if (data.val()) {
                         assignThread(data.val());
-                        // assignFlag = false;
+                        assignFlag = true;
                     }
-                // }else{
-                //     assignFlag = true;
-                // }
+                }else{
+                    assignFlag = true;
+                }
             });
             socket.child(`/moveToInbox`).on('value', function (data) {
-                // if(moveToInboxFlag == true){
+                if(moveToInboxFlag){
                     if (data.val()) {
                         moveToInboxThread(data.val());
-                        // moveToInboxFlag = false;
+                        moveToInboxFlag = true;
                     }
-                // }else{
-                //     moveToInboxFlag = true;
-                // }
+                }else{
+                    moveToInboxFlag = true;
+                }
             });
         }).catch((error) => {
             alert(error);

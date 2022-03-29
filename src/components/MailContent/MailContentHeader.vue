@@ -1513,7 +1513,6 @@ export default {
     const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
     // let viewingUserFlag = false;
     socket.child("/viewing user").on("value", (snapshot) => {
-      console.log("-------- VIEWING USERS --------", snapshot.val());
       if(snapshot.val()){
         this.viewingUsers = snapshot.val();
       }

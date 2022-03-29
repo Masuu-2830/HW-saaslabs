@@ -6,7 +6,7 @@
     <p class="typingMessageNotice tx-12 tx-italic tx-sans" v-if="typingNotesNotice">
       {{typingNotesNotice}}
     </p>
-    <div class="editorContainer">
+    <div class="editorContainer" :class="{'noteMode': this.thread.data.mailboxType == 'mail'}">
       <ul
         class="nav nav-line flex-row mg-l-20 mg-b-10"
         role="tablist"
@@ -882,11 +882,9 @@
       let threadID = this.$route.params.threadId;
       const vueThis = this;
       
-      console.log(`/Account-${managerID}/ThreadID-${threadID}`);
       const socket2 = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
 
       socket2.child(`/commenting user`).on('value', function(data){
-        console.log("--------- NOTES ---------", data.val());
         if(data.val()){
           vueThis.makingTypingCard(data.val(), "notes");
         } else {
