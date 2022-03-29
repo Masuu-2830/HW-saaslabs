@@ -1622,13 +1622,13 @@ export default {
       }
       // if ((to.params.type !== from.params.type && from.params.type !== undefined) || (from.params.threadId !== undefined && this.isThreadRefresh) ||(from.params.threadId !== undefined && to.params.type !== this.route)) {
       if (
-        from.params.type &&
+        // from.params.type &&
         to.params.type &&
-        (to.params.type != from.params.type ||
+        (to.params.type != this.$store.state.type ||
           this.isThreadRefresh ||
           to.params.type !== this.route)
       ) {
-        console.log("type");
+        console.error("type");
         bus.$emit("changeType");
         if (to.params.type == "assigned") {
           this.labelId = 0;
