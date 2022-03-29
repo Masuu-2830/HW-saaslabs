@@ -1647,9 +1647,14 @@ export default {
         // this.fetchThreads();
       }
       // if ((to.params.type !== from.params.type && from.params.type !== undefined) || (from.params.threadId !== undefined && this.isThreadRefresh) ||(from.params.threadId !== undefined && to.params.type !== this.route)) {
-      if (from.params.type && to.params.type && ((to.params.type != from.params.type) || this.isThreadRefresh || to.params.type !== this.route)) {
-        console.log(to, from);
-        console.log("type");
+      if (
+        // from.params.type &&
+        to.params.type &&
+        (to.params.type != this.$store.state.type ||
+          this.isThreadRefresh ||
+          to.params.type !== this.route)
+      ) {
+        console.error("type");
         bus.$emit("changeType");
         if (to.params.type == "assigned") {
           this.labelId = 0;

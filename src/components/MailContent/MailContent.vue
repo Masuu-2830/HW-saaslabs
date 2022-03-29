@@ -96,10 +96,9 @@ export default {
                 socket2.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
             }
         }
-  },
+    },
   created() {
-    console.log("----- CREATED -----");
-    bus.$on("compact", (data) => {
+    bus.$on("compact", (data, contactData) => {
       this.display = "flex";
       this.right = "0px";
       if (data == null) {

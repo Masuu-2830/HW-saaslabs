@@ -308,7 +308,7 @@ export default {
       return this.$store.state.tags
     },
     getMailboxID(){
-      return this.$route.params.mailboxId
+      return this.$store.state.inboxData.id
     },
     getRouteParamType(){
       return this.$store.state.type
