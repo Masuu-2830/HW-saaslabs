@@ -77,16 +77,6 @@ export default {
       integration_name: "",
     };
   },
-<<<<<<< HEAD
-  watch: {
-    $route(to, from) {
-      if (to.params.threadId !== from.params.threadId) {
-        // this.ifIntOpen = false;
-        this.right = "0px";
-        this.contactOpen = false;
-        this.sidebarOpen = false;
-      }
-=======
   watch:{
         $route (to, from) {
             if(to.params.threadId !== from.params.threadId) {
@@ -106,16 +96,9 @@ export default {
                 socket2.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
             }
         }
->>>>>>> 0911077c283a32dde3f8f15c00efbad187bcea69
     },
-  },
   created() {
-<<<<<<< HEAD
     bus.$on("compact", (data, contactData) => {
-=======
-    console.log("----- CREATED -----");
-    bus.$on("compact", (data) => {
->>>>>>> 0911077c283a32dde3f8f15c00efbad187bcea69
       this.display = "flex";
       this.right = "0px";
       if (data == null) {
@@ -248,18 +231,8 @@ export default {
   mounted() {
     let threadID = this.$route.params.threadId;
     let managerID = this.$store.state.userInfo.accountID;
-<<<<<<< HEAD
-    const socket = firebase_app
-      .database()
-      .ref(`/Account-${managerID}/Thread-${threadID}`);
-    // viewing user
-    socket
-      .child(`/viewing user/${this.$store.state.userInfo.id}`)
-      .set(this.$store.state.userInfo);
-=======
     const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
     socket.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
->>>>>>> 0911077c283a32dde3f8f15c00efbad187bcea69
   },
   beforeUnmount() {
     let managerID = this.$store.state.userInfo.accountID;

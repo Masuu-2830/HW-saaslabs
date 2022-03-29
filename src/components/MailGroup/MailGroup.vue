@@ -195,6 +195,9 @@ export default {
     };
   },
   created() {
+
+    // this.$apiBaseURL = "";
+    bus.$off("check");
     bus.$on("check", (id, check) => {
       if (id == 1) {
         if (check == true) {
@@ -307,42 +310,39 @@ export default {
         }
       }
     }),
-      bus.$on("broad", () => {
-        this.$store.dispatch("updateOpenThread", null);
-        this.isCompact = false;
-        this.activeId = "";
-        if (this.isThreadRefresh) {
-          router.push({
-            name: "page",
-            params: {
-              pageNo: this.currPage,
-              type: this.route ? this.route : this.$store.state.type,
-              mailboxId:
-                this.$route.params.mailboxId ||
-                (this.$store.state.inboxData &&
-                  this.$store.state.inboxData.id) ||
-                "me",
-            },
-          });
-          this.isThreadRefresh = false;
-          this.fetchThreads();
-        } else {
-          // console.log("this.$route.params.mailboxId",this.$route.params.mailboxId);
-          // console.log("this.$route.params.mailboxId",this.thread.data);
-          router.push({
-            name: "page",
-            params: {
-              pageNo: this.currPage,
-              type: this.route,
-              mailboxId:
-                this.$route.params.mailboxId ||
-                (this.$store.state.inboxData &&
-                  this.$store.state.inboxData.id) ||
-                "me",
-            },
-          });
-        }
-      });
+
+    bus.$off("broad");
+    bus.$on("broad", () => {
+
+      console.log("------ BROAD BUS EVENT ------");
+      this.$store.dispatch("updateOpenThread", null);
+      this.isCompact = false;
+      this.activeId = "";
+      if (this.isThreadRefresh) {
+        router.push({
+          name: "page",
+          params: {
+            pageNo: this.currPage,
+            type: this.route ? this.route : this.$store.state.type,
+            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+          },
+        });
+        this.isThreadRefresh = false;
+        this.fetchThreads();
+      } else {
+        // console.log("this.$route.params.mailboxId",this.$route.params.mailboxId);
+        // console.log("this.$route.params.mailboxId",this.thread.data);
+        router.push({
+          name: "page",
+          params: {
+            pageNo: this.currPage,
+            type: this.route,
+            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+          },
+        });
+      }
+    });
+    bus.$off("changeRead");
     bus.$on("changeRead", (id, read) => {
       console.log(read);
       let mailboxThreadMap = {};
@@ -391,6 +391,7 @@ export default {
         });
     });
 
+    bus.$off("changeStarred");
     bus.$on("changeStarred", (id) => {
       let mailboxThreadMap = {};
       let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
@@ -433,6 +434,8 @@ export default {
           alert(error);
         });
     });
+    
+    bus.$off("closeThread");
     bus.$on("closeThread", (id) => {
       console.log(id, typeof id);
       let threadIDs = new Array();
@@ -545,6 +548,8 @@ export default {
         });
       this.selectedIds = [];
     });
+    
+    bus.$off("restoreThreads");
     bus.$on("restoreThreads", (id) => {
       let threadIDs = new Array();
       if (typeof id == "number") {
@@ -657,6 +662,8 @@ export default {
         });
       this.selectedIds = [];
     });
+    
+    bus.$off("spamThreads");
     bus.$on("spamThreads", (id) => {
       let threadIDs = new Array();
       if (typeof id == "number") {
@@ -764,6 +771,8 @@ export default {
         });
       this.selectedIds = [];
     });
+    
+    bus.$off("moveToInbox");
     bus.$on("moveToInbox", (id, mailboxId) => {
       let threadIds = new Array();
       if (typeof id == "number") {
@@ -872,6 +881,8 @@ export default {
         });
       this.selectedIds = [];
     });
+    
+    bus.$off("doneThreads");
     bus.$on("doneThreads", (id) => {
       let threadIDs = new Array();
       if (typeof id == "number") {
@@ -956,6 +967,8 @@ export default {
         });
       this.selectedIds = [];
     });
+    
+    bus.$off("snoozeThread");
     bus.$on("snoozeThread", (id, till) => {
       let threadIDs = new Array();
       if (typeof id == "number") {
@@ -1064,6 +1077,8 @@ export default {
         });
       this.selectedIds = [];
     });
+    
+    bus.$off("assignThread");
     bus.$on("assignThread", (id, userId) => {
       let threadIds = new Array();
       if (typeof id == "number") {
@@ -1164,6 +1179,8 @@ export default {
           alert(error);
         });
     });
+    
+    bus.$off("moveConv");
     bus.$on("moveConv", (messageId, subject, threadId) => {
       const requestOptions = {
         method: "POST",
@@ -1202,6 +1219,8 @@ export default {
           alert(error);
         });
     });
+    
+    bus.$off("deleteThreads");
     bus.$on("deleteThreads", (id) => {
       let threadIDs = new Array();
       if (typeof id == "number") {
@@ -1309,6 +1328,8 @@ export default {
         });
       this.selectedIds = [];
     });
+    
+    bus.$off("createTags");
     bus.$on("createTags", (id, tagName, tagColor, folder) => {
       console.log(id, tagName, tagColor, folder);
       let threadIds = new Array();
@@ -1449,6 +1470,8 @@ export default {
           alert(error);
         });
     });
+    
+    bus.$off("toggleTags");
     bus.$on("toggleTags", (id, addtags, removetags, newTag) => {
       console.log(id, addtags, removetags, addtags.length);
       if (addtags.length || removetags.length) {
@@ -1594,7 +1617,9 @@ export default {
   },
   watch: {
     $route(to, from) {
-      console.log("params ke type", to.params, from.params);
+      console.log(to, from);
+      console.error("--------------------- 111111");
+      console.log("params ke type",to.params, from.params);
       this.selectedIds = [];
       console.log(this.isThreadRefresh);
       console.log("to params mailboxId", to.params.mailboxId);
@@ -1617,8 +1642,9 @@ export default {
         this.squery = "";
         this.$store.dispatch("type", this.route);
         this.$store.dispatch("labelId", this.labelId);
-        bus.$emit("broad");
-        this.fetchThreads();
+        bus.$emit("broad")
+        // console.log("------ WATCH ROUTE EVENT ------");
+        // this.fetchThreads();
       }
       // if ((to.params.type !== from.params.type && from.params.type !== undefined) || (from.params.threadId !== undefined && this.isThreadRefresh) ||(from.params.threadId !== undefined && to.params.type !== this.route)) {
       if (
@@ -1786,7 +1812,8 @@ export default {
         }
         this.$store.dispatch("type", this.route);
         this.$store.dispatch("labelId", this.labelId);
-        this.fetchThreads();
+        // console.log("------ WATCH ROUTE EVENT PART 2 ------");
+        // this.fetchThreads();
       }
       if (
         to.params.type == from.params.type &&
@@ -1796,8 +1823,12 @@ export default {
         this.currPage = 1;
         this.startThread = 1;
         this.endThread = 1;
-        this.fetchThreads();
+
+        // console.log("------ WATCH ROUTE EVENT PART 3 ------");
+        // this.fetchThreads();
       }
+
+      this.fetchThreads();
     },
   },
   methods: {
@@ -1818,6 +1849,7 @@ export default {
           },
         });
         this.isThreadRefresh = false;
+        console.log("------ BROAD FUNCTION CALL ------");
         this.fetchThreads();
       } else {
         router.push({
@@ -1837,18 +1869,21 @@ export default {
       this.personId = data;
       this.currPage = 1;
       console.log(this.personId);
+      console.log("------ FILTER PERSON FUNCTION ------");
       this.fetchThreads();
     },
     filterOrder(data) {
       this.order = data;
       this.currPage = 1;
       console.log(this.order);
+      console.log("------ FILTER ORDER FUNCTION ------");
       this.fetchThreads();
     },
     ssquery(data) {
       this.squery = data;
       console.log(this.order);
       this.currPage = 1;
+      console.log("------ SEARCH QUERY FUNCTION ------");
       this.fetchThreads();
     },
     bulkRead(read) {
@@ -2327,19 +2362,9 @@ export default {
     },
     async fetchThreads() {
       this.loading = true;
-      console.log("cool shizz", this.labelId, this.type);
+      console.log("cool shizz",this.labelId, this.type);
       bus.$emit("broad");
-      let url = `${this.$apiBaseURL}unifiedv2/getThreads.php?mailboxIDs[]=${
-        this.$route.params.mailboxId ||
-        (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-        "me"
-      }&page=${this.currPage}&labelID=${this.labelId}${
-        this.squery !== "" ? "&squery=" + this.squery : ""
-      }${this.tagId !== 0 ? "&tagID=" + this.tagId : ""}${
-        this.personId == 1 ? "&filter=unassigned" : ""
-      }${this.personId == 2 ? "&filter=unread" : ""}${
-        this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : ""
-      }${this.order !== "" ? "&order=" + this.order : ""}`;
+      let url = `${this.$apiBaseURL}unifiedv2/getThreads.php?mailboxIDs[]=${this.$route.params.mailboxId||this.$store.state.inboxData&&this.$store.state.inboxData.id||'me'}&page=${this.currPage}&labelID=${this.labelId}${this.squery!==""? "&squery="+this.squery:""}${this.tagId!==0? "&tagID="+this.tagId:""}${this.personId==1? "&filter=unassigned":""}${this.personId==2? "&filter=unread":""}${this.personId>2? "&filter=assignedTo%3A"+this.personId:""}${this.order!==""? "&order="+this.order:""}`;
       let response = await fetch(url, { credentials: "include" });
       const data = await response.json();
       this.mails = data.data.threads;
@@ -2584,6 +2609,7 @@ export default {
     if (this.$route.params.pageNo !== undefined) {
       console.log(2);
       this.currPage = this.$route.params.pageNo;
+      console.log("------ BEFORE MOUNT HOOK IF ------");
       await this.fetchThreads();
     } else {
       if (this.$route.params.threadId !== undefined) {
@@ -2626,6 +2652,7 @@ export default {
         console.log(3);
       } else {
         this.currPage = 1;
+        console.log("------ BEFORE MOUNT HOOK ELSE ------");
         await this.fetchThreads();
       }
     }

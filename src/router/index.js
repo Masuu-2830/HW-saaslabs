@@ -14,13 +14,13 @@ export default new Router({
       path: "/",
       name: 'Home',
       component: Home,
-      redirect: 'me/mine'
+      redirect: 'me/mine/p/1'
     },
     {
       path: '/:mailboxId',
       name: 'mailbox',
       component: Home,
-      redirect: '/:mailboxId/mine'
+      redirect: '/:mailboxId/mine/p/1'
     },
     {
       path: '/open/:threadId',
@@ -29,10 +29,11 @@ export default new Router({
       props: true
     },
     {
-      path: '/:mailboxId/:type',
+      path: '/:mailboxId/:type/p/1',
       name: 'type',
       component: Home,
       props: true,
+      // redirect: '/:mailboxId/:type'
     },
     {
       path: '/:mailboxId/:type/p/:pageNo',
