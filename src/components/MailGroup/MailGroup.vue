@@ -1647,173 +1647,187 @@ export default {
         this.fetchThreads();
       }
       // if ((to.params.type !== from.params.type && from.params.type !== undefined) || (from.params.threadId !== undefined && this.isThreadRefresh) ||(from.params.threadId !== undefined && to.params.type !== this.route)) {
-      if (
-        // from.params.type &&
-        to.params.type &&
-        (to.params.type != this.$store.state.type ||
-          this.isThreadRefresh ||
-          to.params.type !== this.route)
-      ) {
-        console.error("type");
-        bus.$emit("changeType");
-        if (to.params.type == "assigned") {
-          this.labelId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "mine") {
-          this.labelId = 4;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "mentions") {
-          this.labelId = 13;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "discussions") {
-          this.labelId = 15;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "unassigned") {
-          this.labelId = 10;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "starred") {
-          this.labelId = 11;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "snoozed") {
-          this.labelId = 9;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "drafts") {
-          this.labelId = 2;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "all") {
-          this.labelId = 14;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "sent") {
-          this.labelId = 1;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "scheduled") {
-          this.labelId = 6;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "closed") {
-          this.labelId = 7;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "spam") {
-          this.labelId = 8;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (to.params.type == "trash") {
-          this.labelId = 5;
-          this.tagId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        } else if (
-          to.params.type !== undefined &&
-          to.params.type.substring(0, 3) == "tag"
-        ) {
-          this.tagId = to.params.type.substring(4);
-          this.tagId = 0;
-          this.labelId = 0;
-          this.route = to.params.type;
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-        }
-        this.$store.dispatch("type", this.route);
-        this.$store.dispatch("labelId", this.labelId);
-        // console.log("------ WATCH ROUTE EVENT PART 2 ------");
+      if(to.params.mailboxId == 'tags'){
+        this.labelId = 14;
+        this.tagId = to.params.type;
+        this.currPage = 1;
+        this.startThread = 1;
+        this.endThread = 1;
+        this.personId = 0;
+        this.order = "";
+        this.squery = "";
         this.fetchThreads();
+      } else {
+        if (
+          // from.params.type &&
+          to.params.type &&
+          (to.params.type != this.$store.state.type ||
+            this.isThreadRefresh ||
+            to.params.type !== this.route)
+        ) {
+          console.error("type");
+          bus.$emit("changeType");
+
+          if (to.params.type == "assigned") {
+            this.labelId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "mine") {
+            this.labelId = 4;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "mentions") {
+            this.labelId = 13;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "discussions") {
+            this.labelId = 15;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "unassigned") {
+            this.labelId = 10;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "starred") {
+            this.labelId = 11;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "snoozed") {
+            this.labelId = 9;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "drafts") {
+            this.labelId = 2;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "all") {
+            this.labelId = 14;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "sent") {
+            this.labelId = 1;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "scheduled") {
+            this.labelId = 6;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "closed") {
+            this.labelId = 7;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "spam") {
+            this.labelId = 8;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (to.params.type == "trash") {
+            this.labelId = 5;
+            this.tagId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          } else if (
+            to.params.type !== undefined &&
+            to.params.type.substring(0, 3) == "tag"
+          ) {
+            this.tagId = to.params.type.substring(4);
+            this.tagId = 0;
+            this.labelId = 0;
+            this.route = to.params.type;
+            this.currPage = 1;
+            this.startThread = 1;
+            this.endThread = 1;
+            this.personId = 0;
+            this.order = "";
+            this.squery = "";
+          }
+
+          this.$store.dispatch("type", this.route);
+          this.$store.dispatch("labelId", this.labelId);
+          // console.log("------ WATCH ROUTE EVENT PART 2 ------");
+          this.fetchThreads();
+        }
       }
       if (
         to.params.type == from.params.type &&
@@ -2361,11 +2375,16 @@ export default {
       }
     },
     async fetchThreads() {
+
+      let inboxId = `${this.$route.params.mailboxId||this.$store.state.inboxData&&this.$store.state.inboxData.id||'me'}`;
+      if(inboxId == "tags"){
+        inboxId = "me";
+      }
       this.loading = true;
       console.log("cool shizz",this.labelId, this.type);
       bus.$emit("broad");
       bus.$emit("broadForContent")
-      let url = `${this.$apiBaseURL}unifiedv2/getThreads.php?mailboxIDs[]=${this.$route.params.mailboxId||this.$store.state.inboxData&&this.$store.state.inboxData.id||'me'}&page=${this.currPage}&labelID=${this.labelId}${this.squery!==""? "&squery="+this.squery:""}${this.tagId!==0? "&tagID="+this.tagId:""}${this.personId==1? "&filter=unassigned":""}${this.personId==2? "&filter=unread":""}${this.personId>2? "&filter=assignedTo%3A"+this.personId:""}${this.order!==""? "&order="+this.order:""}`;
+      let url = `${this.$apiBaseURL}unifiedv2/getThreads.php?mailboxIDs[]=${inboxId}&page=${this.currPage}&labelID=${this.labelId}${this.squery!==""? "&squery="+this.squery:""}${this.tagId!==0? "&tagID="+this.tagId:""}${this.personId==1? "&filter=unassigned":""}${this.personId==2? "&filter=unread":""}${this.personId>2? "&filter=assignedTo%3A"+this.personId:""}${this.order!==""? "&order="+this.order:""}`;
       let response = await fetch(url, { credentials: "include" });
       const data = await response.json();
       this.mails = data.data.threads;
