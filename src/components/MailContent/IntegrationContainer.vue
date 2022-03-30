@@ -28,7 +28,7 @@
             />
         </div>
         <div v-if="contactOpen" :class="{open: contactOpen}" style="overflow-y: auto; overflow-x: hidden">
-            <mail-contact-panel :thread="thread"></mail-contact-panel>
+            <mail-contact-panel :thread="thread" :contact="contact"></mail-contact-panel>
         </div>
     </div>
 </template>
@@ -53,7 +53,7 @@
                 commentData: {}
             }
         },
-        props: ["sidebarOpen", "contactOpen", "thread"],
+        props: ["sidebarOpen", "contactOpen", "thread", "contact"],
         components:{IntegrationData, IntegrationSidebar, MailContactPanel},
         methods: {
             openIntegration(integrationData){

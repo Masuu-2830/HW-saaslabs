@@ -14,6 +14,7 @@
       <span class="sr-only">Loading...</span>
     </div>
     <mails-header-search-box v-on:squery="ssquery"></mails-header-search-box>
+    <mails-type-filter></mails-type-filter>
     <mails-header-select-all
       :selectedIds="selectedIds"
       :tagsInAll="tagsInAll"
@@ -36,14 +37,14 @@
     <div
       v-if="!loading"
       class="mail-group-body bd-y"
-      style="overflow-y: auto; overflow-x: hidden; background-color: white"
+      style="overflow-y: auto; overflow-x: hidden; background-color: white; position: relative; top: 0px; height: 100%"
     >
       <div v-if="this.$store.state.threads.length !== 0" id="threads-list">
         <div
           v-for="mail in this.$store.state.threads"
           :key="mail.id"
           @click="
-            clickThread(mail.id, mail.type, mail.subtype, mail.ticketNumber)
+            clickThread(mail.id, mail.type, mail.subtype, mail.ticketNumber, mail.mailboxId)
           "
         >
           <mail-group-single-mail
@@ -156,11 +157,13 @@ import router from "../../router";
 import MailGroupSingleMail from "./MailGroupSingleMail.vue";
 import MailsHeaderSearchBox from "./MailsHeaderSearchBox.vue";
 import MailsHeaderSelectAll from "./MailsHeaderSelectAll.vue";
+import MailsTypeFilter from './MailsTypeFilter.vue';
 export default {
   components: {
     MailsHeaderSearchBox,
     MailsHeaderSelectAll,
     MailGroupSingleMail,
+    MailsTypeFilter,
   },
   name: "MailGroup",
   props: {
@@ -192,6 +195,9 @@ export default {
     };
   },
   created() {
+
+    // this.$apiBaseURL = "";
+    bus.$off("check");
     bus.$on("check", (id, check) => {
       if (id == 1) {
         if (check == true) {
@@ -304,34 +310,39 @@ export default {
         }
       }
     }),
-      bus.$on("broad", () => {
-        this.$store.dispatch("updateOpenThread", null);
-        this.isCompact = false;
-        this.activeId = "";
-        if (this.isThreadRefresh) {
-          router.push({
-            name: "page",
-            params: {
-              pageNo: this.currPage,
-              type: this.route ? this.route : this.$store.state.type,
-              mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-            },
-          });
-          this.isThreadRefresh = false;
-          this.fetchThreads();
-        } else {
-          // console.log("this.$route.params.mailboxId",this.$route.params.mailboxId);
-          // console.log("this.$route.params.mailboxId",this.thread.data);
-          router.push({
-            name: "page",
-            params: {
-              pageNo: this.currPage,
-              type: this.route,
-              mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-            },
-          });
-        }
-      });
+
+    bus.$off("broad");
+    bus.$on("broad", () => {
+
+      console.log("------ BROAD BUS EVENT ------");
+      this.$store.dispatch("updateOpenThread", null);
+      this.isCompact = false;
+      this.activeId = "";
+      if (this.isThreadRefresh) {
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route ? this.route : this.$store.state.type,
+        //     mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+        //   },
+        // });
+        this.isThreadRefresh = false;
+        this.fetchThreads();
+      } else {
+        // console.log("this.$route.params.mailboxId",this.$route.params.mailboxId);
+        // console.log("this.$route.params.mailboxId",this.thread.data);
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route,
+        //     mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+        //   },
+        // });
+      }
+    });
+    bus.$off("changeRead");
     bus.$on("changeRead", (id, read) => {
       console.log(read);
       let mailboxThreadMap = {};
@@ -380,6 +391,7 @@ export default {
         });
     });
 
+    bus.$off("changeStarred");
     bus.$on("changeStarred", (id) => {
       let mailboxThreadMap = {};
       let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
@@ -422,6 +434,8 @@ export default {
           alert(error);
         });
     });
+    
+    bus.$off("closeThread");
     bus.$on("closeThread", (id) => {
       console.log(id, typeof id);
       let threadIDs = new Array();
@@ -439,9 +453,9 @@ export default {
         var objIndex;
         for (let i in id) {
           objIndex = this.perPageMails.findIndex((obj) => obj.id == id[i]);
-          console.log("objIndex",objIndex);
-          console.log("id[i]",id[i]);
-          console.log("this.perPageMails",this.perPageMails);
+          console.log("objIndex", objIndex);
+          console.log("id[i]", id[i]);
+          console.log("this.perPageMails", this.perPageMails);
           if (
             !(
               this.perPageMails[objIndex].mailboxId in
@@ -486,30 +500,35 @@ export default {
           }
           bus.$emit("fetchSideBarStats");
           const limit = threadIDs.length;
-          const offset = this.$store.state.userSettings.resultsPerPage - threadIDs.length;
+          const offset =
+            this.$store.state.userSettings.resultsPerPage - threadIDs.length;
           let url;
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&consistent=true";
           } else {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&offset=" +
-              offset +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&offset=" +
+                offset +
+                "&consistent=true";
           }
           fetch(url, { credentials: "include" }).then(async (response) => {
             const data = await response.json();
@@ -527,8 +546,10 @@ export default {
         .catch((error) => {
           alert(error);
         });
-        this.selectedIds = [];
+      this.selectedIds = [];
     });
+    
+    bus.$off("restoreThreads");
     bus.$on("restoreThreads", (id) => {
       let threadIDs = new Array();
       if (typeof id == "number") {
@@ -600,25 +621,29 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&consistent=true";
           } else {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&offset=" +
-              offset +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&offset=" +
+                offset +
+                "&consistent=true";
           }
           fetch(url, { credentials: "include" }).then(async (response) => {
             const data = await response.json();
@@ -637,6 +662,8 @@ export default {
         });
       this.selectedIds = [];
     });
+    
+    bus.$off("spamThreads");
     bus.$on("spamThreads", (id) => {
       let threadIDs = new Array();
       if (typeof id == "number") {
@@ -703,25 +730,29 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&consistent=true";
           } else {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&offset=" +
-              offset +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&offset=" +
+                offset +
+                "&consistent=true";
           }
           fetch(url, { credentials: "include" }).then(async (response) => {
             const data = await response.json();
@@ -738,8 +769,10 @@ export default {
         .catch((error) => {
           alert(error);
         });
-        this.selectedIds = [];
+      this.selectedIds = [];
     });
+    
+    bus.$off("moveToInbox");
     bus.$on("moveToInbox", (id, mailboxId) => {
       let threadIds = new Array();
       if (typeof id == "number") {
@@ -807,25 +840,29 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&consistent=true";
           } else {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&offset=" +
-              offset +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&offset=" +
+                offset +
+                "&consistent=true";
           }
           fetch(url, { credentials: "include" }).then(async (response) => {
             const data = await response.json();
@@ -842,8 +879,10 @@ export default {
         .catch((error) => {
           alert(error);
         });
-        this.selectedIds = [];
+      this.selectedIds = [];
     });
+    
+    bus.$off("doneThreads");
     bus.$on("doneThreads", (id) => {
       let threadIDs = new Array();
       if (typeof id == "number") {
@@ -887,25 +926,29 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&consistent=true";
           } else {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&offset=" +
-              offset +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&offset=" +
+                offset +
+                "&consistent=true";
           }
           fetch(url, { credentials: "include" }).then(async (response) => {
             const data = await response.json();
@@ -922,8 +965,10 @@ export default {
         .catch((error) => {
           alert(error);
         });
-        this.selectedIds = [];
+      this.selectedIds = [];
     });
+    
+    bus.$off("snoozeThread");
     bus.$on("snoozeThread", (id, till) => {
       let threadIDs = new Array();
       if (typeof id == "number") {
@@ -991,25 +1036,29 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&consistent=true";
           } else {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&offset=" +
-              offset +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&offset=" +
+                offset +
+                "&consistent=true";
           }
           fetch(url, { credentials: "include" }).then(async (response) => {
             const data = await response.json();
@@ -1026,8 +1075,10 @@ export default {
         .catch((error) => {
           alert(error);
         });
-        this.selectedIds = [];
+      this.selectedIds = [];
     });
+    
+    bus.$off("assignThread");
     bus.$on("assignThread", (id, userId) => {
       let threadIds = new Array();
       if (typeof id == "number") {
@@ -1128,6 +1179,8 @@ export default {
           alert(error);
         });
     });
+    
+    bus.$off("moveConv");
     bus.$on("moveConv", (messageId, subject, threadId) => {
       const requestOptions = {
         method: "POST",
@@ -1166,6 +1219,8 @@ export default {
           alert(error);
         });
     });
+    
+    bus.$off("deleteThreads");
     bus.$on("deleteThreads", (id) => {
       let threadIDs = new Array();
       if (typeof id == "number") {
@@ -1232,25 +1287,29 @@ export default {
           if (offset == 0) {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&consistent=true";
           } else {
             url =
               this.$apiBaseURL +
-              "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              this.$route.params.mailboxId || this.$store.inboxData && this.$store.inboxData.id || 'me' +
-              "&labelID=" +
-              this.labelId +
-              "&limit=" +
-              limit +
-              "&offset=" +
-              offset +
-              "&consistent=true";
+                "unifiedv2/getThreads.php?mailboxIDs[]=" +
+                this.$route.params.mailboxId ||
+              (this.$store.inboxData && this.$store.inboxData.id) ||
+              "me" +
+                "&labelID=" +
+                this.labelId +
+                "&limit=" +
+                limit +
+                "&offset=" +
+                offset +
+                "&consistent=true";
           }
           fetch(url, { credentials: "include" }).then(async (response) => {
             const data = await response.json();
@@ -1267,8 +1326,10 @@ export default {
         .catch((error) => {
           alert(error);
         });
-        this.selectedIds = [];
+      this.selectedIds = [];
     });
+    
+    bus.$off("createTags");
     bus.$on("createTags", (id, tagName, tagColor, folder) => {
       console.log(id, tagName, tagColor, folder);
       let threadIds = new Array();
@@ -1302,7 +1363,7 @@ export default {
         }
       }
       console.log(mailboxThreadMap);
-      if(tagColor == '' || tagColor == undefined) {
+      if (tagColor == "" || tagColor == undefined) {
         tagColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
       }
       const requestOptions = {
@@ -1329,9 +1390,9 @@ export default {
               (obj) => obj.id == threadIds[t]
             );
             let newTag = new Object();
-            newTag['name'] = tagName;
-            newTag['id'] = data.data;
-            newTag['color'] = tagColor;
+            newTag["name"] = tagName;
+            newTag["id"] = data.data;
+            newTag["color"] = tagColor;
             this.perPageMails[objIndex].tags.push(newTag);
             let logs = new Array();
             let toAdd = new Array();
@@ -1409,6 +1470,8 @@ export default {
           alert(error);
         });
     });
+    
+    bus.$off("toggleTags");
     bus.$on("toggleTags", (id, addtags, removetags, newTag) => {
       console.log(id, addtags, removetags, addtags.length);
       if (addtags.length || removetags.length) {
@@ -1554,31 +1617,44 @@ export default {
   },
   watch: {
     $route(to, from) {
+      console.log(to, from);
+      console.error("--------------------- 111111");
       console.log("params ke type",to.params, from.params);
       this.selectedIds = [];
       console.log(this.isThreadRefresh);
-      console.log("to params mailboxId",to.params.mailboxId);
-      console.log("this.$store.state.inboxData",this.$store.state.inboxData);
-      console.log("this.route dhikhana",this.route);
-      if(to.params.mailboxId !== undefined && this.$store.state.inboxData && (to.params.mailboxId != this.$store.state.inboxData.id)) {
-        console.log("CHanging inbox")
+      console.log("to params mailboxId", to.params.mailboxId);
+      console.log("this.$store.state.inboxData", this.$store.state.inboxData);
+      console.log("this.route dhikhana", this.route);
+      if (
+        to.params.mailboxId !== undefined &&
+        this.$store.state.inboxData &&
+        to.params.mailboxId != this.$store.state.inboxData.id
+      ) {
+        console.log("CHanging inbox");
         this.labelId = 4;
-          this.tagId = 0;
-          this.route = 'mine';
-          this.currPage = 1;
-          this.startThread = 1;
-          this.endThread = 1;
-          this.personId = 0;
-          this.order = "";
-          this.squery = "";
-          this.$store.dispatch("type", this.route);
+        this.tagId = 0;
+        this.route = "mine";
+        this.currPage = 1;
+        this.startThread = 1;
+        this.endThread = 1;
+        this.personId = 0;
+        this.order = "";
+        this.squery = "";
+        this.$store.dispatch("type", this.route);
         this.$store.dispatch("labelId", this.labelId);
-        bus.$emit("broad")
+        // bus.$emit("broad")
+        // console.log("------ WATCH ROUTE EVENT ------");
         this.fetchThreads();
       }
       // if ((to.params.type !== from.params.type && from.params.type !== undefined) || (from.params.threadId !== undefined && this.isThreadRefresh) ||(from.params.threadId !== undefined && to.params.type !== this.route)) {
-      if (from.params.type && to.params.type && ((to.params.type != from.params.type) || this.isThreadRefresh || to.params.type !== this.route)) {
-        console.log("type");
+      if (
+        // from.params.type &&
+        to.params.type &&
+        (to.params.type != this.$store.state.type ||
+          this.isThreadRefresh ||
+          to.params.type !== this.route)
+      ) {
+        console.error("type");
         bus.$emit("changeType");
         if (to.params.type == "assigned") {
           this.labelId = 0;
@@ -1719,20 +1795,24 @@ export default {
           this.personId = 0;
           this.order = "";
           this.squery = "";
-        } else if(to.params.type !== undefined && to.params.type.substring(0,3) == 'tag'){
-            this.tagId = to.params.type.substring(4);
-            this.tagId = 0;
-            this.labelId = 0;
-            this.route = to.params.type;
-            this.currPage = 1;
-            this.startThread = 1;
-            this.endThread = 1;
-            this.personId = 0;
-            this.order = "";
-            this.squery = "";
+        } else if (
+          to.params.type !== undefined &&
+          to.params.type.substring(0, 3) == "tag"
+        ) {
+          this.tagId = to.params.type.substring(4);
+          this.tagId = 0;
+          this.labelId = 0;
+          this.route = to.params.type;
+          this.currPage = 1;
+          this.startThread = 1;
+          this.endThread = 1;
+          this.personId = 0;
+          this.order = "";
+          this.squery = "";
         }
         this.$store.dispatch("type", this.route);
         this.$store.dispatch("labelId", this.labelId);
+        // console.log("------ WATCH ROUTE EVENT PART 2 ------");
         this.fetchThreads();
       }
       if (
@@ -1743,8 +1823,12 @@ export default {
         this.currPage = 1;
         this.startThread = 1;
         this.endThread = 1;
+
+        // console.log("------ WATCH ROUTE EVENT PART 3 ------");
         this.fetchThreads();
       }
+
+      // this.fetchThreads();
     },
   },
   methods: {
@@ -1753,43 +1837,53 @@ export default {
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
-        router.push({
-          name: "page",
-          params: {
-            pageNo: this.currPage,
-            type: this.route ? this.route : this.$store.state.type,
-            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-          },
-        });
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route ? this.route : this.$store.state.type,
+        //     mailboxId:
+        //       this.$route.params.mailboxId ||
+        //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+        //       "me",
+        //   },
+        // });
         this.isThreadRefresh = false;
+        console.log("------ BROAD FUNCTION CALL ------");
         this.fetchThreads();
       } else {
-        router.push({
-          name: "page",
-          params: {
-            pageNo: this.currPage,
-            type: this.route,
-            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-          },
-        });
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route,
+        //     mailboxId:
+        //       this.$route.params.mailboxId ||
+        //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+        //       "me",
+        //   },
+        // });
       }
     },
     filterPerson(data) {
       this.personId = data;
       this.currPage = 1;
       console.log(this.personId);
+      console.log("------ FILTER PERSON FUNCTION ------");
       this.fetchThreads();
     },
     filterOrder(data) {
       this.order = data;
       this.currPage = 1;
       console.log(this.order);
+      console.log("------ FILTER ORDER FUNCTION ------");
       this.fetchThreads();
     },
     ssquery(data) {
       this.squery = data;
       console.log(this.order);
       this.currPage = 1;
+      console.log("------ SEARCH QUERY FUNCTION ------");
       this.fetchThreads();
     },
     bulkRead(read) {
@@ -2015,7 +2109,10 @@ export default {
             url =
               this.$apiBaseURL +
               "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              (this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me') +
+              (this.$route.params.mailboxId ||
+                (this.$store.state.inboxData &&
+                  this.$store.state.inboxData.id) ||
+                "me") +
               "&labelID=" +
               this.labelId +
               "&limit=" +
@@ -2025,7 +2122,10 @@ export default {
             url =
               this.$apiBaseURL +
               "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              (this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me') +
+              (this.$route.params.mailboxId ||
+                (this.$store.state.inboxData &&
+                  this.$store.state.inboxData.id) ||
+                "me") +
               "&labelID=" +
               this.labelId +
               "&limit=" +
@@ -2093,7 +2193,10 @@ export default {
             url =
               this.$apiBaseURL +
               "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              (this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me') +
+              (this.$route.params.mailboxId ||
+                (this.$store.state.inboxData &&
+                  this.$store.state.inboxData.id) ||
+                "me") +
               "&labelID=" +
               this.labelId +
               "&limit=" +
@@ -2103,7 +2206,10 @@ export default {
             url =
               this.$apiBaseURL +
               "unifiedv2/getThreads.php?mailboxIDs[]=" +
-              (this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me') +
+              (this.$route.params.mailboxId ||
+                (this.$store.state.inboxData &&
+                  this.$store.state.inboxData.id) ||
+                "me") +
               "&labelID=" +
               this.labelId +
               "&limit=" +
@@ -2128,13 +2234,16 @@ export default {
           alert(error);
         });
     },
-    async clickThread(id, type, subtype, ticketNumber) {
+    async clickThread(id, type, subtype, ticketNumber, mailboxId) {
       console.log("yhn aya hoga");
       var objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
-      if (this.route == "drafts" && this.perPageMails[objIndex].messageCount == 1) {
+      if (
+        this.route == "drafts" &&
+        this.perPageMails[objIndex].messageCount == 1
+      ) {
         console.log("fir?");
         // if(this.$store.state.inboxData.type == 'mail') {
-        if(type == 'mail') {
+        if (type == "mail") {
           console.log(this.perPageMails[objIndex].messageCount, objIndex);
           let emailId = this.perPageMails[objIndex].id;
           fetch(
@@ -2152,9 +2261,9 @@ export default {
             }
             let hash =
               Date.now() + "-" + Math.floor(Math.random() * 100000000000);
-            bus.$emit("openCompose", hash, 'mail', data.data.email);
+            bus.$emit("openCompose", hash, "mail", data.data.email);
           });
-        } else if(type == 'twitter') {
+        } else if (type == "twitter") {
           console.log(this.perPageMails[objIndex].messageCount, objIndex);
           let emailId = this.perPageMails[objIndex].email.id;
           fetch(
@@ -2172,10 +2281,9 @@ export default {
             }
             let hash =
               Date.now() + "-" + Math.floor(Math.random() * 100000000000);
-            bus.$emit("openTweetCompose", hash, 'twitter', data.data.email);
+            bus.$emit("openTweetCompose", hash, "twitter", data.data.email);
           });
         }
-        
       } else {
         bus.$emit("changeRead", id, 1);
         this.activeId = id;
@@ -2183,6 +2291,29 @@ export default {
         let data = null;
         bus.$emit("compact", data);
         data = await this.fetchThread(id, type, subtype);
+        let data1;
+        if(type == 'chat') {
+          await fetch(
+            this.$apiBaseURL +
+              "chat-widget/getUserDetails_V2?id=" +
+              data.data.contact.id +
+              "&mailboxID=" +
+              mailboxId,
+            { credentials: "include"}
+          )
+            .then(async (response) => {
+              data1 = await response.json();
+              if (data1.status !== "success") {
+                const error = (data1 && data1.message) || response.status;
+                triggerPromptNotif(error, "error", 3000);
+                return Promise.reject(error);
+              }
+              console.log(data1);
+            })
+            .catch((error) => {
+              alert(error);
+            });
+        }
         data["data"]["ticketNumber"] = ticketNumber;
         if (this.isThreadRefresh) {
           let from = {};
@@ -2223,15 +2354,17 @@ export default {
           };
           console.log(thread);
           this.perPageMails.push(thread);
-          this.$store.dispatch("updateThreads", this.perPageMails); 
+          this.$store.dispatch("updateThreads", this.perPageMails);
         }
-        bus.$emit("compact", this.$store.state.threadData[id]);
+        console.log(data1);
+        bus.$emit("compact", this.$store.state.threadData[id], data1);
       }
     },
     async fetchThreads() {
       this.loading = true;
       console.log("cool shizz",this.labelId, this.type);
       bus.$emit("broad");
+      bus.$emit("broadForContent")
       let url = `${this.$apiBaseURL}unifiedv2/getThreads.php?mailboxIDs[]=${this.$route.params.mailboxId||this.$store.state.inboxData&&this.$store.state.inboxData.id||'me'}&page=${this.currPage}&labelID=${this.labelId}${this.squery!==""? "&squery="+this.squery:""}${this.tagId!==0? "&tagID="+this.tagId:""}${this.personId==1? "&filter=unassigned":""}${this.personId==2? "&filter=unread":""}${this.personId>2? "&filter=assignedTo%3A"+this.personId:""}${this.order!==""? "&order="+this.order:""}`;
       let response = await fetch(url, { credentials: "include" });
       const data = await response.json();
@@ -2241,22 +2374,34 @@ export default {
       this.isnextPage = data.data.nextPage;
       this.perPageMails = this.mails;
       this.resultsPerPage = this.$store.state.userSettings.resultsPerPage;
-      // this.resultsPerPage = 1;
-      router.push({
-        name: "page",
-        params: {
-          pageNo: this.currPage,
-          type: this.route,
-          mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-        },
-      });
-      this.startThread = (parseInt(this.currPage) - 1) * this.resultsPerPage + 1;
-      this.endThread = parseInt(this.startThread) + parseInt(this.resultsPerPage) - 1;
+      // // this.resultsPerPage = 1;
+      // router.push({
+      //   name: "page",
+      //   params: {
+      //     pageNo: this.currPage,
+      //     type: this.route,
+      //     mailboxId:
+      //       this.$route.params.mailboxId ||
+      //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+      //       "me",
+      //   },
+      // });
+      this.startThread =
+        (parseInt(this.currPage) - 1) * this.resultsPerPage + 1;
+      this.endThread =
+        parseInt(this.startThread) + parseInt(this.resultsPerPage) - 1;
     },
     async fetchThread(id, type, subtype) {
-      let mailboxID = this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me';
+      this.$store.dispatch("updateOpenThread", id);
+      let mailboxID =
+        this.$route.params.mailboxId ||
+        (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+        "me";
       // if(this.$store.state.inboxData.id)
-      const response = await fetch(`${this.$apiBaseURL}unifiedv2/getThreadData.php?threadID=${id}&mailboxID=${mailboxID}&inboxType=${type}&inboxSubType=${subtype}&labelID=${this.labelId}&maxDate=0&page=1`,{ credentials: "include" });
+      const response = await fetch(
+        `${this.$apiBaseURL}unifiedv2/getThreadData.php?threadID=${id}&mailboxID=${mailboxID}&inboxType=${type}&inboxSubType=${subtype}&labelID=${this.labelId}&maxDate=0&page=1`,
+        { credentials: "include" }
+      );
       const data = await response.json();
       if (this.$store.state.userSettings.orderThread == "asc") {
         data.data.items = data.data.items.sort(
@@ -2273,7 +2418,6 @@ export default {
       console.log(data);
       if (!(id in Object.keys(await this.$store.state.threadData))) {
         this.$store.dispatch("updateThreadData", data);
-        this.$store.dispatch("updateOpenThread", id);
       }
       router.push({
         name: "thread",
@@ -2286,12 +2430,14 @@ export default {
     async nextPage() {
       if (this.isnextPage == true) {
         this.loading = true;
-        this.currPage+=1;
-        console.log("this.currPage",this.currPage);
+        this.currPage += 1;
+        console.log("this.currPage", this.currPage);
         let url =
           this.$apiBaseURL +
           "unifiedv2/getThreads.php?mailboxIDs[]=" +
-          (this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me') +
+          (this.$route.params.mailboxId ||
+            (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+            "me") +
           "&page=" +
           this.currPage +
           "&labelID=" +
@@ -2325,7 +2471,11 @@ export default {
             params: {
               pageNo: this.currPage,
               type: this.route,
-              mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+              mailboxId:
+                this.$route.params.mailboxId ||
+                (this.$store.state.inboxData &&
+                  this.$store.state.inboxData.id) ||
+                "me",
             },
           });
         }
@@ -2334,7 +2484,7 @@ export default {
     async prevPage() {
       if (this.currPage > 1) {
         this.loading = true;
-        this.currPage-=1;
+        this.currPage -= 1;
         console.log(typeof this.currPage);
         if (this.$route.params.threadId == undefined) {
           router.push({
@@ -2342,14 +2492,20 @@ export default {
             params: {
               pageNo: this.currPage,
               type: this.route,
-              mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+              mailboxId:
+                this.$route.params.mailboxId ||
+                (this.$store.state.inboxData &&
+                  this.$store.state.inboxData.id) ||
+                "me",
             },
           });
         }
         let url =
           this.$apiBaseURL +
           "unifiedv2/getThreads.php?mailboxIDs[]=" +
-          (this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me') +
+          (this.$route.params.mailboxId ||
+            (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+            "me") +
           "&page=" +
           this.currPage +
           "&labelID=" +
@@ -2454,6 +2610,7 @@ export default {
     if (this.$route.params.pageNo !== undefined) {
       console.log(2);
       this.currPage = this.$route.params.pageNo;
+      console.log("------ BEFORE MOUNT HOOK IF ------");
       await this.fetchThreads();
     } else {
       if (this.$route.params.threadId !== undefined) {
@@ -2496,6 +2653,7 @@ export default {
         console.log(3);
       } else {
         this.currPage = 1;
+        console.log("------ BEFORE MOUNT HOOK ELSE ------");
         await this.fetchThreads();
       }
     }

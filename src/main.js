@@ -25,11 +25,32 @@ import "vue-toastification/dist/index.css";
 import './firebaseInit.js';
 // import 'bootstrap/dist/css/bootstrap.css'
 window.$ = $;
-Vue.use(require('vue-moment'));
+// const moment = require('moment')
+// require('moment/locale/es')
+
+Vue.use(require('vue-moment'))
 Vue.use(VueFroala);
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
-
+// Vue.moment().locale('en');
+Vue.moment().locale('en', {
+  relativeTime: {
+      future: 'in %s',
+      past: number => (number == 'just now' ? number : `${number} ago`),
+      s: 'just now',
+      ss: 'just now',
+      m: '%dmin',
+      mm: '%dmin',
+      h: '%dH',
+      hh: '%dH',
+      d: '%dD',
+      dd: '%dD',
+      M: '%dM',
+      MM: '%dM',
+      y: '%dY',
+      yy: '%dY',
+  },
+});
 export const bus = new Vue();
 
 function refreshSignatureDropdownOnShow($btn, $dropdown) {

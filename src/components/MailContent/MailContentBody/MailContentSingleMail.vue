@@ -14,7 +14,7 @@
       rounded
     "
     :class="!isMailCollapsed && 'uncollapsed'"
-    id="email-23153177"
+    :id="'email-'+ item.data.id"
     style="margin-left: 20px; margin-top: 20px; margin-right: 20px"
   >
     <div

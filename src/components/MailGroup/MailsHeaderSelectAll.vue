@@ -2,7 +2,7 @@
   <div
     v-if="this.$store.state.stateLoaded"
     class="mail-group-header justify-content-center"
-    style="top: 55px; height: 40px"
+    style="position: relative; height: 40px; border-top: 1px solid rgba(72, 94, 144, 0.16); border-bottom: none"
   >
     <div
       class="row flex-column d-flex"
@@ -1295,6 +1295,7 @@
         <div
           id="right-toolbar-container"
           class="d-flex align-items-center justify-content-between"
+          :class="$store.state.openThread !== null && 'flex-grow-1'"
         >
           <div
             class="
