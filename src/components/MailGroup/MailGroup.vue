@@ -1644,7 +1644,7 @@ export default {
         this.$store.dispatch("labelId", this.labelId);
         // bus.$emit("broad")
         // console.log("------ WATCH ROUTE EVENT ------");
-        // this.fetchThreads();
+        this.fetchThreads();
       }
       // if ((to.params.type !== from.params.type && from.params.type !== undefined) || (from.params.threadId !== undefined && this.isThreadRefresh) ||(from.params.threadId !== undefined && to.params.type !== this.route)) {
       if (
@@ -1813,7 +1813,7 @@ export default {
         this.$store.dispatch("type", this.route);
         this.$store.dispatch("labelId", this.labelId);
         // console.log("------ WATCH ROUTE EVENT PART 2 ------");
-        // this.fetchThreads();
+        this.fetchThreads();
       }
       if (
         to.params.type == from.params.type &&
@@ -1825,10 +1825,10 @@ export default {
         this.endThread = 1;
 
         // console.log("------ WATCH ROUTE EVENT PART 3 ------");
-        // this.fetchThreads();
+        this.fetchThreads();
       }
 
-      this.fetchThreads();
+      // this.fetchThreads();
     },
   },
   methods: {
@@ -2363,7 +2363,8 @@ export default {
     async fetchThreads() {
       this.loading = true;
       console.log("cool shizz",this.labelId, this.type);
-      // bus.$emit("broad");
+      bus.$emit("broad");
+      bus.$emit("broadForContent")
       let url = `${this.$apiBaseURL}unifiedv2/getThreads.php?mailboxIDs[]=${this.$route.params.mailboxId||this.$store.state.inboxData&&this.$store.state.inboxData.id||'me'}&page=${this.currPage}&labelID=${this.labelId}${this.squery!==""? "&squery="+this.squery:""}${this.tagId!==0? "&tagID="+this.tagId:""}${this.personId==1? "&filter=unassigned":""}${this.personId==2? "&filter=unread":""}${this.personId>2? "&filter=assignedTo%3A"+this.personId:""}${this.order!==""? "&order="+this.order:""}`;
       let response = await fetch(url, { credentials: "include" });
       const data = await response.json();
