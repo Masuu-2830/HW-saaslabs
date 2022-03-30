@@ -27,7 +27,7 @@
       class="d-flex flex-column justify-content-between"
       :style="{ width: 'calc(100% - 60px - ' + right + ')' }"
     >
-      <mail-content-header :thread="thread"></mail-content-header>
+      <mail-content-header v-on:broad="broad" :thread="thread"></mail-content-header>
       <!-- <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body> -->
       <mail-content-body
         v-if="thread.data.mailboxType == 'mail'"
@@ -112,9 +112,15 @@ export default {
         console.log(this.loading);
       }
     });
-    bus.$on("broad", () => {
-      this.display = "none";
-    });
+    // bus.$off("broad")
+    // bus.$on("broad", () => {
+    //   console.error("Broad received in mailcontent")
+    //   this.display = "none";
+    // });
+    bus.$on("broadForContent", () => {
+      this.display = 'none';
+      console.log("Heyy from mail content");
+    })
     bus.$on("removeMail", (id) => {
       console.log(id);
       this.thread.data.items = this.thread.data.items.filter(
@@ -243,6 +249,10 @@ export default {
     socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
   },
   methods: {
+    broad() {
+      console.error("Broad received in mailcontent")
+      this.display = "none";
+    },
     openInt() {
       console.log("hello");
       if (this.right == "0px") {

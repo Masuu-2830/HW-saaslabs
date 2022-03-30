@@ -1520,6 +1520,7 @@ export default {
   },
   methods: {
     backThread() {
+      this.$emit("broad")
       bus.$emit("broad");
     },
     unread() {
