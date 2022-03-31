@@ -1465,7 +1465,7 @@
                       "
                       >Me&nbsp;&nbsp;&nbsp;</span
                     ><span
-                      v-if="userInfo.id in Object.keys(mailbox.userAssignmentCount)"
+                      v-if="mailbox.userAssignmentCount && userInfo.id in Object.keys(mailbox.userAssignmentCount)"
                       class="user-assigned-count d-none"
                       :id="'user-assigned-count-' + userInfo.id"
                       v-html="mailbox.userAssignmentCount[userInfo.id]"

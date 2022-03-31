@@ -30,12 +30,12 @@
       <mail-content-header v-on:broad="broad" :thread="thread"></mail-content-header>
       <!-- <mail-content-body v-if="this.$store.state.inboxData.type == 'mail'" :thread="thread"></mail-content-body> -->
       <mail-content-body
-        v-if="thread.data.mailboxType == 'mail'"
+        v-if="thread.data.mailboxType == 'mail' || thread.data.mailboxType == 'custom'"
         :thread="thread"
       ></mail-content-body>
       <!-- <chat-content-body v-if="this.$store.state.inboxData.type !== 'mail'" :thread="thread"></chat-content-body> -->
       <chat-content-body
-        v-if="thread.data.mailboxType !== 'mail'"
+        v-if="thread.data.mailboxType !== 'mail' && thread.data.mailboxType !== 'custom'"
         :thread="thread"
       ></chat-content-body>
       <!-- <chat-content-body></chat-content-body> -->

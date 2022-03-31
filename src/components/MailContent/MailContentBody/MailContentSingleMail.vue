@@ -163,7 +163,7 @@
                 <div
                   class="mg-b-0 tx-color-03"
                   :class="Object.keys(item.data.cc).length == 0 ? 'd-none' : ''"
-                  v-if="Object.keys(item.data.cc).length !== 0"
+                  v-if="item.data.cc !== undefined && Object.keys(item.data.cc).length !== 0"
                 >
                   Cc:
                   <span v-for="(value, key, index) in item.data.cc" :key="index"
@@ -282,7 +282,7 @@
                 <i class="fa fa-reply"></i>
               </button>
               <button
-                v-if="Object.keys(item.data.cc).length !== 0"
+                v-if="item.data.cc !== undefined && Object.keys(item.data.cc).length !== 0"
                 class="reply-all-btn btn replyIconBtn px-1"
                 data-toggle="tooltip"
                 title="Reply All"
@@ -483,7 +483,7 @@
             <span class="ml-1"> Reply</span>
           </button>
           <button
-            v-if="Object.keys(item.data.cc).length !== 0"
+            v-if="item.data.cc !== undefined && Object.keys(item.data.cc).length !== 0"
             type="button"
             class="
               reply-all-btn
