@@ -14,7 +14,13 @@ export default new Router({
       path: "/",
       name: 'Home',
       component: Home,
-      redirect: 'me/mine/p/1'
+      redirect: '/me/mine/p/1'
+    },
+    {
+      path: "/me/mine",
+      name: "pagination",
+      component: Home,
+      redirect: '/me/mine/p/1'
     },
     {
       path: '/:mailboxId',

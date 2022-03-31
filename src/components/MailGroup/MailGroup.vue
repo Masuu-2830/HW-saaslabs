@@ -319,27 +319,27 @@ export default {
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
-        router.push({
-          name: "page",
-          params: {
-            pageNo: this.currPage,
-            type: this.route ? this.route : this.$store.state.type,
-            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-          },
-        });
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route ? this.route : this.$store.state.type,
+        //     mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+        //   },
+        // });
         this.isThreadRefresh = false;
         this.fetchThreads();
       } else {
         // console.log("this.$route.params.mailboxId",this.$route.params.mailboxId);
         // console.log("this.$route.params.mailboxId",this.thread.data);
-        router.push({
-          name: "page",
-          params: {
-            pageNo: this.currPage,
-            type: this.route,
-            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-          },
-        });
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route,
+        //     mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+        //   },
+        // });
       }
     });
     bus.$off("changeRead");
@@ -1642,7 +1642,7 @@ export default {
         this.squery = "";
         this.$store.dispatch("type", this.route);
         this.$store.dispatch("labelId", this.labelId);
-        bus.$emit("broad")
+        // bus.$emit("broad")
         // console.log("------ WATCH ROUTE EVENT ------");
         this.fetchThreads();
       }
@@ -1837,32 +1837,32 @@ export default {
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
-        router.push({
-          name: "page",
-          params: {
-            pageNo: this.currPage,
-            type: this.route ? this.route : this.$store.state.type,
-            mailboxId:
-              this.$route.params.mailboxId ||
-              (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-              "me",
-          },
-        });
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route ? this.route : this.$store.state.type,
+        //     mailboxId:
+        //       this.$route.params.mailboxId ||
+        //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+        //       "me",
+        //   },
+        // });
         this.isThreadRefresh = false;
         console.log("------ BROAD FUNCTION CALL ------");
         this.fetchThreads();
       } else {
-        router.push({
-          name: "page",
-          params: {
-            pageNo: this.currPage,
-            type: this.route,
-            mailboxId:
-              this.$route.params.mailboxId ||
-              (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-              "me",
-          },
-        });
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route,
+        //     mailboxId:
+        //       this.$route.params.mailboxId ||
+        //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+        //       "me",
+        //   },
+        // });
       }
     },
     filterPerson(data) {
@@ -2292,7 +2292,7 @@ export default {
         bus.$emit("compact", data);
         data = await this.fetchThread(id, type, subtype);
         let data1;
-        if(type == 'sms') {
+        if(type == 'chat') {
           await fetch(
             this.$apiBaseURL +
               "chat-widget/getUserDetails_V2?id=" +
@@ -2374,18 +2374,18 @@ export default {
       this.isnextPage = data.data.nextPage;
       this.perPageMails = this.mails;
       this.resultsPerPage = this.$store.state.userSettings.resultsPerPage;
-      // this.resultsPerPage = 1;
-      router.push({
-        name: "page",
-        params: {
-          pageNo: this.currPage,
-          type: this.route,
-          mailboxId:
-            this.$route.params.mailboxId ||
-            (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-            "me",
-        },
-      });
+      // // this.resultsPerPage = 1;
+      // router.push({
+      //   name: "page",
+      //   params: {
+      //     pageNo: this.currPage,
+      //     type: this.route,
+      //     mailboxId:
+      //       this.$route.params.mailboxId ||
+      //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+      //       "me",
+      //   },
+      // });
       this.startThread =
         (parseInt(this.currPage) - 1) * this.resultsPerPage + 1;
       this.endThread =

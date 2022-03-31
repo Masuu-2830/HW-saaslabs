@@ -105,9 +105,10 @@ export default {
         this.loading = true;
         console.log(this.loading);
       } else {
-        console.log(contactData);
+        // console.log(contactData);
         this.thread = data;
-        this.contactData = contactData;
+        console.log(this.thread);
+        // this.contactData = contactData;
         this.loading = false;
         console.log(this.loading);
       }
