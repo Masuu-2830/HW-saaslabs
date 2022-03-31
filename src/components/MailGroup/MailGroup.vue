@@ -319,27 +319,27 @@ export default {
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
-        // router.push({
-        //   name: "page",
-        //   params: {
-        //     pageNo: this.currPage,
-        //     type: this.route ? this.route : this.$store.state.type,
-        //     mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-        //   },
-        // });
+        router.push({
+          name: "page",
+          params: {
+            pageNo: this.currPage,
+            type: this.route ? this.route : this.$store.state.type,
+            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+          },
+        });
         this.isThreadRefresh = false;
         this.fetchThreads();
       } else {
-        // console.log("this.$route.params.mailboxId",this.$route.params.mailboxId);
+        console.log("this.$route.params.mailboxId",this.$route.params.mailboxId);
         // console.log("this.$route.params.mailboxId",this.thread.data);
-        // router.push({
-        //   name: "page",
-        //   params: {
-        //     pageNo: this.currPage,
-        //     type: this.route,
-        //     mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-        //   },
-        // });
+        router.push({
+          name: "page",
+          params: {
+            pageNo: this.currPage,
+            type: this.route,
+            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+          },
+        });
       }
     });
     bus.$off("changeRead");
