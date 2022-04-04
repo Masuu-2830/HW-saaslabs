@@ -2,7 +2,7 @@
   <div>
     <div
       v-if="
-        show && (composer.type == 'mail' || composer.type == 'universalMail')
+        show && (composer.type == 'mail' || composer.type == 'universalMail' || composer.type == 'custom')
       "
       :id="`compose-${composer.hash}`"
       class="mail-compose hw_editor show hideMoreEditingOptions"
@@ -155,7 +155,7 @@
           style="padding-top: 0px; padding-bottom: 10px"
         >
           <div
-            :style="{ display: fromOptions.length > 1 ? 'block' : 'none' }"
+            v-if="fromOptions.length > 1 && (composer.type == 'mail' || composer.type == 'universalMail')"
             class="email-from-container align-items-center d-flex"
           >
             <div>From</div>
@@ -202,7 +202,7 @@
                 <input type="text" class="form-control" style="display: none" />
               </div>
             </div>
-            <div class="d-flex justify-content-start align-items-start p-2">
+            <div v-if="composer.type == 'mail' || composer.type == 'universalMail'" class="d-flex justify-content-start align-items-start p-2">
               <button
                 tabindex="-1"
                 v-if="!isCC"
@@ -346,7 +346,7 @@
             <form class="form">
               <froala
                 :tag="'textarea'"
-                :config="configMail"
+                :config="composer.type == 'custom' ? configCustom : configMail"
                 v-model="mail_body"
                 name="mail_body"
               ></froala>
@@ -1033,6 +1033,124 @@ export default {
                     "clear",
                   ],
                   buttonsVisible: "all",
+                },
+              }
+            : self.composer.type == "twitter"
+            ? [
+                "attachTweetCompose",
+                "scheduleReply",
+                "savedReplyC",
+                "hcArticleC",
+                "clear",
+              ]
+            : ["attachSMSCompose", "clear"],
+      },
+      configCustom: {
+        enter: FroalaEditor.ENTER_DIV,
+        placeholderText: "Type something",
+        charCounterCount: false,
+        toolbarBottom: true,
+        height: "220px",
+        imageUploadParam: "files[]",
+        imageUploadURL:
+          "https://app.helpwise.io/api/uploadInlineAttachment.php",
+        imageUploadParams: {
+          mailboxID: this.$route.params.mailboxId,
+          emailID: this.emailID,
+        },
+        imageUploadMethod: "POST",
+        imageAllowedTypes: ["jpeg", "jpg", "png"],
+        imagePasteProcess: true,
+        imageDefaultAlign: "left",
+        pastePlain: true,
+        requestWithCredentials: true,
+        events: {
+          initialized: async function () {
+            // self.editorInstance.composer = self.composer;
+            var editor = this;
+            editor.composer = self.composer;
+            // self.refreshSignatureDropdownOnShow(this,$btn, $dropdown);
+            editor.type = "custom";
+            // self.composer.type == "mail"
+            //   ? "compose"
+            //   : self.composer.type == "twitter"
+            //   ? "tweetCompose"
+            //   : "smsCompose";
+            if (
+              self.$route.params.mailboxId !== undefined &&
+              self.$route.params.mailboxId !== "me"
+            ) {
+              editor.mailboxID = self.$route.params.mailboxId;
+            } else if (
+              self.$store.state.inboxData.id !== undefined &&
+              self.$store.state.inboxData.id !== "me"
+            ) {
+              editor.mailboxID = self.$store.state.inboxData.id;
+            } else {
+              editor.mailboxID = self.fromSelected.id;
+            }
+            // editor.mailboxID = self.$route.params.mailboxId;
+            self.editorInstance = this;
+            console.log("initialized", self.composer.type, self.editorInstance);
+            console.log(this);
+            let attchComp = Vue.extend(AttachmentComp);
+            let replyAttachmentList = new attchComp({
+              propsData: {
+                attachments: self.attachments,
+                type: "compose",
+              },
+            }).$mount();
+            // var ed = $(`#editor-uploadAttachment`).data('editor');
+            // console.log(editor, ed);
+            editor.$wp.append(replyAttachmentList.$el);
+            // ed.$wp.append(replyAttachmentList.$el);
+          },
+        },
+        key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
+        toolbarButtons:
+          self.composer.type == "custom"
+            ? {
+                moreText: {
+                  buttons: [
+                    "bold",
+                    "italic",
+                    "underline",
+                    "strikeThrough",
+                    "subscript",
+                    "superscript",
+                    "fontFamily",
+                    "fontSize",
+                    "textColor",
+                    "backgroundColor",
+                    "inlineClass",
+                    "inlineStyle",
+                    "clearFormatting",
+                  ],
+                  buttonsVisible: 0,
+                },
+                moreParagraph: {
+                  buttons: [
+                    "alignLeft",
+                    "alignCenter",
+                    "formatOLSimple",
+                    "alignRight",
+                    "alignJustify",
+                    "formatOL",
+                    "formatUL",
+                    "paragraphFormat",
+                    "paragraphStyle",
+                    "lineHeight",
+                    "outdent",
+                    "indent",
+                    "quote",
+                  ],
+                  buttonsVisible: 0,
+                },
+                moreRich: {
+                  buttons: [
+                    "emoticons"
+                  ],
+                  buttonsVisible: 0,
                 },
               }
             : self.composer.type == "twitter"

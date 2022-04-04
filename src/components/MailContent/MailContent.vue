@@ -108,7 +108,7 @@ export default {
         // console.log(contactData);
         this.thread = data;
         console.log(this.thread);
-        // this.contactData = contactData;
+        this.contactData = contactData;
         this.loading = false;
         console.log(this.loading);
       }

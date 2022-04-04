@@ -1535,8 +1535,11 @@ export default {
       let aliasesArr = new Array();
       if (this.$store.state.inboxData.type == "universal") {
         let addresses = aliases[this.reply.mailboxId];
-        for (let i = 0; i < addresses.length; i++) {
-          aliasesArr.push(addresses[i]);
+        console.log(addresses);
+        if(addresses) {
+          for (let i = 0; i < addresses.length; i++) {
+            aliasesArr.push(addresses[i]);
+          }
         }
         console.log(addresses);
       } else {
@@ -1569,9 +1572,11 @@ export default {
       } else {
         if (this.$store.state.inboxData.type == "universal") {
           let addresses = aliases[this.reply.mailboxId];
-          for (let i = 0; i < addresses.length; i++) {
-            if (addresses[i].isDefault) {
-              return addresses[i];
+          if(addresses) {
+            for (let i = 0; i < addresses.length; i++) {
+              if (addresses[i].isDefault) {
+                return addresses[i];
+              }
             }
           }
         } else {
@@ -2106,18 +2111,7 @@ export default {
   color: #000;
 }
 
-.btnn {
-  font-size: 14px;
-  color: white;
-  /* padding: 7px; */
-  border-radius: 5px;
-  cursor: pointer;
 
-  float: right;
-  bottom: 23px;
-  position: absolute;
-  right: 25px;
-}
 
 .fr-toolbar .fr-command .fr-btn img,
 .fr-popup .fr-command.fr-btn img,

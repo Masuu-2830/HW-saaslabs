@@ -1851,32 +1851,32 @@ export default {
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
-        // router.push({
-        //   name: "page",
-        //   params: {
-        //     pageNo: this.currPage,
-        //     type: this.route ? this.route : this.$store.state.type,
-        //     mailboxId:
-        //       this.$route.params.mailboxId ||
-        //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-        //       "me",
-        //   },
-        // });
+        router.push({
+          name: "page",
+          params: {
+            pageNo: this.currPage,
+            type: this.route ? this.route : this.$store.state.type,
+            mailboxId:
+              this.$route.params.mailboxId ||
+              (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+              "me",
+          },
+        });
         this.isThreadRefresh = false;
         console.log("------ BROAD FUNCTION CALL ------");
         this.fetchThreads();
       } else {
-        // router.push({
-        //   name: "page",
-        //   params: {
-        //     pageNo: this.currPage,
-        //     type: this.route,
-        //     mailboxId:
-        //       this.$route.params.mailboxId ||
-        //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-        //       "me",
-        //   },
-        // });
+        router.push({
+          name: "page",
+          params: {
+            pageNo: this.currPage,
+            type: this.route,
+            mailboxId:
+              this.$route.params.mailboxId ||
+              (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+              "me",
+          },
+        });
       }
     },
     filterPerson(data) {
