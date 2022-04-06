@@ -1891,7 +1891,8 @@ export default {
           // bus.$emit("closeReply", this.reply.hash);
         })
         .catch((error) => {
-          alert(error);
+          // alert(error);
+          console(error);
         });
     },
     unsendMail() {

@@ -1526,20 +1526,24 @@ export default {
     unread() {
       // console.log(this.thread);
       bus.$emit("changeRead", this.$route.params.threadId);
+      this.$emit("broad")
       bus.$emit("broad");
     },
     closeThread() {
       // console.log(this.thread);
       bus.$emit("closeThread", this.$route.params.threadId);
+      this.$emit("broad")
       bus.$emit("broad");
     },
     markDone() {
       bus.$emit("doneThreads", this.$route.params.threadId);
+      this.$emit("broad")
       bus.$emit("broad");
     },
     spamThreads() {
       // console.log(this.thread);
       bus.$emit("spamThreads", this.$route.params.threadId);
+      this.$emit("broad")
       bus.$emit("broad");
     },
     changeStarred() {
@@ -1550,12 +1554,14 @@ export default {
     },
     deleteConv() {
       bus.$emit("deleteThreads", this.$route.params.threadId);
+      this.$emit("broad")
       bus.$emit("broad");
     },
     moveToInbox() {
       console.log(this.inboxSelected);
       bus.$emit("moveToInbox", this.$route.params.threadId, this.inboxSelected);
       this.$refs["move-thread-modal"].hide();
+      this.$emit("broad")
       bus.$emit("broad");
     },
     handleChange(value, type) {
@@ -1605,6 +1611,7 @@ export default {
       }
       console.log(mom.toISOString());
       bus.$emit("snoozeThread", this.$route.params.threadId, mom);
+      this.$emit("broad")
       bus.$emit("broad");
     },
     assign(id) {

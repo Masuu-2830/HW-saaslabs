@@ -2,7 +2,10 @@
   <div>
     <div
       v-if="
-        show && (composer.type == 'mail' || composer.type == 'universalMail' || composer.type == 'custom')
+        show &&
+        (composer.type == 'mail' ||
+          composer.type == 'universalMail' ||
+          composer.type == 'custom')
       "
       :id="`compose-${composer.hash}`"
       class="mail-compose hw_editor show hideMoreEditingOptions"
@@ -155,7 +158,10 @@
           style="padding-top: 0px; padding-bottom: 10px"
         >
           <div
-            v-if="fromOptions.length > 1 && (composer.type == 'mail' || composer.type == 'universalMail')"
+            v-if="
+              fromOptions.length > 1 &&
+              (composer.type == 'mail' || composer.type == 'universalMail')
+            "
             class="email-from-container align-items-center d-flex"
           >
             <div>From</div>
@@ -202,7 +208,10 @@
                 <input type="text" class="form-control" style="display: none" />
               </div>
             </div>
-            <div v-if="composer.type == 'mail' || composer.type == 'universalMail'" class="d-flex justify-content-start align-items-start p-2">
+            <div
+              v-if="composer.type == 'mail' || composer.type == 'universalMail'"
+              class="d-flex justify-content-start align-items-start p-2"
+            >
               <button
                 tabindex="-1"
                 v-if="!isCC"
@@ -335,6 +344,77 @@
                   type="text"
                   class="email-sub form-control bd-0"
                 />
+              </div>
+            </div>
+          </div>
+          <div>
+            <hr style="margin-top: 0px; margin-bottom: 10px" />
+            <div
+              class="custom-fields"
+              id="add-custom-fields"
+              style="margin-bottom: 10px"
+            >
+              <div class="flex-grow-1">
+                <a
+                  @click.stop.prevent="addCustomField"
+                  href="javascript:void(0)"
+                  class="addNew-custom-field"
+                  style="color: #93a1af"
+                  tabindex="-1"
+                  >Add a custom field</a
+                >
+              </div>
+
+              <div
+                v-for="(customField, index) in customFields"
+                :key="index"
+                class="
+                  form-row
+                  mg-t-10
+                  d-flex
+                  align-items-center
+                  justify-content-between
+                "
+              >
+                <div
+                  class="form-group mg-b-0 d-flex"
+                  style="margin-left: 5px; width: 90%"
+                >
+                  <input
+                    type="text"
+                    v-model="customField.key"
+                    class="form-control form-control-sm custom-field-key"
+                    placeholder="Key"
+                  />
+                  <div class="invalid-feedback invalid-custom-field-key"></div>
+                  <input
+                    type="text"
+                    v-model="customField.value"
+                    class="form-control form-control-sm custom-field-value"
+                    style="margin-left: 20px"
+                    placeholder="Value"
+                  />
+                </div>
+                <div
+                  class="form-group mg-b-0"
+                  @click="removeCustomField(index)"
+                >
+                  <svg
+                    class="close-custom-field"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
@@ -910,6 +990,7 @@ export default {
       mailboxID: this.$store.state.inboxData.id,
       inReplyTo: null,
       editorInstance: null,
+      customFields: [],
       configMail: {
         enter: FroalaEditor.ENTER_DIV,
         placeholderText: "Type something",
@@ -1147,9 +1228,7 @@ export default {
                   buttonsVisible: 0,
                 },
                 moreRich: {
-                  buttons: [
-                    "emoticons"
-                  ],
+                  buttons: ["emoticons"],
                   buttonsVisible: 0,
                 },
               }
@@ -1669,8 +1748,8 @@ export default {
         height: 20px; margin-top: 5px;'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6v6m0 0v6m0-6h6m-6 0H6'></path></svg> Add time slots`;
           } else {
             this.easycalendarObj = {
-              "Connect": "Connect EasyCalender"
-            }
+              Connect: "Connect EasyCalender",
+            };
             // ["Connect"] = "Connect EasyCalendar";
           }
           console.log(this.easycalendarObj);
@@ -2253,6 +2332,12 @@ export default {
       console.log(bcc);
       return bcc;
     },
+    addCustomField() {
+      this.customFields.push({ key: "", value: "" });
+    },
+    removeCustomField(index) {
+      this.customFields.splice(index, 1);
+    },
     uploadAttachment(event) {
       const selectedFiles = event.target.files;
       console.log(selectedFiles);
@@ -2569,6 +2654,68 @@ export default {
       console.log(requestOptions.body);
       return requestOptions;
     },
+    createBodyCustom(prop) {
+      let from = {};
+      from[this.fromSelected.email] = this.fromSelected.name;
+      let to = {}, custom = {};
+      for (let i = 0; i < this.tagsTo.length; i++) {
+        if (this.tagsTo[i].name == undefined) {
+          to[this.tagsTo[i].email] = this.tagsTo[i].email;
+        } else {
+          to[this.tagsTo[i].email] = this.tagsTo[i].name;
+        }
+      }
+      for (let i = 0; i < this.customFields.length; i++) {
+        if(this.customFields[i].key !== '') {
+          custom[this.customFields[i].key] = this.customFields[i].value
+        }
+      }
+      let html = this.mail_body;
+      var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
+      html = html.replace(re1, "");
+      let body, mailboxID;
+      if (
+        this.$route.params.mailboxId !== undefined &&
+        this.$route.params.mailboxId !== "me"
+      ) {
+        mailboxID = this.$route.params.mailboxId;
+      } else if (
+        this.$store.state.inboxData.id !== undefined &&
+        this.$store.state.inboxData.id !== "me"
+      ) {
+        mailboxID = this.$store.state.inboxData.id;
+      } else {
+        mailboxID = this.fromSelected.id;
+      }
+      body = {
+        mailboxID,
+        files: this.files,
+        from,
+        subject: this.subject,
+        to,
+        custom
+      };
+      let text = html.replace(/(<([^>]+)>)/gi, "");
+      // console.log(text);
+      html &&
+        (body.html = `<div class=\"hwEmailWrapper\" style=\"font-family:sans-serif;font-size:0.875rem;color:#001737\">${html}</div>`);
+      text && (body.text = text);
+      if (prop == "send") {
+        if (this.$store.state.userSettings.send == "send") {
+          body.archive = false;
+        } else {
+          body.archive = true;
+        }
+      }
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        credentials: "include",
+      };
+      console.log(requestOptions);
+      return requestOptions;
+    },
     createBodyTwitter(prop) {
       let from = this.$store.state.inboxData.address.split(":")[1];
       let to = this.$store.state.inboxData.address.split(":")[1];
@@ -2842,6 +2989,34 @@ export default {
           .catch((error) => {
             alert(error);
           });
+      } else if (this.composer.type == "custom") {
+        if (this.tagsTo.length == 0) {
+          this.noTo = true;
+          return;
+        }
+        for (let i = 0; i < this.tagsTo.length; i++) {
+          if (this.tagsTo[i].tiClasses.includes("ti-invalid")) {
+            this.noTo = false;
+            this.toNotValid = true;
+            break;
+          }
+        }
+        if (this.toNotValid) return;
+        let requestOptions = this.createBodyCustom("send");
+        console.log(requestOptions);
+        fetch(this.$apiBaseURL + "send_custom_inbox", requestOptions)
+          .then(async (response) => {
+            const data = await response.json();
+            if (data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            this.show = false;
+            this.closeCompose(this.composer.hash);
+          })
+          .catch((error) => {
+            alert(error);
+          });
       } else if (this.composer.type == "twitter") {
         console.log("sendingg");
         let requestOptions = this.createBodyTwitter("send");
@@ -2972,14 +3147,46 @@ export default {
     },
     check(tag) {
       console.log(tag);
-      if (tag.email == undefined) {
-        return !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
-          tag.text
-        );
+      if (this.composer.type == "custom") {
+        if (tag.email == undefined) {
+          console.log(
+            !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+              tag.text
+            ) && !/^[0-9]+$/.test(tag.text)
+          );
+          return (
+            !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+              tag.text
+            ) && !/^[0-9]+$/.test(tag.text)
+          );
+        } else {
+          console.log(
+            !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+              tag.email
+            ) && !/^[0-9]+$/.test(tag.email)
+          );
+          return (
+            !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+              tag.email
+            ) && !/^[0-9]+$/.test(tag.email)
+          );
+        }
       } else {
-        return !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
-          tag.email
-        );
+        if (tag.email == undefined) {
+          console.log(!/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+            tag.text
+          ))
+          return !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+            tag.text
+          );
+        } else {
+          console.log(!/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+            tag.email
+          ))
+          return !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+            tag.email
+          );
+        }
       }
     },
     updateTo(newTags) {
