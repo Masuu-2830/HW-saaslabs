@@ -258,7 +258,7 @@
                 >
                   <span>Subject:&nbsp;</span
                   ><span class="tx-color-01">{{
-                    item.data.displaySubject
+                    item.data.subject
                   }}</span>
                 </div>
               </div>

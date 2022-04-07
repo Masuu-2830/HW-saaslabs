@@ -86,6 +86,7 @@ export default {
       if (this.$route.params.mailboxId == "me") {
         url = this.$apiBaseURL + "/unified/stats.php";
       }
+      console.log(url);
       const response = await fetch(url, { credentials: "include" });
       const data = await response.json();
       console.log(data);

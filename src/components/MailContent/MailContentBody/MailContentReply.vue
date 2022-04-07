@@ -437,13 +437,13 @@
                 v-model="mail_body"
                 name="mail_body"
               ></froala>
-              <!-- <button
+              <button
                 @click.stop.prevent="sendMail('nil')"
-                class="btnn btn btn-sm btn-primary fr-bt"
+                class="btnnn btn btn-sm btn-primary fr-bt"
                 type="submit"
               >
                 {{ isSend == "send" ? "Send" : "Send and Close" }}
-              </button> -->
+              </button>
               <!-- <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:30px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="reply-push-btn">Send</button> -->
             </form>
           </div>
@@ -662,17 +662,17 @@ export default {
             // var ed = $(`#reply-uploadAttachment`).data('editor');
             console.log(editor);
             editor.$wp.append(replyAttachmentList.$el);
-            if (self.isSend) {
-              editor.$tb.append(`
-                <div class="fr-btn-grp fr-float-right">
-                  <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="sendReply">Send</button>
-                </div>`);
-            } else {
-              editor.$tb.append(`
-                <div class="fr-btn-grp fr-float-right">
-                  <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="sendReply">Send and Close</button>
-                </div>`);
-            }
+            // if (self.isSend) {
+            //   editor.$tb.append(`
+            //     <div class="fr-btn-grp fr-float-right">
+            //       <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="sendReply">Send</button>
+            //     </div>`);
+            // } else {
+            //   editor.$tb.append(`
+            //     <div class="fr-btn-grp fr-float-right">
+            //       <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="sendReply">Send and Close</button>
+            //     </div>`);
+            // }
             // ed.$wp.append(replyAttachmentList.$el);
           },
         },
@@ -744,8 +744,9 @@ export default {
   created() {
     const vueThis = this;
 
-    $(document).off("click", "#sendReply");
+    // $(document).off("click", "#sendReply");
     $(document).on("click", "#sendReply", function () {
+      // alert("Send mail clicked");
       vueThis.sendMail("nil");
     });
     bus.$off("deleteAttachmentUpload");
@@ -1838,8 +1839,10 @@ export default {
       }
       requestOptions.body = JSON.stringify(requestOptions.body);
       console.log(sendAt, requestOptions.body, requestOptions);
+      // alert("Reached to the fetch call");
       fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
         .then(async (response) => {
+          // alert("Fetch success")
           const data = await response.json();
           if (data.status !== "success") {
             const error = (data && data.message) || response.status;
@@ -1877,11 +1880,11 @@ export default {
             payload.id = data.data.messageID;
             payload.attachments = this.attachments;
             payload.date = new Date().toISOString();
-            console.log(payload, this.reply);
             let email = {
               email: payload,
               type: "email",
             };
+            console.log(payload, email, this.reply);
             bus.$emit("changeThreadAttrs", email);
           } else {
             bus.$emit("closeThread", this.$route.params.threadId);
@@ -2112,7 +2115,18 @@ export default {
   color: #000;
 }
 
-
+.btnnn {
+  font-size: 14px;
+  color: white;
+  /* padding: 7px; */
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 10;
+  float: right;
+  bottom: 24px;
+  position: absolute;
+  right: 24px;
+}
 
 .fr-toolbar .fr-command .fr-btn img,
 .fr-popup .fr-command.fr-btn img,
