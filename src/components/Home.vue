@@ -114,8 +114,12 @@ export default {
     },
     async fetchMailBoxData() {
       console.log(this.$route.params.mailboxId);
+      let inboxID = this.$route.params.mailboxId;
+      if(inboxID == "tags"){
+        inboxID = "me";
+      }
       let url =
-        "https://app.helpwise.io/api/ping.php?mailboxID=" + this.$route.params.mailboxId || (this.$store.inboxData && this.$store.inboxData.id) || "me";
+        "https://app.helpwise.io/api/ping.php?mailboxID=" + inboxID || (this.$store.inboxData && this.$store.inboxData.id) || "me";
       const response = await fetch(url, { credentials: "include" });
       const data = await response.json();
       console.log(data);

@@ -319,27 +319,27 @@ export default {
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
-        router.push({
-          name: "page",
-          params: {
-            pageNo: this.currPage,
-            type: this.route ? this.route : this.$store.state.type,
-            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-          },
-        });
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route ? this.route : this.$store.state.type,
+        //     mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+        //   },
+        // });
         this.isThreadRefresh = false;
         this.fetchThreads();
       } else {
         console.log("this.$route.params.mailboxId",this.$route.params.mailboxId);
         // console.log("this.$route.params.mailboxId",this.thread.data);
-        router.push({
-          name: "page",
-          params: {
-            pageNo: this.currPage,
-            type: this.route,
-            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-          },
-        });
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route,
+        //     mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+        //   },
+        // });
       }
     });
     bus.$off("changeRead");
@@ -1644,7 +1644,7 @@ export default {
         this.$store.dispatch("labelId", this.labelId);
         // bus.$emit("broad")
         // console.log("------ WATCH ROUTE EVENT ------");
-        this.fetchThreads();
+        // this.fetchThreads();
       }
       // if ((to.params.type !== from.params.type && from.params.type !== undefined) || (from.params.threadId !== undefined && this.isThreadRefresh) ||(from.params.threadId !== undefined && to.params.type !== this.route)) {
       if(to.params.mailboxId == 'tags'){
@@ -1656,7 +1656,7 @@ export default {
         this.personId = 0;
         this.order = "";
         this.squery = "";
-        this.fetchThreads();
+        // this.fetchThreads();
       } else {
         if (
           // from.params.type &&
@@ -1826,7 +1826,7 @@ export default {
           this.$store.dispatch("type", this.route);
           this.$store.dispatch("labelId", this.labelId);
           // console.log("------ WATCH ROUTE EVENT PART 2 ------");
-          this.fetchThreads();
+          // this.fetchThreads();
         }
       }
       if (
@@ -1839,10 +1839,10 @@ export default {
         this.endThread = 1;
 
         // console.log("------ WATCH ROUTE EVENT PART 3 ------");
-        this.fetchThreads();
+        // this.fetchThreads();
       }
 
-      // this.fetchThreads();
+      this.fetchThreads();
     },
   },
   methods: {
@@ -1851,32 +1851,32 @@ export default {
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
-        router.push({
-          name: "page",
-          params: {
-            pageNo: this.currPage,
-            type: this.route ? this.route : this.$store.state.type,
-            mailboxId:
-              this.$route.params.mailboxId ||
-              (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-              "me",
-          },
-        });
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route ? this.route : this.$store.state.type,
+        //     mailboxId:
+        //       this.$route.params.mailboxId ||
+        //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+        //       "me",
+        //   },
+        // });
         this.isThreadRefresh = false;
         console.log("------ BROAD FUNCTION CALL ------");
         this.fetchThreads();
       } else {
-        router.push({
-          name: "page",
-          params: {
-            pageNo: this.currPage,
-            type: this.route,
-            mailboxId:
-              this.$route.params.mailboxId ||
-              (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-              "me",
-          },
-        });
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: this.currPage,
+        //     type: this.route,
+        //     mailboxId:
+        //       this.$route.params.mailboxId ||
+        //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+        //       "me",
+        //   },
+        // });
       }
     },
     filterPerson(data) {
