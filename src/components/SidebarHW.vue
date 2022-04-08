@@ -326,7 +326,11 @@ export default {
       return this.$store.state.tags
     },
     getMailboxID(){
-      return this.$store.state.inboxData.id
+        if(this.$store.state.inboxData) {
+            return this.$store.state.inboxData.id
+        } else {
+            return "me"
+        }
     },
     getRouteParamType(){
       return this.$store.state.type

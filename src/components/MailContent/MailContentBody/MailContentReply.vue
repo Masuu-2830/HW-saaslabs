@@ -441,6 +441,7 @@
                 @click.stop.prevent="sendMail('nil')"
                 class="btnnn btn btn-sm btn-primary fr-bt"
                 type="submit"
+                :disabled="sending"
               >
                 {{ isSend == "send" ? "Send" : "Send and Close" }}
               </button>
@@ -564,6 +565,7 @@ export default {
     const self = this;
     return {
       show: true,
+      sending: false,
       type: this.reply.type,
       fromOptions: this.aliases(),
       fromSelected: this.defaultAlias(),
@@ -1832,6 +1834,7 @@ export default {
         }
       }
       if (this.toNotValid || this.ccNotValid || this.bccNotValid) return;
+      this.sending = true;
       let requestOptions = this.createBody("send");
       requestOptions.body = JSON.parse(requestOptions.body);
       if (sendAt !== "nil") {
@@ -1850,6 +1853,7 @@ export default {
           }
           requestOptions.body = JSON.parse(requestOptions.body);
           this.show = false;
+          this.sending = false;
           this.undoMessage = data.message;
           $("#undo-txt").text(data.message);
           this.showUndo = true;
@@ -1865,7 +1869,7 @@ export default {
             self.undoTimer = self.$store.state.userSettings.undoTimer;
           }, self.$store.state.userSettings.undoTimer * 1000);
           if (this.isSend == "send") {
-            let payload = this.reply.email;
+            let payload = {};
             payload.subject = this.subject;
             payload.displaySubject = this.subject;
             payload.from = requestOptions.body.from;

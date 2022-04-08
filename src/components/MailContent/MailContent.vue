@@ -209,6 +209,7 @@ export default {
         mail["data"] = data.email;
         mail["type"] = "email";
         mail["timestamp"] = data.email.date;
+        console.log(this.thread.data.items);
         this.thread.data.items.push(mail);
         console.log(this.thread.data.items);
       } else if (data.type == "chat") {

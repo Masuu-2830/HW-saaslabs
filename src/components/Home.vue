@@ -83,14 +83,14 @@ export default {
           this.$route.params.mailboxId ||
         (this.$store.inboxData && this.$store.inboxData.id) ||
         "me";
-      if (this.$route.params.mailboxId == "me") {
+      if (this.$route.params.mailboxId == "me" || (this.$store.inboxData && this.$store.inboxData.id == 'me') || (!this.$store.inboxData && !this.$route.params.mailboxId)) {
         url = this.$apiBaseURL + "/unified/stats.php";
       }
       console.log(url);
       const response = await fetch(url, { credentials: "include" });
       const data = await response.json();
       console.log(data);
-      if (this.$route.params.mailboxId == "me") {
+      if (this.$route.params.mailboxId == "me" || (this.$store.inboxData && this.$store.inboxData.id == 'me') || (!this.$store.inboxData && !this.$route.params.mailboxId)) {
         this.mailbox = data.data;
       } else {
         this.mailbox = data.data.mailbox;
@@ -202,7 +202,7 @@ export default {
     this.fetchUserSignature();
     // this.fetchContacts();
     console.log("this.mailbox ka count", this.mailbox);
-    if (this.$route.params.mailboxId == "me") {
+    if (this.$route.params.mailboxId == "me" || (this.$store.inboxData && this.$store.inboxData.id == 'me') || (!this.$store.inboxData && !this.$route.params.mailboxId)) {
       document.title = "Helpwise (" + this.mailbox.mine + ")";
     } else {
       document.title = "Helpwise (" + this.mailbox.stats.mine + ")";

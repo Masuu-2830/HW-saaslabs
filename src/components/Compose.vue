@@ -434,6 +434,7 @@
                 @click.stop.prevent="sendMail('nil')"
                 class="btnn btn btn-sm btn-primary fr-bt"
                 type="submit"
+                :disabled="sending"
               >
                 {{ isSend == "send" ? "Send" : "Send and Close" }}
               </button>
@@ -615,6 +616,7 @@
               @click.stop.prevent="sendMail('nil')"
               class="btnn btn btn-sm btn-primary fr-bt"
               type="submit"
+              :disabled="sending"
               style="bottom: 17px; right: 40px"
             >
               Send
@@ -858,6 +860,7 @@
                   @click.stop.prevent="sendMail('nil')"
                   class="btnn btn btn-sm btn-primary fr-bt"
                   type="submit"
+                  :disabled="sending"
                   style="bottom: 17px; right: 40px"
                 >
                   Send
@@ -936,6 +939,7 @@ export default {
       minimize: false,
       maximize: false,
       showUndo: false,
+      sending: false,
       message:
         self.composer.type == "mail" || self.composer.type == "universalMail"
           ? "New Message"
@@ -2955,6 +2959,7 @@ export default {
           }
         }
         if (this.toNotValid || this.ccNotValid || this.bccNotValid) return;
+        this.sending = true;
         let requestOptions = this.createBodyMail("send");
         requestOptions.body = JSON.parse(requestOptions.body);
         if (sendAt !== "nil") {
@@ -2970,6 +2975,7 @@ export default {
               return Promise.reject(error);
             }
             this.show = false;
+            this.sending = false;
             this.undoMessage = data.message;
             $("#undo-txt").text(data.message);
             this.showUndo = true;
@@ -3002,6 +3008,7 @@ export default {
           }
         }
         if (this.toNotValid) return;
+        this.sending = true;
         let requestOptions = this.createBodyCustom("send");
         console.log(requestOptions);
         fetch(this.$apiBaseURL + "send_custom_inbox", requestOptions)
@@ -3011,6 +3018,7 @@ export default {
               const error = (data && data.message) || response.status;
               return Promise.reject(error);
             }
+            this.sending = false;
             this.show = false;
             this.closeCompose(this.composer.hash);
           })
@@ -3024,6 +3032,7 @@ export default {
         if (sendAt !== undefined) {
           requestOptions.body["sendAt"] = sendAt;
         }
+        this.sending = true;
         console.log(requestOptions.body);
         fetch(this.$apiBaseURL + "send-tweet.php", requestOptions)
           .then(async (response) => {
@@ -3032,6 +3041,7 @@ export default {
               const error = (data && data.message) || response.status;
               return Promise.reject(error);
             }
+            this.sending = false;
             this.closeCompose(this.composer.hash);
             // this.undoMessage = data.message;
             // $("#undo-txt").text(data.message);
@@ -3054,6 +3064,7 @@ export default {
           });
       } else if (this.composer.type == "sms") {
         console.log("sendingg");
+        this.sending = true;
         let requestOptions = this.createBodySMS("send");
         requestOptions.body = JSON.parse(requestOptions.body);
         console.log(requestOptions.body);
@@ -3076,6 +3087,7 @@ export default {
               const error = (data && data.message) || response.status;
               return Promise.reject(error);
             }
+            this.sending = false;
             this.closeCompose(this.composer.hash);
             // this.undoMessage = data.message;
             // $("#undo-txt").text(data.message);
