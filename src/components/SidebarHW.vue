@@ -168,12 +168,12 @@
                     }"
                     @click.native = "doSomethingInteresting"
                 >
-                  <p
+                   <p
                       style="cursor: pointer"
                       id="mentions-label"
                       class="nav-link hw-label-badge mg-b-0"
-                      :class="{'active' : getRouteParamType == option.type && getMailboxID == option.mailboxId}"
-                  >
+                      :class="{'active' : sectionName == 'me' && getMailboxID == 'me' && option.type == getRouteParamType ? true : sectionName == 'inboxes' && option.id == getMailboxID ? true: sectionName == 'tags' && getMailboxID == 'tags' && option.id == getRouteParamType ? true: false}"
+                    >
                       <span v-if="sectionName == 'tags'">
                           <svg xmlns="http://www.w3.org/2000/svg" :style="'color:'+option.color" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag mg-r-5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                       </span>
@@ -181,9 +181,13 @@
                       <span v-html="option.icon" v-else></span>
                       <span v-if="sectionName == 'inboxes'">{{option.displayName}}</span>
                       <span v-else>{{option.name}}</span>
-                      <span class="badge text-primary hw-count" id="mentions-count">
+                      <span class="badge text-primary hw-count" v-if='sectionName == "me"'>
                           {{mailbox.stats[option.stats] > 0 || (typeof mailbox.stats[option.stats]) === 'string' ? mailbox.stats[option.stats] == 0 ? '' : mailbox.stats[option.stats] : ''}}
                       </span>
+                      <span class="badge text-primary hw-count" v-else-if="sectionName == 'inboxes'">
+                          {{option.stats.inbox}}
+                      </span>
+                      <span class="badge text-primary hw-count" v-else></span>
                   </p>
                 </RouterLink>
               </div> 
