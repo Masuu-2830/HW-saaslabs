@@ -84,7 +84,7 @@ export default {
         (this.$store.inboxData && this.$store.inboxData.id) ||
         "me";
       if (this.$route.params.mailboxId == "me" || (this.$store.inboxData && this.$store.inboxData.id == 'me') || (!this.$store.inboxData && !this.$route.params.mailboxId)) {
-        url = this.$apiBaseURL + "/unified/stats.php";
+        url = this.$apiBaseURL + "unified/stats.php";
       }
       console.log(url);
       const response = await fetch(url, { credentials: "include" });

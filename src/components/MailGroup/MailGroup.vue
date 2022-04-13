@@ -1080,6 +1080,7 @@ export default {
     
     bus.$off("assignThread");
     bus.$on("assignThread", (id, userId) => {
+      console.log(id, userId)
       let threadIds = new Array();
       if (typeof id == "number") {
         threadIds[0] = id;
@@ -2449,7 +2450,7 @@ export default {
     async nextPage() {
       if (this.isnextPage == true) {
         this.loading = true;
-        this.currPage += 1;
+        this.currPage = parseInt(this.currPage) + 1;
         console.log("this.currPage", this.currPage);
         let url =
           this.$apiBaseURL +

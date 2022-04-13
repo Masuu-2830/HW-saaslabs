@@ -14,6 +14,7 @@
             <div
               @click.stop
               class="custom-control hw_thread-selector custom-checkbox"
+              style="padding-right: 15px"
             >
               <input
                 type="checkbox"
@@ -48,6 +49,162 @@
                   points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
                 ></polygon>
               </svg>
+            </div>
+          </div>
+          <div class="mg-l-20">
+            <div
+              class="customMarker"
+              style="
+                height: 20px;
+                width: 20px;
+                margin-right: 10px;
+                margin-bottom: 4px;
+              "
+            >
+              <svg
+                v-if="mail.type == 'mail' || mail.type == 'custom'"
+                style="
+                  width: 18px !important;
+                  height: 18px !important;
+                  margin-left: calc(30% - 6px) !important;
+                  margin-right: 10px;
+                  stroke: #566476;
+                  color: #566476;
+                  stroke-width: 2;
+                "
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#0168fa"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="feather feather-mail"
+              >
+                <path
+                  d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                ></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <svg
+              style="
+                  width: 18px !important;
+                  height: 18px !important;
+                  margin-left: calc(30% - 6px) !important;
+                  margin-right: 10px;
+                  stroke: #566476;
+                  color: #566476;
+                  stroke-width: 2;
+                "
+                v-else-if="mail.type == 'sms'"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#8a2be2"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="feather feather-message-circle"
+              >
+                <path
+                  d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+                ></path>
+              </svg>
+              <svg
+              style="
+                  width: 18px !important;
+                  height: 18px !important;
+                  margin-left: calc(30% - 6px) !important;
+                  margin-right: 10px;
+                  stroke: #566476;
+                  color: #566476;
+                  stroke-width: 2;
+                "
+                v-else-if="mail.type == 'chat'"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#347bfb"
+                stroke-width="3"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="feather feather-message-square"
+              >
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                ></path>
+              </svg>
+              <svg
+              style="
+                  width: 18px !important;
+                  height: 18px !important;
+                  margin-left: calc(30% - 6px) !important;
+                  margin-right: 10px;
+                  stroke: #566476;
+                  color: #566476;
+                  stroke-width: 2;
+                "
+                v-else-if="mail.type == 'twitter' || mail.type == 'twitterdm'"
+                class="customInboxIconSvg"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"
+                ></path>
+              </svg>
+              <svg
+              style="
+                  width: 18px !important;
+                  height: 18px !important;
+                  margin-left: calc(30% - 6px) !important;
+                  margin-right: 10px;
+                  stroke: #566476;
+                  color: #566476;
+                  stroke-width: 2;
+                "
+                v-else-if="mail.type == 'fb-feed' || mail.type == 'facebook'"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="feather feather-facebook"
+              >
+                <path
+                  d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
+                ></path>
+              </svg>
+              <i
+              style="
+                  width: 18px !important;
+                  height: 18px !important;
+                  margin-left: calc(30% - 6px) !important;
+                  margin-right: 10px;
+                  stroke: #566476;
+                  color: #566476;
+                  stroke-width: 2;
+                "
+                v-else-if="mail.type == 'instagram' || mail.type == 'instagram-dm'"
+                class="mg-r-5 fab fa-instagram"
+              ></i>
             </div>
           </div>
           <!-- <div
@@ -162,7 +319,7 @@
                 {{ mail.email.subject ? mail.email.subject : "(no subject)" }}
               </span> -->
               <span
-                 v-if="mail.type == 'mail'"
+                v-if="mail.type == 'mail'"
                 class="tx-14 hw-thread-subject mr-2"
                 :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
               >
@@ -194,10 +351,7 @@
                 v-html="mail.assignedTo.avatarTag"
               ></div>
             </div>
-            <div
-              v-if="mail.seenAt"
-              class="col-6"
-            >
+            <div v-if="mail.seenAt" class="col-6">
               <div
                 data-toggle="tooltip"
                 :title="'Seen ' + seenAt"
@@ -269,8 +423,8 @@
               "
               class="archive-thread pr-1 pl-1"
               data-toggle="tooltip"
-                data-placement="top"
-                title="Close"
+              data-placement="top"
+              title="Close"
               @click.stop="closeThread(mail.id)"
             >
               <svg
@@ -476,8 +630,8 @@
               class="deleteThread pr-1 pl-1"
               :id="'deleteThread-' + mail.id"
               data-toggle="tooltip"
-                data-placement="top"
-                title="Trash"
+              data-placement="top"
+              title="Trash"
               @click.stop="deleteThread(mail.id)"
             >
               <svg
@@ -506,8 +660,8 @@
               class="permanentlyDeleteThread pr-1 pl-1"
               :id="'permanentlyDeleteThread-' + mail.id"
               data-toggle="tooltip"
-                data-placement="top"
-                title="Permanently Delete"
+              data-placement="top"
+              title="Permanently Delete"
               @click.stop="perDeleteThread(mail.id)"
             >
               <svg
@@ -540,8 +694,8 @@
               "
               class="restore-thread pr-1 pl-1"
               data-toggle="tooltip"
-                data-placement="top"
-                title="Move To Inbox"
+              data-placement="top"
+              title="Move To Inbox"
               @click.stop="restoreThread(mail.id)"
             >
               <svg
@@ -597,7 +751,11 @@
       <div
         class="row"
         style="padding-left: 20px"
-        v-if="mail.attachments && mail.attachments !== undefined && mail.attachments.length > 0"
+        v-if="
+          mail.attachments &&
+          mail.attachments !== undefined &&
+          mail.attachments.length > 0
+        "
       >
         <div class="offset-lg-3 col-7 thread-attachments-list">
           <a
@@ -642,7 +800,7 @@
             align-items-center
             w-50
           "
-          >
+        >
           <!-- <div
             v-if="mail.email !== undefined"
             class="flex-grow-1 w-100 d-flex thread-addr"
