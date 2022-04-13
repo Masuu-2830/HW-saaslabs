@@ -176,6 +176,80 @@
                   }}&gt;</b-form-select-option
                 >
               </b-form-select>
+              <!-- <select
+                class="email-from select2-hidden-accessible"
+                style="
+                  display: inline-block;
+                  min-width: 100%;
+                  max-width: 100%;
+                  padding: 5px;
+                "
+                data-select2-id="57"
+                tabindex="-1"
+                aria-hidden="true"
+              >
+                <option
+                  value="vibhor@saaslabs.co"
+                  data-email="vibhor@saaslabs.co"
+                  data-name="Masood"
+                  data-is-default="true"
+                  selected=""
+                  data-select2-id="59"
+                >
+                  Masood &lt;vibhor@saaslabs.co&gt;
+                </option>
+                <option
+                  value="vibhor@helpwise.io"
+                  data-email="vibhor@helpwise.io"
+                  data-name="Vibhor Agrawal"
+                  data-is-default="false"
+                  data-select2-id="65"
+                >
+                  Vibhor Agrawal &lt;vibhor@helpwise.io&gt;
+                </option>
+                <option
+                  value="masood2810@gmail.com"
+                  data-email="masood2810@gmail.com"
+                  data-name="Masood"
+                  data-is-default="false"
+                  data-select2-id="66"
+                >
+                  Masood &lt;masood2810@gmail.com&gt;
+                </option>
+              </select>
+              <span
+                class="
+                  select2
+                  select2-container
+                  select2-container--default
+                  select2-container--below
+                  select2-container--open
+                  select2-container--focus
+                "
+                dir="ltr"
+                data-select2-id="58"
+                style="width: auto"
+                ><span class="selection"
+                  ><span
+                    class="select2-selection select2-selection--single"
+                    role="combobox"
+                    aria-haspopup="true"
+                    aria-expanded="true"
+                    tabindex="0"
+                    aria-labelledby="select2-45hp-container"
+                    aria-owns="select2-45hp-results"
+                    aria-activedescendant="select2-45hp-result-rflw-vibhor@saaslabs.co"
+                    ><span
+                      class="select2-selection__rendered"
+                      id="select2-45hp-container"
+                      role="textbox"
+                      aria-readonly="true"
+                      title="Masood <vibhor@saaslabs.co>"
+                      >Masood &lt;vibhor@saaslabs.co&gt;</span
+                    ><span class="select2-selection__arrow" role="presentation"
+                      ><b role="presentation"></b></span></span></span
+                ><span class="dropdown-wrapper" aria-hidden="true"></span
+              ></span> -->
             </div>
           </div>
           <div class="d-flex align-items-center">
@@ -347,7 +421,7 @@
               </div>
             </div>
           </div>
-          <div>
+          <div v-if="composer.type == 'custom'">
             <hr style="margin-top: 0px; margin-bottom: 10px" />
             <div
               class="custom-fields"
@@ -1100,11 +1174,11 @@ export default {
                   buttons: [
                     "insertLink",
                     "insertImage",
-                    "gdrive",
-                    "Dropbox",
-                    "box",
-                    "OneDrive",
-                    "EasyCalendar",
+                    // "gdrive",
+                    // "Dropbox",
+                    // "box",
+                    // "OneDrive",
+                    // "EasyCalendar",
                   ],
                   buttonsVisible: 0,
                 },
@@ -1337,11 +1411,11 @@ export default {
                   buttons: [
                     "insertLink",
                     "insertImage",
-                    "gdrive",
-                    "Dropbox",
-                    "box",
-                    "OneDrive",
-                    "EasyCalendar",
+                    // "gdrive",
+                    // "Dropbox",
+                    // "box",
+                    // "OneDrive",
+                    // "EasyCalendar",
                   ],
                   buttonsVisible: 0,
                 },
@@ -1581,11 +1655,11 @@ export default {
                   buttons: [
                     "insertLink",
                     "insertImage",
-                    "gdrive",
-                    "Dropbox",
-                    "box",
-                    "OneDrive",
-                    "EasyCalendar",
+                    // "gdrive",
+                    // "Dropbox",
+                    // "box",
+                    // "OneDrive",
+                    // "EasyCalendar",
                   ],
                   buttonsVisible: 0,
                 },
@@ -2661,7 +2735,8 @@ export default {
     createBodyCustom(prop) {
       let from = {};
       from[this.fromSelected.email] = this.fromSelected.name;
-      let to = {}, custom = {};
+      let to = {},
+        custom = {};
       for (let i = 0; i < this.tagsTo.length; i++) {
         if (this.tagsTo[i].name == undefined) {
           to[this.tagsTo[i].email] = this.tagsTo[i].email;
@@ -2670,8 +2745,8 @@ export default {
         }
       }
       for (let i = 0; i < this.customFields.length; i++) {
-        if(this.customFields[i].key !== '') {
-          custom[this.customFields[i].key] = this.customFields[i].value
+        if (this.customFields[i].key !== "") {
+          custom[this.customFields[i].key] = this.customFields[i].value;
         }
       }
       let html = this.mail_body;
@@ -2697,7 +2772,7 @@ export default {
         from,
         subject: this.subject,
         to,
-        custom
+        custom,
       };
       let text = html.replace(/(<([^>]+)>)/gi, "");
       // console.log(text);
@@ -3033,6 +3108,7 @@ export default {
           requestOptions.body["sendAt"] = sendAt;
         }
         this.sending = true;
+        requestOptions.body = JSON.stringify(requestOptions.body);
         console.log(requestOptions.body);
         fetch(this.$apiBaseURL + "send-tweet.php", requestOptions)
           .then(async (response) => {
@@ -3062,11 +3138,15 @@ export default {
           .catch((error) => {
             alert(error);
           });
-      } else if (this.composer.type == "sms") {
+      } else if (
+        this.composer.type == "sms" ||
+        this.composer.type == "universalSms"
+      ) {
         console.log("sendingg");
         this.sending = true;
         let requestOptions = this.createBodySMS("send");
         requestOptions.body = JSON.parse(requestOptions.body);
+        requestOptions.body = JSON.stringify(requestOptions.body);
         console.log(requestOptions.body);
         let url;
         if (this.fromSelected.subtype == "sms") {
@@ -3085,6 +3165,7 @@ export default {
             const data = await response.json();
             if (data.status !== "success") {
               const error = (data && data.message) || response.status;
+              // triggerPromptNotif(error, "error", 3000);
               return Promise.reject(error);
             }
             this.sending = false;
@@ -3106,7 +3187,9 @@ export default {
             // clearTimeout(this.undoInterval);
           })
           .catch((error) => {
-            alert(error);
+            // alert(error);
+            // triggerPromptNotif(error, "error");
+            console.log(error);
           });
       }
     },
@@ -3185,16 +3268,20 @@ export default {
         }
       } else {
         if (tag.email == undefined) {
-          console.log(!/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
-            tag.text
-          ))
+          console.log(
+            !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+              tag.text
+            )
+          );
           return !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
             tag.text
           );
         } else {
-          console.log(!/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
-            tag.email
-          ))
+          console.log(
+            !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+              tag.email
+            )
+          );
           return !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
             tag.email
           );

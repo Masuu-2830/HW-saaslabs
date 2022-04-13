@@ -1,6 +1,6 @@
 <template>
   <div
-    class="row flex-column d-flex"
+    class="flex-column d-flex"
     style="height: 40px; justify-content: center"
   >
     <div class="d-flex justify-content-around">

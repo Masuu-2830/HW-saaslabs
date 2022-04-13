@@ -1,12 +1,12 @@
 <template>
-  <div v-if="$route.params.threadId !== undefined" style="background-color: white" class="d-flex flex-column editor_container" id="threadEditorContainer">
+  <div v-if="$route.params.threadId !== undefined" style="background-color: #f7f7f7" class="d-flex flex-column editor_container" id="threadEditorContainer">
     <p class="typingMessageNotice tx-12 tx-italic tx-sans" v-if="typingNotice">
       {{typingNotice}}
     </p>
     <p class="typingMessageNotice tx-12 tx-italic tx-sans" v-if="typingNotesNotice">
       {{typingNotesNotice}}
     </p>
-    <div class="editorContainer" :class="{'noteMode': this.thread.data.mailboxType == 'mail'}">
+    <div class="editorContainer" style="margin-top: 0px" :class="{'noteMode': this.thread.data.mailboxType == 'mail'}">
       <ul
         class="nav nav-line flex-row mg-l-20 mg-b-10"
         role="tablist"

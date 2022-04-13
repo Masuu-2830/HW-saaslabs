@@ -14,7 +14,7 @@
       rounded
     "
     :class="!isMailCollapsed && 'uncollapsed'"
-    :id="'email-'+ item.data.id"
+    :id="'email-' + item.data.id"
     style="margin-left: 20px; margin-top: 20px; margin-right: 20px"
   >
     <div
@@ -163,7 +163,10 @@
                 <div
                   class="mg-b-0 tx-color-03"
                   :class="Object.keys(item.data.cc).length == 0 ? 'd-none' : ''"
-                  v-if="item.data.cc !== undefined && Object.keys(item.data.cc).length !== 0"
+                  v-if="
+                    item.data.cc !== undefined &&
+                    Object.keys(item.data.cc).length !== 0
+                  "
                 >
                   Cc:
                   <span v-for="(value, key, index) in item.data.cc" :key="index"
@@ -208,7 +211,9 @@
                   class="mg-b-0 tx-color-03 addr-hideable"
                   :class="item.data.replyTo == null ? 'd-none' : ''"
                   v-if="
-                    item.data.replyTo !== null && item.data.replyTo !== undefined && item.data.replyTo.length > 0
+                    item.data.replyTo !== null &&
+                    item.data.replyTo !== undefined &&
+                    item.data.replyTo.length > 0
                   "
                   :style="{ display: showEmailAddresses ? '' : 'none' }"
                 >
@@ -257,9 +262,7 @@
                   :style="{ display: showEmailAddresses ? '' : 'none' }"
                 >
                   <span>Subject:&nbsp;</span
-                  ><span class="tx-color-01">{{
-                    item.data.subject
-                  }}</span>
+                  ><span class="tx-color-01">{{ item.data.subject }}</span>
                 </div>
               </div>
             </div>
@@ -282,7 +285,10 @@
                 <i class="fa fa-reply"></i>
               </button>
               <button
-                v-if="item.data.cc !== undefined && Object.keys(item.data.cc).length !== 0"
+                v-if="
+                  item.data.cc !== undefined &&
+                  Object.keys(item.data.cc).length !== 0
+                "
                 class="reply-all-btn btn replyIconBtn px-1"
                 data-toggle="tooltip"
                 title="Reply All"
@@ -299,9 +305,8 @@
               >
               <div class="dropdown">
                 <span
-                  @click.stop.prevent="showDD"
                   class="three-dot"
-                  type="button"
+                  id="dropdownMenuLink"
                   data-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded="false"
@@ -311,7 +316,6 @@
                     padding: 5px;
                     cursor: pointer;
                   "
-                  id="dropdownMenuLink"
                   ><svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -330,20 +334,36 @@
                 ></span>
 
                 <div
-                  :style="{
-                    display: showdd ? 'block' : 'none',
-                    transform: showdd && 'translate3d(-217px, 31px, 0px)',
-                  }"
                   class="dropdown-menu"
                   aria-labelledby="dropdownMenuLink"
+                  x-placement="top-start"
+                  style="
+                    position: absolute;
+                    will-change: transform;
+                    top: 0px;
+                    left: 0px;
+                    transform: translate3d(-230px, -35px, 0px);
+                  "
                 >
-                  <button type="button" @click.stop="reply(1); showDD();" class="dropdown-item reply-btn">
+                  <button
+                    class="dropdown-item reply-btn"
+                    type="button"
+                    @click.stop="reply(1)"
+                  >
                     Reply
                   </button>
-                  <button type="button" @click.stop="reply(2); showDD();" class="dropdown-item reply-all-btn">
+                  <button
+                    class="dropdown-item reply-all-btn"
+                    type="button"
+                    @click.stop="reply(2)"
+                  >
                     Reply all
                   </button>
-                  <button type="button" @click.stop="reply(3); showDD();" class="dropdown-item forward-btn">
+                  <button
+                    type="button"
+                    class="dropdown-item forward-btn"
+                    @click.stop="reply(3)"
+                  >
                     Forward
                   </button>
                   <button
@@ -394,15 +414,19 @@
                     </template>
                   </b-modal>
                   <a
-                    href="/original-message/204420/23153177"
-                    target="_blank"
                     class="dropdown-item"
+                    :href="
+                      '/original-message/' + mailboxId + '/' + item.data.id
+                    "
+                    target="_blank"
+                    @click.stop
                     >View Info</a
                   >
                   <a
-                    href="/printMessage?id=23153177"
-                    target="_blank"
+                    :href="'/printMessage?id=' + item.data.id"
                     class="dropdown-item"
+                    target="_blank"
+                    @click.stop
                     >Print</a
                   >
                 </div>
@@ -435,7 +459,9 @@
           </button>
         </div>
         <div class="d-flex flex-row attachment-list m-1 flex-wrap">
-          <div v-for="file in item.data.attachments" :key="file.id"
+          <div
+            v-for="file in item.data.attachments"
+            :key="file.id"
             style="padding: 0px 5px 0px 5px; height: 30px; max-width: 33.33%"
             class="
               hw-attachment
@@ -447,20 +473,20 @@
               rounded
             "
           >
-          <span v-html="getFileIcon(file.extension, file.filesize)"></span>
-          
+            <span v-html="getFileIcon(file.extension, file.filesize)"></span>
+
             <a
               style="font-size: 11px; max-width: 90%"
               class="remove-a-style openAttachment mg-l-10 text-truncate"
               target="_blank"
-              :href='"https://app.helpwise.io/attachments/" + file.id'
-              >{{file.filename}}</a
+              :href="'https://app.helpwise.io/attachments/' + file.id"
+              >{{ file.filename }}</a
             >
             <a
               class="remove-a-style downloadAttachment mg-l-10"
               style="font-size: 11px"
               target="_blank"
-              :href='"https://app.helpwise.io/attachments/" + file.id + "?d=1"'
+              :href="'https://app.helpwise.io/attachments/' + file.id + '?d=1'"
             >
               <i class="fas fa-download"></i>
             </a>
@@ -483,7 +509,10 @@
             <span class="ml-1"> Reply</span>
           </button>
           <button
-            v-if="item.data.cc !== undefined && Object.keys(item.data.cc).length !== 0"
+            v-if="
+              item.data.cc !== undefined &&
+              Object.keys(item.data.cc).length !== 0
+            "
             type="button"
             class="
               reply-all-btn
@@ -549,6 +578,7 @@ export default {
     item: Object,
     isCollapsed: Boolean,
     subject: String,
+    mailboxId: Number,
   },
   data() {
     return {
@@ -557,16 +587,22 @@ export default {
       showdd: false,
     };
   },
+  created() {
+    $(".dropdown-item").click(function () {
+      console.log("Dropdown item clicked")
+      $("#dropdownMenuLink").dropdown("toggle");
+    });
+  },
   methods: {
     getFileIcon(extension, size) {
-      console.log("mail content",extension, size);
-        let iconStyle = '';
-        if (size) {
-            iconStyle = `style="height:18px;width:18px;"`;
-        }
+      console.log("mail content", extension, size);
+      let iconStyle = "";
+      if (size) {
+        iconStyle = `style="height:18px;width:18px;"`;
+      }
 
-        let ext = extension.toString().toLowerCase();
-        return `<span class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
+      let ext = extension.toString().toLowerCase();
+      return `<span class="fiv-viv fiv-icon-blank fiv-icon-${ext}"></span>`;
     },
     showDD() {
       this.showdd = !this.showdd;
@@ -586,8 +622,8 @@ export default {
       this.$refs["move-new-modal"].hide();
     },
     reply(type) {
-      console.log("open reply")
-      let hash = Date.now() + '-' + Math.floor(Math.random() * 100000000000);
+      console.log("open reply");
+      let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
       bus.$emit("openReply", hash, type, this.item.data);
     },
     changeCollapseState() {

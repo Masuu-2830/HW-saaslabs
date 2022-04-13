@@ -494,8 +494,8 @@
       </div>
       <a
         v-if="
-          this.$route.params.type !== 'closed' &&
-          this.$route.params.type !== 'drafts'
+          this.$store.state.type !== 'closed' &&
+          this.$store.state.type !== 'drafts'
         "
         href="#"
         @click.stop="closeThread"
@@ -520,7 +520,7 @@
       </a>
       <a
         v-if="
-                this.$route.params.type == 'mentions'
+                this.$store.state.type == 'mentions'
               "
         href=""
         @click.stop.prevent="markDone"
@@ -551,11 +551,11 @@
         title="Move To Inbox"
         class="nav-link reopen-current-thread"
         v-if="
-          this.$route.params.type == 'snoozed' ||
-          this.$route.params.type == 'closed' ||
-          this.$route.params.type == 'spam' ||
-          this.$route.params.type == 'trash' ||
-          this.$route.params.type == 'drafts'
+          this.$store.state.type == 'snoozed' ||
+          this.$store.state.type == 'closed' ||
+          this.$store.state.type == 'spam' ||
+          this.$store.state.type == 'trash' ||
+          this.$store.state.type == 'drafts'
         "
         @click.stop.prevent="restoreThread"
       >
@@ -606,16 +606,16 @@
       </a>
       <a
         v-if="
-          this.$route.params.type !== 'mentions' &&
-          this.$route.params.type !== 'discussions' &&
-          this.$route.params.type !== 'starred' &&
-          this.$route.params.type !== 'snoozed' &&
-          this.$route.params.type !== 'drafts' &&
-          this.$route.params.type !== 'sent' &&
-          this.$route.params.type !== 'scheduled' &&
-          this.$route.params.type !== 'closed' &&
-          this.$route.params.type !== 'spam' &&
-          this.$route.params.type !== 'trash'
+          this.$store.state.type !== 'mentions' &&
+          this.$store.state.type !== 'discussions' &&
+          this.$store.state.type !== 'starred' &&
+          this.$store.state.type !== 'snoozed' &&
+          this.$store.state.type !== 'drafts' &&
+          this.$store.state.type !== 'sent' &&
+          this.$store.state.type !== 'scheduled' &&
+          this.$store.state.type !== 'closed' &&
+          this.$store.state.type !== 'spam' &&
+          this.$store.state.type !== 'trash'
         "
         @click.stop="unread"
         data-toggle="tooltip"
@@ -702,6 +702,7 @@
                     tagUntagCheckboxWrapper
                     d-flex
                   "
+                  style="padding-right: 10px; padding-left: 1.0rem"
                 >
                   <input
                     type="checkbox"
@@ -1068,7 +1069,7 @@
       </div>
       <div
         v-if="
-              this.$route.params.type !== 'trash'
+              this.$store.state.type !== 'trash'
             "
         id="snooze-thread"
         data-toggle="tooltip"
@@ -1305,7 +1306,7 @@
         </template>
       </b-modal>
       <a
-        v-if="this.$route.params.type !== 'trash'"
+        v-if="this.$store.state.type !== 'trash'"
         @click.stop.prevent="deleteConv"
         href=""
         id="trash-thread"
@@ -1374,18 +1375,20 @@
             transform: translate3d(-230px, -35px, 0px);
           "
         >
-          <button type="button" class="dropdown-item create-rule-menu-option">
+          <button type="button" class="dropdown-item create-rule-menu-option d-none">
             Create rule for similar emails
           </button>
           <button
             v-if="thread.data.isArchived == false"
             type="button"
+            @click.stop="closeThread"
             class="d-xl-none dropdown-item archive-current-thread"
           >
             Close Conversation
           </button>
           <button
             type="button"
+            @click.stop="unread"
             class="d-xl-none dropdown-item mark-unread-current-thread"
           >
             Mark as Unread
@@ -1394,9 +1397,9 @@
             @click.stop="restoreThread"
             type="button"
             v-if="
-              this.$route.params.type == 'trash' ||
-              this.$route.params.type == 'spam' ||
-              this.$route.params.type == 'closed'
+              this.$store.state.type == 'trash' ||
+              this.$store.state.type == 'spam' ||
+              this.$store.state.type == 'closed'
             "
             class="dropdown-item d-flex"
             id="move-thread-to-inbox"
@@ -1406,8 +1409,8 @@
           <button
             @click.stop="spamThreads"
             v-if="
-              this.$route.params.type == 'trash' ||
-              this.$route.params.type == 'spam'
+              this.$store.state.type == 'trash' ||
+              this.$store.state.type == 'spam'
             "
             type="button"
             class="dropdown-item d-flex"
@@ -1418,8 +1421,8 @@
           <a
             class="dropdown-item"
             :href="
-              'https://app.helpwise.io/viewConversationInfo/' +
-              this.$route.params.mailboxId +
+              '/viewConversationInfo/' +
+              thread.data.mailbox_id +
               '/' +
               this.$route.params.threadId
             "
@@ -1427,9 +1430,15 @@
             id="viewThreadInfo"
             >View Info</a
           >
-          <button type="button" class="dropdown-item" onclick="printThread()">
-            Print
-          </button>
+          <a
+            class="dropdown-item"
+            :href="
+              '/printThread?threadID=' +
+              this.$route.params.threadId
+            "
+            target="_blank"
+            >Print</a
+          >
         </div>
       </div>
     </nav>
@@ -1615,6 +1624,7 @@ export default {
       bus.$emit("broad");
     },
     assign(id) {
+      console.log(this.$route.params.threadId, id);
       bus.$emit("assignThread", this.$route.params.threadId, id);
     },
     changeTagColor(color) {
