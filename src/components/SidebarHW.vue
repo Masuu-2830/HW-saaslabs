@@ -170,7 +170,7 @@
                 >
                    <p
                       style="cursor: pointer"
-                      id="mentions-label"
+                      :id="option.type + '-label'"
                       class="nav-link hw-label-badge mg-b-0"
                       :class="{'active' : sectionName == 'me' && getMailboxID == 'me' && option.type == getRouteParamType ? true : sectionName == 'inboxes' && option.id == getMailboxID ? true: sectionName == 'tags' && getMailboxID == 'tags' && option.id == getRouteParamType ? true: false}"
                     >
@@ -314,7 +314,6 @@ export default {
     }
   },
     async beforeMount() {
-        console.log("this.mailbox",this.mailbox);
         await this.getInboxes();
 
         await this.getUserSidebarPins();
@@ -348,20 +347,17 @@ export default {
         console.error("----------");
     },
     openCompose(type) {
-      console.log("open");
       let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
       bus.$emit("openCompose", hash, type);
     },
     async getInboxes(){
         const response = await fetch(this.$apiBaseURL + "mailboxes.php", {credentials: 'include'});
         const data = await response.json();
-        console.log(data);
         this.inboxes = data.data.mailboxes; 
     },
     async getUserSidebarPins(){
         let response = await fetch(this.$apiBaseURL + "getUserSidebarPins.php", {credentials: 'include'});
         response = await response.json();
-        console.log("response dhikhana",response.data);
         if(response.status == "success"){
             let sidebarPins = response.data;
             let pinInboxes = sidebarPins.inboxes;
@@ -384,16 +380,10 @@ export default {
                     this.sections["tags"][tag.id] = tag;
                 }
             }
-
-            console.log(this.activeInboxes);
-            console.log(this.activeTags);
-
             this.activeInboxes = this.activeInboxes;
             this.activeTags = this.activeTags;
-
             this.sections["inboxes"] = this.sections.inboxes;
             this.sections["tags"] = this.sections.tags;
-
             this.sections = {...this.sections};
 
         }

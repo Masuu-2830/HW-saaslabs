@@ -306,30 +306,45 @@ export default {
     }),
 
     bus.$off("broad");
-    bus.$on("broad", () => {
+    bus.$on("broad", (event) => {
       this.$store.dispatch("updateOpenThread", null);
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
-        // router.push({
-        //   name: "page",
-        //   params: {
-        //     pageNo: this.currPage,
-        //     type: this.route ? this.route : this.$store.state.type,
-        //     mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-        //   },
-        // });
+        router.push({
+          name: "page",
+          params: {
+            pageNo: this.currPage,
+            type: this.route ? this.route : this.$store.state.type,
+            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+          },
+        });
         this.isThreadRefresh = false;
         this.fetchThreads();
+        console.log("braos if");
       } else {
-        // router.push({
-        //   name: "page",
-        //   params: {
-        //     pageNo: this.currPage,
-        //     type: this.route,
-        //     mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-        //   },
-        // });
+        console.log("event dhikhado", event);
+        if(event == 'back'){
+          router.push({
+            name: "page",
+            params: {
+              pageNo: this.currPage,
+              type: this.route,
+              mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+              event: "back"
+            },
+          });
+        }else{
+          router.push({
+            name: "page",
+            params: {
+              pageNo: this.currPage,
+              type: this.route,
+              mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+            },
+          });
+        }
+        console.log("braos else");
       }
     });
     bus.$off("changeRead");
@@ -1578,6 +1593,8 @@ export default {
   },
   watch: {
     $route(to, from) {
+      console.log("to dhikhao",to);
+      console.log("from dhikhao",from);
       this.selectedIds = [];
       this.tagId = 0;
       this.currPage = 1;
@@ -1586,31 +1603,24 @@ export default {
       this.personId = 0;
       this.order = "";
       this.squery = "";
-      if (
-        to.params.mailboxId !== undefined &&
-        this.$store.state.inboxData &&
-        to.params.mailboxId != this.$store.state.inboxData.id
-      ) {
+      if (to.params.mailboxId !== undefined && this.$store.state.inboxData && to.params.mailboxId != this.$store.state.inboxData.id) { // mailbox change
         this.labelId = 4;
         this.route = "mine";
         this.$store.dispatch("type", this.route);
         this.$store.dispatch("labelId", this.labelId);
+        this.fetchThreads();
       }
       // if ((to.params.type !== from.params.type && from.params.type !== undefined) || (from.params.threadId !== undefined && this.isThreadRefresh) ||(from.params.threadId !== undefined && to.params.type !== this.route)) {
       if(to.params.mailboxId == 'tags'){
         this.labelId = 14;
         this.tagId = to.params.type;
-        // this.fetchThreads();
+        this.fetchThreads();
       } else {
-        if (
-          // from.params.type &&
-          to.params.type &&
-          (to.params.type != this.$store.state.type ||
-            this.isThreadRefresh ||
-            to.params.type !== this.route)
-        ) {
+        // if (to.params.type && (to.params.type != this.$store.state.type || this.isThreadRefresh || to.params.type !== this.route)) {
+        if(to.params.type || this.isThreadRefresh){
           bus.$emit("changeType");
-            this.route = to.params.type;
+          console.log("type dhikhana",to.params);
+          this.route = to.params.type;
           if (to.params.type == "assigned") {
             this.labelId = 0;
           } else if (to.params.type == "mine") {
@@ -1639,29 +1649,17 @@ export default {
             this.labelId = 8;
           } else if (to.params.type == "trash") {
             this.labelId = 5;
-          } else if (
-            to.params.type !== undefined &&
-            to.params.type.substring(0, 3) == "tag"
-          ) {
+          } else if (to.params.type !== undefined && to.params.type.substring(0, 3) == "tag") {
             this.tagId = to.params.type.substring(4);
             this.labelId = 0;
           }
           this.$store.dispatch("type", this.route);
           this.$store.dispatch("labelId", this.labelId);
-          // this.fetchThreads();
+          if(to.params.event!='back'){
+            this.fetchThreads();
+          }
         }
       }
-      if (
-        to.params.type == from.params.type &&
-        to.params.pageNo == undefined &&
-        to.params.threadId == undefined
-      ) {
-        this.currPage = 1;
-        this.startThread = 1;
-        this.endThread = 1;
-      }
-
-      this.fetchThreads();
     },
   },
   methods: {
@@ -2171,13 +2169,15 @@ export default {
       }
     },
     async fetchThreads() {
-
       let inboxId = `${this.$route.params.mailboxId||this.$store.state.inboxData&&this.$store.state.inboxData.id||'me'}`;
       if(inboxId == "tags"){
         inboxId = "me";
       }
       this.loading = true;
-      bus.$emit("broad");
+      // bus.$emit("broad");
+      this.$store.dispatch("updateOpenThread", null);
+      this.isCompact = false;
+      this.activeId = "";
       bus.$emit("broadForContent")
       let url = `${this.$apiBaseURL}unifiedv2/getThreads.php?mailboxIDs[]=${inboxId}&page=${this.currPage}&labelID=${this.labelId}${this.squery!==""? "&squery="+this.squery:""}${this.tagId!==0? "&tagID="+this.tagId:""}${this.personId==1? "&filter=unassigned":""}${this.personId==2? "&filter=unread":""}${this.personId>2? "&filter=assignedTo%3A"+this.personId:""}${this.order!==""? "&order="+this.order:""}`;
       let response = await fetch(url, { credentials: "include" });
