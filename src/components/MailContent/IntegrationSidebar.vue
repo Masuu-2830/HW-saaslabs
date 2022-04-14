@@ -2440,7 +2440,6 @@ export default {
             }
         },
         searchEvent(value, type) {
-            console.log("value",value);
             this.searchDateOpen = false;
             let calendarData = {
                 "int_name": this.integrationName,

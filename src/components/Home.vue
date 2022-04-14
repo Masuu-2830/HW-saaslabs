@@ -86,10 +86,8 @@ export default {
       if (this.$route.params.mailboxId == "me" || (this.$store.inboxData && this.$store.inboxData.id == 'me') || (!this.$store.inboxData && !this.$route.params.mailboxId)) {
         url = this.$apiBaseURL + "unified/stats.php";
       }
-      console.log(url);
       const response = await fetch(url, { credentials: "include" });
       const data = await response.json();
-      console.log(data);
       if (this.$route.params.mailboxId == "me" || (this.$store.inboxData && this.$store.inboxData.id == 'me') || (!this.$store.inboxData && !this.$route.params.mailboxId)) {
         this.mailbox = data.data;
       } else {
@@ -102,7 +100,6 @@ export default {
         credentials: "include",
       });
       const data = await response.json();
-      console.log(data);
       this.mailboxes = data.data.mailboxes;
     },
     async fetchContacts() {
@@ -110,11 +107,9 @@ export default {
         credentials: "include",
       });
       const data = await response.json();
-      console.log(data);
       // this.mailboxes = data.data.mailboxes;
     },
     async fetchMailBoxData() {
-      console.log(this.$route.params.mailboxId);
       let inboxID = this.$route.params.mailboxId;
       if(inboxID == "tags"){
         inboxID = "me";
@@ -123,13 +118,10 @@ export default {
         "https://app.helpwise.io/api/ping.php?mailboxID=" + inboxID || (this.$store.inboxData && this.$store.inboxData.id) || "me";
       const response = await fetch(url, { credentials: "include" });
       const data = await response.json();
-      console.log(data);
-      console.log("++");
       data.data.tags = data.data.tags.sort((b, a) => b.name - a.name);
       await this.$store.dispatch("fetchPingDetails", data);
     },
     async fetchAliases() {
-        console.log("mailboxId from home for aliases",this.$route.params.mailboxId);
         var url;
       if (this.$route.params.mailboxId == "me") {
         url = "https://app.helpwise.io/api/unified/getFromAddresses.php";
@@ -142,7 +134,6 @@ export default {
       }
       const response = await fetch(url, { credentials: "include" });
       const data = await response.json();
-      console.log(data);
       await this.$store.dispatch("fetchAliases", data.data);
     },
     // fetchUserSignature() {
@@ -153,9 +144,7 @@ export default {
     //         const error = (data && data.message) || response.status;
     //         return Promise.reject(error);
     //       }
-    //       console.log(data);
     //       let signature = data.data.signature;
-    //       console.log(signature);
     //       await this.$store.dispatch("fetchUserSignature", signature);
     //   })
     //   .catch((error) => {
@@ -170,7 +159,6 @@ export default {
                     const error = (data && data.message) || response.status;
                     return Promise.reject(error);
                 }
-                console.log(data);
                 let signatureId = data.data[0] && data.data[0].id;
                 if (signatureId) {
                     fetch(this.$apiBaseURL + "signatures/get.php?id=" + signatureId, {credentials: "include"})
@@ -180,9 +168,7 @@ export default {
                         const error = (data && data.message) || response.status;
                         return Promise.reject(error);
                         }
-                        console.log(data);
                         let signature = data.data.signature;
-                        console.log(signature);
                         await this.$store.dispatch('fetchUserSignature', signature);
                     }).catch(error => {
                     alert(error);
@@ -195,7 +181,6 @@ export default {
     async fetchContacts() {
           const response = await fetch(this.$apiBaseURL + "contacts.php", {credentials: 'include'});
           const data = await response.json();
-          console.log(data);
           // this.mailboxes = data.data.mailboxes;
       },
   },
@@ -205,7 +190,6 @@ export default {
     this.fetchAliases();
     this.fetchUserSignature();
     // this.fetchContacts();
-    console.log("this.mailbox ka count", this.mailbox);
     if (this.$route.params.mailboxId == "me" || (this.$store.inboxData && this.$store.inboxData.id == 'me') || (!this.$store.inboxData && !this.$route.params.mailboxId)) {
       document.title = "Helpwise (" + this.mailbox.mine + ")";
     } else {
@@ -213,8 +197,6 @@ export default {
     }
   },
   async beforeCreate() {
-    console.log(this.$route.params);
-    console.log("this dhikhao", this);
     let url =
       "https://app.helpwise.io/api/ping.php?mailboxID=" +
         this.$route.params.mailboxId ||
@@ -222,21 +204,15 @@ export default {
       "me";
     const response1 = await fetch(url, { credentials: "include" });
     const data1 = await response1.json();
-    console.log(data1);
-    console.log("++");
     data1.data.tags = data1.data.tags.sort((b, a) => b.name - a.name);
     await this.$store.dispatch("fetchPingDetails", data1);
     this.loaded = true;
     initFirebase();
-    console.log(this.loaded);
-
     const response2 = await fetch(
       "https://app.helpwise.io/api/getAccountMailboxes.php",
       { credentials: "include" }
     );
     const data2 = await response2.json();
-    console.log(data2);
-    // console.log("++");
     // data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
     await this.$store.dispatch("fetchMailBoxes", data2);
   },
