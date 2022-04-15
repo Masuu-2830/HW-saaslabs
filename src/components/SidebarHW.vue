@@ -337,6 +337,9 @@ export default {
     }
   },
   methods: {
+      broad() {
+      bus.$emit("broad");
+    },
     expandMore() {
       this.more = !this.more;
     },
