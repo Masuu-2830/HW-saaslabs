@@ -35,11 +35,11 @@ export default new Router({
       props: true
     },
     {
-      path: '/:mailboxId/:type',
+      path: '/:mailboxId/:type/p/1',
       name: 'type',
       component: Home,
       props: true,
-      redirect: '/:mailboxId/:type/p/1'
+      // redirect: '/:mailboxId/:type/p/1'
     },
     {
       path: '/:mailboxId/:type/p/:pageNo',

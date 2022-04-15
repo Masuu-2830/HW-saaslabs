@@ -1530,7 +1530,7 @@ export default {
   methods: {
     backThread() {
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     unread() {
       // console.log(this.thread);
