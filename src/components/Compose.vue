@@ -176,6 +176,12 @@
                   }}&gt;</b-form-select-option
                 >
               </b-form-select>
+              <!-- <select id="selectForCompose">
+                <option>buhu</option>
+                <option>buhu</option>
+                <option>buhu</option>
+                <option>buhu</option>
+              </select> -->
               <!-- <select
                 class="email-from select2-hidden-accessible"
                 style="
@@ -184,7 +190,7 @@
                   max-width: 100%;
                   padding: 5px;
                 "
-                data-select2-id="57"
+                
                 tabindex="-1"
                 aria-hidden="true"
               >
@@ -216,40 +222,8 @@
                 >
                   Masood &lt;masood2810@gmail.com&gt;
                 </option>
-              </select>
-              <span
-                class="
-                  select2
-                  select2-container
-                  select2-container--default
-                  select2-container--below
-                  select2-container--open
-                  select2-container--focus
-                "
-                dir="ltr"
-                data-select2-id="58"
-                style="width: auto"
-                ><span class="selection"
-                  ><span
-                    class="select2-selection select2-selection--single"
-                    role="combobox"
-                    aria-haspopup="true"
-                    aria-expanded="true"
-                    tabindex="0"
-                    aria-labelledby="select2-45hp-container"
-                    aria-owns="select2-45hp-results"
-                    aria-activedescendant="select2-45hp-result-rflw-vibhor@saaslabs.co"
-                    ><span
-                      class="select2-selection__rendered"
-                      id="select2-45hp-container"
-                      role="textbox"
-                      aria-readonly="true"
-                      title="Masood <vibhor@saaslabs.co>"
-                      >Masood &lt;vibhor@saaslabs.co&gt;</span
-                    ><span class="select2-selection__arrow" role="presentation"
-                      ><b role="presentation"></b></span></span></span
-                ><span class="dropdown-wrapper" aria-hidden="true"></span
-              ></span> -->
+              </select> -->
+              
             </div>
           </div>
           <div class="d-flex align-items-center">
@@ -1688,6 +1662,9 @@ export default {
     };
   },
   created() {
+    $('#selectForCompose').select2({
+        minimumResultsForSearch: -1
+    });
     bus.$off("deleteAttachmentUpload");
     bus.$on("deleteAttachmentUpload", (id) => {
       console.log("event listenedd", id);
@@ -3069,6 +3046,7 @@ export default {
           })
           .catch((error) => {
             alert(error);
+            this.sending = false;
           });
       } else if (this.composer.type == "custom") {
         if (this.tagsTo.length == 0) {
@@ -3099,6 +3077,7 @@ export default {
           })
           .catch((error) => {
             alert(error);
+            this.sending = false;
           });
       } else if (this.composer.type == "twitter") {
         console.log("sendingg");
@@ -3137,6 +3116,7 @@ export default {
           })
           .catch((error) => {
             alert(error);
+            this.sending = false;
           });
       } else if (
         this.composer.type == "sms" ||
@@ -3187,9 +3167,10 @@ export default {
             // clearTimeout(this.undoInterval);
           })
           .catch((error) => {
-            // alert(error);
+            alert(error);
+            this.sending = false;
             // triggerPromptNotif(error, "error");
-            console.log(error);
+            // console.log(error);
           });
       }
     },

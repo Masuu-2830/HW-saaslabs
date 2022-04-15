@@ -1611,8 +1611,8 @@ export default {
       this.type = 3;
     },
     signature() {
-      if (this.reply.html !== undefined) {
-        return this.reply.html;
+      if (this.reply.email && this.reply.email.html !== undefined) {
+        return this.reply.email.html;
       }
       let signature = "";
       if (this.$store.state.userSignature) {

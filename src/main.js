@@ -252,57 +252,59 @@ FroalaEditor.RegisterCommand("clear", {
   undo: true,
   refreshAfterCallback: true,
   callback: function () {
-    console.log(this.draftID, this.threadID);
-    let requestOptions = {};
-    let url = "";
-    if(this.type == 'replyCard' || this.type == 'tweetCompose') {
-      url = "https://app.helpwise.io/api/discard_tweet_draft.php";
-      let threadId = new Array();
-      threadId.push(this.threadID);
-      requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mailboxId: this.mailboxID,
-          threadIds: threadId,
-        }),
-        credentials: "include",
-      }
-    } else {
-      url = "https://app.helpwise.io/api/discardDraft.php";
-      requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          mailboxId: this.mailboxID,
-          threadId: this.threadID,
-          draftId: this.draftID,
-        }),
-        credentials: "include",
-      }
-    }
-    fetch(
-      url,
-      requestOptions
-    ).then(async (response) => {
-      const data = await response.json();
-      if (data.status !== "success") {
-        const error = (data && data.message) || response.status;
-        return Promise.reject(error);
-      }
-      // console.log(vueThis);
-      // vueThis.closeCompose(this.composer.hash);
-      if(this.type == "compose" || this.type == "tweetCompose" || this.type == "smsCompose") {
-        console.log("compose from main");
-        bus.$emit("closeCompose", this.composer.hash);
-      } else if(this.type == "reply") {
-        console.log("reply from main");
-        bus.$emit("closeReply", this.reply.hash);
-      } else if(this.type == "replyCard") {
-        console.log("replyCard from main");
-        bus.$emit("closeReplyCard", this.draftID);
-      }
-    });
+    console.log(this);
+    bus.$emit("discardDraftModalll", this);
+    // console.log(this.draftID, this.threadID);
+    // let requestOptions = {};
+    // let url = "";
+    // if(this.type == 'replyCard' || this.type == 'tweetCompose') {
+    //   url = "https://app.helpwise.io/api/discard_tweet_draft.php";
+    //   let threadId = new Array();
+    //   threadId.push(this.threadID);
+    //   requestOptions = {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({
+    //       mailboxId: this.mailboxID,
+    //       threadIds: threadId,
+    //     }),
+    //     credentials: "include",
+    //   }
+    // } else {
+    //   url = "https://app.helpwise.io/api/discardDraft.php";
+    //   requestOptions = {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({
+    //       mailboxId: this.mailboxID,
+    //       threadId: this.threadID,
+    //       draftId: this.draftID,
+    //     }),
+    //     credentials: "include",
+    //   }
+    // }
+    // fetch(
+    //   url,
+    //   requestOptions
+    // ).then(async (response) => {
+    //   const data = await response.json();
+    //   if (data.status !== "success") {
+    //     const error = (data && data.message) || response.status;
+    //     return Promise.reject(error);
+    //   }
+    //   // console.log(vueThis);
+    //   // vueThis.closeCompose(this.composer.hash);
+    //   if(this.type == "compose" || this.type == "tweetCompose" || this.type == "smsCompose") {
+    //     console.log("compose from main");
+    //     bus.$emit("closeCompose", this.composer.hash);
+    //   } else if(this.type == "reply") {
+    //     console.log("reply from main");
+    //     bus.$emit("closeReply", this.reply.hash);
+    //   } else if(this.type == "replyCard") {
+    //     console.log("replyCard from main");
+    //     bus.$emit("closeReplyCard", this.draftID);
+    //   }
+    // });
   },
 });
 

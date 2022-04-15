@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$route.params.threadId !== undefined" style="background-color: #f7f7f7" class="d-flex flex-column editor_container" id="threadEditorContainer">
+  <div v-if="$route.params.threadId !== undefined" :style="this.thread.data.mailboxType == 'mail' || this.thread.data.mailboxType == 'custom' ? 'background-color: #f7f7f7' : 'background-color: white'" class="d-flex flex-column editor_container" id="threadEditorContainer">
     <p class="typingMessageNotice tx-12 tx-italic tx-sans" v-if="typingNotice">
       {{typingNotice}}
     </p>

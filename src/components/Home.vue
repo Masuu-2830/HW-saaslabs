@@ -9,6 +9,7 @@
       <!-- <tweet-compose></tweet-compose> -->
     </div>
     <firebase-modal></firebase-modal>
+    <discard-draft></discard-draft>
     <HcArticles />
     <SavedReply />
   </div>
@@ -27,6 +28,7 @@ import ComposeWrapper from "./ComposeWrapper.vue";
 import { bus } from "../main";
 import TweetCompose from "./TweetCompose.vue";
 import { initFirebase } from "../firebaseInit.js";
+import DiscardDraft from './modals/DiscardDraft.vue';
 export default {
   name: "Home",
   components: {
@@ -40,6 +42,7 @@ export default {
     ComposeWrapper,
     TweetCompose,
     FirebaseModal,
+    DiscardDraft,
   },
   data() {
     return {

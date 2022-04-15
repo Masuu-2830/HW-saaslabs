@@ -29,7 +29,7 @@ export default new Router({
       redirect: '/:mailboxId/mine/p/1'
     },
     {
-      path: '/open/:threadId',
+      path: '/conversations/:threadId',
       name: 'thread',
       component: Home,
       props: true
