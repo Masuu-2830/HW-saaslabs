@@ -759,7 +759,7 @@
           ? ''
           : 'shrink'
       "
-      style="z-index: 2147483001"
+      style="z-index: 2147482999"
       :style="{ right: lr ? '45vw' : '' }"
     >
       <div class="mail-compose-dialog mail-compose-dialog-shrink">
