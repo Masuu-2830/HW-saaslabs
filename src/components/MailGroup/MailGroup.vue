@@ -68,7 +68,7 @@
         </button>
       </div>
       <div
-        v-if="perPageMails.length == 0"
+        v-if="perPageMails.length == 0 && !loading"
         class="flex-row justify-content-center w-100"
         id="no-mails-container"
         style="position: absolute; top: 30%"
@@ -1668,31 +1668,40 @@ export default {
       this.isCompact = false;
       this.activeId = "";
       if (this.isThreadRefresh) {
-        // router.push({
-        //   name: "page",
-        //   params: {
-        //     pageNo: this.currPage,
-        //     type: this.route ? this.route : this.$store.state.type,
-        //     mailboxId:
-        //       this.$route.params.mailboxId ||
-        //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-        //       "me",
-        //   },
-        // });
+        router.push({
+          name: "page",
+          params: {
+            pageNo: this.currPage,
+            type: this.route ? this.route : this.$store.state.type,
+            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+          },
+        });
         this.isThreadRefresh = false;
         this.fetchThreads();
+        console.log("braos if");
       } else {
-        // router.push({
-        //   name: "page",
-        //   params: {
-        //     pageNo: this.currPage,
-        //     type: this.route,
-        //     mailboxId:
-        //       this.$route.params.mailboxId ||
-        //       (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-        //       "me",
-        //   },
-        // });
+        console.log("event dhikhado", event);
+        if(event == 'back'){
+          router.push({
+            name: "page",
+            params: {
+              pageNo: this.currPage,
+              type: this.route,
+              mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+              event: "back"
+            },
+          });
+        }else{
+          router.push({
+            name: "page",
+            params: {
+              pageNo: this.currPage,
+              type: this.route,
+              mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+            },
+          });
+        }
+        console.log("braos else");
       }
     },
     filterPerson(data) {
@@ -2101,6 +2110,9 @@ export default {
         this.isCompact = true;
         let data = null;
         bus.$emit("compact", data);
+        if(this.isThreadRefresh) {
+          this.loading = true;
+        }
         data = await this.fetchThread(id, type, subtype);
         let data1;
         if(type == 'chat') {
@@ -2163,6 +2175,7 @@ export default {
             humanFriendlyDate: moment.unix(ts).format("DD MMM"),
           };
           this.perPageMails.push(thread);
+          this.loading = false;
           this.$store.dispatch("updateThreads", this.perPageMails);
         }
         bus.$emit("compact", this.$store.state.threadData[id], data1);
