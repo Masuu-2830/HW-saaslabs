@@ -720,11 +720,11 @@ export default {
             buttons: [
               "insertLink",
               "insertImage",
-              "gdrive",
-              "Dropbox",
-              "box",
-              "OneDrive",
-              "EasyCalendar",
+              // "gdrive",
+              // "Dropbox",
+              // "box",
+              // "OneDrive",
+              // "EasyCalendar",
             ],
             buttonsVisible: 0,
           },
@@ -1536,9 +1536,9 @@ export default {
     aliases() {
       let aliases = this.$store.state.aliases.addresses;
       let aliasesArr = new Array();
-      if (this.$store.state.inboxData.type == "universal") {
+      if (this.$store.state.mailboxId == "me") {
         let addresses = aliases[this.reply.mailboxId];
-        console.log(addresses);
+        console.log(addresses, aliases);
         if(addresses) {
           for (let i = 0; i < addresses.length; i++) {
             aliasesArr.push(addresses[i]);
@@ -1573,7 +1573,7 @@ export default {
         //   }
         // }
       } else {
-        if (this.$store.state.inboxData.type == "universal") {
+        if (this.$store.state.mailboxId == "me") {
           let addresses = aliases[this.reply.mailboxId];
           if(addresses) {
             for (let i = 0; i < addresses.length; i++) {
@@ -1611,7 +1611,7 @@ export default {
       this.type = 3;
     },
     signature() {
-      if (this.reply.email && this.reply.email.html !== undefined) {
+      if (this.reply.draftId && this.reply.email.html !== undefined) {
         return this.reply.email.html;
       }
       let signature = "";

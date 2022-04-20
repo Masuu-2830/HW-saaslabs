@@ -162,11 +162,11 @@
                     :to="{
                       name: 'type', 
                       params:{
-                          type: sectionName == 'tags' ? option.id : option.type, 
+                          type: sectionName == 'tags' ? option.id : 'all', 
                           mailboxId: sectionName == 'me' ? 'me' : sectionName == 'tags' ? 'tags' : option.id,
                         }
                     }"
-                    @click.native = "doSomethingInteresting"
+                    @click.native = "doSomethingInteresting(sectionName, option)"
                 >
                    <p
                       style="cursor: pointer"
@@ -202,6 +202,7 @@
 
 <script>
 import { bus } from "../main";
+import router from "../router";
 import Compose from "./Compose.vue";
 import Vue from 'vue';
 export default {
@@ -346,8 +347,17 @@ export default {
     expandMore() {
       this.more = !this.more;
     },
-    doSomethingInteresting(){
-        console.error("----------");
+    doSomethingInteresting(sectionName, option){
+        console.log("----------", option, sectionName);
+        // router.push({
+        //   name: "page",
+        //   params: {
+        //     pageNo: 1,
+        //     type: sectionName == 'tags' ? option.id : option.type,
+        //     // mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+        //     mailboxId: sectionName == 'me' ? 'me' : sectionName == 'tags' ? 'tags' : option.id,
+        //   },
+        // });
     },
     openCompose(type) {
       let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);

@@ -5,14 +5,15 @@ import createPersistedState from "vuex-persistedstate";
 Vue.use(Vuex);
 
 const dataState = createPersistedState({
-    paths: ['inboxData', 'type']
+    paths: ['inboxData', 'type', 'mailboxId']
 })
 
 export const store = new Vuex.Store({
     plugins: [dataState],
     state: {
         openThread: null,
-        inboxData: {},
+        inboxes: [],
+        mailboxId: null,
         userInfo: {},
         userSettings: {},
         tags: [],
@@ -21,6 +22,7 @@ export const store = new Vuex.Store({
         mailboxes: [],
         userSignature: {},
         aliases: {},
+        fromAddresses: [],
         stateLoaded: false,
         type: "",
         labelId: -1,
@@ -31,12 +33,16 @@ export const store = new Vuex.Store({
     },
     mutations: {
         setState: (state, data) => {
-            state.inboxData = data.data.inboxData;
+            state.inboxes = data.data.inboxes;
+            // if(data.data.inboxData) {
+            //     state.mailboxId = data.data.inboxData.id;
+            // }
             state.userInfo = data.data.userInfo;
             state.userSettings = data.data.userSettings;
             state.tags = data.data.tags;
             state.views = data.data.views;
             state.teammates = data.data.teammates;
+            state.fromAddresses = data.data.fromAddresses;
             state.stateLoaded = true;
             console.log(state);
         },

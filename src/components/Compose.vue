@@ -176,6 +176,15 @@
                   }}&gt;</b-form-select-option
                 >
               </b-form-select>
+              <vue-select
+                class="vue-select2"
+                name="select2"
+                :options="options"
+                :model.sync="result"
+                :searchable="true"
+                language="en-US"
+              >
+              </vue-select>
               <!-- <select id="selectForCompose">
                 <option>buhu</option>
                 <option>buhu</option>
@@ -223,7 +232,6 @@
                   Masood &lt;masood2810@gmail.com&gt;
                 </option>
               </select> -->
-              
             </div>
           </div>
           <div class="d-flex align-items-center">
@@ -957,6 +965,7 @@ import axios from "axios";
 import _ from "underscore";
 import AttachmentComp from "./AttachmentComp.vue";
 import Vue from "vue";
+import VueSelect from "vue-select"
 
 export default {
   name: "Compose",
@@ -973,11 +982,32 @@ export default {
       }
     },
   },
-  components: { VueTagsInput, FroalaEditor, File, VuePhoneNumberInput },
+  components: {
+    VueTagsInput,
+    FroalaEditor,
+    File,
+    VuePhoneNumberInput,
+    VueSelect
+  },
   data() {
     const self = this;
     console.log(self.composer.type);
     return {
+      options: [
+        {
+          text: "name1",
+          value: "value1",
+        },
+        {
+          text: "name2",
+          value: "value2",
+        },
+        {
+          text: "name3",
+          value: "value3",
+        },
+      ],
+      result: "",
       boxAccessToken: "",
       easyCalendar: [],
       easyCalendarUser: [],
@@ -1662,9 +1692,9 @@ export default {
     };
   },
   created() {
-    $('#selectForCompose').select2({
-        minimumResultsForSearch: -1
-    });
+    // $("#selectForCompose").select2({
+    //   minimumResultsForSearch: -1,
+    // });
     bus.$off("deleteAttachmentUpload");
     bus.$on("deleteAttachmentUpload", (id) => {
       console.log("event listenedd", id);
