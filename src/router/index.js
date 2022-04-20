@@ -35,14 +35,14 @@ export default new Router({
       props: true
     },
     {
-      path: '/:mailboxId/:type/:filterSection/p/1',
+      path: '/:mailboxId/:type/:filterSection/p/:pageNo',
       name: 'type',
       component: Home,
-      props: true,
+      props: true
     },
     {
-      path: '/:mailboxId/:type/:filterSection/p/:pageNo',
-      name: 'page',
+      path: '/tags/:tagId/:filterSection/p/:pageNo',
+      name: 'tag',
       component: Home,
       props: true
     },

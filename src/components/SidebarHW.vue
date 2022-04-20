@@ -6,30 +6,6 @@
           <h5 id="mailbox-title" v-if="this.mailbox.displayName">
             {{ this.mailbox.displayName }}
           </h5>
-          <!-- <router-link
-            to="settings"
-            id="mailbox-settings-link"
-            class=""
-            target="_blank"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="feather feather-settings"
-            >
-              <circle cx="12" cy="12" r="3"></circle>
-              <path
-                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
-              ></path>
-            </svg>
-          </router-link> -->
         </div>
         <div role="group" class="btn-group btn-block">
           <button
@@ -343,14 +319,16 @@
               </div>
               <div v-for="(option, index) in sectionValues" :key="index">
                 <RouterLink
-                    :to="{
-                      name: 'type', 
-                      params:{
-                          type: sectionName == 'tags' ? option.id : 'all', 
-                          mailboxId: sectionName == 'me' ? 'me' : sectionName == 'tags' ? 'tags' : option.id,
-                        }
-                    }"
-                    @click.native = "doSomethingInteresting(sectionName, option)"
+                  :to="{
+                    name: 'type',
+                    params: {
+                      type: option.id == 'me' ? option.type : 'all',
+                      mailboxId: option.id,
+                      filterSection: 'open',
+                      pageNo: 1,
+                    },
+                  }"
+                  @click.native="doSomethingInteresting(sectionName, option)"
                 >
                   <p
                     style="cursor: pointer"
@@ -464,7 +442,7 @@ export default {
             name: "Mine",
             type: "mine",
             stats: "mine",
-            mailboxId: "me",
+            id: "me",
             icon: `
                       <svg style="stroke-width: 25px" version="1.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 492 492" xml:space="preserve">
                           <g id="Master_Layer_2"></g>
@@ -503,7 +481,7 @@ export default {
             name: "Mentions",
             type: "mentions",
             stats: "mentions",
-            mailboxId: "me",
+            id: "me",
             icon: `
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-at-sign">
                           <circle cx="12" cy="12" r="4"></circle>
@@ -515,7 +493,7 @@ export default {
             name: "Starred",
             type: "starred",
             stats: "starred",
-            mailboxId: "me",
+            id: "me",
             icon: `
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star">
                           <polygon
@@ -528,7 +506,7 @@ export default {
             name: "All",
             type: "all",
             stats: "inbox",
-            mailboxId: "me",
+            id: "me",
             icon: `
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-inbox">
                           <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
@@ -580,8 +558,8 @@ export default {
     expandMore() {
       this.more = !this.more;
     },
-    doSomethingInteresting() {
-      console.error("----------");
+    doSomethingInteresting(sectionName, option) {
+      console.error(sectionName, option);
     },
     openCompose(type) {
       let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
@@ -767,14 +745,6 @@ export default {
     },
   },
 };
-
-// :to="{
-//                       name: 'type',
-//                       params:{
-//                           type: sectionName == 'tags' ? option.id : option.type,
-//                           mailboxId: sectionName == 'me' ? 'me' : sectionName == 'tags' ? 'tags' : option.id,
-//                         }
-//                     }"
 </script>
 
 <style>
@@ -787,5 +757,4 @@ export default {
   stroke: green;
   fill: green;
 }
-
 </style>

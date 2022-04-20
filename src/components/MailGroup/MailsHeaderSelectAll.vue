@@ -1537,7 +1537,7 @@
                       "
                       >{{ teammate.name }}</span
                     ><span
-                      v-if="teammate.id in Object.keys(mailbox.userAssignmentCount)"
+                      v-if="mailbox.userAssignmentCount && teammate.id in Object.keys(mailbox.userAssignmentCount)"
                       class="user-assigned-count"
                       :id="'user-assigned-count-' + teammate.id"
                       v-html="mailbox.userAssignmentCount[teammate.id]"

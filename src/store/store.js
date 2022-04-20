@@ -13,9 +13,14 @@ export const store = new Vuex.Store({
     state: {
         openThread: null,
         inboxes: [],
-        mailboxId: null,
+        mailboxId: 'me',
         userInfo: {},
         userSettings: {},
+        inboxData: {
+            "id": "me",
+            "name": "Universal",
+            "type": "Universal"
+        },
         tags: [],
         teammates: [],
         views: [],
@@ -34,7 +39,10 @@ export const store = new Vuex.Store({
     },
     mutations: {
         setState: (state, data) => {
-            state.inboxes = data.data.inboxes;
+            state.inboxes = data.data.inboxes.reduce((acc, cv) => {
+                acc[cv.id] = cv;
+                return acc;
+            }, {});
             // if(data.data.inboxData) {
             //     state.mailboxId = data.data.inboxData.id;
             // }
@@ -84,11 +92,18 @@ export const store = new Vuex.Store({
         },
         setFilterSection: (state, data) => {
             state.filterSection = data;
+        },
+        updateMailboxId(state, mailboxId) {
+            state.mailboxId = mailboxId;
+            state.inboxData = state.inboxes[mailboxId];
         }
     },
     actions: {
         async fetchPingDetails(context, data) {
             await context.commit('setState', data);
+        },
+        async updateMailboxId(context, mailboxId) {
+            await context.commit('updateMailboxId', mailboxId);
         },
         async fetchMailBoxes(context, data) {
             await context.commit('setStateMailBoxes', data);
