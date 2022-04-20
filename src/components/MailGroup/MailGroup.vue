@@ -37,14 +37,27 @@
     <div
       v-if="!loading"
       class="mail-group-body bd-y"
-      style="overflow-y: auto; overflow-x: hidden; background-color: white; position: relative; top: 0px; height: 100%"
+      style="
+        overflow-y: auto;
+        overflow-x: hidden;
+        background-color: white;
+        position: relative;
+        top: 0px;
+        height: 100%;
+      "
     >
       <div v-if="this.$store.state.threads.length !== 0" id="threads-list">
         <div
           v-for="mail in this.$store.state.threads"
           :key="mail.id"
           @click="
-            clickThread(mail.id, mail.type, mail.subtype, mail.ticketNumber, mail.mailboxId)
+            clickThread(
+              mail.id,
+              mail.type,
+              mail.subtype,
+              mail.ticketNumber,
+              mail.mailboxId
+            )
           "
         >
           <mail-group-single-mail
@@ -157,7 +170,7 @@ import router from "../../router";
 import MailGroupSingleMail from "./MailGroupSingleMail.vue";
 import MailsHeaderSearchBox from "./MailsHeaderSearchBox.vue";
 import MailsHeaderSelectAll from "./MailsHeaderSelectAll.vue";
-import MailsTypeFilter from './MailsTypeFilter.vue';
+import MailsTypeFilter from "./MailsTypeFilter.vue";
 export default {
   components: {
     MailsHeaderSearchBox,
@@ -179,6 +192,7 @@ export default {
       isnextPage: false,
       noOfPages: 1,
       startThread: 1,
+      filterSection: "open",
       endThread: 1,
       activeId: "",
       route: "",
@@ -304,8 +318,7 @@ export default {
         }
       }
     }),
-
-    bus.$off("broad");
+      bus.$off("broad");
     bus.$on("broad", (event) => {
       this.$store.dispatch("updateOpenThread", null);
       this.isCompact = false;
@@ -316,7 +329,10 @@ export default {
           params: {
             pageNo: this.currPage,
             type: this.route ? this.route : this.$store.state.type,
-            mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+            mailboxId:
+              this.$route.params.mailboxId ||
+              (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+              "me",
           },
         });
         this.isThreadRefresh = false;
@@ -324,23 +340,31 @@ export default {
         console.log("braos if");
       } else {
         console.log("event dhikhado", event);
-        if(event == 'back'){
+        if (event == "back") {
           router.push({
             name: "page",
             params: {
               pageNo: this.currPage,
               type: this.route,
-              mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
-              event: "back"
+              mailboxId:
+                this.$route.params.mailboxId ||
+                (this.$store.state.inboxData &&
+                  this.$store.state.inboxData.id) ||
+                "me",
+              event: "back",
             },
           });
-        }else{
+        } else {
           router.push({
             name: "page",
             params: {
               pageNo: this.currPage,
               type: this.route,
-              mailboxId: this.$route.params.mailboxId || this.$store.state.inboxData && this.$store.state.inboxData.id || 'me',
+              mailboxId:
+                this.$route.params.mailboxId ||
+                (this.$store.state.inboxData &&
+                  this.$store.state.inboxData.id) ||
+                "me",
             },
           });
         }
@@ -434,7 +458,7 @@ export default {
           alert(error);
         });
     });
-    
+
     bus.$off("closeThread");
     bus.$on("closeThread", (id) => {
       let threadIDs = new Array();
@@ -543,7 +567,7 @@ export default {
         });
       this.selectedIds = [];
     });
-    
+
     bus.$off("restoreThreads");
     bus.$on("restoreThreads", (id) => {
       let threadIDs = new Array();
@@ -656,7 +680,7 @@ export default {
         });
       this.selectedIds = [];
     });
-    
+
     bus.$off("spamThreads");
     bus.$on("spamThreads", (id) => {
       let threadIDs = new Array();
@@ -764,7 +788,7 @@ export default {
         });
       this.selectedIds = [];
     });
-    
+
     bus.$off("moveToInbox");
     bus.$on("moveToInbox", (id, mailboxId) => {
       let threadIds = new Array();
@@ -873,7 +897,7 @@ export default {
         });
       this.selectedIds = [];
     });
-    
+
     bus.$off("doneThreads");
     bus.$on("doneThreads", (id) => {
       let threadIDs = new Array();
@@ -958,7 +982,7 @@ export default {
         });
       this.selectedIds = [];
     });
-    
+
     bus.$off("snoozeThread");
     bus.$on("snoozeThread", (id, till) => {
       let threadIDs = new Array();
@@ -1067,7 +1091,7 @@ export default {
         });
       this.selectedIds = [];
     });
-    
+
     bus.$off("assignThread");
     bus.$on("assignThread", (id, userId) => {
       let threadIds = new Array();
@@ -1166,7 +1190,7 @@ export default {
           alert(error);
         });
     });
-    
+
     bus.$off("moveConv");
     bus.$on("moveConv", (messageId, subject, threadId) => {
       const requestOptions = {
@@ -1205,7 +1229,7 @@ export default {
           alert(error);
         });
     });
-    
+
     bus.$off("deleteThreads");
     bus.$on("deleteThreads", (id) => {
       let threadIDs = new Array();
@@ -1313,7 +1337,7 @@ export default {
         });
       this.selectedIds = [];
     });
-    
+
     bus.$off("createTags");
     bus.$on("createTags", (id, tagName, tagColor, folder) => {
       let threadIds = new Array();
@@ -1451,7 +1475,7 @@ export default {
           alert(error);
         });
     });
-    
+
     bus.$off("toggleTags");
     bus.$on("toggleTags", (id, addtags, removetags, newTag) => {
       if (addtags.length || removetags.length) {
@@ -1593,8 +1617,6 @@ export default {
   },
   watch: {
     $route(to, from) {
-      console.log("to dhikhao",to);
-      console.log("from dhikhao",from);
       this.selectedIds = [];
       this.tagId = 0;
       this.currPage = 1;
@@ -1603,63 +1625,81 @@ export default {
       this.personId = 0;
       this.order = "";
       this.squery = "";
-      if (to.params.mailboxId !== undefined && this.$store.state.inboxData && to.params.mailboxId != this.$store.state.inboxData.id) { // mailbox change
-        this.labelId = 4;
-        this.route = "mine";
-        this.$store.dispatch("type", this.route);
-        this.$store.dispatch("labelId", this.labelId);
-        this.fetchThreads();
-      }
-      // if ((to.params.type !== from.params.type && from.params.type !== undefined) || (from.params.threadId !== undefined && this.isThreadRefresh) ||(from.params.threadId !== undefined && to.params.type !== this.route)) {
-      if(to.params.mailboxId == 'tags'){
+      this.filterSection = to.params.filterSection;
+      this.$store.dispatch("updateFilterSection", to.params.filterSection);
+      this.mailboxId = to.params.mailboxId;
+      // if (
+      //   to.params.mailboxId &&
+      //   this.$store.state.inboxData &&
+      //   this.$store.state.inboxData.id != to.params.mailboxId
+      // ) {
+      //   // mailbox change
+      //   // this.labelId = 14;
+      //   // this.route = "all";
+      //   // this.$store.dispatch("type", this.route);
+      //   // this.$store.dispatch("labelId", this.labelId);
+      //   // this.filterSection = 'open';
+      //   // this.$store.dispatch("updateFilterSection", 'open');
+      // }
+      if (to.params.mailboxId == "tags") {
         this.labelId = 14;
         this.tagId = to.params.type;
-        this.fetchThreads();
-      } else {
-        // if (to.params.type && (to.params.type != this.$store.state.type || this.isThreadRefresh || to.params.type !== this.route)) {
-        if(to.params.type || this.isThreadRefresh){
-          bus.$emit("changeType");
-          console.log("type dhikhana",to.params);
-          this.route = to.params.type;
-          if (to.params.type == "assigned") {
-            this.labelId = 0;
-          } else if (to.params.type == "mine") {
-            this.labelId = 4;
-          } else if (to.params.type == "mentions") {
-            this.labelId = 13;
-          } else if (to.params.type == "discussions") {
-            this.labelId = 15;
-          } else if (to.params.type == "unassigned") {
-            this.labelId = 10;
-          } else if (to.params.type == "starred") {
-            this.labelId = 11;
-          } else if (to.params.type == "snoozed") {
-            this.labelId = 9;
-          } else if (to.params.type == "drafts") {
-            this.labelId = 2;
-          } else if (to.params.type == "all") {
-            this.labelId = 14;
-          } else if (to.params.type == "sent") {
-            this.labelId = 1;
-          } else if (to.params.type == "scheduled") {
-            this.labelId = 6;
-          } else if (to.params.type == "closed") {
+        // this.fetchThreads();
+      } // if (to.params.type && (to.params.type != this.$store.state.type || this.isThreadRefresh || to.params.type !== this.route)) {
+
+      if (to.params.type || this.isThreadRefresh) {
+        bus.$emit("changeType");
+        this.route = to.params.type;
+        if (to.params.type == "assigned") {
+          this.labelId = 0;
+        } else if (to.params.type == "mine") {
+          this.labelId = 4;
+        } else if (to.params.type == "mentions") {
+          this.labelId = 13;
+        } else if (to.params.type == "discussions") {
+          this.labelId = 15;
+        } else if (to.params.type == "unassigned") {
+          this.labelId = 10;
+        } else if (to.params.type == "starred") {
+          this.labelId = 11;
+        } else if (to.params.type == "snoozed") {
+          this.labelId = 9;
+        } else if (to.params.type == "drafts") {
+          this.labelId = 2;
+        } else if (to.params.type == "all") {
+          if (to.filterSection == "closed") {
             this.labelId = 7;
-          } else if (to.params.type == "spam") {
-            this.labelId = 8;
-          } else if (to.params.type == "trash") {
+          } else if (to.filterSection == "snoozed") {
+            this.labelId = 9;
+          } else if (to.filterSection == "trash") {
             this.labelId = 5;
-          } else if (to.params.type !== undefined && to.params.type.substring(0, 3) == "tag") {
-            this.tagId = to.params.type.substring(4);
-            this.labelId = 0;
+          } else {
+            this.labelId = 14;
           }
-          this.$store.dispatch("type", this.route);
-          this.$store.dispatch("labelId", this.labelId);
-          if(to.params.event!='back'){
-            this.fetchThreads();
-          }
+        } else if (to.params.type == "sent") {
+          this.labelId = 1;
+        } else if (to.params.type == "scheduled") {
+          this.labelId = 6;
+        } else if (to.params.type == "closed") {
+          this.labelId = 7;
+        } else if (to.params.type == "spam") {
+          this.labelId = 8;
+        } else if (to.params.type == "trash") {
+          this.labelId = 5;
+        } else if (
+          to.params.type !== undefined &&
+          to.params.type.substring(0, 3) == "tag"
+        ) {
+          this.tagId = to.params.type.substring(4);
+          this.labelId = 0;
         }
+        this.$store.dispatch("type", this.route);
+        this.$store.dispatch("labelId", this.labelId);
       }
+      if (to.params.event != "back") {
+        this.fetchThreads();
+      }
+      // this.fetchThreads();
     },
   },
   methods: {
@@ -2115,14 +2155,14 @@ export default {
         }
         data = await this.fetchThread(id, type, subtype);
         let data1;
-        if(type == 'chat') {
+        if (type == "chat") {
           await fetch(
             this.$apiBaseURL +
               "chat-widget/getUserDetails_V2?id=" +
               data.data.contact.id +
               "&mailboxID=" +
               mailboxId,
-            { credentials: "include"}
+            { credentials: "include" }
           )
             .then(async (response) => {
               data1 = await response.json();
@@ -2182,8 +2222,12 @@ export default {
       }
     },
     async fetchThreads() {
-      let inboxId = `${this.$route.params.mailboxId||this.$store.state.inboxData&&this.$store.state.inboxData.id||'me'}`;
-      if(inboxId == "tags"){
+      let inboxId = `${
+        this.$route.params.mailboxId ||
+        (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+        "me"
+      }`;
+      if (inboxId == "tags") {
         inboxId = "me";
       }
       this.loading = true;
@@ -2191,8 +2235,20 @@ export default {
       this.$store.dispatch("updateOpenThread", null);
       this.isCompact = false;
       this.activeId = "";
-      bus.$emit("broadForContent")
-      let url = `${this.$apiBaseURL}unifiedv2/getThreads.php?mailboxIDs[]=${inboxId}&page=${this.currPage}&labelID=${this.labelId}${this.squery!==""? "&squery="+this.squery:""}${this.tagId!==0? "&tagID="+this.tagId:""}${this.personId==1? "&filter=unassigned":""}${this.personId==2? "&filter=unread":""}${this.personId>2? "&filter=assignedTo%3A"+this.personId:""}${this.order!==""? "&order="+this.order:""}`;
+      bus.$emit("broadForContent");
+      let url = `${
+        this.$apiBaseURL
+      }unifiedv2/getThreads.php?mailboxIDs[]=${inboxId}&type=${
+        this.route
+      }&filterSection=${this.filterSection}&page=${this.currPage}&labelID=${
+        this.labelId
+      }${this.squery !== "" ? "&squery=" + this.squery : ""}${
+        this.tagId !== 0 ? "&tagID=" + this.tagId : ""
+      }${this.personId == 1 ? "&filter=unassigned" : ""}${
+        this.personId == 2 ? "&filter=unread" : ""
+      }${this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : ""}${
+        this.order !== "" ? "&order=" + this.order : ""
+      }`;
       let response = await fetch(url, { credentials: "include" });
       const data = await response.json();
       this.mails = data.data.threads;

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="flex-column d-flex"
-    style="height: 40px; justify-content: center"
-  >
+  <div class="flex-column d-flex" style="height: 40px; justify-content: center">
     <div class="d-flex justify-content-around">
       <div
         v-for="type in types"
@@ -18,14 +15,25 @@
         <router-link
           :to="{
             name: 'type',
-            params: { type: type.type, mailboxId: $store.state.inboxData.id },
+            params: {
+              type: $route.params.type,
+              mailboxId: $store.state.inboxData.id,
+              filterSection: type.type == 'all' ? 'open' : type.type,
+            },
           }"
         >
           <p
             class="filterP"
-            :class="$store.state.type == type.type ? 'isActive' : ''"
+            :class="
+              $store.state.filterSection == type.type ||
+              ($store.state.filterSection == 'open' && type.type == 'all')
+                ? 'isActive'
+                : ''
+            "
             :style="
-              $store.state.openThread == null ? 'padding: 0.3rem 1.5rem;' : 'padding: 0.1rem 0.5rem;'
+              $store.state.openThread == null
+                ? 'padding: 0.3rem 1.5rem;'
+                : 'padding: 0.1rem 0.5rem;'
             "
           >
             <span style="cursor: pointer">{{ type.name }}</span>

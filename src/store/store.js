@@ -29,7 +29,8 @@ export const store = new Vuex.Store({
         threads: [],
         threadData: {},
         firebaseModal: '',
-        openThread: null
+        openThread: null,
+        filterSection: 'open'
     },
     mutations: {
         setState: (state, data) => {
@@ -44,7 +45,6 @@ export const store = new Vuex.Store({
             state.teammates = data.data.teammates;
             state.fromAddresses = data.data.fromAddresses;
             state.stateLoaded = true;
-            console.log(state);
         },
         setStateMailBoxes: (state, data) => {
             console.log(data.data)
@@ -63,16 +63,13 @@ export const store = new Vuex.Store({
             state.type = data;
         },
         setLabelId: (state, data) => {
-            console.log(data)
             state.labelId = data;
         },
         setThreads: (state, data) => {
-            console.log(data)
             state.threads = data;
         },
         setThreadData: (state, data) => {
-            console.log(data);
-            if(!(data.id in Object.keys(state.threadData))) {
+            if (!(data.id in Object.keys(state.threadData))) {
                 state.threadData[data.data.id] = data;
                 console.log("adding new thread")
             }
@@ -84,6 +81,9 @@ export const store = new Vuex.Store({
         },
         setOpenThread: (state, data) => {
             state.openThread = data;
+        },
+        setFilterSection: (state, data) => {
+            state.filterSection = data;
         }
     },
     actions: {
@@ -104,6 +104,9 @@ export const store = new Vuex.Store({
         },
         async labelId(context, data) {
             await context.commit('setLabelId', data);
+        },
+        async updateFilterSection(context, data) {
+            await context.commit('setFilterSection', data);
         },
         async updateThreads(context, data) {
             // Vue.$bvModal.show('firebaseModal');
