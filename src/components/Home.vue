@@ -64,7 +64,7 @@ export default {
         to.params.mailboxId !== from.params.mailboxId
       ) {
         // this.fetchMailBoxData();
-        this.fetchSidebarStats();
+        // this.fetchSidebarStats();
         // this.fetchAliases();
       }
     },
