@@ -64,37 +64,37 @@ export default {
         to.params.mailboxId !== from.params.mailboxId
       ) {
         // this.fetchMailBoxData();
-        this.fetchSidebarStats();
+        // this.fetchSidebarStats();
         // this.fetchAliases();
       }
     },
   },
   methods: {
     async fetchSidebarStats() {
-      var url =
-        this.$apiBaseURL +
-          "mailboxes.php?mailboxID=" +
-          this.$route.params.mailboxId ||
-        (this.$store.inboxData && this.$store.inboxData.id) ||
-        "me";
-      if (
-        this.$route.params.mailboxId == "me" ||
-        (this.$store.inboxData && this.$store.inboxData.id == "me") ||
-        (!this.$store.inboxData && !this.$route.params.mailboxId)
-      ) {
-        url = this.$apiBaseURL + "unified/stats.php";
-      }
+      // var url =
+      //   this.$apiBaseURL +
+      //     "mailboxes.php?mailboxID=" +
+      //     this.$route.params.mailboxId ||
+      //   (this.$store.inboxData && this.$store.inboxData.id) ||
+      //   "me";
+      // if (
+      //   this.$route.params.mailboxId == "me" ||
+      //   (this.$store.inboxData && this.$store.inboxData.id == "me") ||
+      //   (!this.$store.inboxData && !this.$route.params.mailboxId)
+      // ) {
+      //   }
+      let url = this.$apiBaseURL + "unified/stats.php";
       const response = await fetch(url, { credentials: "include" });
       const data = await response.json();
-      if (
-        this.$route.params.mailboxId == "me" ||
-        (this.$store.inboxData && this.$store.inboxData.id == "me") ||
-        (!this.$store.inboxData && !this.$route.params.mailboxId)
-      ) {
+      // if (
+      //   this.$route.params.mailboxId == "me" ||
+      //   (this.$store.inboxData && this.$store.inboxData.id == "me") ||
+      //   (!this.$store.inboxData && !this.$route.params.mailboxId)
+      // ) {
         this.mailbox = data.data;
-      } else {
-        this.mailbox = data.data.mailbox;
-      }
+      // } else {
+      // this.mailbox = data.data.mailbox;
+      // }
       this.dataLoaded = true;
     },
     async fetchMailBoxes() {

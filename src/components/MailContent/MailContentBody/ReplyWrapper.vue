@@ -26,12 +26,17 @@ export default {
   },
   created() {
     bus.$on("openReply", (data, type, email) => {
-      console.log("openingg", data, email, this.thread);
       if (email == undefined) {
-        let obj = { hash: data, mailboxId: this.thread.data.mailbox_id, };
+        let obj = { hash: data, mailboxId: this.thread.data.mailbox_id };
         this.replies.push(obj);
       } else {
-        let obj = { hash: data, id: email.id, type: type, email: email, mailboxId: this.thread.data.mailbox_id };
+        let obj = {
+          hash: data,
+          id: email.id,
+          type: type,
+          email: email,
+          mailboxId: this.thread.data.mailbox_id,
+        };
         this.replies.push(obj);
       }
       this.show = true;

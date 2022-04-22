@@ -965,7 +965,7 @@ import axios from "axios";
 import _ from "underscore";
 import AttachmentComp from "./AttachmentComp.vue";
 import Vue from "vue";
-import VueSelect from "vue-select"
+import VueSelect from "vue-select";
 
 export default {
   name: "Compose",
@@ -987,7 +987,7 @@ export default {
     FroalaEditor,
     File,
     VuePhoneNumberInput,
-    VueSelect
+    VueSelect,
   },
   data() {
     const self = this;
@@ -1119,8 +1119,7 @@ export default {
             }
             // editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
-            console.log("initialized", self.composer.type, self.editorInstance);
-            console.log(this);
+
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData: {
@@ -1254,8 +1253,7 @@ export default {
             }
             // editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
-            console.log("initialized", self.composer.type, self.editorInstance);
-            console.log(this);
+
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData: {
@@ -1356,8 +1354,7 @@ export default {
             // : "smsCompose";
             editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
-            console.log("initialized", self.composer.type);
-            console.log(this);
+
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData: {
@@ -1478,8 +1475,7 @@ export default {
             //   : "smsCompose";
             editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
-            console.log("initialized", self.composer.type);
-            console.log(this);
+
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData: {
@@ -1600,8 +1596,7 @@ export default {
                 : "smsCompose";
             editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
-            console.log("initialized", self.composer.type);
-            console.log(this);
+
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData: {
@@ -1697,16 +1692,13 @@ export default {
     // });
     bus.$off("deleteAttachmentUpload");
     bus.$on("deleteAttachmentUpload", (id) => {
-      console.log("event listenedd", id);
       Vue.delete(this.attachments, id);
       this.attachments = this.attachments.filter((i) => i.id !== id);
-      console.log(this.attachments, this.files);
     });
     const vueThis = this;
 
     bus.$off("deleteAttachmentUpload");
     bus.$on("deleteAttachmentUpload", (id) => {
-      console.log("event listened", id);
       if (id) {
         Vue.delete(vueThis.attachments, id);
       }
@@ -1752,35 +1744,30 @@ export default {
     fromSelected: "saveDraft",
     files: "saveDraft",
     subject: function (to, from) {
-      console.log("subject");
       if (to !== from) {
         clearTimeout(this.subjectSave);
         this.subjectSave = setTimeout(this.saveDraft, 2000);
       }
     },
     mail_body: function (to, from) {
-      console.log("mailbody");
       if (to !== from) {
         clearTimeout(this.myGreeting);
         this.myGreeting = setTimeout(this.saveDraft, 2000);
       }
     },
     tweet_compose_body: function (to, from) {
-      console.log("tweetcomposebody");
       if (to !== from) {
         clearTimeout(this.myGreeting);
         this.myGreeting = setTimeout(this.saveDraft, 2000);
       }
     },
     sms_compose_body: function (to, from) {
-      console.log("smscomposebody");
       if (to !== from) {
         clearTimeout(this.myGreeting);
         this.myGreeting = setTimeout(this.saveDraft, 2000);
       }
     },
     toNumber: function (to, from) {
-      console.log("tweetToNumber", this.toNumber, this.toNumber2);
       if (to !== from) {
         clearTimeout(this.myGreeting);
         this.myGreeting = setTimeout(this.saveDraft, 2000);
@@ -1803,7 +1790,6 @@ export default {
             return Promise.reject(error);
           }
           this.boxAccessToken = data.data.boxAccessToken;
-          console.log(data, this.boxAccessToken);
         })
         .catch((error) => {
           alert(error);
@@ -1818,7 +1804,7 @@ export default {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          console.log(data);
+
           this.easyCalendar = data.data.easycalendar;
           this.easyCalendarUser = data.data.easyCalendarUser;
           if (this.easyCalendar.length != 0) {
@@ -1837,7 +1823,6 @@ export default {
             };
             // ["Connect"] = "Connect EasyCalendar";
           }
-          console.log(this.easycalendarObj);
         })
         .catch((error) => {
           alert(error);
@@ -1855,7 +1840,7 @@ export default {
         },
         success: (response) => {
           let html = "";
-          console.log($dropdown.find(".fr-dropdown-list"), response.data);
+
           if (response.status == "success") {
             for (let signature of response.data) {
               html += `<li role="presentation"><a class="fr-command" tabindex="-1" role="option" data-cmd="signatureBtn" data-param1="${signature.id}" title="${signature.name}" aria-selected="false">${signature.name}</a></li>`;
@@ -1990,7 +1975,7 @@ export default {
           this.selection.save();
           let editor = this;
           vueThis.showHcModal = true;
-          console.log("----");
+
           bus.$emit("hcArticles", "compose");
           // vueThis.$bvModal.show("helpcenterArticlesModal");
         },
@@ -2015,7 +2000,6 @@ export default {
           6: "Pick date & time",
         },
         callback: function (cmd, val) {
-          console.log(val);
           var mom;
           if (val == 1) {
             mom = moment(
@@ -2045,7 +2029,7 @@ export default {
             // this.datetime = "";
             vueThis.$refs["schedule-send-modal"].show();
           }
-          console.log(mom.toISOString());
+
           vueThis.sendMail(mom);
         },
       });
@@ -2131,7 +2115,6 @@ export default {
             "166235631936-ne7jkubvmci8k4rtcb870sj8ni9sjp17.apps.googleusercontent.com";
           const scope = "https://www.googleapis.com/auth/drive.readonly";
           let tokenPromise = new Promise((res, rej) => {
-            console.log("clicked");
             gapi.load("auth2", () => {
               gapi.auth2
                 .init({ client_id: clientId })
@@ -2204,7 +2187,7 @@ export default {
             } while (Math.abs(bytes) >= thresh && u < units.length - 1);
             return bytes.toFixed(1) + " " + units[u];
           }
-          console.log(vueThis.boxAccessToken);
+
           if (!vueThis.boxAccessToken) {
             window.open("https://app.helpwise.io/settings/integrations");
           } else {
@@ -2290,12 +2273,8 @@ export default {
               }
               this.html.insert(html);
             },
-            cancel: function () {
-              console.log("cancel");
-            },
-            error: function (error) {
-              console.log("error", error);
-            },
+            cancel: function () {},
+            error: function (error) {},
           };
           OneDrive.open(odOptions);
         },
@@ -2339,7 +2318,7 @@ export default {
           var ab = $("ul").find(`[data-param1='add_easy_calendar']`);
           ab.attr("title", `Add time slots`);
           var abc = ab.parent();
-          console.log(ab, abc);
+
           if (!abc.prev().is("hr")) {
             $(`<hr>`).insertBefore(abc);
           }
@@ -2355,7 +2334,7 @@ export default {
     scheduleSend() {
       var mom = new Date(this.datetime);
       this.datetime = "";
-      console.log(mom.toISOString());
+
       this.sendMail(mom);
       this.$refs["schedule-send-modal"].hide();
     },
@@ -2384,7 +2363,7 @@ export default {
         to.push(obj);
       }
       // }
-      console.log(to);
+
       return to;
     },
     tagscc() {
@@ -2399,7 +2378,7 @@ export default {
         cc.push(obj);
       }
       // }
-      console.log(cc);
+
       return cc;
     },
     tagsbcc() {
@@ -2414,7 +2393,7 @@ export default {
         bcc.push(obj);
       }
       // }
-      console.log(bcc);
+
       return bcc;
     },
     addCustomField() {
@@ -2425,7 +2404,7 @@ export default {
     },
     uploadAttachment(event) {
       const selectedFiles = event.target.files;
-      console.log(selectedFiles);
+
       const vueThis = this;
       for (let i = 0; i < selectedFiles.length; i++) {
         let selectedFile = selectedFiles[i];
@@ -2452,16 +2431,12 @@ export default {
             withCredentials: true,
             onUploadProgress: function (p) {
               let percentage = (p.loaded / p.total) * 100;
-              console.log(percentage);
-              console.log(hash);
-              console.log(vueThis.attachments);
+
               vueThis.attachments[hash]["progress"] = percentage;
             },
           })
           .then((response) => {
             //get the attachment id
-            console.log(response);
-            console.log(hash);
 
             let attachData = response.data.data.files[0];
             let attachID = attachData["id"];
@@ -2479,20 +2454,25 @@ export default {
             vueThis.attachments[attachID]["id"] = attachID;
             vueThis.files.push(attachID);
             vueThis.editorInstance.attachments = vueThis.attachments;
-            console.log(vueThis.attachments, vueThis.editorInstance);
           });
       }
     },
     aliases() {
-      let aliases = this.$store.state.aliases.addresses;
+      console.log(this.$store.state.fromAddresses);
+
+  let aliases = this.$store.state.fromAddresses.filter(
+        (address) =>
+          address.mailboxId == this.$store.state.mailboxId ||
+          this.$store.state.mailboxId == "me"
+      );
+      return aliases;
+      // let aliases = this.$store.state.aliases.addresses;
       let aliasesArr = new Array();
       if (this.$store.state.inboxData.type == "universal") {
-        console.log("aliases retrieve for univ", aliases);
         for (const alias in aliases) {
-          console.log(alias);
           for (let j = 0; j < aliases[alias].length; j++) {
             aliases[alias][j]["id"] = alias;
-            console.log(aliases[alias][j]);
+
             aliasesArr.push(aliases[alias][j]);
           }
         }
@@ -2512,12 +2492,14 @@ export default {
           });
         }
       }
-
-      console.log(aliasesArr);
       return aliasesArr;
     },
     defaultAlias() {
-      let aliases = this.$store.state.aliases.addresses;
+      let aliases = this.$store.state.fromAddresses.filter(
+        (address) =>
+          address.mailboxId == this.$store.state.mailboxId ||
+          this.$store.state.mailboxId == "me"
+      );
       if (this.composer.from !== undefined) {
         for (let i = 0; i < aliases.length; i++) {
           if (aliases[i].email == Object.keys(this.composer.from)) {
@@ -2545,8 +2527,6 @@ export default {
       return {};
     },
     signature() {
-      // return this.$store.state.userInfo;
-      // this.aliases();
       if (this.composer.html !== undefined) {
         return this.composer.html;
       }
@@ -2569,7 +2549,7 @@ export default {
                 </div>
                 </div>`;
       // }
-      console.log(html);
+
       return html;
     },
     closeCompose(hash) {
@@ -2621,7 +2601,7 @@ export default {
     //         const error = (data && data.message) || response.status;
     //         return Promise.reject(error);
     //       }
-    //       console.log(data);
+    //
     //       let signature = this.$store.state.userSignature.body;
     // if(!signature) return '';
     // let body=signature.replace(/^.*?<body[^>]*>(.*?)<\/body>.*?$/i,"$1");
@@ -2736,7 +2716,7 @@ export default {
         body: JSON.stringify(body),
         credentials: "include",
       };
-      console.log(requestOptions.body);
+
       return requestOptions;
     },
     createBodyCustom(prop) {
@@ -2799,7 +2779,7 @@ export default {
         body: JSON.stringify(body),
         credentials: "include",
       };
-      console.log(requestOptions);
+
       return requestOptions;
     },
     createBodyTwitter(prop) {
@@ -2810,9 +2790,9 @@ export default {
       let html = this.tweet_compose_body;
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
-      console.log(html);
+
       html = html.replace(/(<([^>]+)>)/gi, "");
-      console.log(html);
+
       let body;
       if (this.draftID == null) {
         body = {
@@ -2862,7 +2842,7 @@ export default {
         body: JSON.stringify(body),
         credentials: "include",
       };
-      console.log(requestOptions.body);
+
       return requestOptions;
     },
     createBodySMS(prop) {
@@ -2870,9 +2850,9 @@ export default {
       let html = this.sms_compose_body;
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
-      console.log(html);
+
       html = html.replace(/(<([^>]+)>)/gi, "");
-      console.log(html);
+
       let mailboxID;
       if (
         this.$route.params.mailboxId !== undefined &&
@@ -2912,7 +2892,7 @@ export default {
         body: JSON.stringify(body),
         credentials: "include",
       };
-      console.log(requestOptions.body);
+
       return requestOptions;
     },
     saveDraft() {
@@ -2921,7 +2901,6 @@ export default {
         this.composer.type == "universalMail" ||
         this.composer.type == "universalSms"
       ) {
-        console.log(this.fromSelected, this.editorInstance);
         this.editorInstance.mailboxID = this.fromSelected.id;
         if (
           this.composer.type == "universalMail" &&
@@ -2947,7 +2926,6 @@ export default {
           this.mail_body ||
           this.tweet_compose_body
         ) {
-          console.log("save", this.composer.hash);
           this.message = "Saving Draft";
           let requestOptions, url;
           if (
@@ -2966,10 +2944,10 @@ export default {
                 return Promise.reject(error);
               }
               requestOptions.body = JSON.parse(requestOptions.body);
-              console.log(this.draftID, this.threadID);
+
               this.draftID = data.data.draftID;
               this.threadID = data.data.threadID;
-              console.log(this.editorInstance);
+
               this.editorInstance.draftID = data.data.draftID;
               this.editorInstance.mailboxID = this.mailboxID;
               this.editorInstance.threadID = data.data.threadID;
@@ -3016,7 +2994,6 @@ export default {
         this.composer.type == "mail" ||
         this.composer.type == "universalMail"
       ) {
-        console.log("sendingg");
         if (this.tagsTo.length == 0) {
           this.noTo = true;
           return;
@@ -3048,7 +3025,7 @@ export default {
           requestOptions.body["sendAt"] = sendAt;
         }
         requestOptions.body = JSON.stringify(requestOptions.body);
-        console.log(requestOptions.body);
+
         fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -3062,11 +3039,9 @@ export default {
             $("#undo-txt").text(data.message);
             this.showUndo = true;
             this.undoInterval = setInterval(function () {
-              console.log(1);
               self.undoTimer -= 1;
             }, 1000);
             this.undoTimeout = setTimeout(() => {
-              console.log(2);
               clearInterval(self.undoInterval);
               self.showUndo = false;
               self.closeCompose(self.composer.hash);
@@ -3093,7 +3068,7 @@ export default {
         if (this.toNotValid) return;
         this.sending = true;
         let requestOptions = this.createBodyCustom("send");
-        console.log(requestOptions);
+
         fetch(this.$apiBaseURL + "send_custom_inbox", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -3110,7 +3085,6 @@ export default {
             this.sending = false;
           });
       } else if (this.composer.type == "twitter") {
-        console.log("sendingg");
         let requestOptions = this.createBodyTwitter("send");
         requestOptions.body = JSON.parse(requestOptions.body);
         if (sendAt !== undefined) {
@@ -3118,7 +3092,7 @@ export default {
         }
         this.sending = true;
         requestOptions.body = JSON.stringify(requestOptions.body);
-        console.log(requestOptions.body);
+
         fetch(this.$apiBaseURL + "send-tweet.php", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -3152,12 +3126,11 @@ export default {
         this.composer.type == "sms" ||
         this.composer.type == "universalSms"
       ) {
-        console.log("sendingg");
         this.sending = true;
         let requestOptions = this.createBodySMS("send");
         requestOptions.body = JSON.parse(requestOptions.body);
         requestOptions.body = JSON.stringify(requestOptions.body);
-        console.log(requestOptions.body);
+
         let url;
         if (this.fromSelected.subtype == "sms") {
           url = this.$apiBaseURL + "sms/sendSmsUnifiedLive.php";
@@ -3238,7 +3211,7 @@ export default {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          console.log("unsending");
+
           this.showUndo = false;
           this.show = true;
         }
@@ -3252,7 +3225,6 @@ export default {
       this.isBCC = true;
     },
     check(tag) {
-      console.log(tag);
       if (this.composer.type == "custom") {
         if (tag.email == undefined) {
           console.log(
@@ -3300,7 +3272,6 @@ export default {
       }
     },
     updateTo(newTags) {
-      console.log(newTags);
       this.autocompleteItemsTo = [];
       for (let i = 0; i < newTags.length; i++) {
         if (newTags[i].email == undefined) {
@@ -3310,7 +3281,6 @@ export default {
       this.tagsTo = newTags;
       this.noTo = false;
       this.toNotValid = false;
-      console.log(this.tagsTo);
     },
     updateCC(newTags) {
       this.autocompleteItemsCC = [];
@@ -3321,7 +3291,6 @@ export default {
       }
       this.tagsCC = newTags;
       this.ccNotValid = false;
-      console.log(this.tagsCC);
     },
     updateBCC(newTags) {
       this.autocompleteItemsBCC = [];
@@ -3332,18 +3301,16 @@ export default {
       }
       this.tagsBCC = newTags;
       this.bccNotValid = false;
-      console.log(this.tagsBCC);
     },
     initItemsTo() {
       if (this.tagTo.length < 2) return;
       const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagTo}`;
-      console.log("starting");
+
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         axios
           .get(url, { withCredentials: true })
           .then((response) => {
-            console.log(response.data.data.contacts);
             this.autocompleteItemsTo = response.data.data.contacts.map((a) => {
               let icon = `<div class="d-flex align-items-center justify-content-start">
                             <div class="avatar avatar-xs">
@@ -3369,13 +3336,12 @@ export default {
     initItemsCC() {
       if (this.tagCC.length < 2) return;
       const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagCC}`;
-      console.log("starting");
+
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         axios
           .get(url, { withCredentials: true })
           .then((response) => {
-            console.log(response.data.data.contacts);
             this.autocompleteItemsCC = response.data.data.contacts.map((a) => {
               let icon = `<div class="d-flex align-items-center justify-content-start">
                             <div class="avatar avatar-xs">
@@ -3401,13 +3367,12 @@ export default {
     initItemsBCC() {
       if (this.tagBCC.length < 2) return;
       const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagBCC}`;
-      console.log("starting");
+
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         axios
           .get(url, { withCredentials: true })
           .then((response) => {
-            console.log(response.data.data.contacts);
             this.autocompleteItemsBCC = response.data.data.contacts.map((a) => {
               let icon = `<div class="d-flex align-items-center justify-content-start">
                             <div class="avatar avatar-xs">
