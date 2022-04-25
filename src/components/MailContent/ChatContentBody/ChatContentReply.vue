@@ -718,7 +718,7 @@
             comment: payload,
             type: "comment",
           };
-          console.log(comment);
+          triggerPromptNotif("Note added", "success", 1000);
           bus.$emit("changeThreadAttrs", comment);
           this.note = "";
           this.notesAttachments = {};
