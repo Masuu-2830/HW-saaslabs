@@ -126,7 +126,8 @@ export default {
   data() {
     const self = this;
     return {
-      current: this.thread.data.mailboxType == "mail" ? "reply" : "note",
+      current:
+        self.thread.data.mailboxType == "mail" ? "note" : "reply" || "reply",
       tempData: ["a", "b", "v"],
       replyEditorInstance: null,
       noteEditorInstance: null,
@@ -420,20 +421,18 @@ export default {
         }
       }
 
-      var tribute = new Tribute(
-        {
-          trigger: "@",
-          values: d,
-          selectTemplate: function (item) {
-            return `<span class="mention-h fr-deletable fr-tribute" contenteditable="false" data-id=${item.original.id}>&nbsp;${item.original.value}&nbsp;</span>`;
-          },
-          menuContainer: document.body,
-          positionMenu: true,
-          noMatchTemplate: function () {
-            return '<span style:"visibility: hidden;"></span>';
-          },
-        }
-      );
+      var tribute = new Tribute({
+        trigger: "@",
+        values: d,
+        selectTemplate: function (item) {
+          return `<span class="mention-h fr-deletable fr-tribute" contenteditable="false" data-id=${item.original.id}>&nbsp;${item.original.value}&nbsp;</span>`;
+        },
+        menuContainer: document.body,
+        positionMenu: true,
+        noMatchTemplate: function () {
+          return '<span style:"visibility: hidden;"></span>';
+        },
+      });
       return tribute;
     },
     tabChange(props) {
@@ -865,7 +864,7 @@ export default {
       }
     });
 
-    // bus.$off("modal.savedReplyInsert.click");
+    bus.$off("modal.savedReplyInsert.click");
     bus.$on("modal.savedReplyInsert.click", function (id, type) {
       if (type == "chatReply") {
         let editorInstance =
@@ -874,14 +873,32 @@ export default {
             : vueThis.noteEditorInstance;
 
         triggerPromptNotif("Fetching saved reply data");
+        console.log("FETCHING SAVED REPLY IN CHAT CONTENT REPLY");
         fetch(
-          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vuethis.thread.data.mailbox_id}&savedReplyID=${id}`,
+          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.thread.data.mailbox_id}&savedReplyID=${id}`,
           { credentials: "include" }
         )
           .then((response) => response.json())
           .then((response) => {
             if (response.status == "success") {
-              editorInstance.html.insert(response.data.savedReply.content);
+              console.log("----- SUCCESS ------", response.data);
+              console.log(vueThis.replyEditorInstance);
+              console.log(vueThis.noteEditorInstance);
+              // vueThis.chat += response.data.savedReply.content;
+              // vueThis.replyEditorInstance.html.insert(response.data.savedReply.content);
+
+              if (vueThis.current == "reply") {
+                // vueThis.chat += response.data.savedReply.content;
+                vueThis.replyEditorInstance.html.insert(
+                  response.data.savedReply.content
+                );
+              } else {
+                // vueThis.note += response.data.savedReply.content;
+                vueThis.noteEditorInstance.html.insert(
+                  response.data.savedReply.content
+                );
+              }
+              // editorInstance.html.insert(response.data.savedReply.content);
               triggerPromptNotif("Saved Reply Inserted", "success");
             } else {
               triggerPromptNotif("Unable to insert Saved Reply", "error");
