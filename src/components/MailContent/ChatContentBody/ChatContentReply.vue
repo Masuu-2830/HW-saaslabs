@@ -99,7 +99,7 @@
     data() {
       const self = this;
       return {
-        current: this.thread.data.mailboxType == 'mail' ? 'reply' : 'note',
+        current: self.thread.data.mailboxType == 'mail' ? 'note' : 'reply' || 'reply',
         tempData:['a', 'b', 'v'],
         replyEditorInstance: null,
         noteEditorInstance: null,
@@ -837,7 +837,7 @@
       }
     });
 
-    // bus.$off("modal.savedReplyInsert.click");
+    bus.$off("modal.savedReplyInsert.click");
     bus.$on("modal.savedReplyInsert.click", function (id, type) {
       console.log(type, id);
       if (type == "chatReply") {
@@ -847,13 +847,27 @@
             : vueThis.noteEditorInstance;
 
         triggerPromptNotif("Fetching saved reply data");
+        console.log("FETCHING SAVED REPLY IN CHAT CONTENT REPLY");
         fetch(
-          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vuethis.thread.data.mailbox_id}&savedReplyID=${id}`,
+          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.thread.data.mailbox_id}&savedReplyID=${id}`,
           {credentials: 'include'}
         ).then(response => response.json())
         .then(response => {
           if(response.status == "success"){
-            editorInstance.html.insert(response.data.savedReply.content);
+            console.log("----- SUCCESS ------", response.data);
+            console.log(vueThis.replyEditorInstance);
+            console.log(vueThis.noteEditorInstance);
+              // vueThis.chat += response.data.savedReply.content;
+              // vueThis.replyEditorInstance.html.insert(response.data.savedReply.content);
+
+            if(vueThis.current == 'reply'){
+              // vueThis.chat += response.data.savedReply.content;
+              vueThis.replyEditorInstance.html.insert(response.data.savedReply.content);
+            } else {  
+              // vueThis.note += response.data.savedReply.content;
+              vueThis.noteEditorInstance.html.insert(response.data.savedReply.content);
+            }
+            // editorInstance.html.insert(response.data.savedReply.content);
             triggerPromptNotif("Saved Reply Inserted", "success");
           } else {
             triggerPromptNotif("Unable to insert Saved Reply", "error");
