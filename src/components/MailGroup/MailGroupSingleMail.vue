@@ -233,7 +233,7 @@
               (unknown sender)
             </div>
             <div
-              v-else-if="this.$route.params.type == 'sent'"
+              v-else-if="this.$route.params.filterSection == 'sent'"
               class="text-truncate thread-addr-main"
               style="max-width: 90%"
               :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
@@ -392,10 +392,10 @@
           >
             <span
               v-if="
-                this.$route.params.type !== 'sent' &&
-                this.$route.params.type !== 'closed' &&
-                this.$route.params.type !== 'spam' &&
-                this.$route.params.type !== 'trash'
+                this.$route.params.filterSection !== 'sent' &&
+                this.$route.params.filterSection !== 'closed' &&
+                this.$route.params.filterSection !== 'spam' &&
+                this.$route.params.filterSection !== 'trash'
               "
               class="read-unread-thread pl-1 pr-1 pt-1"
               @click.stop="changeRead(mail.id)"
@@ -418,8 +418,8 @@
               ></i> </span
             ><span
               v-if="
-                this.$route.params.type !== 'closed' &&
-                this.$route.params.type !== 'trash'
+                this.$route.params.filterSection !== 'closed' &&
+                this.$route.params.filterSection !== 'trash'
               "
               class="archive-thread pr-1 pl-1"
               data-toggle="tooltip"
@@ -626,7 +626,7 @@
               </div>
             </span>
             <span
-              v-if="this.$route.params.type !== 'trash'"
+              v-if="this.$route.params.filterSection !== 'trash'"
               class="deleteThread pr-1 pl-1"
               :id="'deleteThread-' + mail.id"
               data-toggle="tooltip"
@@ -656,7 +656,7 @@
               </svg>
             </span>
             <span
-              v-if="this.$route.params.type == 'trash'"
+              v-if="this.$route.params.filterSection == 'trash'"
               class="permanentlyDeleteThread pr-1 pl-1"
               :id="'permanentlyDeleteThread-' + mail.id"
               data-toggle="tooltip"
@@ -688,9 +688,9 @@
             </span>
             <span
               v-if="
-                this.$route.params.type == 'closed' ||
-                this.$route.params.type == 'spam' ||
-                this.$route.params.type == 'trash'
+                this.$route.params.filterSection == 'closed' ||
+                this.$route.params.filterSection == 'spam' ||
+                this.$route.params.filterSection == 'trash'
               "
               class="restore-thread pr-1 pl-1"
               data-toggle="tooltip"
@@ -814,7 +814,7 @@
               (unknown sender)
             </div>
             <div
-              v-else-if="this.$route.params.type == 'sent'"
+              v-else-if="this.$route.params.filterSection == 'sent'"
               class="text-truncate thread-addr-main"
               style="max-width: 90%"
               :style="{ fontWeight: this.mail.isRead ? '' : '600' }"

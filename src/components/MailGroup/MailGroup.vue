@@ -192,7 +192,7 @@ export default {
       isnextPage: false,
       noOfPages: 1,
       startThread: 1,
-      filterSection: "open",
+      filterSection: this.$route.params.filterSection || this.$store.state.filterSection,
       endThread: 1,
       activeId: "",
       route: "",
@@ -2440,6 +2440,7 @@ export default {
   async beforeMount() {
     if (this.$route.params.type !== undefined) {
       this.route = this.$route.params.type;
+      this.filterSection = this.$route.params.filterSection;
       if (this.$route.params.type == "assigned") {
         this.labelId = 0;
       } else if (this.$route.params.type == "mine") {
@@ -2465,6 +2466,7 @@ export default {
         //   this.tagId = this.$route.params.type.substring(4);
       }
       this.$store.dispatch("type", this.route);
+      this.$store.dispatch("updateFilterSection", this.filterSection);
       this.$store.dispatch("labelId", this.labelId);
     }
     if (this.$route.params.pageNo !== undefined) {

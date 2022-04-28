@@ -1,9 +1,18 @@
 <template>
   <div class="main">
+    <div
+      v-if="!dataLoaded && !loaded"
+      id="thread-spinner"
+      class="spinner-border text-primary"
+      role="status"
+      style="position: absolute; top: 50%; left: 50%"
+    >
+      <span class="sr-only">Loading...</span>
+    </div>
     <NavBar :mailboxes="mailboxes" />
     <div class="mail-wrapper">
-      <SideBarHW v-if="dataLoaded && loaded" :mailbox="mailbox" />
-      <MailGroup v-if="dataLoaded && loaded" :mailbox="mailbox" />
+      <SideBarHW :mailbox="mailbox" />
+      <MailGroup :mailbox="mailbox" />
       <MailContent />
       <compose-wrapper></compose-wrapper>
       <!-- <tweet-compose></tweet-compose> -->

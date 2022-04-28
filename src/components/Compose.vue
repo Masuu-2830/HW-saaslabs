@@ -176,7 +176,7 @@
                   }}&gt;</b-form-select-option
                 >
               </b-form-select>
-              <vue-select
+              <!-- <vue-select
                 class="vue-select2"
                 name="select2"
                 :options="options"
@@ -184,7 +184,7 @@
                 :searchable="true"
                 language="en-US"
               >
-              </vue-select>
+              </vue-select> -->
               <!-- <select id="selectForCompose">
                 <option>buhu</option>
                 <option>buhu</option>
@@ -1115,7 +1115,7 @@ export default {
             ) {
               editor.mailboxID = self.$store.state.inboxData.id;
             } else {
-              editor.mailboxID = self.fromSelected.id;
+              editor.mailboxID = self.fromSelected.mailboxId;
             }
             // editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
@@ -1249,7 +1249,7 @@ export default {
             ) {
               editor.mailboxID = self.$store.state.inboxData.id;
             } else {
-              editor.mailboxID = self.fromSelected.id;
+              editor.mailboxID = self.fromSelected.mailboxId;
             }
             // editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
@@ -2460,7 +2460,7 @@ export default {
     aliases() {
       console.log(this.$store.state.fromAddresses);
 
-  let aliases = this.$store.state.fromAddresses.filter(
+      let aliases = this.$store.state.fromAddresses.filter(
         (address) =>
           address.mailboxId == this.$store.state.mailboxId ||
           this.$store.state.mailboxId == "me"
@@ -2503,26 +2503,26 @@ export default {
       if (this.composer.from !== undefined) {
         for (let i = 0; i < aliases.length; i++) {
           if (aliases[i].email == Object.keys(this.composer.from)) {
-            return { id: i, email: aliases[i].email, name: aliases[i].name };
+            return aliases[i];
           }
         }
       } else {
-        if (this.$store.state.inboxData.type == "universal") {
-          for (const alias in aliases) {
-            for (let j = 0; j < aliases[alias].length; j++) {
-              if (aliases[alias][j].isDefault) {
-                aliases[alias][j]["id"] = alias;
-                return aliases[alias][j];
-              }
-            }
-          }
-        } else {
+        // if (this.$store.state.inboxData.type == "universal") {
+        //   for (const alias in aliases) {
+        //     for (let j = 0; j < aliases[alias].length; j++) {
+        //       if (aliases[alias][j].isDefault) {
+        //         aliases[alias][j]["id"] = alias;
+        //         return aliases[alias][j];
+        //       }
+        //     }
+        //   }
+        // } else {
           for (let i = 0; i < aliases.length; i++) {
             if (aliases[i].isDefault) {
-              return { id: i, email: aliases[i].email, name: aliases[i].name };
+              return aliases[i];
             }
           }
-        }
+        // }
       }
       return {};
     },
@@ -2671,7 +2671,7 @@ export default {
       ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
-        mailboxID = this.fromSelected.id;
+        mailboxID = this.fromSelected.mailboxId;
       }
       if (this.threadID == null) {
         body = {
@@ -2751,7 +2751,7 @@ export default {
       ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
-        mailboxID = this.fromSelected.id;
+        mailboxID = this.fromSelected.mailboxId;
       }
       body = {
         mailboxID,
@@ -2865,7 +2865,7 @@ export default {
       ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
-        mailboxID = this.fromSelected.id;
+        mailboxID = this.fromSelected.mailboxId;
       }
       let body = {
         mailboxID,
@@ -2897,19 +2897,21 @@ export default {
     },
     saveDraft() {
       // this.getUserSignature();
+      let inboxes = this.$store.state.inboxes;
+      let typeOfInbox = inboxes[this.fromSelected.mailboxId].type;
       if (
         this.composer.type == "universalMail" ||
         this.composer.type == "universalSms"
       ) {
-        this.editorInstance.mailboxID = this.fromSelected.id;
+        this.editorInstance.mailboxID = this.fromSelected.mailboxId;
         if (
           this.composer.type == "universalMail" &&
-          this.fromSelected.type == "sms"
+          typeOfInbox == "sms"
         ) {
           this.composer.type = "universalSms";
         } else if (
           this.composer.type == "universalSms" &&
-          this.fromSelected.type == "mail"
+          typeOfInbox == "mail"
         ) {
           this.composer.type = "universalMail";
         }
@@ -3132,16 +3134,18 @@ export default {
         requestOptions.body = JSON.stringify(requestOptions.body);
 
         let url;
-        if (this.fromSelected.subtype == "sms") {
+        let inboxes = this.$store.state.inboxes;
+        let subtypeOfInbox = inboxes[this.fromSelected.mailboxId].subtype;
+        if (subtypeOfInbox == "sms") {
           url = this.$apiBaseURL + "sms/sendSmsUnifiedLive.php";
-        } else if (this.fromSelected.subtype == "plivo") {
-          this.$apiBaseURL + "plivo/sendSmsUnifiedLive.php";
-        } else if (this.fromSelected.subtype == "ringcentral") {
-          this.$apiBaseURL + "ringcentral/sendSmsUnifiedLive.php";
-        } else if (this.fromSelected.subtype == "justcall") {
-          this.$apiBaseURL + "justcall/sendSmsUnifiedLive.php";
-        } else if (this.fromSelected.subtype == "dialpad") {
-          this.$apiBaseURL + "dialpad/sendSmsUnifiedLive.php";
+        } else if (subtypeOfInbox == "plivo") {
+          url = this.$apiBaseURL + "plivo/sendSmsUnifiedLive.php";
+        } else if (subtypeOfInbox == "ringcentral") {
+          url = this.$apiBaseURL + "ringcentral/sendSmsUnifiedLive.php";
+        } else if (subtypeOfInbox == "justcall") {
+          url = this.$apiBaseURL + "justcall/sendSmsUnifiedLive.php";
+        } else if (subtypeOfInbox == "dialpad") {
+          url = this.$apiBaseURL + "dialpad/sendSmsUnifiedLive.php";
         }
         fetch(url, requestOptions)
           .then(async (response) => {
@@ -3192,7 +3196,7 @@ export default {
       ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
-        mailboxID = this.fromSelected.id;
+        mailboxID = this.fromSelected.mailboxId;
       }
       const requestOptions = {
         method: "POST",
@@ -3444,13 +3448,6 @@ export default {
   bottom: 8px;
   position: absolute;
   right: 20px;
-}
-
-.fr-toolbar .fr-command .fr-btn img,
-.fr-popup .fr-command.fr-btn img,
-.fr-modal .fr-command.fr-btn img {
-  margin: 8px 7px;
-  width: 16px !important;
 }
 
 .fr-toolbar .fr-command.fr-btn img,

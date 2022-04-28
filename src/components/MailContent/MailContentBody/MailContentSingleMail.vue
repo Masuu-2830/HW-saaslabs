@@ -625,6 +625,7 @@ export default {
       console.log("open reply");
       let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
       bus.$emit("openReply", hash, type, this.item.data);
+      this.$emit("scrollToBottom");
     },
     changeCollapseState() {
       this.isMailCollapsed = !this.isMailCollapsed;

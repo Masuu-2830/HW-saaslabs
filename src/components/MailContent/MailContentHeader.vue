@@ -494,8 +494,8 @@
       </div>
       <a
         v-if="
-          this.$store.state.type !== 'closed' &&
-          this.$store.state.type !== 'drafts'
+          this.$store.state.filterSection !== 'closed' &&
+          this.$store.state.filterSection !== 'drafts'
         "
         href="#"
         @click.stop="closeThread"
@@ -520,7 +520,7 @@
       </a>
       <a
         v-if="
-                this.$store.state.type == 'mentions'
+                this.$store.state.filterSection == 'mentions'
               "
         href=""
         @click.stop.prevent="markDone"
@@ -551,11 +551,11 @@
         title="Move To Inbox"
         class="nav-link reopen-current-thread"
         v-if="
-          this.$store.state.type == 'snoozed' ||
-          this.$store.state.type == 'closed' ||
-          this.$store.state.type == 'spam' ||
-          this.$store.state.type == 'trash' ||
-          this.$store.state.type == 'drafts'
+          this.$store.state.filterSection == 'snoozed' ||
+          this.$store.state.filterSection == 'closed' ||
+          this.$store.state.filterSection == 'spam' ||
+          this.$store.state.filterSection == 'trash' ||
+          this.$store.state.filterSection == 'drafts'
         "
         @click.stop.prevent="restoreThread"
       >
@@ -606,16 +606,16 @@
       </a>
       <a
         v-if="
-          this.$store.state.type !== 'mentions' &&
-          this.$store.state.type !== 'discussions' &&
-          this.$store.state.type !== 'starred' &&
-          this.$store.state.type !== 'snoozed' &&
-          this.$store.state.type !== 'drafts' &&
-          this.$store.state.type !== 'sent' &&
-          this.$store.state.type !== 'scheduled' &&
-          this.$store.state.type !== 'closed' &&
-          this.$store.state.type !== 'spam' &&
-          this.$store.state.type !== 'trash'
+          this.$store.state.filterSection !== 'mentions' &&
+          this.$store.state.filterSection !== 'discussions' &&
+          this.$store.state.filterSection !== 'starred' &&
+          this.$store.state.filterSection !== 'snoozed' &&
+          this.$store.state.filterSection !== 'drafts' &&
+          this.$store.state.filterSection !== 'sent' &&
+          this.$store.state.filterSection !== 'scheduled' &&
+          this.$store.state.filterSection !== 'closed' &&
+          this.$store.state.filterSection !== 'spam' &&
+          this.$store.state.filterSection !== 'trash'
         "
         @click.stop="unread"
         data-toggle="tooltip"
@@ -1069,7 +1069,7 @@
       </div>
       <div
         v-if="
-              this.$store.state.type !== 'trash'
+              this.$store.state.filterSection !== 'trash'
             "
         id="snooze-thread"
         data-toggle="tooltip"
@@ -1306,7 +1306,7 @@
         </template>
       </b-modal>
       <a
-        v-if="this.$store.state.type !== 'trash'"
+        v-if="this.$store.state.filterSection !== 'trash'"
         @click.stop.prevent="deleteConv"
         href=""
         id="trash-thread"
@@ -1397,9 +1397,9 @@
             @click.stop="restoreThread"
             type="button"
             v-if="
-              this.$store.state.type == 'trash' ||
-              this.$store.state.type == 'spam' ||
-              this.$store.state.type == 'closed'
+              this.$store.state.filterSection == 'trash' ||
+              this.$store.state.filterSection == 'spam' ||
+              this.$store.state.filterSection == 'closed'
             "
             class="dropdown-item d-flex"
             id="move-thread-to-inbox"
@@ -1409,8 +1409,8 @@
           <button
             @click.stop="spamThreads"
             v-if="
-              this.$store.state.type == 'trash' ||
-              this.$store.state.type == 'spam'
+              this.$store.state.filterSection == 'trash' ||
+              this.$store.state.filterSection == 'spam'
             "
             type="button"
             class="dropdown-item d-flex"
