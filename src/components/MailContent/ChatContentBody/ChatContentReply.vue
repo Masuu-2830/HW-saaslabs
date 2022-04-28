@@ -846,6 +846,7 @@ export default {
           `;
     },
     getArticleCard(article) {
+      
       let $descHtml = "";
       if (article.description) {
         $descHtml = `<p style="margin-top: 0;" class="hw_articleCardText">${article.description}</p>`;
