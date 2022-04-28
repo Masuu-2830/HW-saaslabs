@@ -1842,7 +1842,7 @@ export default {
               email: payload,
               type: "email",
             };
-
+            triggerPromptNotif("Mail sent", "success", 1000);
             bus.$emit("changeThreadAttrs", email);
           } else {
             bus.$emit("closeThread", this.$route.params.threadId);

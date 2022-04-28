@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-column d-flex" style="height: 40px; justify-content: center">
+  <div class="flex-column mail-group-header" style="position: relative; height: 40px; justify-content: center">
     <div class="d-flex justify-content-around">
       <div
         v-for="type in types"

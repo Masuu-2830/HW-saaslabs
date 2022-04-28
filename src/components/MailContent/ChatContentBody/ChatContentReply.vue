@@ -704,6 +704,7 @@ export default {
             return Promise.reject(error);
           }
           // editor.html = "";
+          
           let payload = {
             id: data.data.message_id,
             text: data.data.body,
@@ -845,6 +846,7 @@ export default {
           `;
     },
     getArticleCard(article) {
+      
       let $descHtml = "";
       if (article.description) {
         $descHtml = `<p style="margin-top: 0;" class="hw_articleCardText">${article.description}</p>`;
@@ -892,7 +894,7 @@ export default {
       }
     });
 
-    // bus.$off("modal.savedReplyInsert.click");
+    bus.$off("modal.savedReplyInsert.click");
     bus.$on("modal.savedReplyInsert.click", function (id, type) {
       console.log(type, id);
       if (type == "chatReply") {
@@ -902,21 +904,29 @@ export default {
             : vueThis.noteEditorInstance;
 
         triggerPromptNotif("Fetching saved reply data");
+        console.log("FETCHING SAVED REPLY IN CHAT CONTENT REPLY");
         fetch(
-          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vuethis.thread.data.mailbox_id}&savedReplyID=${id}`,
-          { credentials: "include" }
-        )
-          .then((response) => response.json())
-          .then((response) => {
-            if (response.status == "success") {
-              editorInstance.html.insert(response.data.savedReply.content);
-              triggerPromptNotif("Saved Reply Inserted", "success");
-            } else {
-              triggerPromptNotif("Unable to insert Saved Reply", "error");
+          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.thread.data.mailbox_id}&savedReplyID=${id}`,
+          {credentials: 'include'}
+        ).then(response => response.json())
+        .then(response => {
+          if(response.status == "success"){
+            
+            if(vueThis.current == 'reply'){
+              // vueThis.chat += response.data.savedReply.content;
+              vueThis.replyEditorInstance.html.insert(response.data.savedReply.content);
+            } else {  
+              // vueThis.note += response.data.savedReply.content;
+              vueThis.noteEditorInstance.html.insert(response.data.savedReply.content);
             }
-          });
-      }
-    });
+            // editorInstance.html.insert(response.data.savedReply.content);
+            triggerPromptNotif("Saved Reply Inserted", "success");
+          } else {
+            triggerPromptNotif("Unable to insert Saved Reply", "error");
+          }
+        })
+        }
+      })
 
     $(document).off("click", "#sendMessage");
     $(document).on("click", "#sendMessage", function () {

@@ -4,21 +4,21 @@
       <template #modal-title class="modal-header">
         <h5 class="modal-title">Attention Required!</h5>
       </template>
-      <div class="modal-body">
-        <p>Are you sure you want to discard this draft?</p>
+      <div class="modal-body" style="padding: 0px;">
+        <p style="margin-bottom: 0px;">Are you sure you want to discard this draft?</p>
       </div>
       <template
         class="align-items-center justify-content-between"
         #modal-footer="{ cancel }"
       >
         <b-row class="text-center" align-v="center">
-          <b-col class="float-left">
-            <b-button size="xs" variant="outline-secondary" @click="cancel()">
+          <b-col>
+            <b-button size="xs" variant="secondary" @click="cancel()">
               No
             </b-button>
           </b-col>
-          <b-col class="float-right">
-            <b-button @click.stop="close" size="xs" variant="outline-primary">
+          <b-col style="padding-left: 0px;">
+            <b-button @click.stop="close" size="xs" variant="primary">
               Yes
             </b-button>
           </b-col>
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { bus } from "../../main";
+import { bus, triggerPromptNotif } from "../../main";
 export default {
   data() {
     return {
@@ -67,7 +67,6 @@ export default {
           credentials: "include",
         };
       }
-      console.log(requestOptions)
       fetch(url, requestOptions).then(async (response) => {
         const data = await response.json();
         if (data.status !== "success") {
@@ -90,7 +89,8 @@ export default {
           console.log("replyCard from main");
           bus.$emit("closeReplyCard", this.data.draftID);
         }
-      this.$bvModal.hide("discardDraftModal");
+        triggerPromptNotif("Draft discarded", "success", 1000);
+        this.$bvModal.hide("discardDraftModal");
       });
     },
   },

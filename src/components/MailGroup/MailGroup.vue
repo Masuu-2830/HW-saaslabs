@@ -43,7 +43,7 @@
         background-color: white;
         position: relative;
         top: 0px;
-        height: 100%;
+        height: calc(100% - 135px);
       "
     >
       <div v-if="this.$store.state.threads.length !== 0" id="threads-list">
