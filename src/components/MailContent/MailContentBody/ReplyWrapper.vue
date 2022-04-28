@@ -25,6 +25,14 @@ export default {
   props: {
     thread: Object,
   },
+  watch:{
+        $route (to, from) {
+            if(to.name == "thread" && to.params.threadId !== from.params.threadId) {
+              console.error("Drafts")
+                this.addDrafts();
+            }
+        }
+    },
   created() {
     bus.$on("openReply", (data, type, email) => {
       if (email == undefined) {
@@ -58,6 +66,7 @@ export default {
   },
   methods: {
     addDrafts() {
+      this.replies = []
       if (Object.keys(this.thread).length !== 0) {
         console.log(this.thread.data.drafts);
         for (let i = 0; i < this.thread.data.drafts.length; i++) {
@@ -78,6 +87,9 @@ export default {
   beforeMount() {
     this.addDrafts();
   },
+  // beforeUpdate() {
+  //   this.addDrafts();
+  // },
 };
 </script>
 

@@ -192,7 +192,8 @@ export default {
       isnextPage: false,
       noOfPages: 1,
       startThread: 1,
-      filterSection: this.$route.params.filterSection || this.$store.state.filterSection,
+      filterSection:
+        this.$route.params.filterSection || this.$store.state.filterSection,
       endThread: 1,
       activeId: "",
       route: "",
@@ -1696,7 +1697,7 @@ export default {
         }
         this.$store.dispatch("type", this.route);
         this.$store.dispatch("labelId", this.labelId);
-        if (to.name == "type") {
+        if (to.name == "type" && to.params.event !== "back") {
           this.fetchThreads();
         }
       }
@@ -2157,80 +2158,99 @@ export default {
           });
         }
       } else {
-        bus.$emit("changeRead", id, 1);
-        this.activeId = id;
-        this.isCompact = true;
-        let data = null;
-        bus.$emit("compact", data);
-        if (this.isThreadRefresh) {
-          this.loading = true;
-        }
-        data = await this.fetchThread(id, type, subtype);
-        let data1;
-        if (type == "chat") {
-          await fetch(
-            this.$apiBaseURL +
-              "chat-widget/getUserDetails_V2?id=" +
-              data.data.contact.id +
-              "&mailboxID=" +
-              mailboxId,
-            { credentials: "include" }
-          )
-            .then(async (response) => {
-              data1 = await response.json();
-              if (data1.status !== "success") {
-                const error = (data1 && data1.message) || response.status;
-                triggerPromptNotif(error, "error", 3000);
-                return Promise.reject(error);
-              }
-            })
-            .catch((error) => {
-              alert(error);
-            });
-        }
-        data["data"]["ticketNumber"] = ticketNumber;
-        if (this.isThreadRefresh) {
-          let from = {};
-          let ts = data.data.items[0].timestamp;
-          for (let i = 0; i < data.data.items.length; i++) {
-            if (data.data.items[i].timestamp < ts) {
-              ts = data.data.items[i].timestamp;
-            }
-            // if (
-            //   data.data.items[i].type == "email" &&
-            //   data.data.items[i].timestamp == ts
-            // ) {
-            //   from = data.data.items[i].data.from;
-            // }
+        if (Object.keys(this.$store.state.threadData).includes(id.toString())) {
+          this.activeId = id;
+          this.isCompact = true;
+          router.push({
+            name: "thread",
+            params: {
+              threadId: id,
+            },
+          });
+          this.$store.dispatch("updateOpenThread", id);
+          bus.$emit("compact", this.$store.state.threadData[id]);
+        } else {
+          bus.$emit("changeRead", id, 1);
+          this.activeId = id;
+          this.isCompact = true;
+          let data = null;
+          bus.$emit("compact", data);
+          if (this.isThreadRefresh) {
+            this.loading = true;
           }
-          let thread = {
-            assignedTo: data.data.currentAssignment,
-            draftOnly: false,
-            id: data.data.ticketNumber,
-            hasDraft: data.data.drafts.length > 0,
-            isArchived: data.data.isArchived,
-            isDeleted: data.data.isDeleted,
-            isRead: true,
-            isSnoozed: data.data.isSnoozed,
-            isSpam: data.data.isSpam,
-            isStarred: data.data.isStarred,
-            order: 0,
-            type: "mail",
-            snippetType: "message",
-            totalEmailCount: data.data.emailCount,
-            ticketNumber: data.data.ticketNumber,
-            tags: data.data.tags,
-            attachments: [],
-            subject: data.data.subject,
-            originalSubject: data.data.subject,
-            snippet: data.data.snippet,
-            humanFriendlyDate: moment.unix(ts).format("DD MMM"),
-          };
-          this.perPageMails.push(thread);
-          this.loading = false;
-          this.$store.dispatch("updateThreads", this.perPageMails);
+          data = await this.fetchThread(id, type, subtype);
+          data["data"]["ticketNumber"] = ticketNumber;
+          let data1;
+          if (type == "chat") {
+            await fetch(
+              this.$apiBaseURL +
+                "chat-widget/getUserDetails_V2?id=" +
+                data.data.contact.id +
+                "&mailboxID=" +
+                mailboxId,
+              { credentials: "include" }
+            )
+              .then(async (response) => {
+                data1 = await response.json();
+                if (data1.status !== "success") {
+                  const error = (data1 && data1.message) || response.status;
+                  triggerPromptNotif(error, "error", 3000);
+                  return Promise.reject(error);
+                }
+              })
+              .catch((error) => {
+                alert(error);
+              });
+          }
+          data["data"]["contactData"] = data1;
+          if (
+            !Object.keys(this.$store.state.threadData).includes(id.toString())
+          ) {
+            this.$store.dispatch("updateThreadData", data);
+          }
+          if (this.isThreadRefresh) {
+            let from = {};
+            let ts = data.data.items[0].timestamp;
+            for (let i = 0; i < data.data.items.length; i++) {
+              if (data.data.items[i].timestamp < ts) {
+                ts = data.data.items[i].timestamp;
+              }
+              // if (
+              //   data.data.items[i].type == "email" &&
+              //   data.data.items[i].timestamp == ts
+              // ) {
+              //   from = data.data.items[i].data.from;
+              // }
+            }
+            let thread = {
+              assignedTo: data.data.currentAssignment,
+              draftOnly: false,
+              id: data.data.ticketNumber,
+              hasDraft: data.data.drafts.length > 0,
+              isArchived: data.data.isArchived,
+              isDeleted: data.data.isDeleted,
+              isRead: true,
+              isSnoozed: data.data.isSnoozed,
+              isSpam: data.data.isSpam,
+              isStarred: data.data.isStarred,
+              order: 0,
+              type: "mail",
+              snippetType: "message",
+              totalEmailCount: data.data.emailCount,
+              ticketNumber: data.data.ticketNumber,
+              tags: data.data.tags,
+              attachments: [],
+              subject: data.data.subject,
+              originalSubject: data.data.subject,
+              snippet: data.data.snippet,
+              humanFriendlyDate: moment.unix(ts).format("DD MMM"),
+            };
+            this.perPageMails.push(thread);
+            this.loading = false;
+            this.$store.dispatch("updateThreads", this.perPageMails);
+          }
+          bus.$emit("compact", this.$store.state.threadData[id]);
         }
-        bus.$emit("compact", this.$store.state.threadData[id], data1);
       }
     },
     async fetchThreads() {
@@ -2287,6 +2307,12 @@ export default {
         parseInt(this.startThread) + parseInt(this.resultsPerPage) - 1;
     },
     async fetchThread(id, type, subtype) {
+      router.push({
+        name: "thread",
+        params: {
+          threadId: id,
+        },
+      });
       this.$store.dispatch("updateOpenThread", id);
       let mailboxID =
         this.$route.params.mailboxId ||
@@ -2310,15 +2336,6 @@ export default {
       // data.data.isRead = isread;
       data.data.labelId = this.labelId;
       data.data.id = id;
-      if (!(id in Object.keys(await this.$store.state.threadData))) {
-        this.$store.dispatch("updateThreadData", data);
-      }
-      router.push({
-        name: "thread",
-        params: {
-          threadId: id,
-        },
-      });
       return data;
     },
     async nextPage() {
