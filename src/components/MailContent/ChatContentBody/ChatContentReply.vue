@@ -650,6 +650,7 @@
             return Promise.reject(error);
           }
           // editor.html = "";
+          
           let payload = {
             "id": data.data.message_id,
             "text": data.data.body,
