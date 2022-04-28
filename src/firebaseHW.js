@@ -145,9 +145,9 @@ export function closeThread(data) {
         console.log("thread id", thread);
         // let objIndex = store.state.threads.findIndex((obj) => data.threadID.includes(obj.id));
         let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
-        if (objIndex !== -1 && store.state.type !== 'closed') {
+        if (objIndex !== -1 && store.state.filterSection !== 'closed') {
             store.state.threads.splice(objIndex, 1);
-        } else if (objIndex == -1 && store.state.type == 'closed') {
+        } else if (objIndex == -1 && store.state.filterSection == 'closed') {
             store.state.threads.unshift(createThread(data));
         }
         if (store.state.openThread !== null) {
@@ -165,9 +165,9 @@ export function snoozeThread(data) {
     var allThreads = data.threadID;
     allThreads.forEach(thread => {
         let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
-        if (objIndex !== -1 && store.state.type !== 'snoozed') {
+        if (objIndex !== -1 && store.state.filterSection !== 'snoozed') {
             store.state.threads.splice(objIndex, 1);
-        } else if (objIndex == -1 && store.state.type == 'snoozed') {
+        } else if (objIndex == -1 && store.state.filterSection == 'snoozed') {
             store.state.threads.unshift(createThread(data));
         }
         if (store.state.openThread !== null) {
@@ -185,9 +185,9 @@ export function deleteThread(data) {
     var allThreads = data.threadID;
     allThreads.forEach(thread => {
         let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
-        if (objIndex !== -1 && store.state.type !== 'trash') {
+        if (objIndex !== -1 && store.state.filterSection !== 'trash') {
             store.state.threads.splice(objIndex, 1);
-        } else if (objIndex == -1 && store.state.type == 'trash') {
+        } else if (objIndex == -1 && store.state.filterSection == 'trash') {
             store.state.threads.unshift(createThread(data));
         }
         if (store.state.openThread == thread) {
@@ -219,7 +219,8 @@ export function moveToInboxThread(data) { // var inbox = data.mailboxID == store
     // }
 }
 export function toggleTags(data) {
-    console.log("data dhikhado tags ka", data);
+    if(data.managerID !== store.state.userInfo.accountID) {
+        console.log("data dhikhado tags ka", data);
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
     var allThreads = data.threadID;
@@ -258,7 +259,7 @@ export function toggleTags(data) {
                         'data': {
                             'type': 'tag',
                             'at': data.time,
-                            'body': data.user.first_name + data.user.last_name + ' added the tag ' + tag.name
+                            'body': data.user.first_name + " " + data.user.last_name + ' added the tag ' + tag.name
                         },
                         'timestamp': Date.now()
                     };
@@ -270,7 +271,7 @@ export function toggleTags(data) {
                         'data': {
                             'type': 'tag',
                             'at': data.time,
-                            'body': data.user.first_name + data.user.last_name + ' removed the tag ' + tag.name
+                            'body': data.user.first_name + " " + data.user.last_name + ' removed the tag ' + tag.name
                         },
                         'timestamp': Date.now()
                     };
@@ -279,9 +280,11 @@ export function toggleTags(data) {
             });
         }
     });
+    }
     // }
 }
 export function assignThread(data) {
+    if(data.managerID !== store.state.userInfo.accountID) {
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
     var allThreads = data.threadID;
@@ -299,11 +302,11 @@ export function assignThread(data) {
             };
             let body = '';
             if (data.assigned && data.assigned.id == store.state.userInfo.id) {
-                body = data.assigner.first_name + data.assigner.last_name + ' assigned the conversation to themselves';
+                body = data.assigner.first_name + " " + data.assigner.last_name + ' assigned the conversation to themselves';
             } else if (!data.assigned) {
-                body = data.assigner.first_name + data.assigner.last_name + ' unassigned the conversation';
+                body = data.assigner.first_name + " " + data.assigner.last_name + ' unassigned the conversation';
             } else {
-                body = data.assigner.first_name + data.assigner.last_name + ' assigned the conversation to ' + data.assigned.first_name + data.assigned.last_name;
+                body = data.assigner.first_name + " " + data.assigner.last_name + ' assigned the conversation to ' + data.assigned.first_name + data.assigned.last_name;
             }
             let log = {
                 'type': 'log',
@@ -317,7 +320,7 @@ export function assignThread(data) {
             store.state.threadData[thread].data.items.push(log);
         }
     });
-    // }
+    }
 }
 export function unsnoozeThread(data) { // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     var all = store.state.type == 'all';

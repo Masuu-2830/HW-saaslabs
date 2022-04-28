@@ -26,7 +26,7 @@
           <p
             class="filterP"
             :class="
-              $store.state.filterSection == type.type ||
+              $route.params.filterSection == type.type || $store.state.filterSection == type.type ||
               ($store.state.filterSection == 'open' && type.type == 'all')
                 ? 'isActive'
                 : ''

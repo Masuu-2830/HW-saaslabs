@@ -48,9 +48,13 @@
                     class="dropdown-item text-secondary reply-state-btn-reply"
                     style="font-size: 13px"
                   >
-                    <i class="fas fa-reply"></i> Reply
+                    <i class="fa fa-reply mr-1"></i> Reply
                   </button>
                   <button
+                    v-if="
+              reply.email.cc !== undefined &&
+              Object.keys(reply.email.cc).length !== 0
+            "
                     @click.prevent="replyAll"
                     class="
                       dropdown-item
@@ -1344,8 +1348,9 @@ export default {
           let aliases = this.aliases();
           if (this.$store.state.inboxData.type == "universal") {
             let alias = aliases[this.reply.mailboxId];
+            console.log(alias, aliases)
             for (var key in this.reply.email.to) {
-              if (!alias.some((el) => el.email == key)) {
+              if (!aliases.some((el) => el.email == key)) {
                 let obj = {};
                 obj["email"] = key;
                 obj["name"] = this.reply.email.to[key];
@@ -1380,7 +1385,7 @@ export default {
           let alias = aliases[this.reply.mailboxId];
 
           for (var key in this.reply.email.cc) {
-            if (!alias.some((el) => el.email == key)) {
+            if (!aliases.some((el) => el.email == key)) {
               let obj = {};
               obj["email"] = key;
               obj["name"] = this.reply.email.cc[key];
@@ -1411,13 +1416,13 @@ export default {
     tagsbcc(prop) {
       let bcc = [];
       if (this.reply.type == 2 || prop == 2) {
-        let aliases = this.getAliases();
+        let aliases = this.aliases();
 
         if (this.$store.state.inboxData.type == "universal") {
           let alias = aliases[this.reply.mailboxId];
 
           for (var key in this.reply.email.to) {
-            if (!alias.some((el) => el.email == key)) {
+            if (!aliases.some((el) => el.email == key)) {
               let obj = {};
               obj["email"] = key;
               obj["name"] = this.reply.email.bcc[key];
@@ -2073,7 +2078,7 @@ export default {
   right: 24px;
 }
 
-.fr-toolbar .fr-command .fr-btn img,
+.fr-toolbar .fr-command.fr-btn img,
 .fr-popup .fr-command.fr-btn img,
 .fr-modal .fr-command.fr-btn img {
   margin: 8px 7px;

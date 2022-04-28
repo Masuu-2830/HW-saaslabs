@@ -2,7 +2,8 @@
   <div id="replyWindowWrapper" v-if="replies.length > 0">
     <mail-content-reply
       v-for="reply in replies"
-      :key="reply.id"
+      :ref="reply.hash"
+      :key="reply.hash"
       :reply="reply"
     ></mail-content-reply>
     <!-- <compose v-for="(composer, index) in composers" :key="composer.id" :align="index" :composer="composer" /> -->
@@ -40,6 +41,12 @@ export default {
         this.replies.push(obj);
       }
       this.show = true;
+      // const el = this.$refs[data];
+      // console.error(el)
+      // if (el) {
+      //   // Use el.scrollIntoView() to instantly scroll to the element
+      //   el.scrollIntoView({ behavior: "smooth" });
+      // }
       console.log(this.replies);
     });
     bus.$on("closeReply", (data) => {
