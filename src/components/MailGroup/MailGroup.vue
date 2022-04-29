@@ -1634,7 +1634,7 @@ export default {
   },
   watch: {
     $route(to, from) {
-      if (to.name == "type" && to.params.event !== 'pagination') {
+      if (to.name == "type" && to.params.event !== 'pagination' && to.params.event !== 'back') {
         this.selectedIds = [];
         this.personId = 0;
         this.order = "";
