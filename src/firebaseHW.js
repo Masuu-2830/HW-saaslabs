@@ -218,7 +218,7 @@ export function moveToInboxThread(data) { // var inbox = data.mailboxID == store
 }
 export function toggleTags(data) {
     console.log("data dhikhado tags ka", data);
-    // if(data.managerID !== store.state.userInfo.accountID) {
+    if(data.managerID !== store.state.userInfo.accountID) {
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
     var allThreads = data.threadID;
@@ -283,46 +283,58 @@ export function toggleTags(data) {
         //     console.log("data dhikhao tags ka 225", allTags);
         // }
     });
-    // }
+    }
 }
 export function assignThread(data) {
-    // if (data.managerID !== store.state.userInfo.accountID) {
+    if (data.managerID !== store.state.userInfo.accountID) {
         // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
         // if(inbox) {
         var allThreads = data.threadID;
+        var count = 0;
         allThreads.forEach(thread => {
-            let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
-            if (objIndex !== -1) {
-                store.state.threads[objIndex].assignedTo = data.assigned;
-            }
-            if (Object.keys(store.state.threadData).includes(thread.toString())) {
-                store.state.threadData[thread].data.currentAssignment = {
-                    'assigned': data.assigned,
-                    'me': data.assigned.id == store.state.userInfo.id ? true : false,
-                    'assigner': data.assigner,
-                    'time': data.time
-                };
-                let body = '';
-                if (data.assigned && data.assigned.id == store.state.userInfo.id) {
-                    body = data.assigner.firstname + " " + data.assigner.lastname + ' assigned the conversation to themselves';
-                } else if (! data.assigned) {
-                    body = data.assigner.firstname + " " + data.assigner.lastname + ' unassigned the conversation';
-                } else {
-                    body = data.assigner.firstname + " " + data.assigner.lastname + ' assigned the conversation to ' + data.assigned.firstname + data.assigned.lastname;
-                }
-                let log = {
-                    'type': 'log',
-                    'data': {
-                        'type': 'assign',
-                        'at': data.time,
-                        'body': body
-                    },
-                    'timestamp': Date.now()
-                };
-                store.state.threadData[thread].data.items.push(log);
-            }
+            console.log(thread, data, count++);
+            // let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
+            // if (objIndex !== -1) {
+            //     store.state.threads[objIndex].assignedTo = data.assigned;
+            // }
+            // if (Object.keys(store.state.threadData).includes(thread.toString())) {
+            //     console.log(allThreads, thread, store.state.threadData)
+            //     if(data.assigned) {
+            //         store.state.threadData[thread].data.currentAssignment = {
+            //             'assigned': data.assigned,
+            //             'me': data.assigned.id == store.state.userInfo.id ? true : false,
+            //             'assigner': data.assigner,
+            //             'time': data.time
+            //         };
+            //     } else {
+            //         store.state.threadData[thread].data.currentAssignment = {
+            //             'assigned': null,
+            //             'me': false,
+            //             'assigner': data.assigner,
+            //             'time': data.time
+            //         };
+            //     }
+            //     let body = '';
+            //     if (data.assigned && data.assigned.id == store.state.userInfo.id) {
+            //         body = data.assigner.firstname + " " + data.assigner.lastname + ' assigned the conversation to themselves';
+            //     } else if (! data.assigned) {
+            //         body = data.assigner.firstname + " " + data.assigner.lastname + ' unassigned the conversation';
+            //     } else {
+            //         body = data.assigner.firstname + " " + data.assigner.lastname + ' assigned the conversation to ' + data.assigned.firstname + data.assigned.lastname;
+            //     }
+            //     let log = {
+            //         'type': 'log',
+            //         'data': {
+            //             'type': 'assign',
+            //             'at': data.time,
+            //             'body': body
+            //         },
+            //         'timestamp': Date.now()
+            //     };
+            //     store.state.threadData[thread].data.items.push(log);
+            // }
         });
-    // }
+    }
 }
 export function unsnoozeThread(data) { // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     var all = store.state.type == 'all';

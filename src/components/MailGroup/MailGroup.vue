@@ -1634,7 +1634,7 @@ export default {
   },
   watch: {
     $route(to, from) {
-      if (to.name == "type") {
+      if (to.name == "type" && to.params.event !== 'pagination') {
         this.selectedIds = [];
         this.personId = 0;
         this.order = "";
@@ -1697,7 +1697,7 @@ export default {
         }
         this.$store.dispatch("type", this.route);
         this.$store.dispatch("labelId", this.labelId);
-        if (to.name == "type" && to.params.event !== "back") {
+        if (to.name == "type" && to.params.event !== "back" && to.params.event !== "pagination") {
           this.fetchThreads();
         }
       }
@@ -2340,24 +2340,31 @@ export default {
     },
     async nextPage() {
       if (this.isnextPage == true) {
+        let inboxId = `${
+          this.$route.params.mailboxId ||
+          (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+          "me"
+        }`;
+        if (inboxId == "tags") {
+          inboxId = "me";
+        }
         this.loading = true;
+        console.log(this.currPage)
         this.currPage = parseInt(this.currPage) + 1;
-        let url =
-          this.$apiBaseURL +
-          "unifiedv2/getThreads.php?mailboxIDs[]=" +
-          (this.$route.params.mailboxId ||
-            (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-            "me") +
-          "&page=" +
-          this.currPage +
-          "&labelID=" +
-          this.labelId +
-          (this.squery !== "" ? "&squery=" + this.squery : "") +
-          (this.tagId !== 0 ? "&tagID=" + this.tagId : "") +
-          (this.personId == 1 ? "&filter=unassigned" : "") +
-          (this.personId == 2 ? "&filter=unread" : "") +
-          (this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : "") +
-          (this.order !== "" ? "&order=" + this.order : "");
+        console.log(this.currPage)
+        let url = `${
+          this.$apiBaseURL
+        }unifiedv2/getThreads.php?mailboxIDs[]=${inboxId}&type=${
+          this.route
+        }&filterSection=${this.filterSection}&page=${this.currPage}&labelID=${
+          this.labelId
+        }${this.squery !== "" ? "&squery=" + this.squery : ""}${
+          this.tagId !== 0 ? "&tagID=" + this.tagId : ""
+        }${this.personId == 1 ? "&filter=unassigned" : ""}${
+          this.personId == 2 ? "&filter=unread" : ""
+        }${this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : ""}${
+          this.order !== "" ? "&order=" + this.order : ""
+        }`;
         let response = await fetch(url, { credentials: "include" });
         const data = await response.json();
         this.mails = data.data.threads;
@@ -2383,6 +2390,7 @@ export default {
                 (this.$store.state.inboxData &&
                   this.$store.state.inboxData.id) ||
                 "me",
+                event: "pagination"
             },
           });
         }
@@ -2390,6 +2398,14 @@ export default {
     },
     async prevPage() {
       if (this.currPage > 1) {
+        let inboxId = `${
+          this.$route.params.mailboxId ||
+          (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
+          "me"
+        }`;
+        if (inboxId == "tags") {
+          inboxId = "me";
+        }
         this.loading = true;
         this.currPage -= 1;
         if (this.$route.params.threadId == undefined) {
@@ -2403,25 +2419,23 @@ export default {
                 (this.$store.state.inboxData &&
                   this.$store.state.inboxData.id) ||
                 "me",
+                event: "pagination"
             },
           });
         }
-        let url =
-          this.$apiBaseURL +
-          "unifiedv2/getThreads.php?mailboxIDs[]=" +
-          (this.$route.params.mailboxId ||
-            (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
-            "me") +
-          "&page=" +
-          this.currPage +
-          "&labelID=" +
-          this.labelId +
-          (this.squery !== "" ? "&squery=" + this.squery : "") +
-          (this.tagId !== 0 ? "&tagID=" + this.tagId : "") +
-          (this.personId == 1 ? "&filter=unassigned" : "") +
-          (this.personId == 2 ? "&filter=unread" : "") +
-          (this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : "") +
-          (this.order !== "" ? "&order=" + this.order : "");
+        let url = `${
+          this.$apiBaseURL
+        }unifiedv2/getThreads.php?mailboxIDs[]=${inboxId}&type=${
+          this.route
+        }&filterSection=${this.filterSection}&page=${this.currPage}&labelID=${
+          this.labelId
+        }${this.squery !== "" ? "&squery=" + this.squery : ""}${
+          this.tagId !== 0 ? "&tagID=" + this.tagId : ""
+        }${this.personId == 1 ? "&filter=unassigned" : ""}${
+          this.personId == 2 ? "&filter=unread" : ""
+        }${this.personId > 2 ? "&filter=assignedTo%3A" + this.personId : ""}${
+          this.order !== "" ? "&order=" + this.order : ""
+        }`;
         let response = await fetch(url, { credentials: "include" });
         const data = await response.json();
         this.mails = data.data.threads;
