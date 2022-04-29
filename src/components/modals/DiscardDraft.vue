@@ -56,6 +56,7 @@ export default {
         };
       } else {
         url = "https://app.helpwise.io/api/discardDraft.php";
+        console.log(this.data, this);
         requestOptions = {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -67,7 +68,7 @@ export default {
           credentials: "include",
         };
       }
-      console.log(requestOptions)
+      console.log(requestOptions);
       fetch(url, requestOptions).then(async (response) => {
         const data = await response.json();
         if (data.status !== "success") {
@@ -90,7 +91,7 @@ export default {
           console.log("replyCard from main");
           bus.$emit("closeReplyCard", this.data.draftID);
         }
-      this.$bvModal.hide("discardDraftModal");
+        this.$bvModal.hide("discardDraftModal");
       });
     },
   },

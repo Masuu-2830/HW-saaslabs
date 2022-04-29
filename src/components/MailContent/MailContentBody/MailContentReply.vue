@@ -627,7 +627,7 @@ export default {
         imageUploadURL:
           "https://app.helpwise.io/api/uploadInlineAttachment.php",
         imageUploadParams: {
-          mailboxID: this.$route.params.mailboxId,
+          mailboxID: self.reply.mailboxId,
           emailID: this.threadID,
         },
         imageUploadMethod: "POST",
@@ -642,7 +642,7 @@ export default {
             var editor = this;
             editor.reply = self.reply;
             editor.type = "reply";
-            editor.mailboxID = self.$route.params.mailboxId;
+            editor.mailboxID = self.reply.mailboxId;
             editor.threadID = self.threadID;
             editor.draftID = self.draftID;
             self.editorInstance = this;
@@ -1454,7 +1454,7 @@ export default {
         let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
         var formData = new FormData();
         formData.append("files[]", selectedFile);
-        formData.append("mailboxID", vueThis.$route.params.mailboxId);
+        formData.append("mailboxID", vueThis.reply.mailboxId);
         let attachmentObject = {
           filename: selectedFile["name"],
           filesize: selectedFile["size"],
@@ -1672,10 +1672,10 @@ export default {
       html = html.replace(re1, "");
       let body, mailboxID;
       if (
-        this.$route.params.mailboxId !== undefined &&
-        this.$route.params.mailboxId !== "me"
+        self.reply.mailboxId !== undefined &&
+        self.reply.mailboxId !== "me"
       ) {
-        mailboxID = this.$route.params.mailboxId;
+        mailboxID = self.reply.mailboxId;
       } else if (
         this.$store.state.inboxData.id !== undefined &&
         this.$store.state.inboxData.id !== "me"
