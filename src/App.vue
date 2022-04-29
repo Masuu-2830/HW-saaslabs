@@ -12,7 +12,7 @@ export default {
 
 <style>
 
-/* .tribute-container {
-        bottom: -169px !important;
-      } */
+.tribute-container {
+  bottom: 17% !important;
+}
 </style>

@@ -126,7 +126,8 @@ export default {
   data() {
     const self = this;
     return {
-      current: this.thread.data.mailboxType == "mail" ? "reply" : "note",
+      current:
+        self.thread.data.mailboxType == "mail" ? "note" : "reply" || "reply",
       tempData: ["a", "b", "v"],
       replyEditorInstance: null,
       noteEditorInstance: null,
@@ -259,7 +260,7 @@ export default {
           initialized: async function () {
             const noteFroala = this;
             self.noteEditorInstance = this;
-            let mentionTribute = await self.callApi1();
+            let mentionTribute = await self.callApi1(noteFroala.el);
             mentionTribute.attach(noteFroala.el);
 
             noteFroala.events.on(
@@ -384,8 +385,7 @@ export default {
       }
 
     },
-    async callApi1() {
-      console.log("calling api 2");
+    async callApi1(editorEl) {
       const response = await fetch(
         this.$apiBaseURL +
           "get-teammates.php?mailboxID=" +
@@ -393,12 +393,9 @@ export default {
         { credentials: "include" }
       );
       const data = await response.json();
-      console.log(data);
-      return this.createTribute1(data.data.teammates);
+      return this.createTribute1(data.data.teammates, editorEl);
     },
     createTribute(data) {
-      console.log("creating tribute 1");
-      //   console.log(this.editorInstance);
       var tribute = new Tribute({
         collection: [{
           trigger: "#",
@@ -437,11 +434,26 @@ export default {
           },
         }]
       });
-      console.log(tribute);
       return tribute;
     },
-    createTribute1(data) {
-      console.log("creating tribute 2");
+    createTribute1(data, editorEl) {
+      const d = [];
+      for (let i = 0; i <= data.length - 1; i++) {
+        if (data[i].firstname) {
+          d.push({
+            key: (data[i].firstname + " " + data[i].lastname).trim(),
+            value: "@" + data[i].firstname + " " + data[i].lastname,
+            id: data[i].id,
+          });
+        } else {
+          d.push({
+            key: data[i].email,
+            value: "@" + data[i].email,
+            id: data[i].id,
+          });
+        }
+      }
+
       var tribute = new Tribute({
         collection: [
           {
@@ -511,7 +523,7 @@ export default {
         refreshAfterCallback: true,
         callback: function () {
           this.selection.save();
-          console.log(1);
+
           // $(".saved-replies-btn").click();
           bus.$emit("savedReply", "chatReply");
         },
@@ -530,7 +542,7 @@ export default {
           this.selection.save();
           let editor = this;
           vueThis.showHcModal = true;
-          console.log("----");
+
           bus.$emit("hcArticles", "chatReply");
           // vueThis.$bvModal.show('helpcenterArticlesModal');
         },
@@ -563,13 +575,9 @@ export default {
             ? vueThis.replyAttachments
             : vueThis.notesAttachments;
 
-        console.log(attachmentObject);
-
         attachmentObject[hash] = attachmentData;
         Vue.delete(attachmentObject, hash);
         attachmentObject[hash] = attachmentData;
-
-        console.log(attachmentObject);
 
         axios
           .request({
@@ -579,7 +587,7 @@ export default {
             withCredentials: true,
             onUploadProgress: function (p) {
               let percentage = (p.loaded / p.total) * 100;
-              console.log(percentage);
+
               attachmentObject[hash]["progress"] = percentage;
             },
           })
@@ -745,7 +753,7 @@ export default {
             message: payload,
             type: "chat",
           };
-          console.log(message);
+
           bus.$emit("changeThreadAttrs", message);
           this.chat = "";
           this.replyAttachments = {};
@@ -753,8 +761,6 @@ export default {
         .catch((error) => {
           alert(error);
         });
-
-      console.log(messageData);
     },
     sendNotes() {
       if (this.note !== "") {
@@ -913,7 +919,6 @@ export default {
 
     bus.$off("deleteAttachmentUpload");
     bus.$on("deleteAttachmentUpload", (id) => {
-      console.log("event listened", id);
       if (id) {
         Vue.delete(vueThis.attachments, id);
       }
@@ -921,7 +926,6 @@ export default {
 
     // bus.$off("modal.hcArticleInsert.click");
     bus.$on("modal.hcArticleInsert.click", function (data, type) {
-      console.log(type, data);
       if (type == "chatReply") {
         let editorInstance =
           vueThis.current == "reply"
@@ -933,7 +937,6 @@ export default {
 
     bus.$off("modal.savedReplyInsert.click");
     bus.$on("modal.savedReplyInsert.click", function (id, type) {
-      console.log(type, id);
       if (type == "chatReply") {
         let editorInstance =
           vueThis.current == "reply"
@@ -956,14 +959,10 @@ export default {
               // vueThis.note += response.data.savedReply.content;
               vueThis.noteEditorInstance.html.insert(response.data.savedReply.content);
             }
-            // editorInstance.html.insert(response.data.savedReply.content);
-            triggerPromptNotif("Saved Reply Inserted", "success");
-          } else {
-            triggerPromptNotif("Unable to insert Saved Reply", "error");
           }
-        })
-        }
-      })
+        });
+      }
+    });
 
     $(document).off("click", "#sendMessage");
     $(document).on("click", "#sendMessage", function () {
