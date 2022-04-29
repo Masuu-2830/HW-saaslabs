@@ -361,15 +361,28 @@ export default {
   },
   methods: {
     async callApi() {
-      const response = await fetch(
-        this.$apiBaseURL +
-          "get-teammates.php?mailboxID=" +
-          this.thread.data.mailbox_id,
-        { credentials: "include" }
-      );
-      const data = await response.json();
-      console.log(data);
-      return this.createTribute(data);
+      // const response = await fetch(
+      //   this.$apiBaseURL +
+      //     "get-teammates.php?mailboxID=" +
+      //     this.thread.data.mailbox_id,
+      //   { credentials: "include" }
+      // );
+      // const data = await response.json();
+      // console.log(data);
+      // return this.createTribute(data);
+
+      let fetchURL = 'https://app.helpwise.io/api/list-saved-replies.php';
+      let inboxID = this.thread.data.mailbox_id;
+      if((inboxID && inboxID!='me') || (this.$store.state.inboxData && this.$store.state.inboxData.id!='me')){
+          let mailboxID = inboxID!='me' ? inboxID : this.$store.state.inboxData.id;
+          fetchURL = `https://app.helpwise.io/api/list-saved-replies.php?mailboxID=${mailboxID}`;
+      }
+      let response = await fetch(fetchURL,{credentials: "include"});
+      response = await response.json();
+      if(response.status == "success"){
+        return this.createTribute(response.data.savedReplies);
+      }
+
     },
     async callApi1() {
       console.log("calling api 2");
@@ -387,20 +400,42 @@ export default {
       console.log("creating tribute 1");
       //   console.log(this.editorInstance);
       var tribute = new Tribute({
-        trigger: "#",
-        values: data,
-        lookup: "username",
-        fillAttr: "firstname",
-        selectTemplate: function (item) {
-          return (
-            `<span contenteditable="false" class="mention-h fr-deletable fr-tribute">#` +
-            item.original.firstname +
-            "</span>"
-          );
-        },
-        noMatchTemplate: function () {
-          return '<span style:"visibility: hidden;"></span>';
-        },
+        collection: [{
+          trigger: "#",
+          values: data,
+          lookup: function (item, stringText){
+            let name = item.name.toString().toLowerCase();
+            // let snippet = item.snippet.toString().toLowerCase();
+            stringText = stringText && stringText.toString().toLowerCase();
+
+            if(name.toString().includes(stringText)){
+              let customTemplate = `
+                <div class="d-flex flex-column pd-x-10 pd-y-15">
+                  <span class="tx-color-01 tx-14 tx-bold tx-sans">${item.name}</span>
+                  <span class="tx-color-03 tx-12 savedReplyPreviewOverflow tx-sans">${item.snippet}</span>
+                </div>
+              `;
+              return customTemplate;
+            }
+          },
+          // containerClass: "tribute-container76786287167",
+          menuItemTemplate: function (item) {
+            let customTemplate = `
+              <div class="d-flex flex-column pd-x-10 pd-y-15">
+                <span class="tx-color-01 tx-14 tx-bold tx-sans">${item.original.name}</span>
+                <span class="tx-color-03 tx-12 savedReplyPreviewOverflow tx-sans">${item.original.snippet}</span>
+              </div>
+            `;
+            return customTemplate;
+          },
+          selectTemplate: function (item) {
+            console.log(item);
+            return item.original.snippet;
+          },
+          noMatchTemplate: function () {
+            return '<span style:"visibility: hidden;"></span>';
+          },
+        }]
       });
       console.log(tribute);
       return tribute;
@@ -409,35 +444,22 @@ export default {
       console.log("creating tribute 2");
       var tribute = new Tribute({
         collection: [
-          // {
-          //   trigger: "@",
-          //   values: [
-          //     { key: "masood", value: "Masood" },
-          //     { key: "kunal", value: "Kunal Kumar" },
-          //     { key: "gatti", value: "Gatti Ramya" },
-          //     { key: "mayank", value: "Mayank Banga" },
-          //     { key: "ayush", value: "Ayush Rastogi" },
-          //     { key: "vibhor", value: "Vibhor Agarwal" },
-          //   ],
-          //   selectTemplate: function (item) {
-          //     return (
-          //       `<span contenteditable="false" class="mention fr-deletable fr-tribute">@` +
-          //       item.original.value +
-          //       "</span>"
-          //     );
-          //   },
-          //   noMatchTemplate: function () {
-          //     return '<span style:"visibility: hidden;"></span>';
-          //   },
-          // },
           {
             trigger: "@",
             values: data,
             lookup: "username",
-            fillAttr: "firstname",
+            // fillAttr: "firstname",
+            menuItemTemplate: function (item) {
+              let customTemplate = `
+                <div class="d-flex flex-column pd-x-10 pd-y-15">
+                  <span class="tx-color-01 tx-14 tx-bold tx-sans">${item.original.firstname} ${item.original.lastname}</span>
+                </div>
+              `;
+              return customTemplate;
+            },
             selectTemplate: function (item) {
               return (
-                `<span contenteditable="false" class="mention-h fr-deletable fr-tribute">@` +
+                `<span contenteditable="false" class="mention-highlight fr-deletable fr-tribute" data-id=${item.original.id}>@` +
                 item.original.firstname +
                 "</span>"
               );
@@ -584,7 +606,7 @@ export default {
       let managerID = this.$store.state.userInfo.accountID;
       let threadID = this.$route.params.threadId;
 
-      console.log(`/Account-${managerID}/ThreadID-${threadID}`);
+      // console.log(`/Account-${managerID}/ThreadID-${threadID}`);
       const socket = firebase_app
         .database()
         .ref(`/Account-${managerID}/ThreadID-${threadID}`);
@@ -654,15 +676,18 @@ export default {
         if (Object.hasOwnProperty.call(data, key)) {
           const user = data[key];
           let userID = user.id;
-          let userFName = user.firstname;
-          let userLName = user.lastname;
-          let userName = `${userFName} ${userLName}`;
-          userName = userName.trim();
-          let prefix = "";
-          if (noticeElem.trim().length > 0) {
-            prefix = ";";
+          // console.log(this.$store.state.userInfo);
+          if(userID != this.$store.state.userInfo.id){
+            let userFName = user.firstname;
+            let userLName = user.lastname;
+            let userName = `${userFName} ${userLName}`;
+            userName = userName.trim();
+            let prefix = "";
+            if (noticeElem.trim().length > 0) {
+              prefix = ";";
+            }
+            noticeElem += `${prefix} ${userName} is ${typingType}... `;
           }
-          noticeElem += `${prefix} ${userName} is ${typingType}... `;
         }
       }
 
@@ -738,13 +763,25 @@ export default {
           (attachmentKey) => !attachmentKey.includes("-")
         );
 
-        let message = this.note
-          .replace(/(<p)/gim, "<div")
-          .replace(/<\/p>/gim, "</div>");
+        // let message = this.note
+        //   .replace(/(<p)/gim, "<div")
+        //   .replace(/<\/p>/gim, "</div>");
+        let message = this.note;
+
+        let $temp = $(`<div>${this.note}</div>`);
+        let mentionUserIDs = [];
+        $temp.find(".mention-highlight").each(function(){
+          console.log($(this));
+          mentionUserIDs.push($(this).data('id'));
+        });
+
+        if($temp.text().length == 0 || $temp.find("img").length == 0){
+          return false;
+        }
         let messageData = {
           mailboxID: this.thread.data.mailbox_id,
           threadID: this.$route.params.threadId,
-          mentionUserIDs: [],
+          mentionUserIDs: mentionUserIDs,
           message,
           attachmentIDs,
         };
@@ -972,63 +1009,63 @@ export default {
 </script>
 
 <style scoped>
-.form {
-  bottom: 0%;
-}
+  .form {
+    bottom: 0%;
+  }
 
-.mention {
-  color: #009be5 !important;
-  background-color: #dbf2ff !important;
-  padding: 0 4px;
-}
+  .mention {
+    color: #009be5 !important;
+    background-color: #dbf2ff !important;
+    padding: 0 4px;
+  }
 
-.mention-h {
-  color: blue !important;
-  background-color: #dbf2ff !important;
-  padding: 0 4px;
-}
-.btnn {
-  font-size: 14px;
-  color: white;
-  /* padding: 7px; */
-  width: 70px;
-  border-radius: 5px;
-  cursor: pointer;
+  .mention-h {
+    color: blue !important;
+    background-color: #dbf2ff !important;
+    padding: 0 4px;
+  }
+  .btnn {
+    font-size: 14px;
+    color: white;
+    /* padding: 7px; */
+    width: 70px;
+    border-radius: 5px;
+    cursor: pointer;
 
-  float: right;
-  bottom: 17px;
-  position: absolute;
-  right: 100px;
-}
+    float: right;
+    bottom: 17px;
+    position: absolute;
+    right: 100px;
+  }
 
-.nav-link.active {
-  color: #0168fa;
-}
+  .nav-link.active {
+    color: #0168fa;
+  }
 
-.editorContainer {
-  margin: 10px 20px;
-  background-color: white;
-  border-radius: 10px;
-  /* overflow: hidden; */
-  border: 1px solid #0168fa;
-}
+  .editorContainer {
+    margin: 10px 20px;
+    background-color: white;
+    border-radius: 10px;
+    /* overflow: hidden; */
+    border: 1px solid #0168fa;
+  }
 
-.editorContainer.noteMode {
-  background: #fef6d8;
-}
+  .editorContainer.noteMode {
+    background: #fef6d8;
+  }
 
-.editorContainer:hover {
-  box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.16);
-}
+  .editorContainer:hover {
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.16);
+  }
 
-#removeHCArticleCard {
-  visibility: hidden;
-}
-.hw_removeArticle:hover {
-  visibility: visible;
-}
+  #removeHCArticleCard {
+    visibility: hidden;
+  }
+  .hw_removeArticle:hover {
+    visibility: visible;
+  }
 
-.typingMessageNotice {
-  margin: 5px 20px;
-}
+  .typingMessageNotice {
+    margin: 5px 20px;
+  }
 </style>

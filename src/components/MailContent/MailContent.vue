@@ -84,7 +84,7 @@ export default {
                 this.right = '0px';
                 this.contactOpen = false;
                 this.sidebarOpen = false;
-                
+                console.log("------ KYA YE WATCH CHLA ----");
                 let toThreadId = to.params.threadId;
                 let fromThreadId = from.params.threadId;
                 let managerID = this.$store.state.userInfo.accountID;

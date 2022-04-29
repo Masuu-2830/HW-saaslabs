@@ -559,6 +559,7 @@ import axios from "axios";
 import _ from "underscore";
 import AttachmentComp from "../../AttachmentComp.vue";
 import Vue from "vue";
+import { firebase_app } from "../../../firebaseInit";
 export default {
   name: "MailContentReply",
   components: { VueTagsInput, FroalaEditor },
@@ -621,6 +622,10 @@ export default {
           : this.$route.params.threadId,
       inReplyTo: this.reply.email.id !== undefined ? this.reply.email.id : null,
       editorInstance: null,
+      typingReply: false,
+      defaultTypingTimer: 1000,
+      typingNotice: "",
+      typingTimer: null,
       config: {
         enter: FroalaEditor.ENTER_DIV,
         placeholderText: "Type something",
@@ -662,8 +667,17 @@ export default {
               },
             }).$mount();
             // var ed = $(`#reply-uploadAttachment`).data('editor');
-
             editor.$wp.append(replyAttachmentList.$el);
+
+
+            editor.events.on( "keydown", function (e) {
+              console.log("typing in editor");
+              // self.hitFirebase();
+              if ( e.which == FroalaEditor.KEYCODE.ENTER && savedReplyTribute.isActive) {
+                return false;
+              }
+            },true);
+
             // if (self.isSend) {
             //   editor.$tb.append(`
             //     <div class="fr-btn-grp fr-float-right">
@@ -1328,6 +1342,33 @@ export default {
       this.fromSelected = this.defaultAlias();
       // this.compose = this.compose.filter(el => Object.keys(el) !== hash);
       bus.$emit("closeReply", hash);
+    },
+    hitFirebase() {
+      let managerID = this.$store.state.userInfo.accountID;
+      let threadID = this.$route.params.threadId;
+
+      const socket = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
+      console.log(`/Account-${managerID}/ThreadID-${threadID}`);
+      if (!this.typingReply) {
+        this.typingReply = true;
+        socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).off("value");
+        socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+        this.startReplyingTimer(socket);
+      } else {
+        this.resetReplyingTimer(socket);
+      }
+    },
+    startReplyingTimer(socket) {
+      this.typingTimer = setTimeout(() => {
+        this.typingReply = false;
+        socket
+          .child(`/replying user/user-${this.$store.state.userInfo.id}`)
+          .remove();
+      }, this.defaultTypingTimer);
+    },
+    resetReplyingTimer(socket) {
+      clearTimeout(this.typingTimer);
+      this.startReplyingTimer(socket);
     },
     // myGreeting() {
     //   setTimeout(this.saveDraft, this.doneTypingInterval);
