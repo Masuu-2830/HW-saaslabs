@@ -1685,7 +1685,7 @@ export default {
           // } else {
             this.labelId = 14;
           // }
-          // addFilterFlag = true;
+          addFilterFlag = true;
         } else if (to.params.type == "sent") {
           this.labelId = 1;
         } else if (to.params.type == "scheduled") {
@@ -1713,7 +1713,7 @@ export default {
             this.labelId = 5;
           }
 
-          if(to.params.mailboxId == "me"){
+          if(to.params.mailboxId == "me" && to.params.type != "all"){
             this.personId = this.$store.state.userInfo.id;
           }
         }
