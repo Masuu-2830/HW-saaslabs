@@ -1650,34 +1650,39 @@ export default {
         bus.$emit("changeType");
       }
 
+      let addFilterFlag = false;
       if (to.params.type || this.isThreadRefresh) {
         this.route = to.params.type;
         if (to.params.type == "assigned") {
           this.labelId = 0;
         } else if (to.params.type == "mine") {
           this.labelId = 4;
+          addFilterFlag = true;
         } else if (to.params.type == "mentions") {
           this.labelId = 13;
+          addFilterFlag = true;
         } else if (to.params.type == "discussions") {
           this.labelId = 15;
         } else if (to.params.type == "unassigned") {
           this.labelId = 10;
         } else if (to.params.type == "starred") {
           this.labelId = 11;
+          addFilterFlag = true;
         } else if (to.params.type == "snoozed") {
           this.labelId = 9;
         } else if (to.params.type == "drafts") {
           this.labelId = 2;
         } else if (to.params.type == "all") {
-          if (to.params.filterSection == "closed") {
-            this.labelId = 7;
-          } else if (to.params.filterSection == "snoozed") {
-            this.labelId = 9;
-          } else if (to.params.filterSection == "trash") {
-            this.labelId = 5;
-          } else {
+          // if (to.params.filterSection == "closed") {
+          //   this.labelId = 7;
+          // } else if (to.params.filterSection == "snoozed") {
+          //   this.labelId = 9;
+          // } else if (to.params.filterSection == "trash") {
+          //   this.labelId = 5;
+          // } else {
             this.labelId = 14;
-          }
+          // }
+          addFilterFlag = true;
         } else if (to.params.type == "sent") {
           this.labelId = 1;
         } else if (to.params.type == "scheduled") {
@@ -1695,6 +1700,21 @@ export default {
           //   this.tagId = to.params.type.substring(4);
           //   this.labelId = 0;
         }
+
+        if(addFilterFlag){
+          if (to.params.filterSection == "closed") {
+            this.labelId = 7;
+          } else if (to.params.filterSection == "snoozed") {
+            this.labelId = 9;
+          } else if (to.params.filterSection == "trash") {
+            this.labelId = 5;
+          }
+
+          if(to.params.mailboxId == "me"){
+            this.personId = this.$store.state.userInfo.id;
+          }
+        }
+
         this.$store.dispatch("type", this.route);
         this.$store.dispatch("labelId", this.labelId);
         if (to.name == "type" && to.params.event !== "back" && to.params.event !== "pagination") {
