@@ -1536,24 +1536,24 @@ export default {
       // console.log(this.thread);
       bus.$emit("changeRead", this.$route.params.threadId);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     closeThread() {
       // console.log(this.thread);
       bus.$emit("closeThread", this.$route.params.threadId);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     markDone() {
       bus.$emit("doneThreads", this.$route.params.threadId);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     spamThreads() {
       // console.log(this.thread);
       bus.$emit("spamThreads", this.$route.params.threadId);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     changeStarred() {
       // console.log(this.thread);
@@ -1564,14 +1564,14 @@ export default {
     deleteConv() {
       bus.$emit("deleteThreads", this.$route.params.threadId);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     moveToInbox() {
       console.log(this.inboxSelected);
       bus.$emit("moveToInbox", this.$route.params.threadId, this.inboxSelected);
       this.$refs["move-thread-modal"].hide();
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     handleChange(value, type) {
       if (type === "minute") {
@@ -1621,7 +1621,7 @@ export default {
       console.log(mom.toISOString());
       bus.$emit("snoozeThread", this.$route.params.threadId, mom);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     assign(id) {
       console.log(this.$route.params.threadId, id);
@@ -1715,8 +1715,10 @@ export default {
         this.removetags
       );
     },
-    restoreThread(id) {
-      bus.$emit("restoreThreads", id);
+    restoreThread() {
+      bus.$emit("restoreThreads", this.$route.params.threadId);
+      this.$emit("broad")
+      bus.$emit("broad",'back');
     },
   },
 };

@@ -378,9 +378,16 @@
         </div>
         <div class="col-2 date-thread-options col-lg-1">
           <span
+            v-if="mail.humanFriendlyDate"
             class="tx-13 thread-date"
             :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
             >{{ mail.humanFriendlyDate }}</span
+          >
+          <span
+            v-else
+            class="tx-13 thread-date"
+            :style="{ fontWeight: this.mail.isRead ? '' : '600' }"
+            >{{ mail.date | moment("hh:mm A") }}</span
           >
           <span
             class="

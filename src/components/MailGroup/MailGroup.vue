@@ -478,6 +478,7 @@ export default {
 
     bus.$off("closeThread");
     bus.$on("closeThread", (id) => {
+      console.log(typeof id)
       let threadIDs = new Array();
       if (typeof id == "number") {
         threadIDs[0] = id;
@@ -587,6 +588,7 @@ export default {
 
     bus.$off("restoreThreads");
     bus.$on("restoreThreads", (id) => {
+      console.log(typeof id)
       let threadIDs = new Array();
       if (typeof id == "number") {
         threadIDs[0] = id;
@@ -1002,6 +1004,7 @@ export default {
 
     bus.$off("snoozeThread");
     bus.$on("snoozeThread", (id, till) => {
+      console.log(typeof id)
       let threadIDs = new Array();
       if (typeof id == "number") {
         threadIDs[0] = id;
