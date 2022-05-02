@@ -710,8 +710,14 @@ export default {
       );
 
       let message = this.chat
-        .replace(/(<p)/gim, "<div")
-        .replace(/<\/p>/gim, "</div>");
+        // .replace(/(<p)/gim, "<div")
+        // .replace(/<\/p>/gim, "</div>");
+
+      let $temp = $(`<div>${this.chat}</div>`);
+      if($temp.text().length == 0 && $temp.find("img").length == 0){
+        return false;
+      }
+      
       let messageData = {
         mailboxID: this.thread.data.mailbox_id,
         to: this.$route.params.threadId,
@@ -720,16 +726,31 @@ export default {
         time: new Date().toISOString(),
         attachmentIDs,
       };
+
+
+      let url = "";
+      let inboxType = this.thread.data.mailboxType;
+      if(inboxType == "chat"){
+        url = this.$apiBaseURL + "chat-widget/sendInboxMessage-unified-v2";
+      } else if(inboxType == "sms"){
+        
+      } else if(inboxType == "whatsapp"){
+          
+      }
+
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(messageData),
         credentials: "include",
       };
-      fetch(
-        this.$apiBaseURL + "chat-widget/sendInboxMessage-unified-v2",
-        requestOptions
-      )
+
+      if(url.trim().length > 0){
+
+        fetch(
+          url,
+          requestOptions
+        )
         .then(async (response) => {
           const data = await response.json();
           if (data.status !== "success") {
@@ -761,6 +782,10 @@ export default {
         .catch((error) => {
           alert(error);
         });
+      } else {
+        triggerPromptNotif("Oops! seems like we have not connected this inbox yet!");
+      }
+
     },
     sendNotes() {
       if (this.note !== "") {
@@ -781,7 +806,7 @@ export default {
           mentionUserIDs.push($(this).data('id'));
         });
 
-        if($temp.text().length == 0 || $temp.find("img").length == 0){
+        if($temp.text().length == 0 && $temp.find("img").length == 0){
           return false;
         }
         let messageData = {
