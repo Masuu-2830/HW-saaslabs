@@ -20,7 +20,7 @@
       :sidebarOpen="sidebarOpen"
       :contactOpen="contactOpen"
       :thread="thread"
-      :contact="contactData"
+      :contact="thread.data.contactData"
     ></IntegrationContainer>
     <div
       v-if="!loading"
@@ -69,7 +69,6 @@ export default {
       display: "none",
       right: "0px",
       thread: {},
-      contactData: null,
       loading: false,
       sidebarOpen: false,
       contactOpen: false,
@@ -108,7 +107,6 @@ export default {
         // console.log(contactData);
         this.thread = data;
         console.log(this.thread);
-        this.contactData = contactData;
         this.loading = false;
         console.log(this.loading);
       }
