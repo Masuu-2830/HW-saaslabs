@@ -1710,7 +1710,7 @@ export default {
             this.labelId = 5;
           }
 
-          if(to.params.mailboxId == "me" && this.labelId != 14){
+          if(to.params.mailboxId == "me" && to.params.type != "all"){
             this.personId = this.$store.state.userInfo.id;
           }
         }
