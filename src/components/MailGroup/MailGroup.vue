@@ -1682,7 +1682,7 @@ export default {
           // } else {
             this.labelId = 14;
           // }
-          addFilterFlag = true;
+          // addFilterFlag = true;
         } else if (to.params.type == "sent") {
           this.labelId = 1;
         } else if (to.params.type == "scheduled") {
