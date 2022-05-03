@@ -322,8 +322,8 @@
                   :to="{
                     name: 'type',
                     params: {
-                      type: option.id == 'me' ? option.type : 'all',
-                      mailboxId: option.id,
+                      type: sectionName == 'tags' ? option.id : option.id == 'me' ? option.type : 'all',
+                      mailboxId: sectionName == 'tags' ? 'tags' : option.id,
                       filterSection: 'open',
                       pageNo: 1,
                     },
@@ -542,7 +542,9 @@ export default {
     },
     getMailboxID() {
       if (this.$store.state.inboxData) {
-        return this.$store.state.inboxData.id;
+        // console.log(this.$store.state.inboxData);
+        return this.$store.state.mailboxId;
+        // return this.$route.params.mailboxId;
       } else {
         return "me";
       }
@@ -559,7 +561,7 @@ export default {
       this.more = !this.more;
     },
     doSomethingInteresting(sectionName, option) {
-      console.error(sectionName, option);
+      // console.error(sectionName, option);
     },
     openCompose(type) {
       let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);

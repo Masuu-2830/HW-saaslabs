@@ -95,6 +95,9 @@ export const store = new Vuex.Store({
         },
         updateMailboxId(state, mailboxId) {
             state.mailboxId = mailboxId;
+            if(mailboxId == "tags"){
+                mailboxId = "me";
+            }
             state.inboxData = state.inboxes[mailboxId];
         }
     },

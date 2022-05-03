@@ -724,18 +724,35 @@ export default {
         type: 1,
         message,
         time: new Date().toISOString(),
-        attachmentIDs,
+        attachmentId: attachmentIDs,
+        isUnified: 1
       };
 
 
       let url = "";
       let inboxType = this.thread.data.mailboxType;
+      let inboxSubType = this.thread.data.mailboxSubType;
+
       if(inboxType == "chat"){
-        url = this.$apiBaseURL + "chat-widget/sendInboxMessage-unified-v2";
+        url = this.$apiBaseURL + "unifiedv2/sendChatInboxMessage.php";
       } else if(inboxType == "sms"){
-        
+        if(inboxSubType == "justcall"){
+          url = "api/justcall/sendSMSUnifiedLive.php";
+        } else if(inboxSubType == "dialpad"){
+          url = "api/dialpad/sendSMSUnifiedLive.php";
+        } else if(inboxSubType == "ringcentral"){
+          url = "api/ringcentral/sendSMSUnifiedLive.php";
+        } else if(inboxSubType == "plivo"){
+          url = "api/plivo/sendSMSUnifiedLive.php";
+        } else {
+          url = "api/sms/sendSMSUnifiedLive.php";
+        }
       } else if(inboxType == "whatsapp"){
-          
+        if(inboxSubType == "360dialog"){
+          url = "api/360dialog/sendSMSUnifiedLive.php";
+        } else {
+          url = "api/whatsapp/sendSMSUnifiedLive.php";
+        }
       }
 
       const requestOptions = {

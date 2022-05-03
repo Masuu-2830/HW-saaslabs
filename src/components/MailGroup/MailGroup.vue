@@ -1656,52 +1656,59 @@ export default {
       let addFilterFlag = false;
       if (to.params.type || this.isThreadRefresh) {
         this.route = to.params.type;
-        if (to.params.type == "assigned") {
-          this.labelId = 0;
-        } else if (to.params.type == "mine") {
-          this.labelId = 4;
+
+        if(to.params.mailboxId == 'tags'){
+          this.labelId = 14;
+          this.tagId = to.params.type;
           addFilterFlag = true;
-        } else if (to.params.type == "mentions") {
-          this.labelId = 13;
-          addFilterFlag = true;
-        } else if (to.params.type == "discussions") {
-          this.labelId = 15;
-        } else if (to.params.type == "unassigned") {
-          this.labelId = 10;
-        } else if (to.params.type == "starred") {
-          this.labelId = 11;
-          addFilterFlag = true;
-        } else if (to.params.type == "snoozed") {
-          this.labelId = 9;
-        } else if (to.params.type == "drafts") {
-          this.labelId = 2;
-        } else if (to.params.type == "all") {
-          // if (to.params.filterSection == "closed") {
-          //   this.labelId = 7;
-          // } else if (to.params.filterSection == "snoozed") {
-          //   this.labelId = 9;
-          // } else if (to.params.filterSection == "trash") {
-          //   this.labelId = 5;
-          // } else {
-            this.labelId = 14;
-          // }
-          addFilterFlag = true;
-        } else if (to.params.type == "sent") {
-          this.labelId = 1;
-        } else if (to.params.type == "scheduled") {
-          this.labelId = 6;
-        } else if (to.params.type == "closed") {
-          this.labelId = 7;
-        } else if (to.params.type == "spam") {
-          this.labelId = 8;
-        } else if (to.params.type == "trash") {
-          this.labelId = 5;
-          // } else if (
-          //   to.params.type !== undefined &&
-          //   to.params.type.substring(0, 3) == "tag"
-          // ) {
-          //   this.tagId = to.params.type.substring(4);
-          //   this.labelId = 0;
+        } else {
+          if (to.params.type == "assigned") {
+            this.labelId = 0;
+          } else if (to.params.type == "mine") {
+            this.labelId = 4;
+            addFilterFlag = true;
+          } else if (to.params.type == "mentions") {
+            this.labelId = 13;
+            addFilterFlag = true;
+          } else if (to.params.type == "discussions") {
+            this.labelId = 15;
+          } else if (to.params.type == "unassigned") {
+            this.labelId = 10;
+          } else if (to.params.type == "starred") {
+            this.labelId = 11;
+            addFilterFlag = true;
+          } else if (to.params.type == "snoozed") {
+            this.labelId = 9;
+          } else if (to.params.type == "drafts") {
+            this.labelId = 2;
+          } else if (to.params.type == "all") {
+            // if (to.params.filterSection == "closed") {
+            //   this.labelId = 7;
+            // } else if (to.params.filterSection == "snoozed") {
+            //   this.labelId = 9;
+            // } else if (to.params.filterSection == "trash") {
+            //   this.labelId = 5;
+            // } else {
+              this.labelId = 14;
+            // }
+            addFilterFlag = true;
+          } else if (to.params.type == "sent") {
+            this.labelId = 1;
+          } else if (to.params.type == "scheduled") {
+            this.labelId = 6;
+          } else if (to.params.type == "closed") {
+            this.labelId = 7;
+          } else if (to.params.type == "spam") {
+            this.labelId = 8;
+          } else if (to.params.type == "trash") {
+            this.labelId = 5;
+            // } else if (
+            //   to.params.type !== undefined &&
+            //   to.params.type.substring(0, 3) == "tag"
+            // ) {
+            //   this.tagId = to.params.type.substring(4);
+            //   this.labelId = 0;
+          }
         }
 
         if(addFilterFlag){
@@ -2282,9 +2289,12 @@ export default {
         (this.$store.state.inboxData && this.$store.state.inboxData.id) ||
         "me"
       }`;
+      let type = this.route;
       if (inboxId == "tags") {
         inboxId = "me";
+        type = "all";
       }
+
       this.loading = true;
       // bus.$emit("broad");
       this.$store.dispatch("updateOpenThread", null);
@@ -2294,7 +2304,7 @@ export default {
       let url = `${
         this.$apiBaseURL
       }unifiedv2/getThreads.php?mailboxIDs[]=${inboxId}&type=${
-        this.route
+        type
       }&filterSection=${this.filterSection}&page=${this.currPage}&labelID=${
         this.labelId
       }${this.squery !== "" ? "&squery=" + this.squery : ""}${
