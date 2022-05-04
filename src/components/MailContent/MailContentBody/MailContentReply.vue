@@ -1717,6 +1717,7 @@ export default {
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
       let body, mailboxID;
+      console.log(this.reply.mailboxId)
       if (
         this.reply.mailboxId !== undefined &&
         this.reply.mailboxId !== "me"
