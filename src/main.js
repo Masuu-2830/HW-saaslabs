@@ -54,6 +54,7 @@ Vue.moment().locale('en', {
 export const bus = new Vue();
 
 function refreshSignatureDropdownOnShow($btn, $dropdown) {
+  console.error("111111111")
   $.get({
       url: `https://app.helpwise.io/api/signatures/list.php`,
       xhrFields: {
@@ -81,7 +82,7 @@ function refreshSignatureDropdownOnShow($btn, $dropdown) {
   });
 }
 
-let firstSignatureRefresh = false;
+// let firstSignatureRefresh = false;
 FroalaEditor.DefineIcon('signatureIcon', { SRC:require('./assets/pen-nib-solid.svg'), ALT: 'ChangeSignature', template: 'image' });
 FroalaEditor.RegisterCommand('signatureBtn', {
   title: 'Change Signature',
@@ -108,10 +109,10 @@ FroalaEditor.RegisterCommand('signatureBtn', {
         })
   },
   refresh: function ($btn, $dropdown) {
-      if (!firstSignatureRefresh) {
+      // if (!firstSignatureRefresh) {
           refreshSignatureDropdownOnShow.call(this, $btn, $dropdown);
-      }
-      firstSignatureRefresh = true;
+      // }
+      // firstSignatureRefresh = true;
   }
 });
 

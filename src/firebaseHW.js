@@ -137,7 +137,7 @@ export function closeThread(data) {
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // console.log("inbox ka data",inbox);
     // if(inbox) {
-    console.log("data threads ka", data.threadID);
+    console.log("data threads ka", data);
     var allThreads = data.threadID;
     allThreads.forEach(thread => {
         console.log("thread id", thread);
@@ -154,12 +154,26 @@ export function closeThread(data) {
                 bus.$emit('firebaseModal');
             }
         }
+        if (Object.keys(store.state.threadData).includes(thread.toString())) {
+            let body = data.user.first_name + " " + data.user.last_name + " closed this conversation"; 
+            let log = {
+                'type': 'log',
+                'data': {
+                    'type': 'assign',
+                    'at': data.time,
+                    'body': body
+                },
+                'timestamp': Date.now()
+            };
+            store.state.threadData[thread].data.items.push(log);
+        }
     });
     // }
 }
 export function snoozeThread(data) {
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
+    console.log("data threads ka", data);
     var allThreads = data.threadID;
     allThreads.forEach(thread => {
         let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
@@ -173,6 +187,19 @@ export function snoozeThread(data) {
                 store.dispatch('updateFirebaseModal', data.user.first_name + ' ' + data.user.last_name + ' snoozed this conversation.');
                 bus.$emit('firebaseModal');
             }
+        }
+        if (Object.keys(store.state.threadData).includes(thread.toString())) {
+            let body = data.user.first_name + " " + data.user.last_name + " snoozed this conversation until " + moment(data.snoozedTill.date).format("MMM D, YYYY hh:mm A"); 
+            let log = {
+                'type': 'log',
+                'data': {
+                    'type': 'snooze',
+                    'at': data.time,
+                    'body': body
+                },
+                'timestamp': Date.now()
+            };
+            store.state.threadData[thread].data.items.push(log);
         }
     });
     // }
@@ -191,6 +218,19 @@ export function deleteThread(data) {
         if (store.state.openThread == thread) {
             store.dispatch('updateFirebaseModal', data.user.first_name + ' ' + data.user.last_name + ' moved this conversation to trash.');
             bus.$emit('firebaseModal');
+        }
+        if (Object.keys(store.state.threadData).includes(thread.toString())) {
+            let body = data.user.first_name + " " + data.user.last_name + " deleted this conversation";
+            let log = {
+                'type': 'log',
+                'data': {
+                    'type': 'trash',
+                    'at': data.time,
+                    'body': body
+                },
+                'timestamp': Date.now()
+            };
+            store.state.threadData[thread].data.items.push(log);
         }
     });
     // }
@@ -214,12 +254,25 @@ export function moveToInboxThread(data) { // var inbox = data.mailboxID == store
                 store.dispatch('updateFirebaseModal', data.user.first_name + ' ' + data.user.last_name + ' moved this conversation to inbox.');
                 bus.$emit('firebaseModal');
             }
+            if (Object.keys(store.state.threadData).includes(thread.toString())) {
+                let body = data.user.first_name + " " + data.user.last_name + " moved this conversation to inbox";
+                let log = {
+                    'type': 'log',
+                    'data': {
+                        'type': 'moveToInbox',
+                        'at': data.time,
+                        'body': body
+                    },
+                    'timestamp': Date.now()
+                };
+                store.state.threadData[thread].data.items.push(log);
+            }
         });
     }
 }
 export function toggleTags(data) {
     console.log("data dhikhado tags ka", data);
-    if (data.managerID !== store.state.userInfo.accountID) {
+    // if (data.managerID !== store.state.userInfo.accountID) {
         // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
         // if(inbox) {
         var allThreads = data.threadID;
@@ -284,7 +337,7 @@ export function toggleTags(data) {
             //     console.log("data dhikhao tags ka 225", allTags);
             // }
         });
-    }
+    // }
 }
 export function assignThread(data) {
     // if (data.managerID !== store.state.userInfo.accountID) {

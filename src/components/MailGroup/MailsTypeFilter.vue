@@ -16,8 +16,8 @@
           :to="{
             name: 'type',
             params: {
-              type: $route.params.type,
-              mailboxId: $route.params.mailboxId,
+              type: $store.state.type,
+              mailboxId: $store.state.mailboxId,
               filterSection: type.type == 'all' ? 'open' : type.type,
               pageNo: 1,
             },
