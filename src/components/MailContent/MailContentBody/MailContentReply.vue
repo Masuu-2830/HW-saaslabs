@@ -1718,10 +1718,10 @@ export default {
       html = html.replace(re1, "");
       let body, mailboxID;
       if (
-        self.reply.mailboxId !== undefined &&
-        self.reply.mailboxId !== "me"
+        this.reply.mailboxId !== undefined &&
+        this.reply.mailboxId !== "me"
       ) {
-        mailboxID = self.reply.mailboxId;
+        mailboxID = this.reply.mailboxId;
       } else if (
         this.$store.state.inboxData.id !== undefined &&
         this.$store.state.inboxData.id !== "me"

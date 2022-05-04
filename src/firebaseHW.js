@@ -90,7 +90,7 @@ export function addThread(data) {
     // }
 }
 export function addNote(data) { // hello
-    console.log("data dhikhao", data);
+    console.log("----- data dhikhao", data);
     var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     var all = store.state.type == 'all';
     var assigned = (data.assignedTo ? true : false) && (store.state.type == 'assigned');
@@ -98,17 +98,24 @@ export function addNote(data) { // hello
     var unassigned = (! assigned) && (store.state.type == 'unassigned');
     // if(inbox) {
     let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
+
+    console.log({
+        unassigned, all, mine, objIndex
+    });
+
     if (objIndex !== -1) {
+        console.log("---------- OBJ INDEX -1 --------");
         console.log("store.state.threads[objIndex]", store.state.threads[objIndex]);
         store.state.threads[objIndex].date = data.noteData.time;
         store.state.threads[objIndex].snippet = data.noteData.snippet;
         var a = store.state.threads.splice(objIndex, 1);
         store.state.threads.unshift(a[0]);
     } else if (all || mine || assigned || unassigned) {
+        console.log("---------- ELSE IF --------");
         store.state.threads.unshift(createThread(data));
     }
     if (store.state.openThread == data.threadID) {
-        let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
+        let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.noteData.id);
         if (itemIndex == -1) {
             let comment = {
                 'type': 'comment',
@@ -124,10 +131,13 @@ export function addNote(data) { // hello
             };
             console.log("comment", comment);
             console.log("store.state.threadData", store.state.threadData[data.threadID]);
-            if (store.state.userSettings.orderThread == "asc") {
-                store.state.threadData[data.threadID].data.items.push(comment);
-            } else {
-                store.state.threadData[data.threadID].data.items.unshift(comment);
+
+            if(data.noteData.sentBy != store.state.userInfo.id){
+                if (store.state.userSettings.orderThread == "asc") {
+                    store.state.threadData[data.threadID].data.items.push(comment);
+                } else {
+                    store.state.threadData[data.threadID].data.items.unshift(comment);
+                }
             }
         }
     }
