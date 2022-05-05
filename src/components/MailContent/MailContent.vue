@@ -88,11 +88,13 @@ export default {
                 let fromThreadId = from.params.threadId;
                 let managerID = this.$store.state.userInfo.accountID;
 
-                const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${fromThreadId}`);
-                socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
-
-                const socket2 = firebase_app.database().ref(`/Account-${managerID}/Thread-${toThreadId}`);
-                socket2.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+                if(toThreadId > 0){
+                  const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${fromThreadId}`);
+                  socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
+  
+                  const socket2 = firebase_app.database().ref(`/Account-${managerID}/Thread-${toThreadId}`);
+                  socket2.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+                }
             }
         }
     },

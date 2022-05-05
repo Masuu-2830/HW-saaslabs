@@ -1519,13 +1519,15 @@ export default {
   mounted(){
     let managerID = this.$store.state.userInfo.accountID;
     let threadID = this.$route.params.threadId;
-    const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
-    // let viewingUserFlag = false;
-    socket.child("/viewing user").on("value", (snapshot) => {
-      if(snapshot.val()){
-        this.viewingUsers = snapshot.val();
-      }
-    });
+    if(threadID > 0){
+      const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
+      // let viewingUserFlag = false;
+      socket.child("/viewing user").on("value", (snapshot) => {
+        if(snapshot.val()){
+          this.viewingUsers = snapshot.val();
+        }
+      });
+    }
   },
   methods: {
     backThread() {

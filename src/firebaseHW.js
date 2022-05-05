@@ -42,7 +42,7 @@ export function addThread(data) {
         if (data.inboxType == 'mail') {
             let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
             if (itemIndex == -1) {
-                fetch(this.$apiBaseURL + "getEmail.php?emailID=" + data.messageData.id + "&mailboxID=" + data.mailboxID, {credentials: "include"}).then(async (response) => {
+                fetch("https://app.helpwise.io/api/getEmail.php?emailID=" + data.messageData.id + "&mailboxID=" + data.mailboxID, {credentials: "include"}).then(async (response) => {
                     const data1 = await response.json();
                     if (data1.status !== "success") {
                         const error = (data1 && data1.message) || response.status;
@@ -99,19 +99,14 @@ export function addNote(data) { // hello
     // if(inbox) {
     let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
 
-    console.log({
-        unassigned, all, mine, objIndex
-    });
-
     if (objIndex !== -1) {
-        console.log("---------- OBJ INDEX -1 --------");
-        console.log("store.state.threads[objIndex]", store.state.threads[objIndex]);
+        // console.log("store.state.threads[objIndex]", store.state.threads[objIndex]);
         store.state.threads[objIndex].date = data.noteData.time;
         store.state.threads[objIndex].snippet = data.noteData.snippet;
         var a = store.state.threads.splice(objIndex, 1);
         store.state.threads.unshift(a[0]);
     } else if (all || mine || assigned || unassigned) {
-        console.log("---------- ELSE IF --------");
+        // console.log("---------- ELSE IF --------");
         store.state.threads.unshift(createThread(data));
     }
     if (store.state.openThread == data.threadID) {
@@ -129,9 +124,10 @@ export function addNote(data) { // hello
                 },
                 'timestamp': Date.now()
             };
-            console.log("comment", comment);
-            console.log("store.state.threadData", store.state.threadData[data.threadID]);
+            // console.log("comment", comment);
+            // console.log("store.state.threadData", store.state.threadData[data.threadID]);
 
+            console.log(data.noteData.sentBy, store.state.userInfo.id);
             if(data.noteData.sentBy != store.state.userInfo.id){
                 if (store.state.userSettings.orderThread == "asc") {
                     store.state.threadData[data.threadID].data.items.push(comment);
@@ -246,7 +242,7 @@ export function deleteThread(data) {
     // }
 }
 export function moveToInboxThread(data) { // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
-    if (data.managerID !== store.state.userInfo.accountID) {
+    if (data.managerID == store.state.userInfo.accountID) {
         var all = store.state.type == 'all';
         var assigned = (data.assignedTo ? true : false) && (store.state.type == 'assigned');
         var mine = (assigned && data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
