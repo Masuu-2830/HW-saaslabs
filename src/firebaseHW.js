@@ -254,7 +254,9 @@ export function moveToInboxThread(data) { // var inbox = data.mailboxID == store
             if (objIndex !== -1) {
                 store.state.threads.splice(objIndex, 1);
             } else if (all || mine || assigned || unassigned) {
-                store.state.threads.unshift(createThread(data));
+                if(data.threadData){
+                    store.state.threads.unshift(createThread(data));
+                }
             }
             if (store.state.openThread == thread) {
                 store.dispatch('updateFirebaseModal', data.user.first_name + ' ' + data.user.last_name + ' moved this conversation to inbox.');

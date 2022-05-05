@@ -218,7 +218,7 @@
                     | moment("from", "now")
                 }}</span
               >
-              <span v-else class="participant-status tx-color-03">UnRead</span>
+              <span v-else class="participant-status tx-color-03">Unread</span>
             </div>
           </div>
         </div>
@@ -1525,6 +1525,12 @@ export default {
       socket.child("/viewing user").on("value", (snapshot) => {
         if(snapshot.val()){
           this.viewingUsers = snapshot.val();
+          let tempArray = [];
+          this.viewingUsers.forEach(viewingUser => {
+            tempArray.push(viewingUser.id);
+          });
+
+          this.thread.data.usersReadMap = tempArray;
         }
       });
     }
