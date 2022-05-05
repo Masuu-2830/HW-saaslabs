@@ -218,7 +218,7 @@
                     | moment("from", "now")
                 }}</span
               >
-              <span v-else class="participant-status tx-color-03">UnRead</span>
+              <span v-else class="participant-status tx-color-03">Unread</span>
             </div>
           </div>
         </div>
@@ -1519,13 +1519,21 @@ export default {
   mounted(){
     let managerID = this.$store.state.userInfo.accountID;
     let threadID = this.$route.params.threadId;
-    const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
-    // let viewingUserFlag = false;
-    socket.child("/viewing user").on("value", (snapshot) => {
-      if(snapshot.val()){
-        this.viewingUsers = snapshot.val();
-      }
-    });
+    if(threadID > 0){
+      const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
+      // let viewingUserFlag = false;
+      socket.child("/viewing user").on("value", (snapshot) => {
+        if(snapshot.val()){
+          this.viewingUsers = snapshot.val();
+          let tempArray = [];
+          this.viewingUsers.forEach(viewingUser => {
+            tempArray.push(viewingUser.id);
+          });
+
+          this.thread.data.usersReadMap = tempArray;
+        }
+      });
+    }
   },
   methods: {
     backThread() {
