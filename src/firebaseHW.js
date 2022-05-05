@@ -1,8 +1,8 @@
 import {bus} from "./main";
 import {store} from "./store/store";
-function createThread(data) {
+function createThread(data, id) {
     let thread = {
-        'id': data.threadID,
+        'id': id,
         'mailboxId': data.mailboxID,
         'type': data.inboxType,
         'snippetType': 1,
@@ -146,7 +146,9 @@ export function closeThread(data) {
         if (objIndex !== -1 && store.state.filterSection !== 'closed') {
             store.state.threads.splice(objIndex, 1);
         } else if (objIndex == -1 && store.state.filterSection == 'closed') {
-            store.state.threads.unshift(createThread(data));
+            if(data.threadData) {
+                store.state.threads.unshift(createThread(data));
+            }
         }
         if (store.state.openThread !== null) {
             if (store.state.openThread == thread) {
@@ -180,7 +182,9 @@ export function snoozeThread(data) {
         if (objIndex !== -1 && store.state.filterSection !== 'snoozed') {
             store.state.threads.splice(objIndex, 1);
         } else if (objIndex == -1 && store.state.filterSection == 'snoozed') {
-            store.state.threads.unshift(createThread(data));
+            if(data.threadData) {
+                store.state.threads.unshift(createThread(data));
+            }
         }
         if (store.state.openThread !== null) {
             if (store.state.openThread == thread) {
@@ -213,7 +217,9 @@ export function deleteThread(data) {
         if (objIndex !== -1 && store.state.filterSection !== 'trash') {
             store.state.threads.splice(objIndex, 1);
         } else if (objIndex == -1 && store.state.filterSection == 'trash') {
-            store.state.threads.unshift(createThread(data));
+            if(data.threadData) {
+                store.state.threads.unshift(createThread(data));
+            }
         }
         if (store.state.openThread == thread) {
             store.dispatch('updateFirebaseModal', data.user.first_name + ' ' + data.user.last_name + ' moved this conversation to trash.');
@@ -236,8 +242,9 @@ export function deleteThread(data) {
     // }
 }
 export function moveToInboxThread(data) { // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
-    if (data.managerID !== store.state.userInfo.accountID) {
-        var all = store.state.type == 'all';
+    // if (data.managerID !== store.state.userInfo.accountID) {
+        console.log(data)
+        var all = store.state.filterSection == 'open';
         var assigned = (data.assignedTo ? true : false) && (store.state.type == 'assigned');
         var mine = (assigned && data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
         var unassigned = (! assigned) && (store.state.type == 'unassigned');
@@ -248,7 +255,9 @@ export function moveToInboxThread(data) { // var inbox = data.mailboxID == store
             if (objIndex !== -1) {
                 store.state.threads.splice(objIndex, 1);
             } else if (all || mine || assigned || unassigned) {
-                store.state.threads.unshift(createThread(data));
+                if(data.threadData) {
+                    store.state.threads.unshift(createThread(data, thread));
+                }
             }
             if (store.state.openThread == thread) {
                 store.dispatch('updateFirebaseModal', data.user.first_name + ' ' + data.user.last_name + ' moved this conversation to inbox.');
@@ -268,7 +277,7 @@ export function moveToInboxThread(data) { // var inbox = data.mailboxID == store
                 store.state.threadData[thread].data.items.push(log);
             }
         });
-    }
+    // }
 }
 export function toggleTags(data) {
     console.log("data dhikhado tags ka", data);
