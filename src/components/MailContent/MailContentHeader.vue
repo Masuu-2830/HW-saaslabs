@@ -146,7 +146,6 @@
           <div class="dropdown-divider mt-2 mb-2"></div>
           <div id="viewing-list" style="max-height: 200px; overflow-y: scroll">
             <div
-              id="participant-214897"
               class="
                 hw-participant
                 dropdown-item
@@ -154,13 +153,15 @@
                 justify-content-between
                 align-items-center
               "
+              v-for="viewingUser in viewingUsers"
+              :key="viewingUser.id"
             >
               <span
                 class="d-flex align-items-center justify-content-start w-100"
                 style="width: 55%"
               >
                 <div
-                  v-html="userInfo.avatarTag"
+                  v-html="viewingUser.avatarTag"
                   class="avatar avatar-xxs mr-1"
                 ></div>
                 <span
@@ -171,7 +172,7 @@
                     white-space: nowrap;
                     text-overflow: ellipsis;
                   "
-                  >Me</span
+                  >{{viewingUser.id == userInfo.id ? "Me" : `${viewingUser.firstname} ${viewingUser.lastname}`}}</span
                 >
               </span>
               <span class="participant-status tx-color-03"
@@ -1503,7 +1504,10 @@ export default {
     teammatesNew: function () {
       let query = this.sqTm.toLowerCase().trim();
       if (query == "") {
-        return this.teammates.filter((item) => item.id !== this.userInfo.id);
+        return this.teammates.filter((item) => {
+          let viewingUsersKeys = Object.keys(this.viewingUsers);
+          return !viewingUsersKeys.includes(item.id);
+        });
         // console.log(this.teammatesNew);
       } else {
         return this.teammates.filter(
@@ -1531,6 +1535,7 @@ export default {
           let tempArray = Object.keys(this.viewingUsers);
           console.log(tempArray);
           this.thread.data.usersReadMap = tempArray;
+          this.thread = this.thread;
         }
       });
     }
