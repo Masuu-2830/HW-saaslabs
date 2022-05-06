@@ -1627,7 +1627,6 @@ export default {
   },
   methods: {
     date(date) {
-      console.log(this.$moment(this.$moment(date).fromNow(true)));
       return this.$moment(date).fromNow(true);
     },
     morePages() {
@@ -1688,7 +1687,6 @@ export default {
           }),
           credentials: "include",
         };
-        console.log(requestOptions.body);
         fetch(this.$apiBaseURL + "contacts/update.php", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -1729,7 +1727,6 @@ export default {
           }),
           credentials: "include",
         };
-        console.log(requestOptions.body);
         fetch(this.$apiBaseURL + "contacts/create.php", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -1777,15 +1774,12 @@ export default {
               this.groups.findIndex((a) => a.group_id === id),
               1
             );
-            // console.log(grps);
-            // this.groups = grps;
           } else {
             let grp = {};
             grp["group_id"] = id;
             grp["name"] = name;
             this.groups.push(grp);
           }
-          console.log(this.groups);
           this.$refs["group-modal"].hide();
         })
         .catch((error) => {
@@ -1831,7 +1825,6 @@ export default {
         }),
         credentials: "include",
       };
-      console.log(requestOptions.body);
       fetch(this.$apiBaseURL + "contacts/addNote", requestOptions)
         .then(async (response) => {
           const data = await response.json();
@@ -1853,11 +1846,6 @@ export default {
         });
     },
     createActivity() {
-      console.log(
-        this.startDate + " " + this.startTime,
-        this.endDate + " " + this.endTime,
-        this.type
-      );
       if (this.title !== "") {
         const requestOptions = {
           method: "POST",
@@ -1872,7 +1860,6 @@ export default {
           }),
           credentials: "include",
         };
-        console.log(requestOptions.body);
         fetch(this.$apiBaseURL + "contacts/addActivity", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -1916,7 +1903,6 @@ export default {
       try {
         var successful = document.execCommand("copy");
         var msg = successful ? "successful" : "unsuccessful";
-        console.log("Fallback: Copying text command was " + msg);
       } catch (err) {
         console.error("Fallback: Oops, unable to copy", err);
       }
