@@ -48,9 +48,13 @@
                     class="dropdown-item text-secondary reply-state-btn-reply"
                     style="font-size: 13px"
                   >
-                    <i class="fas fa-reply"></i> Reply
+                    <i class="fa fa-reply mr-1"></i> Reply
                   </button>
                   <button
+                    v-if="
+              reply.email.cc !== undefined &&
+              Object.keys(reply.email.cc).length !== 0
+            "
                     @click.prevent="replyAll"
                     class="
                       dropdown-item
@@ -555,6 +559,7 @@ import axios from "axios";
 import _ from "underscore";
 import AttachmentComp from "../../AttachmentComp.vue";
 import Vue from "vue";
+import { firebase_app } from "../../../firebaseInit";
 export default {
   name: "MailContentReply",
   components: { VueTagsInput, FroalaEditor },
@@ -617,6 +622,10 @@ export default {
           : this.$route.params.threadId,
       inReplyTo: this.reply.email.id !== undefined ? this.reply.email.id : null,
       editorInstance: null,
+      typingReply: false,
+      defaultTypingTimer: 1000,
+      typingNotice: "",
+      typingTimer: null,
       config: {
         enter: FroalaEditor.ENTER_DIV,
         placeholderText: "Type something",
@@ -627,7 +636,7 @@ export default {
         imageUploadURL:
           "https://app.helpwise.io/api/uploadInlineAttachment.php",
         imageUploadParams: {
-          mailboxID: this.$route.params.mailboxId,
+          mailboxID: self.reply.mailboxId,
           emailID: this.threadID,
         },
         imageUploadMethod: "POST",
@@ -642,7 +651,7 @@ export default {
             var editor = this;
             editor.reply = self.reply;
             editor.type = "reply";
-            editor.mailboxID = self.$route.params.mailboxId;
+            editor.mailboxID = self.reply.mailboxId;
             editor.threadID = self.threadID;
             editor.draftID = self.draftID;
             self.editorInstance = this;
@@ -658,8 +667,17 @@ export default {
               },
             }).$mount();
             // var ed = $(`#reply-uploadAttachment`).data('editor');
-
             editor.$wp.append(replyAttachmentList.$el);
+
+
+            editor.events.on( "keydown", function (e) {
+              console.log("typing in editor");
+              // self.hitFirebase();
+              if ( e.which == FroalaEditor.KEYCODE.ENTER && savedReplyTribute.isActive) {
+                return false;
+              }
+            },true);
+
             // if (self.isSend) {
             //   editor.$tb.append(`
             //     <div class="fr-btn-grp fr-float-right">
@@ -1325,6 +1343,33 @@ export default {
       // this.compose = this.compose.filter(el => Object.keys(el) !== hash);
       bus.$emit("closeReply", hash);
     },
+    hitFirebase() {
+      let managerID = this.$store.state.userInfo.accountID;
+      let threadID = this.$route.params.threadId;
+
+      const socket = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
+      console.log(`/Account-${managerID}/ThreadID-${threadID}`);
+      if (!this.typingReply) {
+        this.typingReply = true;
+        socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).off("value");
+        socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+        this.startReplyingTimer(socket);
+      } else {
+        this.resetReplyingTimer(socket);
+      }
+    },
+    startReplyingTimer(socket) {
+      this.typingTimer = setTimeout(() => {
+        this.typingReply = false;
+        socket
+          .child(`/replying user/user-${this.$store.state.userInfo.id}`)
+          .remove();
+      }, this.defaultTypingTimer);
+    },
+    resetReplyingTimer(socket) {
+      clearTimeout(this.typingTimer);
+      this.startReplyingTimer(socket);
+    },
     // myGreeting() {
     //   setTimeout(this.saveDraft, this.doneTypingInterval);
     // },
@@ -1344,8 +1389,9 @@ export default {
           let aliases = this.aliases();
           if (this.$store.state.inboxData.type == "universal") {
             let alias = aliases[this.reply.mailboxId];
+            console.log(alias, aliases)
             for (var key in this.reply.email.to) {
-              if (!alias.some((el) => el.email == key)) {
+              if (!aliases.some((el) => el.email == key)) {
                 let obj = {};
                 obj["email"] = key;
                 obj["name"] = this.reply.email.to[key];
@@ -1380,7 +1426,7 @@ export default {
           let alias = aliases[this.reply.mailboxId];
 
           for (var key in this.reply.email.cc) {
-            if (!alias.some((el) => el.email == key)) {
+            if (!aliases.some((el) => el.email == key)) {
               let obj = {};
               obj["email"] = key;
               obj["name"] = this.reply.email.cc[key];
@@ -1411,13 +1457,13 @@ export default {
     tagsbcc(prop) {
       let bcc = [];
       if (this.reply.type == 2 || prop == 2) {
-        let aliases = this.getAliases();
+        let aliases = this.aliases();
 
         if (this.$store.state.inboxData.type == "universal") {
           let alias = aliases[this.reply.mailboxId];
 
           for (var key in this.reply.email.to) {
-            if (!alias.some((el) => el.email == key)) {
+            if (!aliases.some((el) => el.email == key)) {
               let obj = {};
               obj["email"] = key;
               obj["name"] = this.reply.email.bcc[key];
@@ -1454,7 +1500,7 @@ export default {
         let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
         var formData = new FormData();
         formData.append("files[]", selectedFile);
-        formData.append("mailboxID", vueThis.$route.params.mailboxId);
+        formData.append("mailboxID", vueThis.reply.mailboxId);
         let attachmentObject = {
           filename: selectedFile["name"],
           filesize: selectedFile["size"],
@@ -1671,11 +1717,12 @@ export default {
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
       let body, mailboxID;
+      console.log(this.reply.mailboxId)
       if (
-        this.$route.params.mailboxId !== undefined &&
-        this.$route.params.mailboxId !== "me"
+        this.reply.mailboxId !== undefined &&
+        this.reply.mailboxId !== "me"
       ) {
-        mailboxID = this.$route.params.mailboxId;
+        mailboxID = this.reply.mailboxId;
       } else if (
         this.$store.state.inboxData.id !== undefined &&
         this.$store.state.inboxData.id !== "me"
@@ -2073,7 +2120,7 @@ export default {
   right: 24px;
 }
 
-.fr-toolbar .fr-command .fr-btn img,
+.fr-toolbar .fr-command.fr-btn img,
 .fr-popup .fr-command.fr-btn img,
 .fr-modal .fr-command.fr-btn img {
   margin: 8px 7px;

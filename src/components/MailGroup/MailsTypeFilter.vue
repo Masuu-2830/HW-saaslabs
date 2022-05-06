@@ -17,7 +17,7 @@
             name: 'type',
             params: {
               type: $store.state.type,
-              mailboxId: $store.state.inboxData.id,
+              mailboxId: $store.state.mailboxId,
               filterSection: type.type == 'all' ? 'open' : type.type,
               pageNo: 1,
             },
@@ -26,7 +26,7 @@
           <p
             class="filterP"
             :class="
-              $store.state.filterSection == type.type ||
+              $route.params.filterSection == type.type || $store.state.filterSection == type.type ||
               ($store.state.filterSection == 'open' && type.type == 'all')
                 ? 'isActive'
                 : ''

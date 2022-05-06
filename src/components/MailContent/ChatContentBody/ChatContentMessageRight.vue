@@ -134,7 +134,7 @@
                     v-html="item.data.text"
                   ></span>
                 </div>
-                <br />
+                <!-- <br /> -->
                 <div v-if="item.data.attachment !== undefined && item.data.attachment.length > 0" class="d-flex align-items-end">
                   <i
                     class="fas fa-paperclip mg-r-2 pd-b-5 tx-color-03 tx-14"

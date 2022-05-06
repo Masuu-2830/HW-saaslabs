@@ -5,7 +5,7 @@ import createPersistedState from "vuex-persistedstate";
 Vue.use(Vuex);
 
 const dataState = createPersistedState({
-    paths: ['inboxData', 'type', 'mailboxId']
+    paths: ['inboxData', 'type', 'mailboxId', 'filterSection']
 })
 
 export const store = new Vuex.Store({
@@ -95,6 +95,9 @@ export const store = new Vuex.Store({
         },
         updateMailboxId(state, mailboxId) {
             state.mailboxId = mailboxId;
+            if(mailboxId == "tags"){
+                mailboxId = "me";
+            }
             state.inboxData = state.inboxes[mailboxId];
         }
     },

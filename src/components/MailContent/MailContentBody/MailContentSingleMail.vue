@@ -348,21 +348,21 @@
                   <button
                     class="dropdown-item reply-btn"
                     type="button"
-                    @click.stop="reply(1)"
+                    @click="reply(1)"
                   >
                     Reply
                   </button>
                   <button
                     class="dropdown-item reply-all-btn"
                     type="button"
-                    @click.stop="reply(2)"
+                    @click="reply(2)"
                   >
                     Reply all
                   </button>
                   <button
                     type="button"
                     class="dropdown-item forward-btn"
-                    @click.stop="reply(3)"
+                    @click="reply(3)"
                   >
                     Forward
                   </button>
@@ -625,6 +625,7 @@ export default {
       console.log("open reply");
       let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
       bus.$emit("openReply", hash, type, this.item.data);
+      this.$emit("scrollToBottom");
     },
     changeCollapseState() {
       this.isMailCollapsed = !this.isMailCollapsed;

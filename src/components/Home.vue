@@ -1,9 +1,18 @@
 <template>
   <div class="main">
+    <div
+      v-if="!dataLoaded && !loaded"
+      id="thread-spinner"
+      class="spinner-border text-primary"
+      role="status"
+      style="position: absolute; top: 50%; left: 50%"
+    >
+      <span class="sr-only">Loading...</span>
+    </div>
     <NavBar :mailboxes="mailboxes" />
-    <div class="mail-wrapper">
-      <SideBarHW v-if="dataLoaded && loaded" :mailbox="mailbox" />
-      <MailGroup v-if="dataLoaded && loaded" :mailbox="mailbox" />
+    <div v-if="dataLoaded && loaded" class="mail-wrapper">
+      <SideBarHW :mailbox="mailbox" />
+      <MailGroup :mailbox="mailbox" />
       <MailContent />
       <compose-wrapper></compose-wrapper>
       <!-- <tweet-compose></tweet-compose> -->
@@ -205,6 +214,21 @@ export default {
   },
   async beforeMount() {
     await this.fetchSidebarStats();
+    const response = await fetch("https://app.helpwise.io/api/pingv2.php", {
+      credentials: "include",
+    });
+    const data = await response.json();
+    data.data.tags = data.data.tags.sort((b, a) => b.name - a.name);
+    await this.$store.dispatch("fetchPingDetails", data);
+    this.loaded = true;
+    initFirebase();
+    const response2 = await fetch(
+      "https://app.helpwise.io/api/getAccountMailboxes.php",
+      { credentials: "include" }
+    );
+    const data2 = await response2.json();
+    // data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
+    await this.$store.dispatch("fetchMailBoxes", data2);
     // this.fetchMailBoxes();
     // this.fetchAliases();
     this.fetchUserSignature();
@@ -225,21 +249,21 @@ export default {
     //     this.$route.params.mailboxId ||
     //   (this.$store.inboxData && this.$store.inboxData.id) ||
     //   "me";
-    const response = await fetch("https://app.helpwise.io/api/pingv2.php", {
-      credentials: "include",
-    });
-    const data = await response.json();
-    data.data.tags = data.data.tags.sort((b, a) => b.name - a.name);
-    await this.$store.dispatch("fetchPingDetails", data);
-    this.loaded = true;
-    initFirebase();
-    const response2 = await fetch(
-      "https://app.helpwise.io/api/getAccountMailboxes.php",
-      { credentials: "include" }
-    );
-    const data2 = await response2.json();
-    // data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
-    await this.$store.dispatch("fetchMailBoxes", data2);
+    // const response = await fetch("https://app.helpwise.io/api/pingv2.php", {
+    //   credentials: "include",
+    // });
+    // const data = await response.json();
+    // data.data.tags = data.data.tags.sort((b, a) => b.name - a.name);
+    // await this.$store.dispatch("fetchPingDetails", data);
+    // this.loaded = true;
+    // initFirebase();
+    // const response2 = await fetch(
+    //   "https://app.helpwise.io/api/getAccountMailboxes.php",
+    //   { credentials: "include" }
+    // );
+    // const data2 = await response2.json();
+    // // data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
+    // await this.$store.dispatch("fetchMailBoxes", data2);
   },
 };
 </script>

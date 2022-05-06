@@ -31,8 +31,8 @@
           >
             <span
               v-if="
-                this.$store.state.type !== 'closed' && 
-                this.$store.state.type !== 'trash'
+                this.$store.state.filterSection !== 'closed' && 
+                this.$store.state.filterSection !== 'trash'
               "
               @click.stop.prevent="bulkClose"
               id="bulk-close"
@@ -59,7 +59,7 @@
             </span>
             <span
               v-if="
-                this.$store.state.type == 'mentions'
+                this.$store.state.filterSection == 'mentions'
               "
               @click.stop.prevent="bulkDone"
               id="bulk-done"
@@ -87,16 +87,16 @@
             </span>
             <span
               v-if="
-                this.$store.state.type !== 'mentions' &&
-                this.$store.state.type !== 'discussions' && 
-                this.$store.state.type !== 'starred' &&
-                this.$store.state.type !== 'snoozed' &&
-                this.$store.state.type !== 'drafts' && 
-                this.$store.state.type !== 'sent' && 
-                this.$store.state.type !== 'scheduled' && 
-                this.$store.state.type !== 'closed' && 
-                this.$store.state.type !== 'spam' && 
-                this.$store.state.type !== 'trash'
+                this.$store.state.filterSection !== 'mentions' &&
+                this.$store.state.filterSection !== 'discussions' && 
+                this.$store.state.filterSection !== 'starred' &&
+                this.$store.state.filterSection !== 'snoozed' &&
+                this.$store.state.filterSection !== 'drafts' && 
+                this.$store.state.filterSection !== 'sent' && 
+                this.$store.state.filterSection !== 'scheduled' && 
+                this.$store.state.filterSection !== 'closed' && 
+                this.$store.state.filterSection !== 'spam' && 
+                this.$store.state.filterSection !== 'trash'
               "
               @click.stop.prevent="bulkRead(1)"
               id="bulk-read"
@@ -125,16 +125,16 @@
 
             <span
               v-if="
-                this.$store.state.type !== 'mentions' &&
-                this.$store.state.type !== 'discussions' && 
-                this.$store.state.type !== 'starred' &&
-                this.$store.state.type !== 'snoozed' &&
-                this.$store.state.type !== 'drafts' && 
-                this.$store.state.type !== 'sent' && 
-                this.$store.state.type !== 'scheduled' && 
-                this.$store.state.type !== 'closed' && 
-                this.$store.state.type !== 'spam' && 
-                this.$store.state.type !== 'trash'
+                this.$store.state.filterSection !== 'mentions' &&
+                this.$store.state.filterSection !== 'discussions' && 
+                this.$store.state.filterSection !== 'starred' &&
+                this.$store.state.filterSection !== 'snoozed' &&
+                this.$store.state.filterSection !== 'drafts' && 
+                this.$store.state.filterSection !== 'sent' && 
+                this.$store.state.filterSection !== 'scheduled' && 
+                this.$store.state.filterSection !== 'closed' && 
+                this.$store.state.filterSection !== 'spam' && 
+                this.$store.state.filterSection !== 'trash'
               "
               @click.stop.prevent="bulkRead(0)"
               id="bulk-unread"
@@ -317,7 +317,7 @@
             </span>
 
             <span
-              v-if="this.$store.state.type !== 'trash'"
+              v-if="this.$store.state.filterSection !== 'trash'"
               @click.stop.prevent="bulkDelete"
               id="bulk-trash"
               data-toggle="tooltip"
@@ -347,7 +347,7 @@
             </span>
 
             <span
-              v-if="this.$store.state.type == 'trash'"
+              v-if="this.$store.state.filterSection == 'trash'"
               @click.stop.prevent="bulkPerDelete"
               id="bulk-permanent-delete"
               data-toggle="tooltip"
@@ -375,7 +375,7 @@
               </svg>
             </span>
             <span
-              v-if="this.$store.state.type !== 'spam' && this.$store.state.type !== 'trash'"
+              v-if="this.$store.state.filterSection !== 'spam' && this.$store.state.filterSection !== 'trash'"
               @click.stop.prevent="bulkSpam"
               id="bulk-spam"
               data-toggle="tooltip"
@@ -406,10 +406,10 @@
 
             <span
               v-if="
-                this.$store.state.type == 'snoozed' || 
-                this.$store.state.type == 'closed' || 
-                this.$store.state.type == 'spam' || 
-                this.$store.state.type == 'trash'
+                this.$store.state.filterSection == 'snoozed' || 
+                this.$store.state.filterSection == 'closed' || 
+                this.$store.state.filterSection == 'spam' || 
+                this.$store.state.filterSection == 'trash'
               "              
               @click.stop.prevent="bulkMove"
               id="bulk-move-to-inbox"
@@ -439,7 +439,7 @@
             </span>
             <span
               v-if="
-                this.$store.state.type !== 'starred'
+                this.$store.state.filterSection !== 'starred'
               "
               id="bulk-star-threads"
               class="align-items-center d-flex px-2"
@@ -466,7 +466,7 @@
             </span>
             <span
               v-if="
-                this.$store.state.type == 'starred'
+                this.$store.state.filterSection == 'starred'
               "
               @click.stop.prevent="bulkStar()"
               id="bulk-unstar-threads"
@@ -1079,9 +1079,9 @@
             </b-modal>
             <div
               v-if="
-                this.$store.state.type !== 'drafts' && 
-                this.$store.state.type !== 'sent' && 
-                this.$store.state.type !== 'scheduled'
+                this.$store.state.filterSection !== 'drafts' && 
+                this.$store.state.filterSection !== 'sent' && 
+                this.$store.state.filterSection !== 'scheduled'
               "
               class="
                 dropdown
@@ -1358,12 +1358,12 @@
           </div>
           <div
             v-if="
-              this.$store.state.type !== 'unassigned' &&
-              this.$store.state.type !== 'mine' &&
-              this.$store.state.type !== 'mentions' &&
-              this.$store.state.type !== 'discussions' &&
-              this.$store.state.type !== 'starred' &&
-              this.$store.state.type !== 'drafts'
+              this.$store.state.filterSection !== 'unassigned' &&
+              this.$store.state.filterSection !== 'mine' &&
+              this.$store.state.filterSection !== 'mentions' &&
+              this.$store.state.filterSection !== 'discussions' &&
+              this.$store.state.filterSection !== 'starred' &&
+              this.$store.state.filterSection !== 'drafts'
             "
             id="threads-filter"
             style=""
@@ -1409,7 +1409,7 @@
                 data-val="unassigned"
                 data-text="Unassigned"
                 @click="filterPerson(1, 'Unassigned')"
-                v-if="this.$store.state.type !== 'snoozed'"
+                v-if="this.$store.state.filterSection !== 'snoozed'"
               >
                 Unassigned
               </button>
@@ -1418,7 +1418,7 @@
                 data-val="unread"
                 data-text="Unread"
                 @click="filterPerson(2, 'Unread')"
-                v-if="this.$store.state.type !== 'snoozed'"
+                v-if="this.$store.state.filterSection !== 'snoozed'"
               >
                 Unread
               </button>
@@ -1571,11 +1571,11 @@
           </div>
           <div
             v-if="
-              this.$store.state.type !== 'snoozed' &&
-              this.$store.state.type !== 'mentions' &&
-              this.$store.state.type !== 'discussions' &&
-              this.$store.state.type !== 'starred' &&
-              this.$store.state.type !== 'drafts'
+              this.$store.state.filterSection !== 'snoozed' &&
+              this.$store.state.filterSection !== 'mentions' &&
+              this.$store.state.filterSection !== 'discussions' &&
+              this.$store.state.filterSection !== 'starred' &&
+              this.$store.state.filterSection !== 'drafts'
             "
             id="orderThreadsBy"
             style="margin-left: 5px"

@@ -7,12 +7,13 @@
 <script>
 export default {
   name: 'App',
+  
 }
 </script>
 
 <style>
 
 .tribute-container {
-        bottom: -169px !important;
-      }
+  bottom: 17% !important;
+}
 </style>

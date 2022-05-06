@@ -28,7 +28,8 @@
             closeModal(){
                 this.$bvModal.hide('firebaseModal');
                 this.$store.dispatch('updateFirebaseModal', '');
-                bus.$emit("broad");
+                bus.$emit("broad", "back");
+                bus.$emit("broadForContent")
             },
         },
         created(){

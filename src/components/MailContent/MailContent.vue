@@ -20,7 +20,7 @@
       :sidebarOpen="sidebarOpen"
       :contactOpen="contactOpen"
       :thread="thread"
-      :contact="contactData"
+      :contact="thread.data.contactData"
     ></IntegrationContainer>
     <div
       v-if="!loading"
@@ -69,7 +69,6 @@ export default {
       display: "none",
       right: "0px",
       thread: {},
-      contactData: null,
       loading: false,
       sidebarOpen: false,
       contactOpen: false,
@@ -84,16 +83,18 @@ export default {
                 this.right = '0px';
                 this.contactOpen = false;
                 this.sidebarOpen = false;
-                
+                console.log("------ KYA YE WATCH CHLA ----");
                 let toThreadId = to.params.threadId;
                 let fromThreadId = from.params.threadId;
                 let managerID = this.$store.state.userInfo.accountID;
 
-                const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${fromThreadId}`);
-                socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
-
-                const socket2 = firebase_app.database().ref(`/Account-${managerID}/Thread-${toThreadId}`);
-                socket2.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+                if(toThreadId > 0){
+                  const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${fromThreadId}`);
+                  socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
+  
+                  const socket2 = firebase_app.database().ref(`/Account-${managerID}/Thread-${toThreadId}`);
+                  socket2.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+                }
             }
         }
     },
@@ -108,7 +109,6 @@ export default {
         // console.log(contactData);
         this.thread = data;
         console.log(this.thread);
-        this.contactData = contactData;
         this.loading = false;
         console.log(this.loading);
       }
