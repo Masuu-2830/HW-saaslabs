@@ -1522,14 +1522,14 @@ export default {
     if(threadID > 0){
       const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
       // let viewingUserFlag = false;
+
       socket.child("/viewing user").on("value", (snapshot) => {
         if(snapshot.val()){
+          console.log(this);
           this.viewingUsers = snapshot.val();
-          let tempArray = [];
-          this.viewingUsers.forEach(viewingUser => {
-            tempArray.push(viewingUser.id);
-          });
-
+          console.log(snapshot.val(), this.viewingUsers);
+          let tempArray = Object.keys(this.viewingUsers);
+          console.log(tempArray);
           this.thread.data.usersReadMap = tempArray;
         }
       });
