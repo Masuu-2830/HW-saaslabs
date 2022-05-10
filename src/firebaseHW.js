@@ -41,48 +41,52 @@ export function addThread(data) {
     if (store.state.openThread == data.threadID) {
         if (data.inboxType == 'mail') {
             let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
-            if (itemIndex == -1) {
-                fetch("https://app.helpwise.io/api/getEmail.php?emailID=" + data.messageData.id + "&mailboxID=" + data.mailboxID, {credentials: "include"}).then(async (response) => {
-                    const data1 = await response.json();
-                    if (data1.status !== "success") {
-                        const error = (data1 && data1.message) || response.status;
-                        return Promise.reject(error);
-                    }
-                    let email = {
-                        'type': 'email',
-                        'data': data1.data.email,
-                        'timestamp': Date.now()
-                    };
-                    store.state.threadData[data.threadID].data.snippet = data1.data.email.snippet;
-                    store.state.threadData[data.threadID].data.subject = data1.data.email.subject;
-                    if (store.state.userSettings.orderThread == "asc") {
-                        store.state.threadData[data.threadID].data.items.push(email);
-                    } else {
-                        store.state.threadData[data.threadID].data.items.unshift(email);
-                    }
-                });
+            if(data.messageData.sentBy.id != store.state.userInfo.id){
+                if (itemIndex == -1) {
+                    fetch("https://app.helpwise.io/api/getEmail.php?emailID=" + data.messageData.id + "&mailboxID=" + data.mailboxID, {credentials: "include"}).then(async (response) => {
+                        const data1 = await response.json();
+                        if (data1.status !== "success") {
+                            const error = (data1 && data1.message) || response.status;
+                            return Promise.reject(error);
+                        }
+                        let email = {
+                            'type': 'email',
+                            'data': data1.data.email,
+                            'timestamp': Date.now()
+                        };
+                        store.state.threadData[data.threadID].data.snippet = data1.data.email.snippet;
+                        store.state.threadData[data.threadID].data.subject = data1.data.email.subject;
+                        if (store.state.userSettings.orderThread == "asc") {
+                            store.state.threadData[data.threadID].data.items.push(email);
+                        } else {
+                            store.state.threadData[data.threadID].data.items.unshift(email);
+                        }
+                    });
+                }
             }
         } else if (data.inboxType == 'chat' || data.inboxType == 'facebook') {
             let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
-            if (itemIndex == -1) {
-                let message = {
-                    'type': data.inboxType,
-                    'data': {
-                        'id': data.messageData.id,
-                        'threadId': data.threadID,
-                        'text': data.messageData.body,
-                        'sentBy': data.messageData.sentBy,
-                        'attachments': data.messageData.attachments,
-                        'type': data.action == 'incoming' ? 0 : 1,
-                        'date': data.messageData.time,
-                        'unixTime': Date.now()
-                    },
-                    'timestamp': Date.now()
-                };
-                if (store.state.userSettings.orderThread == "asc") {
-                    store.state.threadData[data.threadID].data.items.push(message);
-                } else {
-                    store.state.threadData[data.threadID].data.items.unshift(message);
+            if(data.messageData.sentBy.id != store.state.userInfo.id){
+                if (itemIndex == -1) {
+                    let message = {
+                        'type': data.inboxType,
+                        'data': {
+                            'id': data.messageData.id,
+                            'threadId': data.threadID,
+                            'text': data.messageData.body,
+                            'sentBy': data.messageData.sentBy,
+                            'attachments': data.messageData.attachments,
+                            'type': data.action == 'incoming' ? 0 : 1,
+                            'date': data.messageData.time,
+                            'unixTime': Date.now()
+                        },
+                        'timestamp': Date.now()
+                    };
+                    if (store.state.userSettings.orderThread == "asc") {
+                        store.state.threadData[data.threadID].data.items.push(message);
+                    } else {
+                        store.state.threadData[data.threadID].data.items.unshift(message);
+                    }
                 }
             }
         }
