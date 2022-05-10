@@ -128,7 +128,7 @@ export function addNote(data) { // hello
             // console.log("store.state.threadData", store.state.threadData[data.threadID]);
 
             console.log(data.noteData.sentBy, store.state.userInfo.id);
-            if(data.noteData.sentBy != store.state.userInfo.id){
+            if(data.noteData.sentBy.id != store.state.userInfo.id){
                 if (store.state.userSettings.orderThread == "asc") {
                     store.state.threadData[data.threadID].data.items.push(comment);
                 } else {

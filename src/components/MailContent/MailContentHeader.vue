@@ -180,7 +180,7 @@
               >
             </div>
             <div
-              v-for="teammate in teammatesNew"
+              v-for="teammate in viewingListTeammates"
               :key="teammate.id"
               :id="'participant-' + teammate.id"
               class="
@@ -1491,15 +1491,18 @@ export default {
       }
     },
     teammates() {
-      // let query = this.sqTm.toLowerCase().trim();
-      // if(query == "") {
       return this.$store.state.teammates;
-      // } else {
-      // return this.teammates.filter((item) => item.id !== this.userInfo.id);
-      // }
+      
     },
     mailboxes() {
       return this.$store.state.mailboxes;
+    },
+    viewingListTeammates(){
+      let viewingUsersKeys = Object.keys(this.viewingUsers);
+      let tempArray = this.teammates.filter(teammate => {
+        return viewingUsersKeys.indexOf(teammate.id+"") == -1;
+      });
+      return tempArray;
     },
     teammatesNew: function () {
       let query = this.sqTm.toLowerCase().trim();
@@ -1531,9 +1534,9 @@ export default {
         if(snapshot.val()){
           console.log(this);
           this.viewingUsers = snapshot.val();
-          console.log(snapshot.val(), this.viewingUsers);
           let tempArray = Object.keys(this.viewingUsers);
-          console.log(tempArray);
+          console.log(tempArray, this.thread.data);
+          console.log(this.teammatesNew);
           this.thread.data.usersReadMap = tempArray;
           this.thread = this.thread;
         }
@@ -1542,7 +1545,14 @@ export default {
   },
   methods: {
     backThread() {
-      this.$emit("broad")
+      this.$emit("broad");
+      let managerID = this.$store.state.userInfo.accountID;
+      let threadID = this.$route.params.threadId;
+      if(threadID > 0){
+        const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
+        socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
+      }
+      // let viewingUserFlag = false;
       bus.$emit("broad",'back');
     },
     unread() {
