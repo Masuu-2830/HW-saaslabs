@@ -754,6 +754,10 @@ export default {
             buttonsVisible: "all",
           },
         },
+        htmlAllowedTags: [".*"],
+        htmlAllowedAttrs: [".*"],
+        htmlRemoveTags: ["script"],
+        quickInsertTags: [""],
       },
     };
   },

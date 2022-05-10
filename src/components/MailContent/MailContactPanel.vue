@@ -906,83 +906,44 @@
                 class="d-flex flex-column openPrevThread bd-b pd-y-10"
                 :id="'prev-thread-' + thread.thread_id"
               >
-                <div class="d-flex mg-b-5 align-items-center">
-                  <!-- <div
-                        class="
-                          avatar avatar-xs
-                          mg-r-5
-                          d-flex
-                          align-items-center
-                        "
-                        style="width: 26px !important; height: 26px !important"
-                      >
-                        <div
-                          style="
-                            display: grid;
-                            place-content: center;
-                            border: 1px solid;
-                            border-radius: 50%;
-                            height: 22px;
-                            width: 22px;
-                          "
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            class="feather feather-user"
-                          >
-                            <path
-                              d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-                            ></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                          </svg>
-                        </div>
-                      </div> -->
+                <div class="d-flex align-items-center">
                   <a
-                    class="mg-b-0 tx-12 tx-color-01"
-                    :href="
-                      'http://localinbox.helpwise.io:3001/' +
-                      thread.mailbox_id +
-                      '/all/' +
-                      thread.thread_id
-                    "
+                    class="mg-b-0 tx-14 tx-color-01"
+                    :href="thread.url"
                     target="_blank"
                     style="font-weight: 500; margin-left: 15px; color: #4f5d6b"
                   >
-                    {{ thread.logMessage }}
+                    {{ thread.subject }}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0168fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-external-link ml-1 mb-1">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
                   </a>
                 </div>
                 <div class="d-flex pd-x-10">
                   <p
                     class="
                       mg-b-0 mg-l-2
-                      tx-14 tx-color-03
+                      tx-12 tx-color-03
                       hw_rel-date
                       notOpenDate
                       pd-5
                     "
-                    :id="'popoverDate' + thread.date"
+                    :id="'popoverDate'"
                     style="
                       text-align: right;
                       cursor: pointer;
-                      margin-left: auto;
                     "
                   >
-                    {{ thread.date | moment("from", "now", true) }}
+                    {{ thread.createdAt | moment("from", "now", true) }}
                   </p>
                   <b-popover
-                    :target="'popoverDate' + thread.date"
+                    :target="'popoverDate' + thread.createdAt"
                     triggers="hover"
                     placement="bottom"
                   >
-                    {{ thread.date | moment("MMM D, YYYY hh:mm a") }}
+                    {{ thread.createdAt | moment("MMM D, YYYY hh:mm a") }}
                   </b-popover>
                 </div>
               </div>
@@ -1666,7 +1627,6 @@ export default {
   },
   methods: {
     date(date) {
-      console.log(this.$moment(this.$moment(date).fromNow(true)));
       return this.$moment(date).fromNow(true);
     },
     morePages() {
@@ -1727,7 +1687,6 @@ export default {
           }),
           credentials: "include",
         };
-        console.log(requestOptions.body);
         fetch(this.$apiBaseURL + "contacts/update.php", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -1768,7 +1727,6 @@ export default {
           }),
           credentials: "include",
         };
-        console.log(requestOptions.body);
         fetch(this.$apiBaseURL + "contacts/create.php", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -1816,15 +1774,12 @@ export default {
               this.groups.findIndex((a) => a.group_id === id),
               1
             );
-            // console.log(grps);
-            // this.groups = grps;
           } else {
             let grp = {};
             grp["group_id"] = id;
             grp["name"] = name;
             this.groups.push(grp);
           }
-          console.log(this.groups);
           this.$refs["group-modal"].hide();
         })
         .catch((error) => {
@@ -1870,7 +1825,6 @@ export default {
         }),
         credentials: "include",
       };
-      console.log(requestOptions.body);
       fetch(this.$apiBaseURL + "contacts/addNote", requestOptions)
         .then(async (response) => {
           const data = await response.json();
@@ -1892,11 +1846,6 @@ export default {
         });
     },
     createActivity() {
-      console.log(
-        this.startDate + " " + this.startTime,
-        this.endDate + " " + this.endTime,
-        this.type
-      );
       if (this.title !== "") {
         const requestOptions = {
           method: "POST",
@@ -1911,7 +1860,6 @@ export default {
           }),
           credentials: "include",
         };
-        console.log(requestOptions.body);
         fetch(this.$apiBaseURL + "contacts/addActivity", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -1955,7 +1903,6 @@ export default {
       try {
         var successful = document.execCommand("copy");
         var msg = successful ? "successful" : "unsuccessful";
-        console.log("Fallback: Copying text command was " + msg);
       } catch (err) {
         console.error("Fallback: Oops, unable to copy", err);
       }

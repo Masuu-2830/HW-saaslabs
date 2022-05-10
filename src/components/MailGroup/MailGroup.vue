@@ -319,7 +319,7 @@ export default {
         }
       }
     }),
-      bus.$off("broad");
+    bus.$off("broad");
     bus.$on("broad", (event) => {
       this.$store.dispatch("updateOpenThread", null);
       this.isCompact = false;
@@ -540,45 +540,45 @@ export default {
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIDs.length;
           let url;
-          if (offset == 0) {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&consistent=true";
-          } else {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&offset=" +
-                offset +
-                "&consistent=true";
-          }
-          fetch(url, { credentials: "include" }).then(async (response) => {
-            const data = await response.json();
-            if (data.status !== "success") {
-              const error = (data && data.message) || response.status;
-              return Promise.reject(error);
-            }
-            for (let i = 0; i < data.data.threads.length; i++) {
-              this.perPageMails.push(data.data.threads[i]);
-            }
-            // this.$store.state.threads = this.perPageMails;
-            this.$store.dispatch("updateThreads", this.perPageMails);
-          });
+          // if (offset == 0) {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&consistent=true";
+          // } else {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&offset=" +
+          //       offset +
+          //       "&consistent=true";
+          // }
+          // fetch(url, { credentials: "include" }).then(async (response) => {
+          //   const data = await response.json();
+          //   if (data.status !== "success") {
+          //     const error = (data && data.message) || response.status;
+          //     return Promise.reject(error);
+          //   }
+          //   for (let i = 0; i < data.data.threads.length; i++) {
+          //     this.perPageMails.push(data.data.threads[i]);
+          //   }
+          //   // this.$store.state.threads = this.perPageMails;
+          //   this.$store.dispatch("updateThreads", this.perPageMails);
+          // });
         })
         .catch((error) => {
           alert(error);
@@ -655,44 +655,44 @@ export default {
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIDs.length;
           let url;
-          if (offset == 0) {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&consistent=true";
-          } else {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&offset=" +
-                offset +
-                "&consistent=true";
-          }
-          fetch(url, { credentials: "include" }).then(async (response) => {
-            const data = await response.json();
-            if (data.status !== "success") {
-              const error = (data && data.message) || response.status;
-              return Promise.reject(error);
-            }
-            for (let i = 0; i < data.data.threads.length; i++) {
-              this.perPageMails.push(data.data.threads[i]);
-            }
-            this.$store.dispatch("updateThreads", this.perPageMails);
-          });
+          // if (offset == 0) {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&consistent=true";
+          // } else {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&offset=" +
+          //       offset +
+          //       "&consistent=true";
+          // }
+          // fetch(url, { credentials: "include" }).then(async (response) => {
+          //   const data = await response.json();
+          //   if (data.status !== "success") {
+          //     const error = (data && data.message) || response.status;
+          //     return Promise.reject(error);
+          //   }
+          //   for (let i = 0; i < data.data.threads.length; i++) {
+          //     this.perPageMails.push(data.data.threads[i]);
+          //   }
+          //   this.$store.dispatch("updateThreads", this.perPageMails);
+          // });
         })
         .catch((error) => {
           alert(error);
@@ -763,44 +763,44 @@ export default {
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIDs.length;
           let url;
-          if (offset == 0) {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&consistent=true";
-          } else {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&offset=" +
-                offset +
-                "&consistent=true";
-          }
-          fetch(url, { credentials: "include" }).then(async (response) => {
-            const data = await response.json();
-            if (data.status !== "success") {
-              const error = (data && data.message) || response.status;
-              return Promise.reject(error);
-            }
-            for (let i = 0; i < data.data.threads.length; i++) {
-              this.perPageMails.push(data.data.threads[i]);
-            }
-            this.$store.dispatch("updateThreads", this.perPageMails);
-          });
+          // if (offset == 0) {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&consistent=true";
+          // } else {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&offset=" +
+          //       offset +
+          //       "&consistent=true";
+          // }
+          // fetch(url, { credentials: "include" }).then(async (response) => {
+          //   const data = await response.json();
+          //   if (data.status !== "success") {
+          //     const error = (data && data.message) || response.status;
+          //     return Promise.reject(error);
+          //   }
+          //   for (let i = 0; i < data.data.threads.length; i++) {
+          //     this.perPageMails.push(data.data.threads[i]);
+          //   }
+          //   this.$store.dispatch("updateThreads", this.perPageMails);
+          // });
         })
         .catch((error) => {
           alert(error);
@@ -872,44 +872,44 @@ export default {
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIds.length;
           let url;
-          if (offset == 0) {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&consistent=true";
-          } else {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&offset=" +
-                offset +
-                "&consistent=true";
-          }
-          fetch(url, { credentials: "include" }).then(async (response) => {
-            const data = await response.json();
-            if (data.status !== "success") {
-              const error = (data && data.message) || response.status;
-              return Promise.reject(error);
-            }
-            for (let i = 0; i < data.data.threads.length; i++) {
-              this.perPageMails.push(data.data.threads[i]);
-            }
-            this.$store.dispatch("updateThreads", this.perPageMails);
-          });
+          // if (offset == 0) {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&consistent=true";
+          // } else {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&offset=" +
+          //       offset +
+          //       "&consistent=true";
+          // }
+          // fetch(url, { credentials: "include" }).then(async (response) => {
+          //   const data = await response.json();
+          //   if (data.status !== "success") {
+          //     const error = (data && data.message) || response.status;
+          //     return Promise.reject(error);
+          //   }
+          //   for (let i = 0; i < data.data.threads.length; i++) {
+          //     this.perPageMails.push(data.data.threads[i]);
+          //   }
+          //   this.$store.dispatch("updateThreads", this.perPageMails);
+          // });
         })
         .catch((error) => {
           alert(error);
@@ -957,44 +957,44 @@ export default {
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIDs.length;
           let url;
-          if (offset == 0) {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&consistent=true";
-          } else {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&offset=" +
-                offset +
-                "&consistent=true";
-          }
-          fetch(url, { credentials: "include" }).then(async (response) => {
-            const data = await response.json();
-            if (data.status !== "success") {
-              const error = (data && data.message) || response.status;
-              return Promise.reject(error);
-            }
-            for (let i = 0; i < data.data.threads.length; i++) {
-              this.perPageMails.push(data.data.threads[i]);
-            }
-            this.$store.dispatch("updateThreads", this.perPageMails);
-          });
+          // if (offset == 0) {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&consistent=true";
+          // } else {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&offset=" +
+          //       offset +
+          //       "&consistent=true";
+          // }
+          // fetch(url, { credentials: "include" }).then(async (response) => {
+          //   const data = await response.json();
+          //   if (data.status !== "success") {
+          //     const error = (data && data.message) || response.status;
+          //     return Promise.reject(error);
+          //   }
+          //   for (let i = 0; i < data.data.threads.length; i++) {
+          //     this.perPageMails.push(data.data.threads[i]);
+          //   }
+          //   this.$store.dispatch("updateThreads", this.perPageMails);
+          // });
         })
         .catch((error) => {
           alert(error);
@@ -1067,44 +1067,44 @@ export default {
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIDs.length;
           let url;
-          if (offset == 0) {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&consistent=true";
-          } else {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&offset=" +
-                offset +
-                "&consistent=true";
-          }
-          fetch(url, { credentials: "include" }).then(async (response) => {
-            const data = await response.json();
-            if (data.status !== "success") {
-              const error = (data && data.message) || response.status;
-              return Promise.reject(error);
-            }
-            for (let i = 0; i < data.data.threads.length; i++) {
-              this.perPageMails.push(data.data.threads[i]);
-            }
-            this.$store.dispatch("updateThreads", this.perPageMails);
-          });
+          // if (offset == 0) {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&consistent=true";
+          // } else {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&offset=" +
+          //       offset +
+          //       "&consistent=true";
+          // }
+          // fetch(url, { credentials: "include" }).then(async (response) => {
+          //   const data = await response.json();
+          //   if (data.status !== "success") {
+          //     const error = (data && data.message) || response.status;
+          //     return Promise.reject(error);
+          //   }
+          //   for (let i = 0; i < data.data.threads.length; i++) {
+          //     this.perPageMails.push(data.data.threads[i]);
+          //   }
+          //   this.$store.dispatch("updateThreads", this.perPageMails);
+          // });
         })
         .catch((error) => {
           alert(error);
@@ -1313,44 +1313,44 @@ export default {
           const offset =
             this.$store.state.userSettings.resultsPerPage - threadIDs.length;
           let url;
-          if (offset == 0) {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&consistent=true";
-          } else {
-            url =
-              this.$apiBaseURL +
-                "unifiedv2/getThreads.php?mailboxIDs[]=" +
-                this.$route.params.mailboxId ||
-              (this.$store.inboxData && this.$store.inboxData.id) ||
-              "me" +
-                "&labelID=" +
-                this.labelId +
-                "&limit=" +
-                limit +
-                "&offset=" +
-                offset +
-                "&consistent=true";
-          }
-          fetch(url, { credentials: "include" }).then(async (response) => {
-            const data = await response.json();
-            if (data.status !== "success") {
-              const error = (data && data.message) || response.status;
-              return Promise.reject(error);
-            }
-            for (let i = 0; i < data.data.threads.length; i++) {
-              this.perPageMails.push(data.data.threads[i]);
-            }
-            this.$store.dispatch("updateThreads", this.perPageMails);
-          });
+          // if (offset == 0) {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&consistent=true";
+          // } else {
+          //   url =
+          //     this.$apiBaseURL +
+          //       "unifiedv2/getThreads.php?mailboxIDs[]=" +
+          //       this.$route.params.mailboxId ||
+          //     (this.$store.inboxData && this.$store.inboxData.id) ||
+          //     "me" +
+          //       "&labelID=" +
+          //       this.labelId +
+          //       "&limit=" +
+          //       limit +
+          //       "&offset=" +
+          //       offset +
+          //       "&consistent=true";
+          // }
+          // fetch(url, { credentials: "include" }).then(async (response) => {
+          //   const data = await response.json();
+          //   if (data.status !== "success") {
+          //     const error = (data && data.message) || response.status;
+          //     return Promise.reject(error);
+          //   }
+          //   for (let i = 0; i < data.data.threads.length; i++) {
+          //     this.perPageMails.push(data.data.threads[i]);
+          //   }
+          //   this.$store.dispatch("updateThreads", this.perPageMails);
+          // });
         })
         .catch((error) => {
           alert(error);

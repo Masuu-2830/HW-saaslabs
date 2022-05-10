@@ -146,7 +146,6 @@
           <div class="dropdown-divider mt-2 mb-2"></div>
           <div id="viewing-list" style="max-height: 200px; overflow-y: scroll">
             <div
-              id="participant-214897"
               class="
                 hw-participant
                 dropdown-item
@@ -154,13 +153,15 @@
                 justify-content-between
                 align-items-center
               "
+              v-for="viewingUser in viewingUsers"
+              :key="viewingUser.id"
             >
               <span
                 class="d-flex align-items-center justify-content-start w-100"
                 style="width: 55%"
               >
                 <div
-                  v-html="userInfo.avatarTag"
+                  v-html="viewingUser.avatarTag"
                   class="avatar avatar-xxs mr-1"
                 ></div>
                 <span
@@ -171,7 +172,7 @@
                     white-space: nowrap;
                     text-overflow: ellipsis;
                   "
-                  >Me</span
+                  >{{viewingUser.id == userInfo.id ? "Me" : `${viewingUser.firstname} ${viewingUser.lastname}`}}</span
                 >
               </span>
               <span class="participant-status tx-color-03"
@@ -179,7 +180,7 @@
               >
             </div>
             <div
-              v-for="teammate in teammatesNew"
+              v-for="teammate in viewingListTeammates"
               :key="teammate.id"
               :id="'participant-' + teammate.id"
               class="
@@ -1490,20 +1491,26 @@ export default {
       }
     },
     teammates() {
-      // let query = this.sqTm.toLowerCase().trim();
-      // if(query == "") {
       return this.$store.state.teammates;
-      // } else {
-      // return this.teammates.filter((item) => item.id !== this.userInfo.id);
-      // }
+      
     },
     mailboxes() {
       return this.$store.state.mailboxes;
     },
+    viewingListTeammates(){
+      let viewingUsersKeys = Object.keys(this.viewingUsers);
+      let tempArray = this.teammates.filter(teammate => {
+        return viewingUsersKeys.indexOf(teammate.id+"") == -1;
+      });
+      return tempArray;
+    },
     teammatesNew: function () {
       let query = this.sqTm.toLowerCase().trim();
       if (query == "") {
-        return this.teammates.filter((item) => item.id !== this.userInfo.id);
+        return this.teammates.filter((item) => {
+          let viewingUsersKeys = Object.keys(this.viewingUsers);
+          return !viewingUsersKeys.includes(item.id);
+        });
         // console.log(this.teammatesNew);
       } else {
         return this.teammates.filter(
@@ -1522,22 +1529,30 @@ export default {
     if(threadID > 0){
       const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
       // let viewingUserFlag = false;
+
       socket.child("/viewing user").on("value", (snapshot) => {
         if(snapshot.val()){
+          console.log(this);
           this.viewingUsers = snapshot.val();
-          let tempArray = [];
-          this.viewingUsers.forEach(viewingUser => {
-            tempArray.push(viewingUser.id);
-          });
-
+          let tempArray = Object.keys(this.viewingUsers);
+          console.log(tempArray, this.thread.data);
+          console.log(this.teammatesNew);
           this.thread.data.usersReadMap = tempArray;
+          this.thread = this.thread;
         }
       });
     }
   },
   methods: {
     backThread() {
-      this.$emit("broad")
+      this.$emit("broad");
+      let managerID = this.$store.state.userInfo.accountID;
+      let threadID = this.$route.params.threadId;
+      if(threadID > 0){
+        const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
+        socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
+      }
+      // let viewingUserFlag = false;
       bus.$emit("broad",'back');
     },
     unread() {
