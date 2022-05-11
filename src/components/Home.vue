@@ -181,6 +181,7 @@ export default {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
+          await this.$store.dispatch("fetchUserSignatures", data.data);
           let signatureId = data.data[0] && data.data[0].id;
           if (signatureId) {
             fetch(this.$apiBaseURL + "signatures/get.php?id=" + signatureId, {
@@ -229,7 +230,7 @@ export default {
     const data2 = await response2.json();
     // data.data.tags = data.data.tags.sort((b,a) => b.name-a.name);
     await this.$store.dispatch("fetchMailBoxes", data2);
-    // this.fetchMailBoxes();
+    this.fetchMailBoxes();
     // this.fetchAliases();
     this.fetchUserSignature();
     // this.fetchContacts();

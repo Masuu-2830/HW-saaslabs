@@ -26,6 +26,7 @@ export const store = new Vuex.Store({
         views: [],
         mailboxes: [],
         userSignature: {},
+        userSignatures: {},
         aliases: {},
         fromAddresses: [],
         stateLoaded: false,
@@ -61,6 +62,10 @@ export const store = new Vuex.Store({
         setUserSignature: (state, data) => {
             console.log(data)
             state.userSignature = data;
+        },
+        setUserSignatures: (state, data) => {
+            console.log(data)
+            state.userSignatures = data;
         },
         setAliases: (state, data) => {
             console.log(data)
@@ -113,6 +118,9 @@ export const store = new Vuex.Store({
         },
         async fetchUserSignature(context, data) {
             await context.commit('setUserSignature', data);
+        },
+        async fetchUserSignatures(context, data) {
+            await context.commit('setUserSignatures', data);
         },
         async fetchAliases(context, data) {
             await context.commit('setAliases', data);
