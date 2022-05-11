@@ -97,6 +97,7 @@ export function initFirebase() {
                 }
             });
             socket.child(`/close`).on('value', function (data) {
+                console.log("yhn kitni bar araha close ka",closeFlag);
                 if(closeFlag){
                     if (data.val()) {
                         console.log("close ka firebase",data.val());
@@ -159,9 +160,15 @@ export function initFirebase() {
                     removeTagFlag = true;
                 }
             });
+<<<<<<< HEAD
             socket.child(`/assignment`).on('value', function (data) {
+=======
+            socket.child(`/assign`).on('value', function (data) {
+                console.log("yhn kitni bar araha",assignFlag);
+>>>>>>> 7f273041a59af7d90edbfffb73481a232fca1345
                 if(assignFlag){
                     if (data.val()) {
+                        console.log("assign ka flag");
                         assignThread(data.val());
                         assignFlag = true;
                     }

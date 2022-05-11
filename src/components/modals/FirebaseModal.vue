@@ -3,10 +3,10 @@
         <template #modal-title class="modal-header">
             <h5 class="modal-title">Attention!!</h5>
         </template>
-        <div class="modal-body">
-            {{ this.$store.state.firebaseModal }}
+        <div class="modal-body" style="padding: 0px;">
+            <div class="d-flex align-items-center justify-content-center tx-16 pd-15">{{ this.$store.state.firebaseModal }}</div>
             <div
-                class="d-flex align-items-center justify-content-center"
+                class="d-flex align-items-center justify-content-end"
                 style="margin-top: 10px"
             >
                 <button
@@ -14,7 +14,7 @@
                     @click.stop.prevent="closeModal"
                     class="btn btn-xs btn-primary"
                 >
-                    Ok
+                    OK
                 </button>
             </div>
         </div>
