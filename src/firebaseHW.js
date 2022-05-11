@@ -30,7 +30,8 @@ export function addThread(data) {
     let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
     if (objIndex !== -1) {
         store.state.threads[objIndex].date = data.messageData.time;
-        store.state.threads[objIndex].subject = data.messageData.subject;
+        store.state.threads[objIndex].subject = data.subject;
+        store.state.threads[objIndex].snippet = data.snippet;
         var a = store.state.threads.splice(objIndex, 1);
         store.state.threads.unshift(a[0]);
     } else if (data.action == 'incoming' && (all || mine || assigned || unassigned)) {

@@ -1845,6 +1845,7 @@ export default {
       requestOptions.body = JSON.stringify(requestOptions.body);
 
       // alert("Reached to the fetch call");
+      clearTimeout(this.myGreeting);
       fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
         .then(async (response) => {
           // alert("Fetch success")
