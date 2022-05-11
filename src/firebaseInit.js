@@ -97,6 +97,7 @@ export function initFirebase() {
                 }
             });
             socket.child(`/close`).on('value', function (data) {
+                console.log("yhn kitni bar araha close ka",closeFlag);
                 if(closeFlag){
                     if (data.val()) {
                         console.log("close ka firebase",data.val());
@@ -160,8 +161,10 @@ export function initFirebase() {
                 }
             });
             socket.child(`/assign`).on('value', function (data) {
+                console.log("yhn kitni bar araha",assignFlag);
                 if(assignFlag){
                     if (data.val()) {
+                        console.log("assign ka flag");
                         assignThread(data.val());
                         assignFlag = true;
                     }

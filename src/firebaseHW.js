@@ -21,7 +21,6 @@ function createThread(data, id) {
     return thread;
 }
 export function addThread(data) {
-    console.log("data dhikhao add thread", data);
     var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     var all = store.state.type == 'all';
     var assigned = (data.assignedTo ? true : false) && (store.state.type == 'assigned');
@@ -29,7 +28,6 @@ export function addThread(data) {
     var unassigned = (! assigned) && (store.state.type == 'unassigned');
     // if(inbox) {
     let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
-    console.log("objIndex", objIndex);
     if (objIndex !== -1) {
         store.state.threads[objIndex].date = data.messageData.time;
         store.state.threads[objIndex].subject = data.messageData.subject;
@@ -362,51 +360,52 @@ export function assignThread(data) {
     // if (data.managerID !== store.state.userInfo.accountID) {
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
     // if(inbox) {
+    console.log("thread ka data to dhikhao assign thread",data);
     var allThreads = data.threadID;
     var count = 0;
-    console.log(data);
     allThreads.forEach(thread => {
-        // console.log(thread, data, count++);
-        // let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
-        // if (objIndex !== -1) {
-        //     store.state.threads[objIndex].assignedTo = data.assigned;
-        // }
-        // if (Object.keys(store.state.threadData).includes(thread.toString())) {
-        //     console.log(allThreads, thread, store.state.threadData)
-        //     if(data.assigned) {
-        //         store.state.threadData[thread].data.currentAssignment = {
-        //             'assigned': data.assigned,
-        //             'me': data.assigned.id == store.state.userInfo.id ? true : false,
-        //             'assigner': data.assigner,
-        //             'time': data.time
-        //         };
-        //     } else {
-        //         store.state.threadData[thread].data.currentAssignment = {
-        //             'assigned': null,
-        //             'me': false,
-        //             'assigner': data.assigner,
-        //             'time': data.time
-        //         };
-        //     }
-        //     let body = '';
-        //     if (data.assigned && data.assigned.id == store.state.userInfo.id) {
-        //         body = data.assigner.firstname + " " + data.assigner.lastname + ' assigned the conversation to themselves';
-        //     } else if (! data.assigned) {
-        //         body = data.assigner.firstname + " " + data.assigner.lastname + ' unassigned the conversation';
-        //     } else {
-        //         body = data.assigner.firstname + " " + data.assigner.lastname + ' assigned the conversation to ' + data.assigned.firstname + data.assigned.lastname;
-        //     }
-        //     let log = {
-        //         'type': 'log',
-        //         'data': {
-        //             'type': 'assign',
-        //             'at': data.time,
-        //             'body': body
-        //         },
-        //         'timestamp': Date.now()
-        //     };
-        //     store.state.threadData[thread].data.items.push(log);
-        // }
+        console.log(thread, data, count++);
+        let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
+        if (objIndex !== -1) {
+            store.state.threads[objIndex].assignedTo = data.assigned;
+        }
+        if (Object.keys(store.state.threadData).includes(thread.toString())) {
+            console.log(allThreads, thread, store.state.threadData)
+            if(data.assigned) {
+                store.state.threadData[thread].data.currentAssignment = {
+                    'assigned': data.assigned,
+                    'me': data.assigned.id == store.state.userInfo.id ? true : false,
+                    'assigner': data.assigner,
+                    'time': data.time
+                };
+            } else {
+                store.state.threadData[thread].data.currentAssignment = {
+                    'assigned': null,
+                    'me': false,
+                    'assigner': data.assigner,
+                    'time': data.time
+                };
+            }
+            let body = '';
+            if(data.assigned){
+                let assignedStr = data.assigned.id != data.assigner.id ? (data.assigned.firstname + " " + data.assigned.lastname) : "themselves";
+                body = data.assigner.firstname + " " + data.assigner.lastname + ' assigned the conversation to ' + assignedStr;
+            }else{
+                body = data.assigner.firstname + " " + data.assigner.lastname + ' unassigned the conversation';
+            }
+            if(data.assigner.id != store.state.userInfo.id){
+                let log = {
+                    'type': 'log',
+                    'data': {
+                        'type': 'assign',
+                        'at': data.time,
+                        'body': body
+                    },
+                    'timestamp': Date.now()
+                };
+                store.state.threadData[thread].data.items.push(log);
+            }
+        }
     });
     // }
 }
