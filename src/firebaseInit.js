@@ -159,7 +159,7 @@ export function initFirebase() {
                     removeTagFlag = true;
                 }
             });
-            socket.child(`/assign`).on('value', function (data) {
+            socket.child(`/assignment`).on('value', function (data) {
                 if(assignFlag){
                     if (data.val()) {
                         assignThread(data.val());

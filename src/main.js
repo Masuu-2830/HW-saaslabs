@@ -52,7 +52,7 @@ function refreshSignatureDropdownOnShow($btn, $dropdown) {
     let signatures = store.state.userSignatures;
     console.log("111111111", signatures);
     if (signatures) {
-      let html = '';
+        let html = '';
         for (let signature of signatures) {
             html += `<li role="presentation"><a class="fr-command" tabindex="-1" role="option" data-cmd="signatureBtn" data-param1="${
                 signature.id
@@ -63,6 +63,8 @@ function refreshSignatureDropdownOnShow($btn, $dropdown) {
             }</a></li>`;
         }
         $dropdown.find('.fr-dropdown-list').html(html);
+    } else {
+        console.log("--------- NO SIGNATURE FOUND ---------");
     }
     // $.get({
     //     url: `https://app.helpwise.io/api/signatures/list.php`,
