@@ -1530,8 +1530,9 @@ export default {
     if(threadID > 0){
       const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
       // let viewingUserFlag = false;
-      console.log("!!!!!!!!!!!!!!");
+      console.log("!!!!!!!!!!!!!!", socket);
       socket.child("/viewing user").on("value", (snapshot) => {
+        console.log("------ VIEWING USERS -----");
         if(snapshot.val()){
           console.log(this);
           this.viewingUsers = snapshot.val();
@@ -1542,6 +1543,7 @@ export default {
           this.thread = this.thread;
         }
       });
+      console.log("!!!!!!!!!!!!!!@@@@@@@");
     }
   },
   methods: {

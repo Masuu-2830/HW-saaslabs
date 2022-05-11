@@ -39,6 +39,7 @@ export function addThread(data) {
     if (store.state.openThread == data.threadID) {
         if (data.inboxType == 'mail') {
             let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
+            console.log("============ ", data.messageData.sentBy.id, store.state.userInfo.id, data.messageData.sentBy.id != store.state.userInfo.id)
             if(data.messageData.sentBy.id != store.state.userInfo.id){
                 if (itemIndex == -1) {
                     fetch("https://app.helpwise.io/api/getEmail.php?emailID=" + data.messageData.id + "&mailboxID=" + data.mailboxID, {credentials: "include"}).then(async (response) => {
