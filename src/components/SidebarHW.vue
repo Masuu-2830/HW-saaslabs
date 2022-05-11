@@ -541,7 +541,9 @@ export default {
       return this.$store.state.tags;
     },
     getMailboxID() {
-      if (this.$store.state.inboxData) {
+      if(this.$route.params.mailboxId){
+        return this.$route.params.mailboxId;
+      } else if (this.$store.state.inboxData) {
         // console.log(this.$store.state.inboxData);
         return this.$store.state.mailboxId;
         // return this.$route.params.mailboxId;
