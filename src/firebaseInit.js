@@ -160,12 +160,7 @@ export function initFirebase() {
                     removeTagFlag = true;
                 }
             });
-<<<<<<< HEAD
             socket.child(`/assignment`).on('value', function (data) {
-=======
-            socket.child(`/assign`).on('value', function (data) {
-                console.log("yhn kitni bar araha",assignFlag);
->>>>>>> 7f273041a59af7d90edbfffb73481a232fca1345
                 if(assignFlag){
                     if (data.val()) {
                         console.log("assign ka flag");
