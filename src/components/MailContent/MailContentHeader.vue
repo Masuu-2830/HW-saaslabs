@@ -1526,10 +1526,11 @@ export default {
   mounted(){
     let managerID = this.$store.state.userInfo.accountID;
     let threadID = this.$route.params.threadId;
+    console.log("!!!!!!!!!!!!!!!!!!!! ", managerID, threadID);
     if(threadID > 0){
       const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
       // let viewingUserFlag = false;
-
+      console.log("!!!!!!!!!!!!!!");
       socket.child("/viewing user").on("value", (snapshot) => {
         if(snapshot.val()){
           console.log(this);

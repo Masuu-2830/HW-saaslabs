@@ -83,7 +83,6 @@ export default {
                 this.right = '0px';
                 this.contactOpen = false;
                 this.sidebarOpen = false;
-                console.log("------ KYA YE WATCH CHLA ----");
                 let toThreadId = to.params.threadId;
                 let fromThreadId = from.params.threadId;
                 let managerID = this.$store.state.userInfo.accountID;
@@ -239,8 +238,13 @@ export default {
   mounted() {
     let threadID = this.$route.params.threadId;
     let managerID = this.$store.state.userInfo.accountID;
-    const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
-    socket.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+    // console.log("------- ", threadID, managerID);
+    if(threadID > 0){
+      const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
+      socket.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo, function(error){
+        console.error("--------- viewing user set error -----", error);
+      });
+    }
   },
   beforeUnmount() {
     let managerID = this.$store.state.userInfo.accountID;
