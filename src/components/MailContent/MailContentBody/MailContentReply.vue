@@ -52,9 +52,9 @@
                   </button>
                   <button
                     v-if="
-              reply.email.cc !== undefined &&
-              Object.keys(reply.email.cc).length !== 0
-            "
+                      reply.email.cc !== undefined &&
+                      Object.keys(reply.email.cc).length !== 0
+                    "
                     @click.prevent="replyAll"
                     class="
                       dropdown-item
@@ -669,14 +669,20 @@ export default {
             // var ed = $(`#reply-uploadAttachment`).data('editor');
             editor.$wp.append(replyAttachmentList.$el);
 
-
-            editor.events.on( "keydown", function (e) {
-              console.log("typing in editor");
-              // self.hitFirebase();
-              if ( e.which == FroalaEditor.KEYCODE.ENTER && savedReplyTribute.isActive) {
-                return false;
-              }
-            },true);
+            editor.events.on(
+              "keydown",
+              function (e) {
+                console.log("typing in editor");
+                // self.hitFirebase();
+                if (
+                  e.which == FroalaEditor.KEYCODE.ENTER &&
+                  savedReplyTribute.isActive
+                ) {
+                  return false;
+                }
+              },
+              true
+            );
 
             // if (self.isSend) {
             //   editor.$tb.append(`
@@ -1351,12 +1357,18 @@ export default {
       let managerID = this.$store.state.userInfo.accountID;
       let threadID = this.$route.params.threadId;
 
-      const socket = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
+      const socket = firebase_app
+        .database()
+        .ref(`/Account-${managerID}/ThreadID-${threadID}`);
       console.log(`/Account-${managerID}/ThreadID-${threadID}`);
       if (!this.typingReply) {
         this.typingReply = true;
-        socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).off("value");
-        socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+        socket
+          .child(`/replying user/user-${this.$store.state.userInfo.id}`)
+          .off("value");
+        socket
+          .child(`/replying user/user-${this.$store.state.userInfo.id}`)
+          .set(this.$store.state.userInfo);
         this.startReplyingTimer(socket);
       } else {
         this.resetReplyingTimer(socket);
@@ -1379,22 +1391,22 @@ export default {
     // },
     tagsto(prop) {
       let to = [];
+      let aliases = this.aliases();
 
       if (this.reply.type !== 3 && prop !== 3) {
         for (var key in this.reply.email.from) {
-          let obj = {};
-          obj["email"] = key;
-          obj["name"] = this.reply.email.from[key];
-          obj["text"] = this.reply.email.from[key] + " (" + key + ")";
-          obj["tiClasses"] = ["ti-valid"];
-          to.push(obj);
+          if (!aliases.some((el) => el.email == key)) {
+            let obj = {};
+            obj["email"] = key;
+            obj["name"] = this.reply.email.from[key];
+            obj["text"] = this.reply.email.from[key] + " (" + key + ")";
+            obj["tiClasses"] = ["ti-valid"];
+            to.push(obj);
+          }
         }
         if (this.reply.type == 2 || prop == 2) {
-          let aliases = this.aliases();
           if (this.$store.state.inboxData.type == "universal") {
-            let alias = aliases[this.reply.mailboxId];
-            console.log(alias, aliases)
-            for (var key in this.reply.email.to) {
+            for (let key in this.reply.email.to) {
               if (!aliases.some((el) => el.email == key)) {
                 let obj = {};
                 obj["email"] = key;
@@ -1405,7 +1417,7 @@ export default {
               }
             }
           } else {
-            for (var key in this.reply.email.to) {
+            for (let key in this.reply.email.to) {
               if (!aliases.some((el) => el.email == key)) {
                 let obj = {};
                 obj["email"] = key;
@@ -1418,7 +1430,6 @@ export default {
           }
         }
       }
-
       return to;
     },
     tagscc(prop) {
@@ -1568,7 +1579,7 @@ export default {
     },
     defaultAlias() {
       let aliases = this.aliases();
-      return aliases.find(alias => alias.isDefault);
+      return aliases.find((alias) => alias.isDefault);
       if (this.reply.from !== undefined) {
         // for(let i = 0; i < aliases.length; i++) {
         //   if(aliases[i].email == Object.keys(this.reply.from)) {
@@ -1721,11 +1732,8 @@ export default {
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
       let body, mailboxID;
-      console.log(this.reply.mailboxId)
-      if (
-        this.reply.mailboxId !== undefined &&
-        this.reply.mailboxId !== "me"
-      ) {
+      console.log(this.reply.mailboxId);
+      if (this.reply.mailboxId !== undefined && this.reply.mailboxId !== "me") {
         mailboxID = this.reply.mailboxId;
       } else if (
         this.$store.state.inboxData.id !== undefined &&
