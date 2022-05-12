@@ -82,16 +82,21 @@ export default {
       }, 200);
     },
   },
-  // mounted() {
-  //   bus.$on("openReply", (data, type, email) => {
-  //     var el = this.$refs.mailcontentbody;
-  //     console.error(el)
-  //     if (el) {
-  //       // Use el.scrollIntoView() to instantly scroll to the element
-  //       el.scrollIntoView({ behavior: "smooth" });
-  //     }
-  //   });
-  // },
+  mounted() {
+    // bus.$on("openReply", (data, type, email) => {
+    //   var el = this.$refs.mailcontentbody;
+    //   console.error(el)
+    //   if (el) {
+    //     // Use el.scrollIntoView() to instantly scroll to the element
+    //     el.scrollIntoView({ behavior: "smooth" });
+    //   }
+    // });
+
+    this.scrollToBottom();
+  },
+  updated() {
+    this.scrollToBottom();
+  },
   computed: {
     lastMailId() {
       if (Object.keys(this.thread).length !== 0) {

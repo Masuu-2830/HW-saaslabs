@@ -766,7 +766,7 @@
             <span class="tx-13 tx-bold ml-2">Load more</span>
           </a> -->
 
-          <a @click="createTag('quick')" class="dropdown-item mt-2 quick-tag-btn"
+          <a @click="createTag('quick')" class="dropdown-item mt-2 quick-tag-btn d-none"
             :style="{display: tags.findIndex(tag => tag.name == sqTag.toLowerCase().trim()) !== -1 ? 'none' : ''}">
             <svg
               xmlns="http://www.w3.org/2000/svg"

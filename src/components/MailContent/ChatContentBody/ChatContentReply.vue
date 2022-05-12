@@ -25,6 +25,7 @@
       :class="{ noteMode: this.thread.data.mailboxType == 'mail' }"
     >
       <ul
+        v-if="this.thread.data.mailboxType !== 'mail'"
         class="nav nav-line flex-row mg-l-20 mg-b-10"
         role="tablist"
         style="
@@ -32,8 +33,9 @@
           margin-top: 5px;
           margin-bottom: 5px;
         "
+        
       >
-        <li class="nav-item" v-if="this.thread.data.mailboxType !== 'mail'">
+        <li class="nav-item">
           <a
             class="nav-link reply-tab"
             :class="this.thread.data.mailboxType !== 'mail' && 'active'"
@@ -287,7 +289,7 @@ export default {
 
             noteFroala.$tb.append(`
                 <div class="fr-btn-grp fr-float-right">
-                  <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="sendNotes">Add Note</button>
+                  <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="openReply">Add Note</button>
                 </div>`);
           },
         },
@@ -296,7 +298,7 @@ export default {
         charCounterCount: false,
         toolbarBottom: true,
         key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
-        heightMin: 100,
+        heightMin: this.thread.data.mailboxType == 'mail' ? 50 : 100,
         heightMax: 290,
         toolbarButtons: {
           moreText: {
