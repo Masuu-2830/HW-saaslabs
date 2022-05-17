@@ -1404,6 +1404,18 @@ export default {
             to.push(obj);
           }
         }
+        if ((this.reply.type == 1 || prop == 1) && to.length <= 0) {
+          for (var key in this.reply.email.to) {
+            if (!aliases.some((el) => el.email == key)) {
+              let obj = {};
+              obj["email"] = key;
+              obj["name"] = this.reply.email.to[key];
+              obj["text"] = this.reply.email.to[key] + " (" + key + ")";
+              obj["tiClasses"] = ["ti-valid"];
+              to.push(obj);
+            }
+          }
+        }
         if (this.reply.type == 2 || prop == 2) {
           if (this.$store.state.inboxData.type == "universal") {
             for (let key in this.reply.email.to) {
