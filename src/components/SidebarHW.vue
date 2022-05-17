@@ -1,7 +1,18 @@
 <template>
   <div class="mail-sidebar">
     <div class="mail-sidebar-body ps--active-y">
-      <div class="pd-20" style="padding-bottom: 25px">
+      <div class="rounded border pd-x-10 pd-y-5 m-2 border-primary" id="testForwardingContainer">
+          <div class="tx-color-03 mt-1 mb-1 tx-11" id="testforwardingText">
+              Welcome to a new, improved version of Universal Inbox. Currently, this version supports <strong><em>email shared inboxes</em></strong> only. We will be releasing an update on the other shared inboxes in the coming weeks.
+          </div>
+          <div class="text-center">
+              <button class="btn btn-link btn-xs pd-0" style="font-weight: 600;font-size:10px"
+                  id="testForwardingSettings">
+                  Switch to Old version
+              </button>
+          </div>
+      </div>
+      <div class="pd-x-20 pd-y-10">
         <div class="justify-content-between align-items-start">
           <h5 id="mailbox-title" v-if="this.mailbox.displayName">
             {{ this.mailbox.displayName }}
@@ -129,7 +140,7 @@
                         padding: 10px;
                         border-radius: 5px;
                         z-index: 99999;
-                        max-height: calc(55vh + 100px);
+                        max-height: 50vh;
                       "
                       v-if="sidebarViewOptionShow"
                     >
@@ -317,90 +328,93 @@
                   </div>
                 </template>
               </div>
-              <div v-for="(option, index) in sectionValues" :key="index">
-                <RouterLink
-                  :to="{
-                    name: 'type',
-                    params: {
-                      type: sectionName == 'tags' ? option.id : option.id == 'me' ? option.type : 'all',
-                      mailboxId: sectionName == 'tags' ? 'tags' : option.id,
-                      filterSection: 'open',
-                      pageNo: 1,
-                    },
-                  }"
-                  @click.native="doSomethingInteresting(sectionName, option)"
-                >
-                  <p
-                    style="cursor: pointer"
-                    :id="option.type + '-label'"
-                    class="nav-link hw-label-badge mg-b-0"
-                    :class="{
-                      active:
-                        sectionName == 'me' &&
-                        getMailboxID == 'me' &&
-                        option.type == getRouteParamType
-                          ? true
-                          : sectionName == 'inboxes' &&
-                            option.id == getMailboxID
-                          ? true
-                          : sectionName == 'tags' &&
-                            getMailboxID == 'tags' &&
-                            option.id == getRouteParamType
-                          ? true
-                          : false,
+              <div class="sectionSubCategories d-flex flex-column w-100">
+
+                <div v-for="(option, index) in sectionValues" :key="index">
+                  <RouterLink
+                    :to="{
+                      name: 'type',
+                      params: {
+                        type: sectionName == 'tags' ? option.id : option.id == 'me' ? option.type : 'all',
+                        mailboxId: sectionName == 'tags' ? 'tags' : option.id,
+                        filterSection: 'open',
+                        pageNo: 1,
+                      },
                     }"
+                    @click.native="doSomethingInteresting(sectionName, option)"
                   >
-                    <span v-if="sectionName == 'tags'">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        :style="'color:' + option.color"
-                        width="15"
-                        height="15"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="feather feather-tag mg-r-5"
+                    <p
+                      style="cursor: pointer"
+                      :id="option.type + '-label'"
+                      class="nav-link hw-label-badge mg-b-0"
+                      :class="{
+                        active:
+                          sectionName == 'me' &&
+                          getMailboxID == 'me' &&
+                          option.type == getRouteParamType
+                            ? true
+                            : sectionName == 'inboxes' &&
+                              option.id == getMailboxID
+                            ? true
+                            : sectionName == 'tags' &&
+                              getMailboxID == 'tags' &&
+                              option.id == getRouteParamType
+                            ? true
+                            : false,
+                      }"
+                    >
+                      <span v-if="sectionName == 'tags'">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          :style="'color:' + option.color"
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="feather feather-tag mg-r-5"
+                        >
+                          <path
+                            d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+                          />
+                          <line x1="7" y1="7" x2="7.01" y2="7" />
+                        </svg>
+                      </span>
+                      <span
+                        v-html="getInboxIcon(option.type)"
+                        v-else-if="sectionName == 'inboxes'"
+                      ></span>
+                      <span v-html="option.icon" v-else></span>
+                      <span v-if="sectionName == 'inboxes'">{{
+                        option.displayName
+                      }}</span>
+                      <span v-else>{{ option.name }}</span>
+                      <span
+                        class="badge text-primary hw-count"
+                        v-if="sectionName == 'me'"
                       >
-                        <path
-                          d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
-                        />
-                        <line x1="7" y1="7" x2="7.01" y2="7" />
-                      </svg>
-                    </span>
-                    <span
-                      v-html="getInboxIcon(option.type)"
-                      v-else-if="sectionName == 'inboxes'"
-                    ></span>
-                    <span v-html="option.icon" v-else></span>
-                    <span v-if="sectionName == 'inboxes'">{{
-                      option.displayName
-                    }}</span>
-                    <span v-else>{{ option.name }}</span>
-                    <span
-                      class="badge text-primary hw-count"
-                      v-if="sectionName == 'me'"
-                    >
-                      {{
-                        mailbox.stats[option.stats] > 0 ||
-                        typeof mailbox.stats[option.stats] === "string"
-                          ? mailbox.stats[option.stats] == 0
-                            ? ""
-                            : mailbox.stats[option.stats]
-                          : ""
-                      }}
-                    </span>
-                    <span
-                      class="badge text-primary hw-count"
-                      v-else-if="sectionName == 'inboxes'"
-                    >
-                      {{ option.stats.inbox }}
-                    </span>
-                    <span class="badge text-primary hw-count" v-else></span>
-                  </p>
-                </RouterLink>
+                        {{
+                          mailbox.stats[option.stats] > 0 ||
+                          typeof mailbox.stats[option.stats] === "string"
+                            ? mailbox.stats[option.stats] == 0
+                              ? ""
+                              : mailbox.stats[option.stats]
+                            : ""
+                        }}
+                      </span>
+                      <span
+                        class="badge text-primary hw-count"
+                        v-else-if="sectionName == 'inboxes'"
+                      >
+                        {{ option.stats.inbox }}
+                      </span>
+                      <span class="badge text-primary hw-count" v-else></span>
+                    </p>
+                  </RouterLink>
+                </div>
               </div>
             </div>
           </nav>
@@ -516,6 +530,19 @@ export default {
                       </svg>
                   `,
           },
+          4: {
+            name: "Trash",
+            type: "trash",
+            stats: "trash",
+            id: "me",
+            icon: `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                        </path>
+                    </svg>
+                  `,
+          }
         },
         inboxes: {},
         tags: {},
@@ -760,5 +787,17 @@ export default {
 .bookmarkIcon.isActive {
   stroke: green;
   fill: green;
+}
+
+/* #labels-nav{
+  display: grid;
+  grid-template-rows: 40% 30% 30%;
+  grid-template-columns: 100%;
+} */
+
+#labels-nav > div:nth-child(2) > .sectionSubCategories, #labels-nav > div:nth-child(3) > .sectionSubCategories{
+  max-height: calc(calc(87vh - 460px) / 2 );
+  width: 100%;
+  overflow-y: auto;
 }
 </style>

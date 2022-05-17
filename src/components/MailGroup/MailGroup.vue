@@ -14,7 +14,7 @@
       <span class="sr-only">Loading...</span>
     </div>
     <mails-header-search-box v-on:squery="ssquery"></mails-header-search-box>
-    <mails-type-filter></mails-type-filter>
+    <mails-type-filter v-if="showMailTypeFilters"></mails-type-filter>
     <mails-header-select-all
       :selectedIds="selectedIds"
       :tagsInAll="tagsInAll"
@@ -207,6 +207,7 @@ export default {
       selectedIds: [],
       tagsInAll: [],
       tagsPartial: [],
+      showMailTypeFilters: true
     };
   },
   created() {
@@ -1654,9 +1655,9 @@ export default {
       }
 
       let addFilterFlag = false;
+      this.showMailTypeFilters = true;
       if (to.params.type || this.isThreadRefresh) {
         this.route = to.params.type;
-
         if(to.params.mailboxId == 'tags'){
           this.labelId = 14;
           this.tagId = to.params.type;
@@ -1670,6 +1671,8 @@ export default {
           } else if (to.params.type == "mentions") {
             this.labelId = 13;
             addFilterFlag = true;
+            console.log("--------- TEST --------");
+            this.showMailTypeFilters = false;
           } else if (to.params.type == "discussions") {
             this.labelId = 15;
           } else if (to.params.type == "unassigned") {
@@ -1677,6 +1680,7 @@ export default {
           } else if (to.params.type == "starred") {
             this.labelId = 11;
             addFilterFlag = true;
+            this.showMailTypeFilters = false;
           } else if (to.params.type == "snoozed") {
             this.labelId = 9;
           } else if (to.params.type == "drafts") {
@@ -1702,6 +1706,7 @@ export default {
             this.labelId = 8;
           } else if (to.params.type == "trash") {
             this.labelId = 5;
+            this.showMailTypeFilters = false;
             // } else if (
             //   to.params.type !== undefined &&
             //   to.params.type.substring(0, 3) == "tag"
@@ -2142,6 +2147,7 @@ export default {
         });
     },
     async clickThread(id, type, subtype, ticketNumber, mailboxId) {
+      console.log("!!!!! clickThread !!!!!", id, type, subtype, ticketNumber, mailboxId);
       var objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
       if (
         this.route == "drafts" &&

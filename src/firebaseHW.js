@@ -16,31 +16,43 @@ function createThread(data, id) {
         'assignedTo': data.assignedTo,
         'attachments': (data.action == 'incoming' || data.action == 'outgoing') ? data.messageData.attachments : null,
         'date': (data.action == 'incoming' || data.action == 'outgoing') ? data.messageData.time : data.time,
-        'displayContact': data.displayContact
+        'humanFriendlyDate': data.humanFriendlyDate || data.time,
+        'displayContact': data.displayContact || 'Unknown Sender'
     }
     return thread;
 }
 export function addThread(data) {
-    var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
+    // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
+    console.log("------- ADD THREAD ----", data);
     var all = store.state.type == 'all';
     var assigned = (data.assignedTo ? true : false) && (store.state.type == 'assigned');
     var mine = (assigned && data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
     var unassigned = (! assigned) && (store.state.type == 'unassigned');
-    // if(inbox) {
-    let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
-    if (objIndex !== -1) {
-        store.state.threads[objIndex].date = data.messageData.time;
-        store.state.threads[objIndex].subject = data.subject;
-        store.state.threads[objIndex].snippet = data.snippet;
-        var a = store.state.threads.splice(objIndex, 1);
-        store.state.threads.unshift(a[0]);
-    } else if (data.action == 'incoming' && (all || mine || assigned || unassigned)) {
-        store.state.threads.unshift(createThread(data));
+
+    // checking whether to addThread or not
+    let addThreadFlag = false;
+    if(store.state.inboxData.id == "me"){
+        addThreadFlag = true;
+    } else if(data.mailboxID == store.state.inboxData.id){
+        addThreadFlag = true;
     }
+
+    if(addThreadFlag) {
+        let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
+        if (objIndex !== -1) {
+            store.state.threads[objIndex].date = data.messageData.time;
+            store.state.threads[objIndex].subject = data.subject;
+            store.state.threads[objIndex].snippet = data.snippet;
+            var a = store.state.threads.splice(objIndex, 1);
+            store.state.threads.unshift(a[0]);
+        } else if (data.action == 'incoming' && (all || mine || assigned || unassigned)) {
+            store.state.threads.unshift(createThread(data));
+        }
+    }
+
     if (store.state.openThread == data.threadID) {
         if (data.inboxType == 'mail') {
             let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
-            console.log("============ ", data.messageData.sentBy.id, store.state.userInfo.id, data.messageData.sentBy.id != store.state.userInfo.id)
             if(data.messageData.sentBy.id != store.state.userInfo.id){
                 if (itemIndex == -1) {
                     fetch("https://app.helpwise.io/api/getEmail.php?emailID=" + data.messageData.id + "&mailboxID=" + data.mailboxID, {credentials: "include"}).then(async (response) => {
@@ -103,15 +115,25 @@ export function addNote(data) { // hello
     // if(inbox) {
     let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
 
-    if (objIndex !== -1) {
-        // console.log("store.state.threads[objIndex]", store.state.threads[objIndex]);
-        store.state.threads[objIndex].date = data.noteData.time;
-        store.state.threads[objIndex].snippet = data.noteData.snippet;
-        var a = store.state.threads.splice(objIndex, 1);
-        store.state.threads.unshift(a[0]);
-    } else if (all || mine || assigned || unassigned) {
-        // console.log("---------- ELSE IF --------");
-        store.state.threads.unshift(createThread(data));
+    // checking whether to addThread or not
+    let addThreadFlag = false;
+    if(store.state.inboxData.id == "me"){
+        addThreadFlag = true;
+    } else if(data.mailboxID == store.state.inboxData.id){
+        addThreadFlag = true;
+    }
+
+    if(addThreadFlag){
+        if (objIndex !== -1) {
+            // console.log("store.state.threads[objIndex]", store.state.threads[objIndex]);
+            store.state.threads[objIndex].date = data.noteData.time;
+            store.state.threads[objIndex].snippet = data.noteData.snippet;
+            var a = store.state.threads.splice(objIndex, 1);
+            store.state.threads.unshift(a[0]);
+        } else if (all || mine || assigned || unassigned) {
+            // console.log("---------- ELSE IF --------");
+            store.state.threads.unshift(createThread(data));
+        }
     }
     if (store.state.openThread == data.threadID) {
         let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.noteData.id);

@@ -64,8 +64,8 @@ export default {
           type: "snoozed",
         },
         3: {
-          name: "Trash",
-          type: "trash",
+          name: "Sent",
+          type: "sent",
         },
       },
     };
