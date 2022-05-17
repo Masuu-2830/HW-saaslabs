@@ -92,7 +92,7 @@ export default {
       //   (!this.$store.inboxData && !this.$route.params.mailboxId)
       // ) {
       //   }
-      let url = this.$apiBaseURL + "unified/stats.php";
+      let url = this.$apiBaseURL + "unifiedv2/stats.php";
       const response = await fetch(url, { credentials: "include" });
       const data = await response.json();
       // if (
