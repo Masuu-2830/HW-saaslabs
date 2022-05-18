@@ -111,13 +111,15 @@
                 :key="mailbox.id"
                 @click="hideNavSub"
               >
-                <router-link
+                <!-- <router-link
                   :to="{ name: 'mailbox', params: { mailboxId: mailbox.id } }"
-                >
+                > -->
                   <a
                     :id="'mailbox-' + mailbox.id"
                     style="text-decoration: none; color: black"
                     class="nav-sub-link flex-column align-items-start p-1"
+                    :href="`https://app.helpwise.io/${mailbox.type}/${mailbox.id}/mine`"
+                    target="_blank"
                   >
                     <div
                       class="
@@ -321,7 +323,7 @@
                       </div>
                     </div>
                   </a>
-                </router-link>
+                <!-- </router-link> -->
               </li>
             </div>
             <div class="dropdown-divider" style="margin: 0px"></div>
