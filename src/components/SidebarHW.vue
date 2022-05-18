@@ -8,7 +8,9 @@
           <div class="text-center">
               <button class="btn btn-link btn-xs pd-0" style="font-weight: 600;font-size:10px"
                   id="testForwardingSettings">
-                  Switch to Old version
+                  <a href="https://app.helpwise.io/inbox/me/mine" target="_blank">
+                    Switch to Old version
+                  </a>
               </button>
           </div>
       </div>
