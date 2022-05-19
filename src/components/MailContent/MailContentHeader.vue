@@ -52,7 +52,7 @@
                 v-for="tag in thread.data.tags"
                 :key="tag.id"
                 :id="'thread-tag-ID-' + tag.id"
-                data-mailbox_id="204420"
+                :data-mailbox_id="thread.data.mailbox_id"
                 :data-tag_id="tag.id"
                 style="
                   cursor: pointer;
@@ -1343,8 +1343,7 @@
           aria-expanded="false"
           style="
             float: right;
-            margin-left: 20px;
-            margin-bottom: 3px;
+            margin-left: 8px;
             cursor: pointer;
           "
           ><svg
@@ -1397,11 +1396,7 @@
           <button
             @click.stop="restoreThread"
             type="button"
-            v-if="
-              this.$store.state.filterSection == 'trash' ||
-              this.$store.state.filterSection == 'spam' ||
-              this.$store.state.filterSection == 'closed'
-            "
+            v-if="this.$store.state.filterSection == 'trash' || this.$store.state.filterSection == 'spam' || this.$store.state.filterSection == 'closed'"
             class="dropdown-item d-flex"
             id="move-thread-to-inbox"
           >
@@ -1409,10 +1404,7 @@
           </button>
           <button
             @click.stop="spamThreads"
-            v-if="
-              this.$store.state.filterSection == 'trash' ||
-              this.$store.state.filterSection == 'spam'
-            "
+            v-if="this.$store.state.filterSection !== 'spam'"
             type="button"
             class="dropdown-item d-flex"
             id="mark-spam"
@@ -1420,23 +1412,17 @@
             Mark Spam
           </button>
           <a
+            v-if="thread.data.mailboxType != 'sms' && thread.data.mailboxType != 'whatsapp'"
             class="dropdown-item"
-            :href="
-              '/viewConversationInfo/' +
-              thread.data.mailbox_id +
-              '/' +
-              this.$route.params.threadId
-            "
+            :href="'https://app.helpwise.io/viewConversationInfo' + thread.data.mailbox_id + '/' + this.$route.params.threadId"
             target="_blank"
             id="viewThreadInfo"
             >View Info</a
           >
           <a
+            v-if="thread.data.mailboxType != 'sms' && thread.data.mailboxType != 'whatsapp'"
             class="dropdown-item"
-            :href="
-              '/printThread?threadID=' +
-              this.$route.params.threadId
-            "
+            :href="'https://app.helpwise.io/printThread?threadID=' + this.$route.params.threadId"
             target="_blank"
             >Print</a
           >
@@ -1576,7 +1562,7 @@ export default {
       bus.$emit("broad",'back');
     },
     spamThreads() {
-      // console.log(this.thread);
+      console.log("this.$route.params.threadId",this.$route.params.threadId);
       bus.$emit("spamThreads", this.$route.params.threadId);
       this.$emit("broad")
       bus.$emit("broad",'back');

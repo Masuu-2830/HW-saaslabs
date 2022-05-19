@@ -761,8 +761,7 @@ export default {
           }
           bus.$emit("fetchSideBarStats");
           const limit = threadIDs.length;
-          const offset =
-            this.$store.state.userSettings.resultsPerPage - threadIDs.length;
+          const offset = this.$store.state.userSettings.resultsPerPage - threadIDs.length;
           let url;
           // if (offset == 0) {
           //   url =

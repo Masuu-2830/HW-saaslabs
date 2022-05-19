@@ -128,8 +128,7 @@ export default {
   data() {
     const self = this;
     return {
-      current:
-        self.thread.data.mailboxType == "mail" ? "note" : "reply" || "reply",
+      current: self.thread.data.mailboxType == "mail" ? "note" : "reply" || "reply",
       tempData: ["a", "b", "v"],
       replyEditorInstance: null,
       noteEditorInstance: null,
@@ -706,10 +705,13 @@ export default {
         : (this.typingNotice = noticeElem);
     },
     sendMessage() {
+      console.log("this thread ka data",this.thread);
       let attachmentKeys = Object.keys(this.replyAttachments);
       let attachmentIDs = attachmentKeys.filter(
         (attachmentKey) => !attachmentKey.includes("-")
       );
+      let inboxType = this.thread.data.mailboxType;
+      let inboxSubType = this.thread.data.mailboxSubType;
 
       let message = this.chat
         // .replace(/(<p)/gim, "<div")
@@ -719,21 +721,22 @@ export default {
       if($temp.text().length == 0 && $temp.find("img").length == 0){
         return false;
       }
-      
+      let to_id = this.$route.params.threadId;
+      if(inboxType == 'sms' || inboxType == 'whatsapp'){
+        to_id = this.thread.data.clientNumber; // thread_real_id
+      }
       let messageData = {
         mailboxID: this.thread.data.mailbox_id,
-        to: this.$route.params.threadId,
+        to: to_id,
         type: 1,
         message,
         time: new Date().toISOString(),
         attachmentId: attachmentIDs,
         isUnified: 1
       };
-
+      console.log("message ata",messageData);
 
       let url = "";
-      let inboxType = this.thread.data.mailboxType;
-      let inboxSubType = this.thread.data.mailboxSubType;
 
       if(inboxType == "chat"){
         url = this.$apiBaseURL + "unifiedv2/sendChatInboxMessage.php";
