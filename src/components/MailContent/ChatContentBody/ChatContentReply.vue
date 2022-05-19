@@ -288,7 +288,7 @@ export default {
 
             noteFroala.$tb.append(`
                 <div class="fr-btn-grp fr-float-right">
-                  <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="openReply">Add Note</button>
+                  <button style="height: 31px;position:absolute;right:0px;padding-top: 5px;margin-right:20px;margin-top: 9px;z-index:999999" class="btn btn-sm btn-primary fr-float-right fr-bt" id="sendNotes">Add Note</button>
                 </div>`);
           },
         },
@@ -810,6 +810,7 @@ export default {
 
     },
     sendNotes() {
+      console.log("note ka hit",this.note);
       if (this.note !== "") {
         let attachmentKeys = Object.keys(this.notesAttachments);
         let attachmentIDs = attachmentKeys.filter(

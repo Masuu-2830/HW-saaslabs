@@ -76,7 +76,6 @@ export default {
     },
     scrollToBottom() {
       var el = this.$refs.mailcontentbody;
-      console.error(el);
       setTimeout(() => {
         el.scrollTop = el.scrollHeight
       }, 200);
