@@ -40,9 +40,15 @@ export function addThread(data) {
     if(addThreadFlag) {
         let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
         if (objIndex !== -1) {
-            store.state.threads[objIndex].date = data.messageData.time;
-            store.state.threads[objIndex].subject = data.subject;
-            store.state.threads[objIndex].snippet = data.snippet;
+            if(data.inboxType == 'mail') {
+                store.state.threads[objIndex].date = data.messageData.time;
+                store.state.threads[objIndex].subject = data.subject;
+                store.state.threads[objIndex].snippet = data.snippet;
+            } else if(data.inboxType == 1) {
+                store.state.threads[objIndex].date = data.date;
+                store.state.threads[objIndex].humanFriendlyDate = moment(data.date).format("HH:mm");
+                store.state.threads[objIndex].snippet = data.snippet;
+            }
             var a = store.state.threads.splice(objIndex, 1);
             store.state.threads.unshift(a[0]);
         } else if (data.action == 'incoming' && (all || mine || assigned || unassigned)) {
@@ -127,6 +133,7 @@ export function addNote(data) { // hello
         if (objIndex !== -1) {
             // console.log("store.state.threads[objIndex]", store.state.threads[objIndex]);
             store.state.threads[objIndex].date = data.noteData.time;
+            store.state.threads[objIndex].humanFriendlyDate = moment((data.noteData.time*1000).toISOString()).format("HH:mm");
             store.state.threads[objIndex].snippet = data.noteData.snippet;
             var a = store.state.threads.splice(objIndex, 1);
             store.state.threads.unshift(a[0]);

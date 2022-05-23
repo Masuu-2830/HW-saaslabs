@@ -22,7 +22,7 @@
         </div>
         <div role="group" class="btn-group btn-block">
           <button
-            v-if="this.mailbox.type == 'mail'"
+            v-if="$store.state.inboxData.type == 'mail'"
             @click="openCompose('mail')"
             class="
               tx-uppercase
@@ -35,7 +35,7 @@
             Compose
           </button>
           <button
-            v-if="this.mailbox.type == 'custom'"
+            v-if="$store.state.inboxData.type == 'custom'"
             @click="openCompose('custom')"
             class="
               tx-uppercase
@@ -48,7 +48,7 @@
             Compose
           </button>
           <button
-            v-if="this.mailbox.type == 'twitter'"
+            v-if="$store.state.inboxData.type == 'twitter'"
             @click="openCompose('twitter')"
             id="mailComposeBtn"
             class="
@@ -63,7 +63,7 @@
             Tweet
           </button>
           <button
-            v-if="this.mailbox.type == 'sms'"
+            v-if="$store.state.inboxData.type == 'sms'"
             @click="openCompose('sms')"
             id="mailComposeBtn"
             class="
@@ -74,7 +74,7 @@
             Compose
           </button>
           <button
-            v-if="this.mailbox.type == 'universal'"
+            v-if="$store.state.inboxData.type == 'universal'"
             @click="openCompose('universalMail')"
             class="
               tx-uppercase
