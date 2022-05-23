@@ -200,10 +200,10 @@ export default {
         console.log(this.thread.data.items);
         this.thread.data.items.push(mail);
         console.log(this.thread.data.items);
-      } else if (data.type == "chat") {
+      } else if (data.type == "chat" || data.type == "sms" || data.type == "whatsapp") {
         let chat = {};
         chat["data"] = data.message;
-        chat["type"] = "chat";
+        chat["type"] = data.type;
         chat["timestamp"] = data.message.unixTime;
         this.thread.data.items.push(chat);
         console.log(this.thread.data.items);

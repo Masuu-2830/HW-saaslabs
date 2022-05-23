@@ -723,7 +723,7 @@ export default {
       }
       let to_id = this.$route.params.threadId;
       if(inboxType == 'sms' || inboxType == 'whatsapp'){
-        to_id = this.thread.data.clientNumber; // thread_real_id
+        to_id = this.thread.data.clientNumber; 
       }
       let messageData = {
         mailboxID: this.thread.data.mailbox_id,
@@ -734,10 +734,7 @@ export default {
         attachmentId: attachmentIDs,
         isUnified: 1
       };
-      console.log("message ata",messageData);
-
       let url = "";
-
       if(inboxType == "chat"){
         url = this.$apiBaseURL + "unifiedv2/sendChatInboxMessage.php";
       } else if(inboxType == "sms"){
@@ -768,7 +765,6 @@ export default {
       };
 
       if(url.trim().length > 0){
-
         fetch(
           url,
           requestOptions
@@ -794,7 +790,7 @@ export default {
           };
           let message = {
             message: payload,
-            type: "chat",
+            type: inboxType,
           };
 
           bus.$emit("changeThreadAttrs", message);
@@ -838,6 +834,7 @@ export default {
           mentionUserIDs: mentionUserIDs,
           message,
           attachmentIDs,
+          type: this.thread.data.mailboxType
         };
         const requestOptions = {
           method: "POST",
@@ -872,8 +869,6 @@ export default {
           .catch((error) => {
             alert(error);
           });
-
-        console.log(messageData);
       }
     },
     getArticleCardEmail(article) {
