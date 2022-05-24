@@ -19,11 +19,11 @@
     </div>
     <div v-if="Object.keys(thread).length !== 0" class="emails-wrapper">
       <div v-for="item in thread.data.items" :key="item.timestamp">
-        <mail-content-log v-if="item.type == 'log'" :item="item"></mail-content-log>
+        <mail-content-log v-if="item.type == 'log'" :item="item" :mailboxType="thread.data.mailboxType"></mail-content-log>
         <mail-content-comment v-else-if="item.type == 'comment'" :item="item" v-on:deleteComment="deleteComment"></mail-content-comment>
         <chat-content-messenger-right v-else-if="item.type == 'facebook' && item.data.type == 1" :item="item"></chat-content-messenger-right>
         <chat-content-card v-else-if="item.type == 'fb-feed' || item.type == 'instagram' || item.type == 'twitter'" :item="item" v-on:deleteTweet="deleteTweet"></chat-content-card>
-        <chat-content-message-left v-else-if="item.data.type == 0" :item="item"></chat-content-message-left>
+        <chat-content-message-left v-else-if="item.data.type == 0" :item="item" :mailboxType="thread.data.mailboxType"></chat-content-message-left>
         <chat-content-message-right v-else-if="item.data.type == 1" :item="item" v-on:deleteMessage="deleteComment"></chat-content-message-right>
       </div>
     </div>

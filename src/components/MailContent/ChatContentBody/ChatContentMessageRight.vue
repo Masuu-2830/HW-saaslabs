@@ -5,9 +5,9 @@
     :id="'sms-options-' + item.data.id"
     style="
       margin-left: 20px;
-      margin-top: 0px;
+      padding-top: 8px;
       margin-right: 20px;
-      padding-bottom: 15px;
+      padding-bottom: 8px;
     "
   >
     <div class="comment d-flex justify-content-end align-items-end">
@@ -134,7 +134,7 @@
                     v-html="item.data.text"
                   ></span>
                 </div>
-                <br />
+                <!-- <br /> -->
                 <div v-if="item.data.attachment !== undefined && item.data.attachment.length > 0" class="d-flex align-items-end">
                   <i
                     class="fas fa-paperclip mg-r-2 pd-b-5 tx-color-03 tx-14"

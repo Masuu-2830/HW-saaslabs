@@ -5,9 +5,9 @@
     :id="'comment-options-' + item.data.id"
     style="
       margin-left: 20px;
-      margin-top: 0px;
+      padding-top: 8px;
       margin-right: 20px;
-      padding-bottom: 15px;
+      padding-bottom: 8px;
     "
   >
     <div class="comment d-flex justify-content-end align-items-end">

@@ -26,7 +26,7 @@
           :placeholder="'Search'"
         />
         <a
-          class="collapsed"
+          class="collapsed d-none"
           :class="isCompact ? 'd-none' : ''"
           data-toggle="collapse"
           id="adv-arrow-down"

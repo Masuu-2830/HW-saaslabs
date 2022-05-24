@@ -2,12 +2,12 @@
   <div
     v-if="this.$store.state.stateLoaded"
     class="mail-group-header justify-content-center"
-    style="position: relative; height: 40px; border-top: 1px solid rgba(72, 94, 144, 0.16); border-bottom: none"
+    style="position: relative; height: 40px; /* border-top: 1px solid rgba(72, 94, 144, 0.16);*/ border-bottom: none"
   >
     <div
       class="row flex-column d-flex"
       id="mails-toolbar"
-      style="padding-left: 20px"
+      style="padding-left: 12px"
     >
       <div class="d-flex justify-content-between">
         <div
@@ -31,8 +31,8 @@
           >
             <span
               v-if="
-                this.$route.params.type !== 'closed' && 
-                this.$route.params.type !== 'trash'
+                this.$store.state.filterSection !== 'closed' && 
+                this.$store.state.filterSection !== 'trash'
               "
               @click.stop.prevent="bulkClose"
               id="bulk-close"
@@ -59,7 +59,7 @@
             </span>
             <span
               v-if="
-                this.$route.params.type == 'mentions'
+                this.$store.state.filterSection == 'mentions'
               "
               @click.stop.prevent="bulkDone"
               id="bulk-done"
@@ -87,16 +87,16 @@
             </span>
             <span
               v-if="
-                this.$route.params.type !== 'mentions' &&
-                this.$route.params.type !== 'discussions' && 
-                this.$route.params.type !== 'starred' &&
-                this.$route.params.type !== 'snoozed' &&
-                this.$route.params.type !== 'drafts' && 
-                this.$route.params.type !== 'sent' && 
-                this.$route.params.type !== 'scheduled' && 
-                this.$route.params.type !== 'closed' && 
-                this.$route.params.type !== 'spam' && 
-                this.$route.params.type !== 'trash'
+                this.$store.state.filterSection !== 'mentions' &&
+                this.$store.state.filterSection !== 'discussions' && 
+                this.$store.state.filterSection !== 'starred' &&
+                this.$store.state.filterSection !== 'snoozed' &&
+                this.$store.state.filterSection !== 'drafts' && 
+                this.$store.state.filterSection !== 'sent' && 
+                this.$store.state.filterSection !== 'scheduled' && 
+                this.$store.state.filterSection !== 'closed' && 
+                this.$store.state.filterSection !== 'spam' && 
+                this.$store.state.filterSection !== 'trash'
               "
               @click.stop.prevent="bulkRead(1)"
               id="bulk-read"
@@ -125,16 +125,16 @@
 
             <span
               v-if="
-                this.$route.params.type !== 'mentions' &&
-                this.$route.params.type !== 'discussions' && 
-                this.$route.params.type !== 'starred' &&
-                this.$route.params.type !== 'snoozed' &&
-                this.$route.params.type !== 'drafts' && 
-                this.$route.params.type !== 'sent' && 
-                this.$route.params.type !== 'scheduled' && 
-                this.$route.params.type !== 'closed' && 
-                this.$route.params.type !== 'spam' && 
-                this.$route.params.type !== 'trash'
+                this.$store.state.filterSection !== 'mentions' &&
+                this.$store.state.filterSection !== 'discussions' && 
+                this.$store.state.filterSection !== 'starred' &&
+                this.$store.state.filterSection !== 'snoozed' &&
+                this.$store.state.filterSection !== 'drafts' && 
+                this.$store.state.filterSection !== 'sent' && 
+                this.$store.state.filterSection !== 'scheduled' && 
+                this.$store.state.filterSection !== 'closed' && 
+                this.$store.state.filterSection !== 'spam' && 
+                this.$store.state.filterSection !== 'trash'
               "
               @click.stop.prevent="bulkRead(0)"
               id="bulk-unread"
@@ -317,7 +317,7 @@
             </span>
 
             <span
-              v-if="this.$route.params.type !== 'trash'"
+              v-if="this.$store.state.filterSection !== 'trash'"
               @click.stop.prevent="bulkDelete"
               id="bulk-trash"
               data-toggle="tooltip"
@@ -347,7 +347,7 @@
             </span>
 
             <span
-              v-if="this.$route.params.type == 'trash'"
+              v-if="this.$store.state.filterSection == 'trash'"
               @click.stop.prevent="bulkPerDelete"
               id="bulk-permanent-delete"
               data-toggle="tooltip"
@@ -375,7 +375,7 @@
               </svg>
             </span>
             <span
-              v-if="this.$route.params.type !== 'spam' && this.$route.params.type !== 'trash'"
+              v-if="this.$store.state.filterSection !== 'spam' && this.$store.state.filterSection !== 'trash'"
               @click.stop.prevent="bulkSpam"
               id="bulk-spam"
               data-toggle="tooltip"
@@ -406,10 +406,10 @@
 
             <span
               v-if="
-                this.$route.params.type == 'snoozed' || 
-                this.$route.params.type == 'closed' || 
-                this.$route.params.type == 'spam' || 
-                this.$route.params.type == 'trash'
+                this.$store.state.filterSection == 'snoozed' || 
+                this.$store.state.filterSection == 'closed' || 
+                this.$store.state.filterSection == 'spam' || 
+                this.$store.state.filterSection == 'trash'
               "              
               @click.stop.prevent="bulkMove"
               id="bulk-move-to-inbox"
@@ -439,7 +439,7 @@
             </span>
             <span
               v-if="
-                this.$route.params.type !== 'starred'
+                this.$store.state.filterSection !== 'starred'
               "
               id="bulk-star-threads"
               class="align-items-center d-flex px-2"
@@ -466,7 +466,7 @@
             </span>
             <span
               v-if="
-                this.$route.params.type == 'starred'
+                this.$store.state.filterSection == 'starred'
               "
               @click.stop.prevent="bulkStar()"
               id="bulk-unstar-threads"
@@ -1079,9 +1079,9 @@
             </b-modal>
             <div
               v-if="
-                this.$route.params.type !== 'drafts' && 
-                this.$route.params.type !== 'sent' && 
-                this.$route.params.type !== 'scheduled'
+                this.$store.state.filterSection !== 'drafts' && 
+                this.$store.state.filterSection !== 'sent' && 
+                this.$store.state.filterSection !== 'scheduled'
               "
               class="
                 dropdown
@@ -1358,12 +1358,12 @@
           </div>
           <div
             v-if="
-              this.$route.params.type !== 'unassigned' &&
-              this.$route.params.type !== 'mine' &&
-              this.$route.params.type !== 'mentions' &&
-              this.$route.params.type !== 'discussions' &&
-              this.$route.params.type !== 'starred' &&
-              this.$route.params.type !== 'drafts'
+              this.$store.state.filterSection !== 'unassigned' &&
+              this.$store.state.filterSection !== 'mine' &&
+              this.$store.state.filterSection !== 'mentions' &&
+              this.$store.state.filterSection !== 'discussions' &&
+              this.$store.state.filterSection !== 'starred' &&
+              this.$store.state.filterSection !== 'drafts'
             "
             id="threads-filter"
             style=""
@@ -1409,7 +1409,7 @@
                 data-val="unassigned"
                 data-text="Unassigned"
                 @click="filterPerson(1, 'Unassigned')"
-                v-if="this.$route.params.type !== 'snoozed'"
+                v-if="this.$store.state.filterSection !== 'snoozed'"
               >
                 Unassigned
               </button>
@@ -1418,7 +1418,7 @@
                 data-val="unread"
                 data-text="Unread"
                 @click="filterPerson(2, 'Unread')"
-                v-if="this.$route.params.type !== 'snoozed'"
+                v-if="this.$store.state.filterSection !== 'snoozed'"
               >
                 Unread
               </button>
@@ -1537,7 +1537,7 @@
                       "
                       >{{ teammate.name }}</span
                     ><span
-                      v-if="teammate.id in Object.keys(mailbox.userAssignmentCount)"
+                      v-if="mailbox.userAssignmentCount && teammate.id in Object.keys(mailbox.userAssignmentCount)"
                       class="user-assigned-count"
                       :id="'user-assigned-count-' + teammate.id"
                       v-html="mailbox.userAssignmentCount[teammate.id]"
@@ -1571,11 +1571,11 @@
           </div>
           <div
             v-if="
-              this.$route.params.type !== 'snoozed' &&
-              this.$route.params.type !== 'mentions' &&
-              this.$route.params.type !== 'discussions' &&
-              this.$route.params.type !== 'starred' &&
-              this.$route.params.type !== 'drafts'
+              this.$store.state.filterSection !== 'snoozed' &&
+              this.$store.state.filterSection !== 'mentions' &&
+              this.$store.state.filterSection !== 'discussions' &&
+              this.$store.state.filterSection !== 'starred' &&
+              this.$store.state.filterSection !== 'drafts'
             "
             id="orderThreadsBy"
             style="margin-left: 5px"
@@ -1681,8 +1681,8 @@ export default {
     });
     console.log(typeof this.currPage);
     console.log((this.mailbox));
-    console.log(this.userInfo)
-    console.log(this.mailbox.userAssignmentCount[this.userInfo.id])
+    console.log(this.order)
+    // console.log(this.mailbox.userAssignmentCount[this.userInfo.id])
   },
   methods: {
     handleChange(value, type) {
@@ -1938,6 +1938,7 @@ export default {
     },
     filterOrder(order, orderType) {
       this.order = order;
+      console.log(this.order, order)
       this.$emit("filterOrder", orderType);
     },
   },

@@ -266,7 +266,6 @@
             },
             postData(integration_name){
                 // setTimeout(function () {
-                //     console.log("wait");
                 // }, 500);
                 let fetchUrl = '';
                 let date = moment().format("YYYY-MM-DD");
@@ -323,7 +322,6 @@
                 });
             },
             calendarIntegration(calendarData){
-                console.log("calendarData dhikhao",calendarData);
                 fetch("https://app.helpwise.io/api/integration-vue/"+calendarData.int_name+"/"+calendarData.int_name+".php?mailbox_id=" + calendarData.mailbox_id + "&email=" + calendarData.email + "&inbox_type=" + calendarData.inboxType + "&integration_id=" + calendarData.int_id + "&date=" + calendarData.date + "&contactID=" + calendarData.contactID, {credentials: 'include'})
                 .then(async response => {
                     const integrationData = await response.json();

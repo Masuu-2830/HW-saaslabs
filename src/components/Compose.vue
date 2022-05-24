@@ -176,6 +176,62 @@
                   }}&gt;</b-form-select-option
                 >
               </b-form-select>
+              <!-- <vue-select
+                class="vue-select2"
+                name="select2"
+                :options="options"
+                :model.sync="result"
+                :searchable="true"
+                language="en-US"
+              >
+              </vue-select> -->
+              <!-- <select id="selectForCompose">
+                <option>buhu</option>
+                <option>buhu</option>
+                <option>buhu</option>
+                <option>buhu</option>
+              </select> -->
+              <!-- <select
+                class="email-from select2-hidden-accessible"
+                style="
+                  display: inline-block;
+                  min-width: 100%;
+                  max-width: 100%;
+                  padding: 5px;
+                "
+                
+                tabindex="-1"
+                aria-hidden="true"
+              >
+                <option
+                  value="vibhor@saaslabs.co"
+                  data-email="vibhor@saaslabs.co"
+                  data-name="Masood"
+                  data-is-default="true"
+                  selected=""
+                  data-select2-id="59"
+                >
+                  Masood &lt;vibhor@saaslabs.co&gt;
+                </option>
+                <option
+                  value="vibhor@helpwise.io"
+                  data-email="vibhor@helpwise.io"
+                  data-name="Vibhor Agrawal"
+                  data-is-default="false"
+                  data-select2-id="65"
+                >
+                  Vibhor Agrawal &lt;vibhor@helpwise.io&gt;
+                </option>
+                <option
+                  value="masood2810@gmail.com"
+                  data-email="masood2810@gmail.com"
+                  data-name="Masood"
+                  data-is-default="false"
+                  data-select2-id="66"
+                >
+                  Masood &lt;masood2810@gmail.com&gt;
+                </option>
+              </select> -->
             </div>
           </div>
           <div class="d-flex align-items-center">
@@ -347,7 +403,7 @@
               </div>
             </div>
           </div>
-          <div>
+          <div v-if="composer.type == 'custom'">
             <hr style="margin-top: 0px; margin-bottom: 10px" />
             <div
               class="custom-fields"
@@ -685,7 +741,7 @@
           ? ''
           : 'shrink'
       "
-      style="z-index: 2147483001"
+      style="z-index: 2147482999"
       :style="{ right: lr ? '45vw' : '' }"
     >
       <div class="mail-compose-dialog mail-compose-dialog-shrink">
@@ -909,6 +965,7 @@ import axios from "axios";
 import _ from "underscore";
 import AttachmentComp from "./AttachmentComp.vue";
 import Vue from "vue";
+import VueSelect from "vue-select";
 
 export default {
   name: "Compose",
@@ -925,11 +982,32 @@ export default {
       }
     },
   },
-  components: { VueTagsInput, FroalaEditor, File, VuePhoneNumberInput },
+  components: {
+    VueTagsInput,
+    FroalaEditor,
+    File,
+    VuePhoneNumberInput,
+    VueSelect,
+  },
   data() {
     const self = this;
     console.log(self.composer.type);
     return {
+      options: [
+        {
+          text: "name1",
+          value: "value1",
+        },
+        {
+          text: "name2",
+          value: "value2",
+        },
+        {
+          text: "name3",
+          value: "value3",
+        },
+      ],
+      result: "",
       boxAccessToken: "",
       easyCalendar: [],
       easyCalendarUser: [],
@@ -1037,12 +1115,11 @@ export default {
             ) {
               editor.mailboxID = self.$store.state.inboxData.id;
             } else {
-              editor.mailboxID = self.fromSelected.id;
+              editor.mailboxID = self.fromSelected.mailboxId;
             }
             // editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
-            console.log("initialized", self.composer.type, self.editorInstance);
-            console.log(this);
+
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData: {
@@ -1100,11 +1177,11 @@ export default {
                   buttons: [
                     "insertLink",
                     "insertImage",
-                    "gdrive",
-                    "Dropbox",
-                    "box",
-                    "OneDrive",
-                    "EasyCalendar",
+                    // "gdrive",
+                    // "Dropbox",
+                    // "box",
+                    // "OneDrive",
+                    // "EasyCalendar",
                   ],
                   buttonsVisible: 0,
                 },
@@ -1172,12 +1249,11 @@ export default {
             ) {
               editor.mailboxID = self.$store.state.inboxData.id;
             } else {
-              editor.mailboxID = self.fromSelected.id;
+              editor.mailboxID = self.fromSelected.mailboxId;
             }
             // editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
-            console.log("initialized", self.composer.type, self.editorInstance);
-            console.log(this);
+
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData: {
@@ -1278,8 +1354,7 @@ export default {
             // : "smsCompose";
             editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
-            console.log("initialized", self.composer.type);
-            console.log(this);
+
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData: {
@@ -1337,11 +1412,11 @@ export default {
                   buttons: [
                     "insertLink",
                     "insertImage",
-                    "gdrive",
-                    "Dropbox",
-                    "box",
-                    "OneDrive",
-                    "EasyCalendar",
+                    // "gdrive",
+                    // "Dropbox",
+                    // "box",
+                    // "OneDrive",
+                    // "EasyCalendar",
                   ],
                   buttonsVisible: 0,
                 },
@@ -1400,8 +1475,7 @@ export default {
             //   : "smsCompose";
             editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
-            console.log("initialized", self.composer.type);
-            console.log(this);
+
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData: {
@@ -1522,8 +1596,7 @@ export default {
                 : "smsCompose";
             editor.mailboxID = self.$route.params.mailboxId;
             self.editorInstance = this;
-            console.log("initialized", self.composer.type);
-            console.log(this);
+
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData: {
@@ -1581,11 +1654,11 @@ export default {
                   buttons: [
                     "insertLink",
                     "insertImage",
-                    "gdrive",
-                    "Dropbox",
-                    "box",
-                    "OneDrive",
-                    "EasyCalendar",
+                    // "gdrive",
+                    // "Dropbox",
+                    // "box",
+                    // "OneDrive",
+                    // "EasyCalendar",
                   ],
                   buttonsVisible: 0,
                 },
@@ -1614,18 +1687,18 @@ export default {
     };
   },
   created() {
+    // $("#selectForCompose").select2({
+    //   minimumResultsForSearch: -1,
+    // });
     bus.$off("deleteAttachmentUpload");
     bus.$on("deleteAttachmentUpload", (id) => {
-      console.log("event listenedd", id);
       Vue.delete(this.attachments, id);
       this.attachments = this.attachments.filter((i) => i.id !== id);
-      console.log(this.attachments, this.files);
     });
     const vueThis = this;
 
     bus.$off("deleteAttachmentUpload");
     bus.$on("deleteAttachmentUpload", (id) => {
-      console.log("event listened", id);
       if (id) {
         Vue.delete(vueThis.attachments, id);
       }
@@ -1671,35 +1744,30 @@ export default {
     fromSelected: "saveDraft",
     files: "saveDraft",
     subject: function (to, from) {
-      console.log("subject");
       if (to !== from) {
         clearTimeout(this.subjectSave);
         this.subjectSave = setTimeout(this.saveDraft, 2000);
       }
     },
     mail_body: function (to, from) {
-      console.log("mailbody");
       if (to !== from) {
         clearTimeout(this.myGreeting);
         this.myGreeting = setTimeout(this.saveDraft, 2000);
       }
     },
     tweet_compose_body: function (to, from) {
-      console.log("tweetcomposebody");
       if (to !== from) {
         clearTimeout(this.myGreeting);
         this.myGreeting = setTimeout(this.saveDraft, 2000);
       }
     },
     sms_compose_body: function (to, from) {
-      console.log("smscomposebody");
       if (to !== from) {
         clearTimeout(this.myGreeting);
         this.myGreeting = setTimeout(this.saveDraft, 2000);
       }
     },
     toNumber: function (to, from) {
-      console.log("tweetToNumber", this.toNumber, this.toNumber2);
       if (to !== from) {
         clearTimeout(this.myGreeting);
         this.myGreeting = setTimeout(this.saveDraft, 2000);
@@ -1722,7 +1790,6 @@ export default {
             return Promise.reject(error);
           }
           this.boxAccessToken = data.data.boxAccessToken;
-          console.log(data, this.boxAccessToken);
         })
         .catch((error) => {
           alert(error);
@@ -1737,7 +1804,7 @@ export default {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          console.log(data);
+
           this.easyCalendar = data.data.easycalendar;
           this.easyCalendarUser = data.data.easyCalendarUser;
           if (this.easyCalendar.length != 0) {
@@ -1756,7 +1823,6 @@ export default {
             };
             // ["Connect"] = "Connect EasyCalendar";
           }
-          console.log(this.easycalendarObj);
         })
         .catch((error) => {
           alert(error);
@@ -1774,7 +1840,7 @@ export default {
         },
         success: (response) => {
           let html = "";
-          console.log($dropdown.find(".fr-dropdown-list"), response.data);
+
           if (response.status == "success") {
             for (let signature of response.data) {
               html += `<li role="presentation"><a class="fr-command" tabindex="-1" role="option" data-cmd="signatureBtn" data-param1="${signature.id}" title="${signature.name}" aria-selected="false">${signature.name}</a></li>`;
@@ -1909,7 +1975,7 @@ export default {
           this.selection.save();
           let editor = this;
           vueThis.showHcModal = true;
-          console.log("----");
+
           bus.$emit("hcArticles", "compose");
           // vueThis.$bvModal.show("helpcenterArticlesModal");
         },
@@ -1934,7 +2000,6 @@ export default {
           6: "Pick date & time",
         },
         callback: function (cmd, val) {
-          console.log(val);
           var mom;
           if (val == 1) {
             mom = moment(
@@ -1964,7 +2029,7 @@ export default {
             // this.datetime = "";
             vueThis.$refs["schedule-send-modal"].show();
           }
-          console.log(mom.toISOString());
+
           vueThis.sendMail(mom);
         },
       });
@@ -2050,7 +2115,6 @@ export default {
             "166235631936-ne7jkubvmci8k4rtcb870sj8ni9sjp17.apps.googleusercontent.com";
           const scope = "https://www.googleapis.com/auth/drive.readonly";
           let tokenPromise = new Promise((res, rej) => {
-            console.log("clicked");
             gapi.load("auth2", () => {
               gapi.auth2
                 .init({ client_id: clientId })
@@ -2123,7 +2187,7 @@ export default {
             } while (Math.abs(bytes) >= thresh && u < units.length - 1);
             return bytes.toFixed(1) + " " + units[u];
           }
-          console.log(vueThis.boxAccessToken);
+
           if (!vueThis.boxAccessToken) {
             window.open("https://app.helpwise.io/settings/integrations");
           } else {
@@ -2209,12 +2273,8 @@ export default {
               }
               this.html.insert(html);
             },
-            cancel: function () {
-              console.log("cancel");
-            },
-            error: function (error) {
-              console.log("error", error);
-            },
+            cancel: function () {},
+            error: function (error) {},
           };
           OneDrive.open(odOptions);
         },
@@ -2258,7 +2318,7 @@ export default {
           var ab = $("ul").find(`[data-param1='add_easy_calendar']`);
           ab.attr("title", `Add time slots`);
           var abc = ab.parent();
-          console.log(ab, abc);
+
           if (!abc.prev().is("hr")) {
             $(`<hr>`).insertBefore(abc);
           }
@@ -2274,7 +2334,7 @@ export default {
     scheduleSend() {
       var mom = new Date(this.datetime);
       this.datetime = "";
-      console.log(mom.toISOString());
+
       this.sendMail(mom);
       this.$refs["schedule-send-modal"].hide();
     },
@@ -2303,7 +2363,7 @@ export default {
         to.push(obj);
       }
       // }
-      console.log(to);
+
       return to;
     },
     tagscc() {
@@ -2318,7 +2378,7 @@ export default {
         cc.push(obj);
       }
       // }
-      console.log(cc);
+
       return cc;
     },
     tagsbcc() {
@@ -2333,7 +2393,7 @@ export default {
         bcc.push(obj);
       }
       // }
-      console.log(bcc);
+
       return bcc;
     },
     addCustomField() {
@@ -2344,7 +2404,7 @@ export default {
     },
     uploadAttachment(event) {
       const selectedFiles = event.target.files;
-      console.log(selectedFiles);
+
       const vueThis = this;
       for (let i = 0; i < selectedFiles.length; i++) {
         let selectedFile = selectedFiles[i];
@@ -2371,16 +2431,12 @@ export default {
             withCredentials: true,
             onUploadProgress: function (p) {
               let percentage = (p.loaded / p.total) * 100;
-              console.log(percentage);
-              console.log(hash);
-              console.log(vueThis.attachments);
+
               vueThis.attachments[hash]["progress"] = percentage;
             },
           })
           .then((response) => {
             //get the attachment id
-            console.log(response);
-            console.log(hash);
 
             let attachData = response.data.data.files[0];
             let attachID = attachData["id"];
@@ -2398,20 +2454,25 @@ export default {
             vueThis.attachments[attachID]["id"] = attachID;
             vueThis.files.push(attachID);
             vueThis.editorInstance.attachments = vueThis.attachments;
-            console.log(vueThis.attachments, vueThis.editorInstance);
           });
       }
     },
     aliases() {
-      let aliases = this.$store.state.aliases.addresses;
+      console.log(this.$store.state.fromAddresses);
+
+      let aliases = this.$store.state.fromAddresses.filter(
+        (address) =>
+          address.mailboxId == this.$store.state.mailboxId ||
+          this.$store.state.mailboxId == "me"
+      );
+      return aliases;
+      // let aliases = this.$store.state.aliases.addresses;
       let aliasesArr = new Array();
       if (this.$store.state.inboxData.type == "universal") {
-        console.log("aliases retrieve for univ", aliases);
         for (const alias in aliases) {
-          console.log(alias);
           for (let j = 0; j < aliases[alias].length; j++) {
             aliases[alias][j]["id"] = alias;
-            console.log(aliases[alias][j]);
+
             aliasesArr.push(aliases[alias][j]);
           }
         }
@@ -2431,41 +2492,41 @@ export default {
           });
         }
       }
-
-      console.log(aliasesArr);
       return aliasesArr;
     },
     defaultAlias() {
-      let aliases = this.$store.state.aliases.addresses;
+      let aliases = this.$store.state.fromAddresses.filter(
+        (address) =>
+          address.mailboxId == this.$store.state.mailboxId ||
+          this.$store.state.mailboxId == "me"
+      );
       if (this.composer.from !== undefined) {
         for (let i = 0; i < aliases.length; i++) {
           if (aliases[i].email == Object.keys(this.composer.from)) {
-            return { id: i, email: aliases[i].email, name: aliases[i].name };
+            return aliases[i];
           }
         }
       } else {
-        if (this.$store.state.inboxData.type == "universal") {
-          for (const alias in aliases) {
-            for (let j = 0; j < aliases[alias].length; j++) {
-              if (aliases[alias][j].isDefault) {
-                aliases[alias][j]["id"] = alias;
-                return aliases[alias][j];
-              }
-            }
-          }
-        } else {
+        // if (this.$store.state.inboxData.type == "universal") {
+        //   for (const alias in aliases) {
+        //     for (let j = 0; j < aliases[alias].length; j++) {
+        //       if (aliases[alias][j].isDefault) {
+        //         aliases[alias][j]["id"] = alias;
+        //         return aliases[alias][j];
+        //       }
+        //     }
+        //   }
+        // } else {
           for (let i = 0; i < aliases.length; i++) {
             if (aliases[i].isDefault) {
-              return { id: i, email: aliases[i].email, name: aliases[i].name };
+              return aliases[i];
             }
           }
-        }
+        // }
       }
       return {};
     },
     signature() {
-      // return this.$store.state.userInfo;
-      // this.aliases();
       if (this.composer.html !== undefined) {
         return this.composer.html;
       }
@@ -2488,7 +2549,7 @@ export default {
                 </div>
                 </div>`;
       // }
-      console.log(html);
+
       return html;
     },
     closeCompose(hash) {
@@ -2540,7 +2601,7 @@ export default {
     //         const error = (data && data.message) || response.status;
     //         return Promise.reject(error);
     //       }
-    //       console.log(data);
+    //
     //       let signature = this.$store.state.userSignature.body;
     // if(!signature) return '';
     // let body=signature.replace(/^.*?<body[^>]*>(.*?)<\/body>.*?$/i,"$1");
@@ -2610,7 +2671,7 @@ export default {
       ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
-        mailboxID = this.fromSelected.id;
+        mailboxID = this.fromSelected.mailboxId;
       }
       if (this.threadID == null) {
         body = {
@@ -2655,13 +2716,14 @@ export default {
         body: JSON.stringify(body),
         credentials: "include",
       };
-      console.log(requestOptions.body);
+
       return requestOptions;
     },
     createBodyCustom(prop) {
       let from = {};
       from[this.fromSelected.email] = this.fromSelected.name;
-      let to = {}, custom = {};
+      let to = {},
+        custom = {};
       for (let i = 0; i < this.tagsTo.length; i++) {
         if (this.tagsTo[i].name == undefined) {
           to[this.tagsTo[i].email] = this.tagsTo[i].email;
@@ -2670,8 +2732,8 @@ export default {
         }
       }
       for (let i = 0; i < this.customFields.length; i++) {
-        if(this.customFields[i].key !== '') {
-          custom[this.customFields[i].key] = this.customFields[i].value
+        if (this.customFields[i].key !== "") {
+          custom[this.customFields[i].key] = this.customFields[i].value;
         }
       }
       let html = this.mail_body;
@@ -2689,7 +2751,7 @@ export default {
       ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
-        mailboxID = this.fromSelected.id;
+        mailboxID = this.fromSelected.mailboxId;
       }
       body = {
         mailboxID,
@@ -2697,7 +2759,7 @@ export default {
         from,
         subject: this.subject,
         to,
-        custom
+        custom,
       };
       let text = html.replace(/(<([^>]+)>)/gi, "");
       // console.log(text);
@@ -2717,7 +2779,7 @@ export default {
         body: JSON.stringify(body),
         credentials: "include",
       };
-      console.log(requestOptions);
+
       return requestOptions;
     },
     createBodyTwitter(prop) {
@@ -2728,9 +2790,9 @@ export default {
       let html = this.tweet_compose_body;
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
-      console.log(html);
+
       html = html.replace(/(<([^>]+)>)/gi, "");
-      console.log(html);
+
       let body;
       if (this.draftID == null) {
         body = {
@@ -2780,7 +2842,7 @@ export default {
         body: JSON.stringify(body),
         credentials: "include",
       };
-      console.log(requestOptions.body);
+
       return requestOptions;
     },
     createBodySMS(prop) {
@@ -2788,9 +2850,9 @@ export default {
       let html = this.sms_compose_body;
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
-      console.log(html);
+
       html = html.replace(/(<([^>]+)>)/gi, "");
-      console.log(html);
+
       let mailboxID;
       if (
         this.$route.params.mailboxId !== undefined &&
@@ -2803,7 +2865,7 @@ export default {
       ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
-        mailboxID = this.fromSelected.id;
+        mailboxID = this.fromSelected.mailboxId;
       }
       let body = {
         mailboxID,
@@ -2830,25 +2892,26 @@ export default {
         body: JSON.stringify(body),
         credentials: "include",
       };
-      console.log(requestOptions.body);
+
       return requestOptions;
     },
     saveDraft() {
       // this.getUserSignature();
+      let inboxes = this.$store.state.inboxes;
+      let typeOfInbox = inboxes[this.fromSelected.mailboxId].type;
       if (
         this.composer.type == "universalMail" ||
         this.composer.type == "universalSms"
       ) {
-        console.log(this.fromSelected, this.editorInstance);
-        this.editorInstance.mailboxID = this.fromSelected.id;
+        this.editorInstance.mailboxID = this.fromSelected.mailboxId;
         if (
           this.composer.type == "universalMail" &&
-          this.fromSelected.type == "sms"
+          typeOfInbox == "sms"
         ) {
           this.composer.type = "universalSms";
         } else if (
           this.composer.type == "universalSms" &&
-          this.fromSelected.type == "mail"
+          typeOfInbox == "mail"
         ) {
           this.composer.type = "universalMail";
         }
@@ -2865,7 +2928,6 @@ export default {
           this.mail_body ||
           this.tweet_compose_body
         ) {
-          console.log("save", this.composer.hash);
           this.message = "Saving Draft";
           let requestOptions, url;
           if (
@@ -2884,10 +2946,10 @@ export default {
                 return Promise.reject(error);
               }
               requestOptions.body = JSON.parse(requestOptions.body);
-              console.log(this.draftID, this.threadID);
+
               this.draftID = data.data.draftID;
               this.threadID = data.data.threadID;
-              console.log(this.editorInstance);
+
               this.editorInstance.draftID = data.data.draftID;
               this.editorInstance.mailboxID = this.mailboxID;
               this.editorInstance.threadID = data.data.threadID;
@@ -2934,7 +2996,6 @@ export default {
         this.composer.type == "mail" ||
         this.composer.type == "universalMail"
       ) {
-        console.log("sendingg");
         if (this.tagsTo.length == 0) {
           this.noTo = true;
           return;
@@ -2966,7 +3027,7 @@ export default {
           requestOptions.body["sendAt"] = sendAt;
         }
         requestOptions.body = JSON.stringify(requestOptions.body);
-        console.log(requestOptions.body);
+
         fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -2980,11 +3041,9 @@ export default {
             $("#undo-txt").text(data.message);
             this.showUndo = true;
             this.undoInterval = setInterval(function () {
-              console.log(1);
               self.undoTimer -= 1;
             }, 1000);
             this.undoTimeout = setTimeout(() => {
-              console.log(2);
               clearInterval(self.undoInterval);
               self.showUndo = false;
               self.closeCompose(self.composer.hash);
@@ -2994,6 +3053,7 @@ export default {
           })
           .catch((error) => {
             alert(error);
+            this.sending = false;
           });
       } else if (this.composer.type == "custom") {
         if (this.tagsTo.length == 0) {
@@ -3010,7 +3070,7 @@ export default {
         if (this.toNotValid) return;
         this.sending = true;
         let requestOptions = this.createBodyCustom("send");
-        console.log(requestOptions);
+
         fetch(this.$apiBaseURL + "send_custom_inbox", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -3024,16 +3084,17 @@ export default {
           })
           .catch((error) => {
             alert(error);
+            this.sending = false;
           });
       } else if (this.composer.type == "twitter") {
-        console.log("sendingg");
         let requestOptions = this.createBodyTwitter("send");
         requestOptions.body = JSON.parse(requestOptions.body);
         if (sendAt !== undefined) {
           requestOptions.body["sendAt"] = sendAt;
         }
         this.sending = true;
-        console.log(requestOptions.body);
+        requestOptions.body = JSON.stringify(requestOptions.body);
+
         fetch(this.$apiBaseURL + "send-tweet.php", requestOptions)
           .then(async (response) => {
             const data = await response.json();
@@ -3061,30 +3122,37 @@ export default {
           })
           .catch((error) => {
             alert(error);
+            this.sending = false;
           });
-      } else if (this.composer.type == "sms") {
-        console.log("sendingg");
+      } else if (
+        this.composer.type == "sms" ||
+        this.composer.type == "universalSms"
+      ) {
         this.sending = true;
         let requestOptions = this.createBodySMS("send");
         requestOptions.body = JSON.parse(requestOptions.body);
-        console.log(requestOptions.body);
+        requestOptions.body = JSON.stringify(requestOptions.body);
+
         let url;
-        if (this.fromSelected.subtype == "sms") {
+        let inboxes = this.$store.state.inboxes;
+        let subtypeOfInbox = inboxes[this.fromSelected.mailboxId].subtype;
+        if (subtypeOfInbox == "sms") {
           url = this.$apiBaseURL + "sms/sendSmsUnifiedLive.php";
-        } else if (this.fromSelected.subtype == "plivo") {
-          this.$apiBaseURL + "plivo/sendSmsUnifiedLive.php";
-        } else if (this.fromSelected.subtype == "ringcentral") {
-          this.$apiBaseURL + "ringcentral/sendSmsUnifiedLive.php";
-        } else if (this.fromSelected.subtype == "justcall") {
-          this.$apiBaseURL + "justcall/sendSmsUnifiedLive.php";
-        } else if (this.fromSelected.subtype == "dialpad") {
-          this.$apiBaseURL + "dialpad/sendSmsUnifiedLive.php";
+        } else if (subtypeOfInbox == "plivo") {
+          url = this.$apiBaseURL + "plivo/sendSmsUnifiedLive.php";
+        } else if (subtypeOfInbox == "ringcentral") {
+          url = this.$apiBaseURL + "ringcentral/sendSmsUnifiedLive.php";
+        } else if (subtypeOfInbox == "justcall") {
+          url = this.$apiBaseURL + "justcall/sendSmsUnifiedLive.php";
+        } else if (subtypeOfInbox == "dialpad") {
+          url = this.$apiBaseURL + "dialpad/sendSmsUnifiedLive.php";
         }
         fetch(url, requestOptions)
           .then(async (response) => {
             const data = await response.json();
             if (data.status !== "success") {
               const error = (data && data.message) || response.status;
+              // triggerPromptNotif(error, "error", 3000);
               return Promise.reject(error);
             }
             this.sending = false;
@@ -3107,6 +3175,9 @@ export default {
           })
           .catch((error) => {
             alert(error);
+            this.sending = false;
+            // triggerPromptNotif(error, "error");
+            // console.log(error);
           });
       }
     },
@@ -3125,7 +3196,7 @@ export default {
       ) {
         mailboxID = this.$store.state.inboxData.id;
       } else {
-        mailboxID = this.fromSelected.id;
+        mailboxID = this.fromSelected.mailboxId;
       }
       const requestOptions = {
         method: "POST",
@@ -3144,7 +3215,7 @@ export default {
             const error = (data && data.message) || response.status;
             return Promise.reject(error);
           }
-          console.log("unsending");
+
           this.showUndo = false;
           this.show = true;
         }
@@ -3158,7 +3229,6 @@ export default {
       this.isBCC = true;
     },
     check(tag) {
-      console.log(tag);
       if (this.composer.type == "custom") {
         if (tag.email == undefined) {
           console.log(
@@ -3185,16 +3255,20 @@ export default {
         }
       } else {
         if (tag.email == undefined) {
-          console.log(!/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
-            tag.text
-          ))
+          console.log(
+            !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+              tag.text
+            )
+          );
           return !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
             tag.text
           );
         } else {
-          console.log(!/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
-            tag.email
-          ))
+          console.log(
+            !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
+              tag.email
+            )
+          );
           return !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
             tag.email
           );
@@ -3202,7 +3276,6 @@ export default {
       }
     },
     updateTo(newTags) {
-      console.log(newTags);
       this.autocompleteItemsTo = [];
       for (let i = 0; i < newTags.length; i++) {
         if (newTags[i].email == undefined) {
@@ -3212,7 +3285,6 @@ export default {
       this.tagsTo = newTags;
       this.noTo = false;
       this.toNotValid = false;
-      console.log(this.tagsTo);
     },
     updateCC(newTags) {
       this.autocompleteItemsCC = [];
@@ -3223,7 +3295,6 @@ export default {
       }
       this.tagsCC = newTags;
       this.ccNotValid = false;
-      console.log(this.tagsCC);
     },
     updateBCC(newTags) {
       this.autocompleteItemsBCC = [];
@@ -3234,18 +3305,16 @@ export default {
       }
       this.tagsBCC = newTags;
       this.bccNotValid = false;
-      console.log(this.tagsBCC);
     },
     initItemsTo() {
       if (this.tagTo.length < 2) return;
       const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagTo}`;
-      console.log("starting");
+
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         axios
           .get(url, { withCredentials: true })
           .then((response) => {
-            console.log(response.data.data.contacts);
             this.autocompleteItemsTo = response.data.data.contacts.map((a) => {
               let icon = `<div class="d-flex align-items-center justify-content-start">
                             <div class="avatar avatar-xs">
@@ -3271,13 +3340,12 @@ export default {
     initItemsCC() {
       if (this.tagCC.length < 2) return;
       const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagCC}`;
-      console.log("starting");
+
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         axios
           .get(url, { withCredentials: true })
           .then((response) => {
-            console.log(response.data.data.contacts);
             this.autocompleteItemsCC = response.data.data.contacts.map((a) => {
               let icon = `<div class="d-flex align-items-center justify-content-start">
                             <div class="avatar avatar-xs">
@@ -3303,13 +3371,12 @@ export default {
     initItemsBCC() {
       if (this.tagBCC.length < 2) return;
       const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagBCC}`;
-      console.log("starting");
+
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         axios
           .get(url, { withCredentials: true })
           .then((response) => {
-            console.log(response.data.data.contacts);
             this.autocompleteItemsBCC = response.data.data.contacts.map((a) => {
               let icon = `<div class="d-flex align-items-center justify-content-start">
                             <div class="avatar avatar-xs">
@@ -3381,13 +3448,6 @@ export default {
   bottom: 8px;
   position: absolute;
   right: 20px;
-}
-
-.fr-toolbar .fr-command .fr-btn img,
-.fr-popup .fr-command.fr-btn img,
-.fr-modal .fr-command.fr-btn img {
-  margin: 8px 7px;
-  width: 16px !important;
 }
 
 .fr-toolbar .fr-command.fr-btn img,

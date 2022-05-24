@@ -52,7 +52,7 @@
                 v-for="tag in thread.data.tags"
                 :key="tag.id"
                 :id="'thread-tag-ID-' + tag.id"
-                data-mailbox_id="204420"
+                :data-mailbox_id="thread.data.mailbox_id"
                 :data-tag_id="tag.id"
                 style="
                   cursor: pointer;
@@ -146,7 +146,6 @@
           <div class="dropdown-divider mt-2 mb-2"></div>
           <div id="viewing-list" style="max-height: 200px; overflow-y: scroll">
             <div
-              id="participant-214897"
               class="
                 hw-participant
                 dropdown-item
@@ -154,13 +153,15 @@
                 justify-content-between
                 align-items-center
               "
+              v-for="viewingUser in viewingUsers"
+              :key="viewingUser.id"
             >
               <span
                 class="d-flex align-items-center justify-content-start w-100"
                 style="width: 55%"
               >
                 <div
-                  v-html="userInfo.avatarTag"
+                  v-html="viewingUser.avatarTag"
                   class="avatar avatar-xxs mr-1"
                 ></div>
                 <span
@@ -171,7 +172,7 @@
                     white-space: nowrap;
                     text-overflow: ellipsis;
                   "
-                  >Me</span
+                  >{{viewingUser.id == userInfo.id ? "Me" : `${viewingUser.firstname} ${viewingUser.lastname}`}}</span
                 >
               </span>
               <span class="participant-status tx-color-03"
@@ -179,7 +180,7 @@
               >
             </div>
             <div
-              v-for="teammate in teammatesNew"
+              v-for="teammate in viewingListTeammates"
               :key="teammate.id"
               :id="'participant-' + teammate.id"
               class="
@@ -218,7 +219,7 @@
                     | moment("from", "now")
                 }}</span
               >
-              <span v-else class="participant-status tx-color-03">UnRead</span>
+              <span v-else class="participant-status tx-color-03">Unread</span>
             </div>
           </div>
         </div>
@@ -494,8 +495,8 @@
       </div>
       <a
         v-if="
-          this.$route.params.type !== 'closed' &&
-          this.$route.params.type !== 'drafts'
+          this.$store.state.filterSection !== 'closed' &&
+          this.$store.state.filterSection !== 'drafts'
         "
         href="#"
         @click.stop="closeThread"
@@ -520,7 +521,7 @@
       </a>
       <a
         v-if="
-                this.$route.params.type == 'mentions'
+                this.$store.state.filterSection == 'mentions'
               "
         href=""
         @click.stop.prevent="markDone"
@@ -551,11 +552,11 @@
         title="Move To Inbox"
         class="nav-link reopen-current-thread"
         v-if="
-          this.$route.params.type == 'snoozed' ||
-          this.$route.params.type == 'closed' ||
-          this.$route.params.type == 'spam' ||
-          this.$route.params.type == 'trash' ||
-          this.$route.params.type == 'drafts'
+          this.$store.state.filterSection == 'snoozed' ||
+          this.$store.state.filterSection == 'closed' ||
+          this.$store.state.filterSection == 'spam' ||
+          this.$store.state.filterSection == 'trash' ||
+          this.$store.state.filterSection == 'drafts'
         "
         @click.stop.prevent="restoreThread"
       >
@@ -606,16 +607,16 @@
       </a>
       <a
         v-if="
-          this.$route.params.type !== 'mentions' &&
-          this.$route.params.type !== 'discussions' &&
-          this.$route.params.type !== 'starred' &&
-          this.$route.params.type !== 'snoozed' &&
-          this.$route.params.type !== 'drafts' &&
-          this.$route.params.type !== 'sent' &&
-          this.$route.params.type !== 'scheduled' &&
-          this.$route.params.type !== 'closed' &&
-          this.$route.params.type !== 'spam' &&
-          this.$route.params.type !== 'trash'
+          this.$store.state.filterSection !== 'mentions' &&
+          this.$store.state.filterSection !== 'discussions' &&
+          this.$store.state.filterSection !== 'starred' &&
+          this.$store.state.filterSection !== 'snoozed' &&
+          this.$store.state.filterSection !== 'drafts' &&
+          this.$store.state.filterSection !== 'sent' &&
+          this.$store.state.filterSection !== 'scheduled' &&
+          this.$store.state.filterSection !== 'closed' &&
+          this.$store.state.filterSection !== 'spam' &&
+          this.$store.state.filterSection !== 'trash'
         "
         @click.stop="unread"
         data-toggle="tooltip"
@@ -702,6 +703,7 @@
                     tagUntagCheckboxWrapper
                     d-flex
                   "
+                  style="padding-right: 10px; padding-left: 1.0rem"
                 >
                   <input
                     type="checkbox"
@@ -764,7 +766,7 @@
             <span class="tx-13 tx-bold ml-2">Load more</span>
           </a> -->
 
-          <a @click="createTag('quick')" class="dropdown-item mt-2 quick-tag-btn"
+          <a @click="createTag('quick')" class="dropdown-item mt-2 quick-tag-btn d-none"
             :style="{display: tags.findIndex(tag => tag.name == sqTag.toLowerCase().trim()) !== -1 ? 'none' : ''}">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -1068,7 +1070,7 @@
       </div>
       <div
         v-if="
-              this.$route.params.type !== 'trash'
+              this.$store.state.filterSection !== 'trash'
             "
         id="snooze-thread"
         data-toggle="tooltip"
@@ -1305,7 +1307,7 @@
         </template>
       </b-modal>
       <a
-        v-if="this.$route.params.type !== 'trash'"
+        v-if="this.$store.state.filterSection !== 'trash'"
         @click.stop.prevent="deleteConv"
         href=""
         id="trash-thread"
@@ -1341,8 +1343,7 @@
           aria-expanded="false"
           style="
             float: right;
-            margin-left: 20px;
-            margin-bottom: 3px;
+            margin-left: 8px;
             cursor: pointer;
           "
           ><svg
@@ -1374,18 +1375,20 @@
             transform: translate3d(-230px, -35px, 0px);
           "
         >
-          <button type="button" class="dropdown-item create-rule-menu-option">
+          <button type="button" class="dropdown-item create-rule-menu-option d-none">
             Create rule for similar emails
           </button>
           <button
             v-if="thread.data.isArchived == false"
             type="button"
+            @click.stop="closeThread"
             class="d-xl-none dropdown-item archive-current-thread"
           >
             Close Conversation
           </button>
           <button
             type="button"
+            @click.stop="unread"
             class="d-xl-none dropdown-item mark-unread-current-thread"
           >
             Mark as Unread
@@ -1393,11 +1396,7 @@
           <button
             @click.stop="restoreThread"
             type="button"
-            v-if="
-              this.$route.params.type == 'trash' ||
-              this.$route.params.type == 'spam' ||
-              this.$route.params.type == 'closed'
-            "
+            v-if="this.$store.state.filterSection == 'trash' || this.$store.state.filterSection == 'spam' || this.$store.state.filterSection == 'closed'"
             class="dropdown-item d-flex"
             id="move-thread-to-inbox"
           >
@@ -1405,10 +1404,7 @@
           </button>
           <button
             @click.stop="spamThreads"
-            v-if="
-              this.$route.params.type == 'trash' ||
-              this.$route.params.type == 'spam'
-            "
+            v-if="this.$store.state.filterSection !== 'spam'"
             type="button"
             class="dropdown-item d-flex"
             id="mark-spam"
@@ -1416,20 +1412,20 @@
             Mark Spam
           </button>
           <a
+            v-if="thread.data.mailboxType != 'sms' && thread.data.mailboxType != 'whatsapp'"
             class="dropdown-item"
-            :href="
-              'https://app.helpwise.io/viewConversationInfo/' +
-              this.$route.params.mailboxId +
-              '/' +
-              this.$route.params.threadId
-            "
+            :href="'https://app.helpwise.io/viewConversationInfo' + thread.data.mailbox_id + '/' + this.$route.params.threadId"
             target="_blank"
             id="viewThreadInfo"
             >View Info</a
           >
-          <button type="button" class="dropdown-item" onclick="printThread()">
-            Print
-          </button>
+          <a
+            v-if="thread.data.mailboxType != 'sms' && thread.data.mailboxType != 'whatsapp'"
+            class="dropdown-item"
+            :href="'https://app.helpwise.io/printThread?threadID=' + this.$route.params.threadId"
+            target="_blank"
+            >Print</a
+          >
         </div>
       </div>
     </nav>
@@ -1481,20 +1477,26 @@ export default {
       }
     },
     teammates() {
-      // let query = this.sqTm.toLowerCase().trim();
-      // if(query == "") {
       return this.$store.state.teammates;
-      // } else {
-      // return this.teammates.filter((item) => item.id !== this.userInfo.id);
-      // }
+      
     },
     mailboxes() {
       return this.$store.state.mailboxes;
     },
+    viewingListTeammates(){
+      let viewingUsersKeys = Object.keys(this.viewingUsers);
+      let tempArray = this.teammates.filter(teammate => {
+        return viewingUsersKeys.indexOf(teammate.id+"") == -1;
+      });
+      return tempArray;
+    },
     teammatesNew: function () {
       let query = this.sqTm.toLowerCase().trim();
       if (query == "") {
-        return this.teammates.filter((item) => item.id !== this.userInfo.id);
+        return this.teammates.filter((item) => {
+          let viewingUsersKeys = Object.keys(this.viewingUsers);
+          return !viewingUsersKeys.includes(item.id);
+        });
         // console.log(this.teammatesNew);
       } else {
         return this.teammates.filter(
@@ -1510,41 +1512,60 @@ export default {
   mounted(){
     let managerID = this.$store.state.userInfo.accountID;
     let threadID = this.$route.params.threadId;
-    const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
-    // let viewingUserFlag = false;
-    socket.child("/viewing user").on("value", (snapshot) => {
-      if(snapshot.val()){
-        this.viewingUsers = snapshot.val();
-      }
-    });
+    console.log("!!!!!!!!!!!!!!!!!!!! ", managerID, threadID);
+    if(threadID > 0){
+      const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
+      // let viewingUserFlag = false;
+      console.log("!!!!!!!!!!!!!!", socket);
+      socket.child("/viewing user").on("value", (snapshot) => {
+        console.log("------ VIEWING USERS -----");
+        if(snapshot.val()){
+          console.log(this);
+          this.viewingUsers = snapshot.val();
+          let tempArray = Object.keys(this.viewingUsers);
+          console.log(tempArray, this.thread.data);
+          console.log(this.teammatesNew);
+          this.thread.data.usersReadMap = tempArray;
+          this.thread = this.thread;
+        }
+      });
+      console.log("!!!!!!!!!!!!!!@@@@@@@");
+    }
   },
   methods: {
     backThread() {
-      this.$emit("broad")
-      bus.$emit("broad");
+      this.$emit("broad");
+      let managerID = this.$store.state.userInfo.accountID;
+      let threadID = this.$route.params.threadId;
+      if(threadID > 0){
+        const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
+        socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
+      }
+      // let viewingUserFlag = false;
+      bus.$emit("broad",'back');
     },
     unread() {
       // console.log(this.thread);
       bus.$emit("changeRead", this.$route.params.threadId);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     closeThread() {
       // console.log(this.thread);
       bus.$emit("closeThread", this.$route.params.threadId);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     markDone() {
       bus.$emit("doneThreads", this.$route.params.threadId);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     spamThreads() {
-      // console.log(this.thread);
+      console.log("this.$route.params.threadId",this.$route.params.threadId);
       bus.$emit("spamThreads", this.$route.params.threadId);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     changeStarred() {
       // console.log(this.thread);
@@ -1555,14 +1576,14 @@ export default {
     deleteConv() {
       bus.$emit("deleteThreads", this.$route.params.threadId);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     moveToInbox() {
       console.log(this.inboxSelected);
       bus.$emit("moveToInbox", this.$route.params.threadId, this.inboxSelected);
       this.$refs["move-thread-modal"].hide();
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     handleChange(value, type) {
       if (type === "minute") {
@@ -1612,9 +1633,10 @@ export default {
       console.log(mom.toISOString());
       bus.$emit("snoozeThread", this.$route.params.threadId, mom);
       this.$emit("broad")
-      bus.$emit("broad");
+      bus.$emit("broad",'back');
     },
     assign(id) {
+      console.log(this.$route.params.threadId, id);
       bus.$emit("assignThread", this.$route.params.threadId, id);
     },
     changeTagColor(color) {
@@ -1705,8 +1727,10 @@ export default {
         this.removetags
       );
     },
-    restoreThread(id) {
-      bus.$emit("restoreThreads", id);
+    restoreThread() {
+      bus.$emit("restoreThreads", this.$route.params.threadId);
+      this.$emit("broad")
+      bus.$emit("broad",'back');
     },
   },
 };

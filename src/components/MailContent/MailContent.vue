@@ -20,7 +20,7 @@
       :sidebarOpen="sidebarOpen"
       :contactOpen="contactOpen"
       :thread="thread"
-      :contact="contactData"
+      :contact="thread.data.contactData"
     ></IntegrationContainer>
     <div
       v-if="!loading"
@@ -69,7 +69,6 @@ export default {
       display: "none",
       right: "0px",
       thread: {},
-      contactData: null,
       loading: false,
       sidebarOpen: false,
       contactOpen: false,
@@ -78,52 +77,41 @@ export default {
     };
   },
   watch:{
-        $route (to, from) {
-            if(to.params.threadId !== from.params.threadId) {
-                // this.ifIntOpen = false;
-                this.right = '0px';
-                this.contactOpen = false;
-                this.sidebarOpen = false;
-                
-                let toThreadId = to.params.threadId;
-                let fromThreadId = from.params.threadId;
-                let managerID = this.$store.state.userInfo.accountID;
+    $route (to, from) {
+      if(to.params.threadId !== from.params.threadId) {
+          // this.ifIntOpen = false;
+          this.right = '0px';
+          this.contactOpen = false;
+          this.sidebarOpen = false;
+          let toThreadId = to.params.threadId;
+          let fromThreadId = from.params.threadId;
+          let managerID = this.$store.state.userInfo.accountID;
+          if(toThreadId > 0){
+            const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${fromThreadId}`);
+            socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
 
-                const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${fromThreadId}`);
-                socket.child(`/viewing user/${this.$store.state.userInfo.id}`).remove();
-
-                const socket2 = firebase_app.database().ref(`/Account-${managerID}/Thread-${toThreadId}`);
-                socket2.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
-            }
-        }
-    },
+            const socket2 = firebase_app.database().ref(`/Account-${managerID}/Thread-${toThreadId}`);
+            socket2.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+          }
+      }
+    }
+  },
   created() {
     bus.$on("compact", (data, contactData) => {
       this.display = "flex";
       this.right = "0px";
       if (data == null) {
         this.loading = true;
-        console.log(this.loading);
       } else {
         // console.log(contactData);
         this.thread = data;
-        console.log(this.thread);
-        this.contactData = contactData;
         this.loading = false;
-        console.log(this.loading);
       }
     });
-    // bus.$off("broad")
-    // bus.$on("broad", () => {
-    //   console.error("Broad received in mailcontent")
-    //   this.display = "none";
-    // });
     bus.$on("broadForContent", () => {
       this.display = 'none';
-      console.log("Heyy from mail content");
     })
     bus.$on("removeMail", (id) => {
-      console.log(id);
       this.thread.data.items = this.thread.data.items.filter(
         (item) => item.data.id !== id
       );
@@ -212,10 +200,10 @@ export default {
         console.log(this.thread.data.items);
         this.thread.data.items.push(mail);
         console.log(this.thread.data.items);
-      } else if (data.type == "chat") {
+      } else if (data.type == "chat" || data.type == "sms" || data.type == "whatsapp") {
         let chat = {};
         chat["data"] = data.message;
-        chat["type"] = "chat";
+        chat["type"] = data.type;
         chat["timestamp"] = data.message.unixTime;
         this.thread.data.items.push(chat);
         console.log(this.thread.data.items);
@@ -239,8 +227,12 @@ export default {
   mounted() {
     let threadID = this.$route.params.threadId;
     let managerID = this.$store.state.userInfo.accountID;
-    const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
-    socket.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+    if(threadID > 0){
+      const socket = firebase_app.database().ref(`/Account-${managerID}/Thread-${threadID}`);
+      socket.child(`/viewing user/${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo, function(error){
+        console.error("--------- viewing user set error -----", error);
+      });
+    }
   },
   beforeUnmount() {
     let managerID = this.$store.state.userInfo.accountID;
@@ -252,11 +244,10 @@ export default {
   },
   methods: {
     broad() {
-      console.error("Broad received in mailcontent")
+      console.log("Broad received in mailcontent", this);
       this.display = "none";
     },
     openInt() {
-      console.log("hello");
       if (this.right == "0px") {
         this.right = "250px";
       } else {

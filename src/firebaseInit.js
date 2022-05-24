@@ -84,7 +84,20 @@ export function initFirebase() {
                     notesFlag = true;
                 }
             });
+            socket.child(`/moveToInbox`).on('value', function (data) {
+                console.log("------- Move To Inbox Firebase hit ------");
+                if(moveToInboxFlag){
+                    if (data.val()) {
+                        console.log("MOVE TO INBOX", data.val());
+                        moveToInboxThread(data.val());
+                        moveToInboxFlag = true;
+                    }
+                }else{
+                    moveToInboxFlag = true;
+                }
+            });
             socket.child(`/close`).on('value', function (data) {
+                console.log("yhn kitni bar araha close ka",closeFlag);
                 if(closeFlag){
                     if (data.val()) {
                         console.log("close ka firebase",data.val());
@@ -126,6 +139,7 @@ export function initFirebase() {
                 }
             });
             socket.child(`/addTag`).on('value', function (data) {
+                console.log("----- -ADD TAG FIREBASE HIT -----");
                 if(addTagFlag){
                     if (data.val()) {
                         toggleTags(data.val());
@@ -136,6 +150,7 @@ export function initFirebase() {
                 }
             });
             socket.child(`/removeTag`).on('value', function (data) {
+                console.log("------ REMOVE TAG FIREBASE HIT -----");
                 if(removeTagFlag){
                     if (data.val()) {
                         toggleTags(data.val());
@@ -145,9 +160,10 @@ export function initFirebase() {
                     removeTagFlag = true;
                 }
             });
-            socket.child(`/assign`).on('value', function (data) {
+            socket.child(`/assignment`).on('value', function (data) {
                 if(assignFlag){
                     if (data.val()) {
+                        console.log("assign ka flag");
                         assignThread(data.val());
                         assignFlag = true;
                     }
@@ -155,16 +171,7 @@ export function initFirebase() {
                     assignFlag = true;
                 }
             });
-            socket.child(`/moveToInbox`).on('value', function (data) {
-                if(moveToInboxFlag){
-                    if (data.val()) {
-                        moveToInboxThread(data.val());
-                        moveToInboxFlag = true;
-                    }
-                }else{
-                    moveToInboxFlag = true;
-                }
-            });
+            
         }).catch((error) => {
             alert(error);
         });

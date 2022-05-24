@@ -48,9 +48,13 @@
                     class="dropdown-item text-secondary reply-state-btn-reply"
                     style="font-size: 13px"
                   >
-                    <i class="fas fa-reply"></i> Reply
+                    <i class="fa fa-reply mr-1"></i> Reply
                   </button>
                   <button
+                    v-if="
+                      reply.email.cc !== undefined &&
+                      Object.keys(reply.email.cc).length !== 0
+                    "
                     @click.prevent="replyAll"
                     class="
                       dropdown-item
@@ -555,6 +559,7 @@ import axios from "axios";
 import _ from "underscore";
 import AttachmentComp from "../../AttachmentComp.vue";
 import Vue from "vue";
+import { firebase_app } from "../../../firebaseInit";
 export default {
   name: "MailContentReply",
   components: { VueTagsInput, FroalaEditor },
@@ -615,11 +620,12 @@ export default {
         this.reply.email.threadId !== undefined
           ? this.reply.email.threadId
           : this.$route.params.threadId,
-      inReplyTo:
-        this.reply.email.id !== undefined
-          ? this.reply.email.id
-          : null,
+      inReplyTo: this.reply.email.id !== undefined ? this.reply.email.id : null,
       editorInstance: null,
+      typingReply: false,
+      defaultTypingTimer: 1000,
+      typingNotice: "",
+      typingTimer: null,
       config: {
         enter: FroalaEditor.ENTER_DIV,
         placeholderText: "Type something",
@@ -630,7 +636,7 @@ export default {
         imageUploadURL:
           "https://app.helpwise.io/api/uploadInlineAttachment.php",
         imageUploadParams: {
-          mailboxID: this.$route.params.mailboxId,
+          mailboxID: self.reply.mailboxId,
           emailID: this.threadID,
         },
         imageUploadMethod: "POST",
@@ -645,12 +651,11 @@ export default {
             var editor = this;
             editor.reply = self.reply;
             editor.type = "reply";
-            editor.mailboxID = self.$route.params.mailboxId;
+            editor.mailboxID = self.reply.mailboxId;
             editor.threadID = self.threadID;
             editor.draftID = self.draftID;
             self.editorInstance = this;
-            console.log("initialized");
-            console.log(this);
+
             let attchComp = Vue.extend(AttachmentComp);
             let replyAttachmentList = new attchComp({
               propsData: {
@@ -662,8 +667,23 @@ export default {
               },
             }).$mount();
             // var ed = $(`#reply-uploadAttachment`).data('editor');
-            console.log(editor);
             editor.$wp.append(replyAttachmentList.$el);
+
+            editor.events.on(
+              "keydown",
+              function (e) {
+                console.log("typing in editor");
+                // self.hitFirebase();
+                if (
+                  e.which == FroalaEditor.KEYCODE.ENTER &&
+                  savedReplyTribute.isActive
+                ) {
+                  return false;
+                }
+              },
+              true
+            );
+
             // if (self.isSend) {
             //   editor.$tb.append(`
             //     <div class="fr-btn-grp fr-float-right">
@@ -720,11 +740,11 @@ export default {
             buttons: [
               "insertLink",
               "insertImage",
-              "gdrive",
-              "Dropbox",
-              "box",
-              "OneDrive",
-              "EasyCalendar",
+              // "gdrive",
+              // "Dropbox",
+              // "box",
+              // "OneDrive",
+              // "EasyCalendar",
             ],
             buttonsVisible: 0,
           },
@@ -740,6 +760,10 @@ export default {
             buttonsVisible: "all",
           },
         },
+        htmlAllowedTags: [".*"],
+        htmlAllowedAttrs: [".*"],
+        htmlRemoveTags: ["script"],
+        quickInsertTags: [""],
       },
     };
   },
@@ -753,12 +777,9 @@ export default {
     });
     bus.$off("deleteAttachmentUpload");
     bus.$on("deleteAttachmentUpload", (id) => {
-      console.log("event listenedd", id);
       Vue.delete(this.attachments, id);
       Vue.delete(this.files, id);
       this.files = this.files.filter((i) => i !== id);
-      console.log(this.attachments, this.files);
-      console.log("File deleted");
     });
     // bus.$off("modal.hcArticleInsert.click");
     bus.$on("modal.hcArticleInsert.click", function (data, type) {
@@ -800,14 +821,12 @@ export default {
     fromSelected: "saveDraft",
     files: "saveDraft",
     subject: function (to, from) {
-      console.log("subject");
       if (to !== from) {
         clearTimeout(this.subjectSave);
         this.subjectSave = setTimeout(this.saveDraft, 2000);
       }
     },
     mail_body: function (to, from) {
-      console.log("mailbody");
       if (to !== from) {
         clearTimeout(this.myGreeting);
         this.myGreeting = setTimeout(this.saveDraft, 2000);
@@ -938,7 +957,7 @@ export default {
           this.selection.save();
           let editor = this;
           vueThis.showHcModal = true;
-          console.log("----");
+
           bus.$emit("hcArticles", "mailReply");
           // vueThis.$bvModal.show("helpcenterArticlesModal");
         },
@@ -963,7 +982,6 @@ export default {
           6: "Pick date & time",
         },
         callback: function (cmd, val) {
-          console.log(val);
           var mom;
           if (val == 1) {
             mom = moment(
@@ -988,12 +1006,11 @@ export default {
               "YYYY-MM-DD hh:mm A"
             );
           } else if (val == 6) {
-            // console.log(this.datetime);
             // mom = new Date(this.datetime);
             // this.datetime = "";
             vueThis.$refs["schedule-send-modal"].show();
           }
-          console.log(mom.toISOString());
+
           vueThis.sendMail(mom);
         },
       });
@@ -1079,7 +1096,6 @@ export default {
             "166235631936-ne7jkubvmci8k4rtcb870sj8ni9sjp17.apps.googleusercontent.com";
           const scope = "https://www.googleapis.com/auth/drive.readonly";
           let tokenPromise = new Promise((res, rej) => {
-            console.log("clicked");
             gapi.load("auth2", () => {
               gapi.auth2
                 .init({ client_id: clientId })
@@ -1232,12 +1248,8 @@ export default {
               }
               this.html.insert(html);
             },
-            cancel: function () {
-              console.log("cancel");
-            },
-            error: function (error) {
-              console.log("error", error);
-            },
+            cancel: function () {},
+            error: function (error) {},
           };
           OneDrive.open(odOptions);
         },
@@ -1296,7 +1308,7 @@ export default {
     scheduleSend() {
       var mom = new Date(this.datetime);
       this.datetime = "";
-      console.log(mom.toISOString());
+
       this.sendMail(mom);
       this.$refs["schedule-send-modal"].hide();
     },
@@ -1341,28 +1353,73 @@ export default {
       // this.compose = this.compose.filter(el => Object.keys(el) !== hash);
       bus.$emit("closeReply", hash);
     },
+    hitFirebase() {
+      let managerID = this.$store.state.userInfo.accountID;
+      let threadID = this.$route.params.threadId;
+
+      const socket = firebase_app
+        .database()
+        .ref(`/Account-${managerID}/ThreadID-${threadID}`);
+      console.log(`/Account-${managerID}/ThreadID-${threadID}`);
+      if (!this.typingReply) {
+        this.typingReply = true;
+        socket
+          .child(`/replying user/user-${this.$store.state.userInfo.id}`)
+          .off("value");
+        socket
+          .child(`/replying user/user-${this.$store.state.userInfo.id}`)
+          .set(this.$store.state.userInfo);
+        this.startReplyingTimer(socket);
+      } else {
+        this.resetReplyingTimer(socket);
+      }
+    },
+    startReplyingTimer(socket) {
+      this.typingTimer = setTimeout(() => {
+        this.typingReply = false;
+        socket
+          .child(`/replying user/user-${this.$store.state.userInfo.id}`)
+          .remove();
+      }, this.defaultTypingTimer);
+    },
+    resetReplyingTimer(socket) {
+      clearTimeout(this.typingTimer);
+      this.startReplyingTimer(socket);
+    },
     // myGreeting() {
     //   setTimeout(this.saveDraft, this.doneTypingInterval);
     // },
     tagsto(prop) {
       let to = [];
-      console.log(this.reply.email.from);
+      let aliases = this.aliases();
+
       if (this.reply.type !== 3 && prop !== 3) {
         for (var key in this.reply.email.from) {
-          let obj = {};
-          obj["email"] = key;
-          obj["name"] = this.reply.email.from[key];
-          obj["text"] = this.reply.email.from[key] + " (" + key + ")";
-          obj["tiClasses"] = ["ti-valid"];
-          to.push(obj);
+          if (!aliases.some((el) => el.email == key)) {
+            let obj = {};
+            obj["email"] = key;
+            obj["name"] = this.reply.email.from[key];
+            obj["text"] = this.reply.email.from[key] + " (" + key + ")";
+            obj["tiClasses"] = ["ti-valid"];
+            to.push(obj);
+          }
+        }
+        if ((this.reply.type == 1 || prop == 1) && to.length <= 0) {
+          for (var key in this.reply.email.to) {
+            if (!aliases.some((el) => el.email == key)) {
+              let obj = {};
+              obj["email"] = key;
+              obj["name"] = this.reply.email.to[key];
+              obj["text"] = this.reply.email.to[key] + " (" + key + ")";
+              obj["tiClasses"] = ["ti-valid"];
+              to.push(obj);
+            }
+          }
         }
         if (this.reply.type == 2 || prop == 2) {
-          let aliases = this.$store.state.aliases.addresses;
           if (this.$store.state.inboxData.type == "universal") {
-            let alias = aliases[this.reply.mailboxId];
-            console.log(alias);
-            for (var key in this.reply.email.to) {
-              if (!alias.some((el) => el.email == key)) {
+            for (let key in this.reply.email.to) {
+              if (!aliases.some((el) => el.email == key)) {
                 let obj = {};
                 obj["email"] = key;
                 obj["name"] = this.reply.email.to[key];
@@ -1372,7 +1429,7 @@ export default {
               }
             }
           } else {
-            for (var key in this.reply.email.to) {
+            for (let key in this.reply.email.to) {
               if (!aliases.some((el) => el.email == key)) {
                 let obj = {};
                 obj["email"] = key;
@@ -1385,19 +1442,18 @@ export default {
           }
         }
       }
-      console.log(to);
       return to;
     },
     tagscc(prop) {
       let cc = [];
-      console.log(this.reply.type);
+
       if (this.reply.type == 2 || prop == 2) {
-        let aliases = this.$store.state.aliases.addresses;
+        let aliases = this.aliases();
         if (this.$store.state.inboxData.type == "universal") {
           let alias = aliases[this.reply.mailboxId];
-          console.log(alias);
+
           for (var key in this.reply.email.cc) {
-            if (!alias.some((el) => el.email == key)) {
+            if (!aliases.some((el) => el.email == key)) {
               let obj = {};
               obj["email"] = key;
               obj["name"] = this.reply.email.cc[key];
@@ -1419,22 +1475,22 @@ export default {
           }
         }
       }
-      console.log(cc);
+
       if (cc.length > 0) {
         this.isCC = true;
-        console.log(cc.length, this.isCC);
       }
       return cc;
     },
     tagsbcc(prop) {
       let bcc = [];
       if (this.reply.type == 2 || prop == 2) {
-        let aliases = this.$store.state.aliases.addresses;
+        let aliases = this.aliases();
+
         if (this.$store.state.inboxData.type == "universal") {
           let alias = aliases[this.reply.mailboxId];
-          console.log(alias);
+
           for (var key in this.reply.email.to) {
-            if (!alias.some((el) => el.email == key)) {
+            if (!aliases.some((el) => el.email == key)) {
               let obj = {};
               obj["email"] = key;
               obj["name"] = this.reply.email.bcc[key];
@@ -1456,23 +1512,22 @@ export default {
           }
         }
       }
-      console.log(bcc);
+
       if (bcc.length > 0) {
         this.isBCC = true;
-        console.log(bcc.length, this.isBCC);
       }
       return bcc;
     },
     uploadAttachment(event) {
       const selectedFiles = event.target.files;
-      console.log(selectedFiles);
+
       const vueThis = this;
       for (let i = 0; i < selectedFiles.length; i++) {
         let selectedFile = selectedFiles[i];
         let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
         var formData = new FormData();
         formData.append("files[]", selectedFile);
-        formData.append("mailboxID", vueThis.$route.params.mailboxId);
+        formData.append("mailboxID", vueThis.reply.mailboxId);
         let attachmentObject = {
           filename: selectedFile["name"],
           filesize: selectedFile["size"],
@@ -1492,16 +1547,12 @@ export default {
             withCredentials: true,
             onUploadProgress: function (p) {
               let percentage = (p.loaded / p.total) * 100;
-              console.log(percentage);
-              console.log(hash);
-              console.log(vueThis.attachments, vueThis.draftID);
+
               vueThis.attachments[hash]["progress"] = percentage;
             },
           })
           .then((response) => {
             //get the attachment id
-            console.log(response);
-            console.log(hash);
 
             let attachData = response.data.data.files[0];
             let attachID = attachData["id"];
@@ -1519,7 +1570,7 @@ export default {
             vueThis.attachments[attachID]["id"] = attachID;
             vueThis.files.push(attachID);
             vueThis.editorInstance.attachments = vueThis.attachments;
-            console.log(vueThis.attachments, vueThis.editorInstance);
+
             // let attchComp = Vue.extend(AttachmentComp);
             // let replyAttachmentList = new attchComp({
             //   propsData:{
@@ -1528,44 +1579,19 @@ export default {
             // }).$mount();
             // // $('#editor-<>').data('editor',editor)
             // var ed = $(`#reply-uploadAttachment`).data('editor');
-            // console.log(ed);
+
             // ed.$wp.append(replyAttachmentList.$el);
           });
       }
     },
     aliases() {
-      let aliases = this.$store.state.aliases.addresses;
-      let aliasesArr = new Array();
-      if (this.$store.state.inboxData.type == "universal") {
-        let addresses = aliases[this.reply.mailboxId];
-        console.log(addresses);
-        if(addresses) {
-          for (let i = 0; i < addresses.length; i++) {
-            aliasesArr.push(addresses[i]);
-          }
-        }
-        console.log(addresses);
-      } else {
-        for (let i = 0; i < aliases.length; i++) {
-          if (aliases[i].isDefault) {
-            this.fromSelected = {
-              id: i,
-              email: aliases[i].email,
-              name: aliases[i].name,
-            };
-          }
-          aliasesArr.push({
-            id: i,
-            email: aliases[i].email,
-            name: aliases[i].name,
-          });
-        }
-      }
-      console.log(aliasesArr);
-      return aliasesArr;
+      return this.$store.state.fromAddresses.filter(
+        (address) => address.mailboxId == this.reply.mailboxId
+      );
     },
     defaultAlias() {
-      let aliases = this.$store.state.aliases.addresses;
+      let aliases = this.aliases();
+      return aliases.find((alias) => alias.isDefault);
       if (this.reply.from !== undefined) {
         // for(let i = 0; i < aliases.length; i++) {
         //   if(aliases[i].email == Object.keys(this.reply.from)) {
@@ -1573,9 +1599,9 @@ export default {
         //   }
         // }
       } else {
-        if (this.$store.state.inboxData.type == "universal") {
+        if (this.$store.state.mailboxId == "me") {
           let addresses = aliases[this.reply.mailboxId];
-          if(addresses) {
+          if (addresses) {
             for (let i = 0; i < addresses.length; i++) {
               if (addresses[i].isDefault) {
                 return addresses[i];
@@ -1611,8 +1637,8 @@ export default {
       this.type = 3;
     },
     signature() {
-      if (this.reply.html !== undefined) {
-        return this.reply.html;
+      if (this.reply.draftId && this.reply.email.html !== undefined) {
+        return this.reply.email.html;
       }
       let signature = "";
       if (this.$store.state.userSignature) {
@@ -1620,7 +1646,7 @@ export default {
       }
       if (!signature) return "";
       let body = signature.replace(/^.*?<body[^>]*>(.*?)<\/body>.*?$/i, "$1");
-      console.log(body);
+
       let html = "";
       let sign = `<div>${body}</div>`;
       html = `<br/>
@@ -1636,7 +1662,7 @@ export default {
                     </div>
                     </div>
                     </div>`;
-      console.log(html);
+
       return html;
     },
     openHere() {
@@ -1718,11 +1744,9 @@ export default {
       var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
       html = html.replace(re1, "");
       let body, mailboxID;
-      if (
-        this.$route.params.mailboxId !== undefined &&
-        this.$route.params.mailboxId !== "me"
-      ) {
-        mailboxID = this.$route.params.mailboxId;
+      console.log(this.reply.mailboxId);
+      if (this.reply.mailboxId !== undefined && this.reply.mailboxId !== "me") {
+        mailboxID = this.reply.mailboxId;
       } else if (
         this.$store.state.inboxData.id !== undefined &&
         this.$store.state.inboxData.id !== "me"
@@ -1759,7 +1783,7 @@ export default {
         };
       }
       let text = html.replace(/(<([^>]+)>)/gi, "");
-      console.log(text);
+
       html &&
         (body.html = `<div class=\"hwEmailWrapper\" style=\"font-family:sans-serif;font-size:0.875rem;color:#001737\">${html}</div>`);
       text && (body.text = text);
@@ -1776,7 +1800,7 @@ export default {
         body: JSON.stringify(body),
         credentials: "include",
       };
-      console.log(requestOptions.body);
+
       return requestOptions;
     },
     saveDraft() {
@@ -1800,7 +1824,6 @@ export default {
             this.editorInstance.draftID = data.data.draftID;
             this.threadID = data.data.threadID;
             this.message = "Draft Saved";
-            // setTimeout(function() {console.log(this.message);self.message = "";}, 3000);
           })
           .catch((error) => {
             alert(error);
@@ -1809,7 +1832,6 @@ export default {
     },
     sendMail(sendAt) {
       var self = this;
-      console.log("sendin");
       if (this.tagsTo.length == 0) {
         this.noTo = true;
         return;
@@ -1841,8 +1863,9 @@ export default {
         requestOptions.body["sendAt"] = sendAt;
       }
       requestOptions.body = JSON.stringify(requestOptions.body);
-      console.log(sendAt, requestOptions.body, requestOptions);
+
       // alert("Reached to the fetch call");
+      clearTimeout(this.myGreeting);
       fetch(this.$apiBaseURL + "sendMail.php", requestOptions)
         .then(async (response) => {
           // alert("Fetch success")
@@ -1858,11 +1881,9 @@ export default {
           $("#undo-txt").text(data.message);
           this.showUndo = true;
           this.undoInterval = setInterval(function () {
-            console.log(1);
             self.undoTimer -= 1;
           }, 1000);
           this.undoTimeout = setTimeout(() => {
-            console.log(2);
             clearInterval(self.undoInterval);
             self.showUndo = false;
             self.cancelReply(self.reply.hash);
@@ -1888,7 +1909,7 @@ export default {
               email: payload,
               type: "email",
             };
-            console.log(payload, email, this.reply);
+            triggerPromptNotif("Mail sent", "success", 1000);
             bus.$emit("changeThreadAttrs", email);
           } else {
             bus.$emit("closeThread", this.$route.params.threadId);
@@ -1899,7 +1920,7 @@ export default {
         })
         .catch((error) => {
           // alert(error);
-          console(error);
+          console.error(error);
         });
     },
     unsendMail() {
@@ -1923,9 +1944,9 @@ export default {
             return Promise.reject(error);
             triggerPromptNotif(data.message, "error");
           }
-          console.log("unsending");
+
           this.show = true;
-          console.log(this.draftID);
+
           bus.$emit("removeMail", this.draftID);
         }
       );
@@ -1939,7 +1960,6 @@ export default {
       this.isBCC = true;
     },
     check(tag) {
-      console.log(tag);
       if (tag.email == undefined) {
         return !/^((([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})))$/.test(
           tag.text
@@ -1951,7 +1971,6 @@ export default {
       }
     },
     updateTo(newTags) {
-      console.log(newTags);
       this.autocompleteItemsTo = [];
       for (let i = 0; i < newTags.length; i++) {
         if (newTags[i].email == undefined) {
@@ -1961,7 +1980,6 @@ export default {
       this.tagsTo = newTags;
       this.noTo = false;
       this.toNotValid = false;
-      console.log(this.tagsTo);
     },
     updateCC(newTags) {
       this.autocompleteItemsCC = [];
@@ -1972,7 +1990,6 @@ export default {
       }
       this.tagsCC = newTags;
       this.ccNotValid = false;
-      console.log(this.tagsCC);
     },
     updateBCC(newTags) {
       this.autocompleteItemsBCC = [];
@@ -1983,18 +2000,16 @@ export default {
       }
       this.tagsBCC = newTags;
       this.bccNotValid = false;
-      console.log(this.tagsBCC);
     },
     initItemsTo() {
       if (this.tagTo.length < 2) return;
       const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagTo}`;
-      console.log("starting");
+
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         axios
           .get(url, { withCredentials: true })
           .then((response) => {
-            console.log(response.data.data.contacts);
             this.autocompleteItemsTo = response.data.data.contacts.map((a) => {
               let icon = `<div class="d-flex align-items-center justify-content-start">
                             <div class="avatar avatar-xs">
@@ -2020,13 +2035,12 @@ export default {
     initItemsCC() {
       if (this.tagCC.length < 2) return;
       const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagCC}`;
-      console.log("starting");
+
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         axios
           .get(url, { withCredentials: true })
           .then((response) => {
-            console.log(response.data.data.contacts);
             this.autocompleteItemsCC = response.data.data.contacts.map((a) => {
               let icon = `<div class="d-flex align-items-center justify-content-start">
                             <div class="avatar avatar-xs">
@@ -2052,13 +2066,12 @@ export default {
     initItemsBCC() {
       if (this.tagBCC.length < 2) return;
       const url = `https://app.helpwise.io/api/contacts/autocomplete.php?q=${this.tagBCC}`;
-      console.log("starting");
+
       clearTimeout(this.debounce);
       this.debounce = setTimeout(() => {
         axios
           .get(url, { withCredentials: true })
           .then((response) => {
-            console.log(response.data.data.contacts);
             this.autocompleteItemsBCC = response.data.data.contacts.map((a) => {
               let icon = `<div class="d-flex align-items-center justify-content-start">
                             <div class="avatar avatar-xs">
@@ -2132,7 +2145,7 @@ export default {
   right: 24px;
 }
 
-.fr-toolbar .fr-command .fr-btn img,
+.fr-toolbar .fr-command.fr-btn img,
 .fr-popup .fr-command.fr-btn img,
 .fr-modal .fr-command.fr-btn img {
   margin: 8px 7px;

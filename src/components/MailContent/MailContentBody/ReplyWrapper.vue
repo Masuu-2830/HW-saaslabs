@@ -2,7 +2,8 @@
   <div id="replyWindowWrapper" v-if="replies.length > 0">
     <mail-content-reply
       v-for="reply in replies"
-      :key="reply.id"
+      :ref="reply.hash"
+      :key="reply.hash"
       :reply="reply"
     ></mail-content-reply>
     <!-- <compose v-for="(composer, index) in composers" :key="composer.id" :align="index" :composer="composer" /> -->
@@ -24,17 +25,36 @@ export default {
   props: {
     thread: Object,
   },
+  watch:{
+        $route (to, from) {
+            if(to.name == "thread" && to.params.threadId !== from.params.threadId) {
+              console.error("Drafts")
+                this.addDrafts();
+            }
+        }
+    },
   created() {
     bus.$on("openReply", (data, type, email) => {
-      console.log("openingg", data, email, this.thread);
       if (email == undefined) {
-        let obj = { hash: data, mailboxId: this.thread.data.mailbox_id, };
+        let obj = { hash: data, mailboxId: this.thread.data.mailbox_id };
         this.replies.push(obj);
       } else {
-        let obj = { hash: data, id: email.id, type: type, email: email, mailboxId: this.thread.data.mailbox_id };
+        let obj = {
+          hash: data,
+          id: email.id,
+          type: type,
+          email: email,
+          mailboxId: this.thread.data.mailbox_id,
+        };
         this.replies.push(obj);
       }
       this.show = true;
+      // const el = this.$refs[data];
+      // console.error(el)
+      // if (el) {
+      //   // Use el.scrollIntoView() to instantly scroll to the element
+      //   el.scrollIntoView({ behavior: "smooth" });
+      // }
       console.log(this.replies);
     });
     bus.$on("closeReply", (data) => {
@@ -46,6 +66,7 @@ export default {
   },
   methods: {
     addDrafts() {
+      this.replies = []
       if (Object.keys(this.thread).length !== 0) {
         console.log(this.thread.data.drafts);
         for (let i = 0; i < this.thread.data.drafts.length; i++) {
@@ -66,6 +87,9 @@ export default {
   beforeMount() {
     this.addDrafts();
   },
+  // beforeUpdate() {
+  //   this.addDrafts();
+  // },
 };
 </script>
 

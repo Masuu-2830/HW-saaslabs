@@ -1,34 +1,24 @@
 <template>
   <div class="mail-sidebar">
     <div class="mail-sidebar-body ps--active-y">
-      <div class="pd-20" style="padding-bottom: 25px">
+      <div class="rounded border pd-x-10 pd-y-5 m-2 border-primary" id="testForwardingContainer">
+          <div class="tx-color-03 mt-1 mb-1 tx-11" id="testforwardingText">
+              Welcome to a new, improved version of Universal Inbox. Currently, this version supports <strong><em>email shared inboxes</em></strong> only. We will be releasing an update on the other shared inboxes in the coming weeks.
+          </div>
+          <div class="text-center">
+              <button class="btn btn-link btn-xs pd-0" style="font-weight: 600;font-size:10px"
+                  id="testForwardingSettings">
+                  <a href="https://app.helpwise.io/inbox/me/mine" target="_blank">
+                    Switch to Old version
+                  </a>
+              </button>
+          </div>
+      </div>
+      <div class="pd-x-20 pd-y-10">
         <div class="justify-content-between align-items-start">
-          <h5 id="mailbox-title" v-if="this.mailbox.displayName">{{ this.mailbox.displayName }}</h5>
-          <!-- <router-link
-            to="settings"
-            id="mailbox-settings-link"
-            class=""
-            target="_blank"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="feather feather-settings"
-            >
-              <circle cx="12" cy="12" r="3"></circle>
-              <path
-                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
-              ></path>
-            </svg>
-          </router-link> -->
-          
+          <h5 id="mailbox-title" v-if="this.mailbox.displayName">
+            {{ this.mailbox.displayName }}
+          </h5>
         </div>
         <div role="group" class="btn-group btn-block">
           <button
@@ -101,96 +91,333 @@
       <div class="pd-b-10 pd-l-10">
         <div id="nav-links-container" class="pd-r-10">
           <nav class="nav nav-sidebar tx-13" id="labels-nav">
-
-            <div 
+            <div
               v-for="(sectionValues, sectionName) in sections"
               :key="sectionName"
             >
-                <div class="d-flex justify-content-between">
-                    <li class="nav-label mg-y-10 tx-color-03 tx-uppercase" v-if="Object.keys(sectionValues).length > 0">{{sectionName}}</li>
-                    <template v-if="sectionName == 'me'">
-                        <div class="pd-y-5 d-flex justify-content-center pos-relative">
-                            <button class="btn btn-link pd-0 mg-5 sidebarViewOptionButton" :class="{'open': sidebarViewOptionShow}" style="color: #566476;" @click="sidebarViewOptionShow = !sidebarViewOptionShow"><svg style="height: 16px; width: 16px" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></button>
-                            <div class="pos-absolute d-flex flex-column" style="/* width: 100%; */ max-width: 300px; top: 100%; left: 50%; background: white; box-shadow: rgba(0,0,0,0.16) 0 0 10px 2px; padding: 10px; border-radius: 5px; z-index: 99999; max-height: calc(55vh + 100px)" v-if="sidebarViewOptionShow">
-                                <div class="d-flex w-100">
-                                    <div class="search-form pd-b-10 bd-b mg-b-10 w-100">
-                                        <input type="search" class="form-control" placeholder="Search" @keyup="filterOptionResults" v-model="searchSidebarViewOptions">
-                                        <button class="btn" type="button" @click="filterOptionResults">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="optionContainer" style="max-height: 55vh; overflow: auto; padding-right: 20px; max-width: 350px;">
-                                    <div class="d-flex flex-column w-100" v-for="(list, labels) in sidebarViewOptionsListFiltered" :key="labels">
-                                        <p class="tx-color-03 tx-14 mg-b-5 mg-y-15 tx-uppercase pd-x-5" v-if="list.length > 0">{{labels}}</p>
-                                        <div 
-                                            class="d-flex justify-content-between w-100"
-                                            v-for="option in list"
-                                            :key="option.id"
-                                            @click="pinThisOption(labels, option)"
-                                        >
-                                            <div class="pd-5 mg-b-5 w-100 d-flex justify-content-between" v-if="(option.displayName && option.displayName.trim().length > 0) || (option.name && option.name.trim().length > 0)">
-                                                <div class="tx-color-01 mg-r-15 mg-b-0 d-flex" style="width: calc(100% - 30px)">
-                                                    <div class="tagIcon" v-if="labels == 'tags'">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" :style="'color:'+option.color" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag mg-r-5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-                                                    </div>
-                                                    <div class="tx-color-01 mg-r-10 mg-b-0 d-flex" v-if="labels == 'inboxes'">
-                                                        <div class="inboxIcon" v-html="getInboxIcon(option.type)">
-                                                        </div>
-                                                    </div>
-                                                    <p class="mg-b-0 w-100" style="white-space: nowrap; overflow-x: hidden; text-overflow: ellipsis">{{labels == 'inboxes' ? option.displayName : option.name }}</p>
-                                                </div>
-
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bookmark tx-color-03 bookmarkIcon" :class="{'isActive' : isItPinned(labels, option.id)}"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="d-flex w-100 bd-t mg-t-10 pd-t-10 justify-content-between">
-                                    <button class="btn btn-outline-secondary btn-xs" @click="sidebarViewOptionShow = !sidebarViewOptionShow">Cancel</button>
-                                    <button class="btn btn-primary btn-xs" @click="saveSidebarPins">Save</button>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-              <div
-                  v-for="(option, index) in sectionValues"
-                  :key="index"
-              >
-                <RouterLink
-                    :to="{
-                      name: 'type', 
-                      params:{
-                          type: sectionName == 'tags' ? option.id : option.type, 
-                          mailboxId: sectionName == 'me' ? 'me' : sectionName == 'tags' ? 'tags' : option.id,
-                        }
-                    }"
-                    @click.native = "doSomethingInteresting"
+              <div class="d-flex justify-content-between">
+                <li
+                  class="nav-label mg-y-10 tx-color-03 tx-uppercase"
+                  v-if="Object.keys(sectionValues).length > 0"
                 >
-                   <p
+                  {{ sectionName }}
+                </li>
+                <template v-if="sectionName == 'me'">
+                  <div
+                    class="pd-y-5 d-flex justify-content-center pos-relative"
+                  >
+                    <button
+                      class="btn btn-link pd-0 mg-5 sidebarViewOptionButton"
+                      :class="{ open: sidebarViewOptionShow }"
+                      style="color: #566476"
+                      @click="sidebarViewOptionShow = !sidebarViewOptionShow"
+                    >
+                      <svg
+                        style="height: 16px; width: 16px"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="feather feather-plus-circle"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="16" />
+                        <line x1="8" y1="12" x2="16" y2="12" />
+                      </svg>
+                    </button>
+                    <div
+                      class="pos-absolute d-flex flex-column"
+                      style="
+                        /* width: 100%; */
+                        max-width: 300px;
+                        top: 100%;
+                        left: 50%;
+                        background: white;
+                        box-shadow: rgba(0, 0, 0, 0.16) 0 0 10px 2px;
+                        padding: 10px;
+                        border-radius: 5px;
+                        z-index: 99999;
+                        max-height: 50vh;
+                      "
+                      v-if="sidebarViewOptionShow"
+                    >
+                      <div class="d-flex w-100">
+                        <div class="search-form pd-b-10 bd-b mg-b-10 w-100">
+                          <input
+                            type="search"
+                            class="form-control"
+                            placeholder="Search"
+                            @keyup="filterOptionResults"
+                            v-model="searchSidebarViewOptions"
+                          />
+                          <button
+                            class="btn"
+                            type="button"
+                            @click="filterOptionResults"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="15"
+                              height="15"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              class="feather feather-search"
+                            >
+                              <circle cx="11" cy="11" r="8" />
+                              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                      <div
+                        class="optionContainer"
+                        style="
+                          max-height: 55vh;
+                          overflow: auto;
+                          padding-right: 20px;
+                          max-width: 350px;
+                        "
+                      >
+                        <div
+                          class="d-flex flex-column w-100"
+                          v-for="(
+                            list, labels
+                          ) in sidebarViewOptionsListFiltered"
+                          :key="labels"
+                        >
+                          <p
+                            class="
+                              tx-color-03 tx-14
+                              mg-b-5 mg-y-15
+                              tx-uppercase
+                              pd-x-5
+                            "
+                            v-if="list.length > 0"
+                          >
+                            {{ labels }}
+                          </p>
+                          <div
+                            class="d-flex justify-content-between w-100"
+                            v-for="option in list"
+                            :key="option.id"
+                            @click="pinThisOption(labels, option)"
+                          >
+                            <div
+                              class="
+                                pd-5
+                                mg-b-5
+                                w-100
+                                d-flex
+                                justify-content-between
+                              "
+                              v-if="
+                                (option.displayName &&
+                                  option.displayName.trim().length > 0) ||
+                                (option.name && option.name.trim().length > 0)
+                              "
+                            >
+                              <div
+                                class="tx-color-01 mg-r-15 mg-b-0 d-flex"
+                                style="width: calc(100% - 30px)"
+                              >
+                                <div class="tagIcon" v-if="labels == 'tags'">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    :style="'color:' + option.color"
+                                    width="15"
+                                    height="15"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    class="feather feather-tag mg-r-5"
+                                  >
+                                    <path
+                                      d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+                                    />
+                                    <line x1="7" y1="7" x2="7.01" y2="7" />
+                                  </svg>
+                                </div>
+                                <div
+                                  class="tx-color-01 mg-r-10 mg-b-0 d-flex"
+                                  v-if="labels == 'inboxes'"
+                                >
+                                  <div
+                                    class="inboxIcon"
+                                    v-html="getInboxIcon(option.type)"
+                                  ></div>
+                                </div>
+                                <p
+                                  class="mg-b-0 w-100"
+                                  style="
+                                    white-space: nowrap;
+                                    overflow-x: hidden;
+                                    text-overflow: ellipsis;
+                                  "
+                                >
+                                  {{
+                                    labels == "inboxes"
+                                      ? option.displayName
+                                      : option.name
+                                  }}
+                                </p>
+                              </div>
+
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="15"
+                                height="15"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="
+                                  feather feather-bookmark
+                                  tx-color-03
+                                  bookmarkIcon
+                                "
+                                :class="{
+                                  isActive: isItPinned(labels, option.id),
+                                }"
+                              >
+                                <path
+                                  d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="
+                          d-flex
+                          w-100
+                          bd-t
+                          mg-t-10
+                          pd-t-10
+                          justify-content-between
+                        "
+                      >
+                        <button
+                          class="btn btn-outline-secondary btn-xs"
+                          @click="
+                            sidebarViewOptionShow = !sidebarViewOptionShow
+                          "
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          class="btn btn-primary btn-xs"
+                          @click="saveSidebarPins"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+              <div class="sectionSubCategories d-flex flex-column w-100">
+
+                <div v-for="(option, index) in sectionValues" :key="index">
+                  <RouterLink
+                    :to="{
+                      name: 'type',
+                      params: {
+                        type: sectionName == 'tags' ? option.id : option.id == 'me' ? option.type : 'all',
+                        mailboxId: sectionName == 'tags' ? 'tags' : option.id,
+                        filterSection: 'open',
+                        pageNo: 1,
+                      },
+                    }"
+                    @click.native="doSomethingInteresting(sectionName, option)"
+                  >
+                    <p
                       style="cursor: pointer"
-                      id="mentions-label"
+                      :id="option.type + '-label'"
                       class="nav-link hw-label-badge mg-b-0"
-                      :class="{'active' : sectionName == 'me' && getMailboxID == 'me' && option.type == getRouteParamType ? true : sectionName == 'inboxes' && option.id == getMailboxID ? true: sectionName == 'tags' && getMailboxID == 'tags' && option.id == getRouteParamType ? true: false}"
+                      :class="{
+                        active:
+                          sectionName == 'me' &&
+                          getMailboxID == 'me' &&
+                          option.type == getRouteParamType
+                            ? true
+                            : sectionName == 'inboxes' &&
+                              option.id == getMailboxID
+                            ? true
+                            : sectionName == 'tags' &&
+                              getMailboxID == 'tags' &&
+                              option.id == getRouteParamType
+                            ? true
+                            : false,
+                      }"
                     >
                       <span v-if="sectionName == 'tags'">
-                          <svg xmlns="http://www.w3.org/2000/svg" :style="'color:'+option.color" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag mg-r-5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          :style="'color:' + option.color"
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="feather feather-tag mg-r-5"
+                        >
+                          <path
+                            d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+                          />
+                          <line x1="7" y1="7" x2="7.01" y2="7" />
+                        </svg>
                       </span>
-                      <span v-html="getInboxIcon(option.type)" v-else-if="sectionName == 'inboxes'"></span>
+                      <span
+                        v-html="getInboxIcon(option.type)"
+                        v-else-if="sectionName == 'inboxes'"
+                      ></span>
                       <span v-html="option.icon" v-else></span>
-                      <span v-if="sectionName == 'inboxes'">{{option.displayName}}</span>
-                      <span v-else>{{option.name}}</span>
-                      <span class="badge text-primary hw-count" v-if='sectionName == "me"'>
-                          {{mailbox.stats[option.stats] > 0 || (typeof mailbox.stats[option.stats]) === 'string' ? mailbox.stats[option.stats] == 0 ? '' : mailbox.stats[option.stats] : ''}}
+                      <span v-if="sectionName == 'inboxes'">{{
+                        option.displayName
+                      }}</span>
+                      <span v-else>{{ option.name }}</span>
+                      <span
+                        class="badge text-primary hw-count"
+                        v-if="sectionName == 'me'"
+                      >
+                        {{
+                          mailbox.stats[option.stats] > 0 ||
+                          typeof mailbox.stats[option.stats] === "string"
+                            ? mailbox.stats[option.stats] == 0
+                              ? ""
+                              : mailbox.stats[option.stats]
+                            : ""
+                        }}
                       </span>
-                      <span class="badge text-primary hw-count" v-else-if="sectionName == 'inboxes'">
-                          {{option.stats.inbox}}
+                      <span
+                        class="badge text-primary hw-count"
+                        v-else-if="sectionName == 'inboxes'"
+                      >
+                        {{ option.stats.inbox }}
                       </span>
                       <span class="badge text-primary hw-count" v-else></span>
-                  </p>
-                </RouterLink>
-              </div> 
+                    </p>
+                  </RouterLink>
+                </div>
+              </div>
             </div>
           </nav>
         </div>
@@ -202,36 +429,37 @@
 
 <script>
 import { bus } from "../main";
+import router from "../router";
 import Compose from "./Compose.vue";
-import Vue from 'vue';
+import Vue from "vue";
 export default {
-  name:'SideBarHW',
+  name: "SideBarHW",
   props: {
     mailbox: Object,
   },
   data() {
     return {
-        more: false,
-        sidebarViewOptionShow: false,
-        searchSidebarViewOptions: "",
+      more: false,
+      sidebarViewOptionShow: false,
+      searchSidebarViewOptions: "",
+      inboxes: [],
+      sidebarViewOptionsListFiltered: {
         inboxes: [],
-        sidebarViewOptionsListFiltered: {
-            "inboxes": [],
-            "tags": [],
-        },
-        sidebarViewOptionsList: {
-            "inboxes": [],
-            "tags": [],
-        },
-        //   sections: ['mine', 'mentions', 'discussion', 'all', 'assigned','unassigned','starred','snoozed','drafts']
-        sections: {
-          "me": {
-              0: {
-                  name: 'Mine',
-                  type: 'mine',
-                  stats: 'mine',
-                  mailboxId: "me",
-                  icon: `
+        tags: [],
+      },
+      sidebarViewOptionsList: {
+        inboxes: [],
+        tags: [],
+      },
+      //   sections: ['mine', 'mentions', 'discussion', 'all', 'assigned','unassigned','starred','snoozed','drafts']
+      sections: {
+        me: {
+          0: {
+            name: "Mine",
+            type: "mine",
+            stats: "mine",
+            id: "me",
+            icon: `
                       <svg style="stroke-width: 25px" version="1.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 492 492" xml:space="preserve">
                           <g id="Master_Layer_2"></g>
                           <g id="Layer_1">
@@ -263,306 +491,315 @@ export default {
                           </g>
                           </g>
                       </svg>
-                  `
-              },
-              1: {
-                  name: 'Mentions',
-                  type: 'mentions',
-                  stats: 'mentions',
-                  mailboxId: "me",
-                  icon: `
+                  `,
+          },
+          1: {
+            name: "Mentions",
+            type: "mentions",
+            stats: "mentions",
+            id: "me",
+            icon: `
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-at-sign">
                           <circle cx="12" cy="12" r="4"></circle>
                           <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"></path>
                       </svg>
-                  `
-              },
-              2: {
-                  name: 'Starred',
-                  type: 'starred',
-                  stats: 'starred',
-                  mailboxId: "me",
-                  icon: `
+                  `,
+          },
+          2: {
+            name: "Starred",
+            type: "starred",
+            stats: "starred",
+            id: "me",
+            icon: `
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star">
                           <polygon
                           points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
                           ></polygon>
                       </svg>
-                  `
-              },
-              3: {
-                  name: 'All',
-                  type: 'all',
-                  stats: 'inbox',
-                  mailboxId: "me",
-                  icon: `
+                  `,
+          },
+          3: {
+            name: "All",
+            type: "all",
+            stats: "inbox",
+            id: "me",
+            icon: `
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-inbox">
                           <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
                           <path
                           d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
                           ></path>
                       </svg>
-                  `
-              },
+                  `,
           },
-          "inboxes": {},
-          "tags": {},
+          4: {
+            name: "Trash",
+            type: "trash",
+            stats: "trash",
+            id: "me",
+            icon: `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                        </path>
+                    </svg>
+                  `,
+          }
         },
-        activeInboxes: {},
-        activeTags: {},
+        inboxes: {},
+        tags: {},
+      },
+      activeInboxes: {},
+      activeTags: {},
       // compose: {}
-    }
+    };
   },
-    async beforeMount() {
-        console.log("this.mailbox",this.mailbox);
-        await this.getInboxes();
+  async beforeMount() {
+    await this.getInboxes();
 
-        await this.getUserSidebarPins();
+    await this.getUserSidebarPins();
 
-        this.sidebarViewOptionsList = {
-            inboxes: this.inboxes,
-            tags: this.tags,
-        }
-        this.sidebarViewOptionsListFiltered = this.sidebarViewOptionsList;
+    this.sidebarViewOptionsList = {
+      inboxes: this.inboxes,
+      tags: this.tags,
+    };
+    this.sidebarViewOptionsListFiltered = this.sidebarViewOptionsList;
   },
   computed: {
     tags() {
-      return this.$store.state.tags
+      return this.$store.state.tags;
     },
-    getMailboxID(){
-        if(this.$store.state.inboxData) {
-            return this.$store.state.inboxData.id
-        } else {
-            return "me"
-        }
+    getMailboxID() {
+      if(this.$route.params.mailboxId){
+        return this.$route.params.mailboxId;
+      } else if (this.$store.state.inboxData) {
+        // console.log(this.$store.state.inboxData);
+        return this.$store.state.mailboxId;
+        // return this.$route.params.mailboxId;
+      } else {
+        return "me";
+      }
     },
-    getRouteParamType(){
-      return this.$store.state.type
-    }
+    getRouteParamType() {
+      return this.$store.state.type;
+    },
   },
   methods: {
+    broad() {
+      bus.$emit("broad");
+    },
     expandMore() {
       this.more = !this.more;
     },
-    doSomethingInteresting(){
-        console.error("----------");
+    doSomethingInteresting(sectionName, option) {
+      // console.error(sectionName, option);
     },
     openCompose(type) {
-      console.log("open");
       let hash = Date.now() + "-" + Math.floor(Math.random() * 100000000000);
       bus.$emit("openCompose", hash, type);
     },
-    async getInboxes(){
-        const response = await fetch(this.$apiBaseURL + "mailboxes.php", {credentials: 'include'});
-        const data = await response.json();
-        console.log(data);
-        this.inboxes = data.data.mailboxes; 
+    async getInboxes() {
+      const response = await fetch(this.$apiBaseURL + "mailboxes.php", {
+        credentials: "include",
+      });
+      const data = await response.json();
+      this.inboxes = data.data.mailboxes;
     },
-    async getUserSidebarPins(){
-        let response = await fetch(this.$apiBaseURL + "getUserSidebarPins.php", {credentials: 'include'});
-        response = await response.json();
-        console.log("response dhikhana",response.data);
-        if(response.status == "success"){
-            let sidebarPins = response.data;
-            let pinInboxes = sidebarPins.inboxes;
-            let pinTags = sidebarPins.tags;
+    async getUserSidebarPins() {
+      let response = await fetch(this.$apiBaseURL + "getUserSidebarPins.php", {
+        credentials: "include",
+      });
+      response = await response.json();
+      if (response.status == "success") {
+        let sidebarPins = response.data;
+        let pinInboxes = sidebarPins.inboxes;
+        let pinTags = sidebarPins.tags;
 
-            for(let i = 0; i < this.inboxes.length; i++){
-                let inbox = this.inboxes[i];
-                if(pinInboxes.includes(inbox.id + "")){
-                    this.activeInboxes[inbox.id] = inbox;
-                    this.sections["inboxes"][inbox.id] = inbox;
-                }
-            }
-
-            let tags = this.tags;
-            
-            for(let i = 0; i < tags.length; i++){
-                let tag = tags[i];
-                if(pinTags.includes(tag.id + "")){
-                    this.activeTags[tag.id] = tag;
-                    this.sections["tags"][tag.id] = tag;
-                }
-            }
-
-            console.log(this.activeInboxes);
-            console.log(this.activeTags);
-
-            this.activeInboxes = this.activeInboxes;
-            this.activeTags = this.activeTags;
-
-            this.sections["inboxes"] = this.sections.inboxes;
-            this.sections["tags"] = this.sections.tags;
-
-            this.sections = {...this.sections};
-
-        }
-        
-    },
-    filterOptionResults(){
-        //  This is somethi
-        if(this.searchSidebarViewOptions.trim().length > 0){
-            let filteredTags = this.tags.filter(tag => {
-                return tag.name.toLowerCase().includes(this.searchSidebarViewOptions.toLowerCase())
-            });
-            let filteredInboxes = this.inboxes.filter(inbox => {
-                return inbox.displayName.toLowerCase().includes(this.searchSidebarViewOptions.toLowerCase())
-            });
-            this.sidebarViewOptionsListFiltered = {
-                "inboxes" : filteredInboxes,
-                "tags" : filteredTags,
-            }
-        } else {
-            this.sidebarViewOptionsListFiltered = this.sidebarViewOptionsList;
+        for (let i = 0; i < this.inboxes.length; i++) {
+          let inbox = this.inboxes[i];
+          if (pinInboxes.includes(inbox.id + "")) {
+            this.activeInboxes[inbox.id] = inbox;
+            this.sections["inboxes"][inbox.id] = inbox;
+          }
         }
 
+        let tags = this.tags;
+
+        for (let i = 0; i < tags.length; i++) {
+          let tag = tags[i];
+          if (pinTags.includes(tag.id + "")) {
+            this.activeTags[tag.id] = tag;
+            this.sections["tags"][tag.id] = tag;
+          }
+        }
+        this.activeInboxes = this.activeInboxes;
+        this.activeTags = this.activeTags;
+        this.sections["inboxes"] = this.sections.inboxes;
+        this.sections["tags"] = this.sections.tags;
+        this.sections = { ...this.sections };
+      }
     },
-    getInboxIcon(type){
-        let icon = `
+    filterOptionResults() {
+      //  This is somethi
+      if (this.searchSidebarViewOptions.trim().length > 0) {
+        let filteredTags = this.tags.filter((tag) => {
+          return tag.name
+            .toLowerCase()
+            .includes(this.searchSidebarViewOptions.toLowerCase());
+        });
+        let filteredInboxes = this.inboxes.filter((inbox) => {
+          return inbox.displayName
+            .toLowerCase()
+            .includes(this.searchSidebarViewOptions.toLowerCase());
+        });
+        this.sidebarViewOptionsListFiltered = {
+          inboxes: filteredInboxes,
+          tags: filteredTags,
+        };
+      } else {
+        this.sidebarViewOptionsListFiltered = this.sidebarViewOptionsList;
+      }
+    },
+    getInboxIcon(type) {
+      let icon = `
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mail">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
                 </path>
                 <polyline points="22,6 12,13 2,6"></polyline>
             </svg>
         `;
-        if(type == "mail"){
-            icon = `
+      if (type == "mail") {
+        icon = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-mail">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
                     </path>
                     <polyline points="22,6 12,13 2,6"></polyline>
                 </svg>
-            `; 
-        } else if (type == "sms"){
-            icon = `
+            `;
+      } else if (type == "sms") {
+        icon = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-circle">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
                     </path>
                 </svg>
-            `; 
-        } else if (type == "chat"){
-            icon = `
+            `;
+      } else if (type == "chat") {
+        icon = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-            `; 
-        } else if (type == "twitter"){
-            icon = `
+            `;
+      } else if (type == "twitter") {
+        icon = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-twitter"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path></svg>
-            `; 
-        } else if (type == "facebook"){
-            icon = `
+            `;
+      } else if (type == "facebook") {
+        icon = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-            `; 
-        } else if (type == "instagram"){
-            icon = `
+            `;
+      } else if (type == "instagram") {
+        icon = `
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-instagram"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-            `; 
-        } else if (type == "whatsapp"){
-            icon = `
+            `;
+      } else if (type == "whatsapp") {
+        icon = `
                 <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="whatsapp" class="svg-inline--fa fa-whatsapp fa-w-14" role="img" viewBox="0 0 448 512"><path fill="currentColor" d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/></svg>
             `;
-        }
+      }
 
-        return icon;
+      return icon;
     },
-    pinThisOption(labels, option){
+    pinThisOption(labels, option) {
+      if (this.sections[labels][option.id]) {
+        delete this.sections[labels][option.id];
+      } else {
+        this.sections[labels][option.id] = option;
+      }
 
-        if(this.sections[labels][option.id]){
-            delete this.sections[labels][option.id];
+      this.sections["inboxes"] = this.sections.inboxes;
+      this.sections["tags"] = this.sections.tags;
+
+      // this.sections[labels].push(option);
+
+      if (labels == "inboxes") {
+        if (this.activeInboxes[option.id]) {
+          delete this.activeInboxes[option.id];
         } else {
-            this.sections[labels][option.id] = option;
+          this.activeInboxes[option.id] = option;
         }
+        this.activeInboxes = { ...this.activeInboxes };
+      }
 
-        this.sections["inboxes"] = this.sections.inboxes;
-        this.sections["tags"] = this.sections.tags;
-
-        // this.sections[labels].push(option);
-
-        if(labels == "inboxes"){
-            if(this.activeInboxes[option.id]){
-                delete this.activeInboxes[option.id];
-            } else {
-                this.activeInboxes[option.id] = option;
-            }
-            this.activeInboxes = {...this.activeInboxes};
+      if (labels == "tags") {
+        if (this.activeTags[option.id]) {
+          delete this.activeTags[option.id];
+        } else {
+          this.activeTags[option.id] = option;
         }
-        
-        if(labels == "tags"){
-            if(this.activeTags[option.id]){
-                delete this.activeTags[option.id];
-            } else {
-                this.activeTags[option.id] = option;
-            }
-            this.activeTags = {...this.activeTags};
-        }
+        this.activeTags = { ...this.activeTags };
+      }
     },
-    isItPinned(label, id){
-        // if(this.sections[label][id]){
-        //     return true;
-        // } else {
-        //     return false;
-        // }
+    isItPinned(label, id) {
+      // if(this.sections[label][id]){
+      //     return true;
+      // } else {
+      //     return false;
+      // }
 
-        if(label == "inboxes"){
-            return this.activeInboxes[id];
-        }
-        
-        if(label == "tags"){
-            return this.activeTags[id];
-        }
+      if (label == "inboxes") {
+        return this.activeInboxes[id];
+      }
+
+      if (label == "tags") {
+        return this.activeTags[id];
+      }
     },
-    async saveSidebarPins(){
-        this.sidebarViewOptionShow = false;
-        let pins = {
-            inboxes: Object.keys(this.activeInboxes),
-            tags: Object.keys(this.activeTags)
-        };
+    async saveSidebarPins() {
+      this.sidebarViewOptionShow = false;
+      let pins = {
+        inboxes: Object.keys(this.activeInboxes),
+        tags: Object.keys(this.activeTags),
+      };
 
-        let response = await fetch("https://app.helpwise.io/api/setUserSidebarPins.php", {
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify({
-                pins
-            })
-        });
-
-        response = await response.json();
-
-        if(response.status == "success"){
-            this.$toast.success("Settings saved successfully");
+      let response = await fetch(
+        "https://app.helpwise.io/api/setUserSidebarPins.php",
+        {
+          method: "POST",
+          credentials: "include",
+          body: JSON.stringify({
+            pins,
+          }),
         }
-    }
-  }
+      );
+
+      response = await response.json();
+
+      if (response.status == "success") {
+        this.$toast.success("Settings saved successfully");
+      }
+    },
+  },
 };
-
-
-// :to="{
-//                       name: 'type', 
-//                       params:{
-//                           type: sectionName == 'tags' ? option.id : option.type, 
-//                           mailboxId: sectionName == 'me' ? 'me' : sectionName == 'tags' ? 'tags' : option.id,
-//                         }
-//                     }"
 </script>
 
 <style>
+.inboxIcon svg {
+  height: 15px;
+  width: 15px;
+}
 
-    .inboxIcon svg{
-        height: 15px;
-        width: 15px;
-    }
+.bookmarkIcon.isActive {
+  stroke: green;
+  fill: green;
+}
 
-    .bookmarkIcon.isActive{
-        stroke: green;
-        fill: green;
-    }
+/* #labels-nav{
+  display: grid;
+  grid-template-rows: 40% 30% 30%;
+  grid-template-columns: 100%;
+} */
 
-    .sidebarViewOptionButton{
-        /* transform: rotateZ(0deg);
-        transition: transform 250ms ease; */
-    }
-
-    .sidebarViewOptionButton.open{
-        /* transform: rotateZ(45deg); */
-    }
-
+#labels-nav > div:nth-child(2) > .sectionSubCategories, #labels-nav > div:nth-child(3) > .sectionSubCategories{
+  max-height: calc(calc(87vh - 460px) / 2 );
+  width: 100%;
+  overflow-y: auto;
+}
 </style>

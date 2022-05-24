@@ -14,45 +14,38 @@ export default new Router({
       path: "/",
       name: 'Home',
       component: Home,
-      redirect: '/me/mine/p/1'
+      redirect: '/me/mine/open/p/1'
     },
     {
       path: "/me/mine",
       name: "pagination",
       component: Home,
-      redirect: '/me/mine/p/1'
+      redirect: '/me/mine/open/p/1'
     },
     {
       path: '/:mailboxId',
       name: 'mailbox',
       component: Home,
-      redirect: '/:mailboxId/mine/p/1'
+      redirect: '/:mailboxId/all/open/p/1'
     },
     {
-      path: '/open/:threadId',
+      path: '/conversations/:threadId',
       name: 'thread',
       component: Home,
       props: true
     },
     {
-      path: '/:mailboxId/:type/p/1',
+      path: '/:mailboxId/:type/:filterSection/p/:pageNo',
       name: 'type',
-      component: Home,
-      props: true,
-      // redirect: '/:mailboxId/:type/p/1'
-    },
-    {
-      path: '/:mailboxId/:type/p/:pageNo',
-      name: 'page',
       component: Home,
       props: true
     },
-    // {
-    //   path: '/:mailboxId/:type/:threadId',
-    //   name: 'thread',
-    //   component: Home,
-    // },
-    
+    {
+      path: '/tags/:tagId/:filterSection/p/:pageNo',
+      name: 'tag',
+      component: Home,
+      props: true
+    },
     {
       path: "/settings",
       name: 'SHome',

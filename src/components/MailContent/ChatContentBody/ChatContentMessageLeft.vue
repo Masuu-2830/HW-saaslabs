@@ -12,12 +12,13 @@
   >
     <div class="comment d-flex justify-content-start align-items-center">
       <div
-        class="avtar-message d-flex justify-content-start align-items-end w-100"
+        class="avatar-message d-flex justify-content-start align-items-end w-100"
       >
         <div
           class="avatar avatar-offline mg-b-15"
           :class="'customer-avatar-' + item.data.sentBy.id"
           v-html="item.data.sentBy.avatarTag"
+          v-if="mailboxType!='sms' && mailboxType!='whatsapp'"
         ></div>
         <div
           class="
@@ -132,6 +133,7 @@ export default {
   name: "ChatContentMessageLeft",
   props: {
     item: Object,
+    mailboxType: String
   },
   data() {
     return {

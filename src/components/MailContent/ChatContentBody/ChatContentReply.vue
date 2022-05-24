@@ -1,13 +1,31 @@
 <template>
-  <div v-if="$route.params.threadId !== undefined" style="background-color: white" class="d-flex flex-column editor_container" id="threadEditorContainer">
+  <div
+    v-if="$route.params.threadId !== undefined"
+    :style="
+      this.thread.data.mailboxType == 'mail' ||
+      this.thread.data.mailboxType == 'custom'
+        ? 'background-color: #f7f7f7'
+        : 'background-color: white'
+    "
+    class="d-flex flex-column editor_container"
+    id="threadEditorContainer"
+  >
     <p class="typingMessageNotice tx-12 tx-italic tx-sans" v-if="typingNotice">
-      {{typingNotice}}
+      {{ typingNotice }}
     </p>
-    <p class="typingMessageNotice tx-12 tx-italic tx-sans" v-if="typingNotesNotice">
-      {{typingNotesNotice}}
+    <p
+      class="typingMessageNotice tx-12 tx-italic tx-sans"
+      v-if="typingNotesNotice"
+    >
+      {{ typingNotesNotice }}
     </p>
-    <div class="editorContainer" :class="{'noteMode': this.thread.data.mailboxType == 'mail'}">
+    <div
+      class="editorContainer"
+      style="margin-top: 0px"
+      :class="{ noteMode: this.thread.data.mailboxType == 'mail' }"
+    >
       <ul
+        v-if="this.thread.data.mailboxType !== 'mail'"
         class="nav nav-line flex-row mg-l-20 mg-b-10"
         role="tablist"
         style="
@@ -15,8 +33,9 @@
           margin-top: 5px;
           margin-bottom: 5px;
         "
+        
       >
-        <li class="nav-item" v-if="this.thread.data.mailboxType !== 'mail'">
+        <li class="nav-item">
           <a
             class="nav-link reply-tab"
             :class="this.thread.data.mailboxType !== 'mail' && 'active'"
@@ -53,7 +72,12 @@
           role="tabpanel"
           aria-labelledby="reply-tab"
         >
-          <froala :tag="'textarea'" v-model="chat" name="chat" :config="replyEditorConfig"></froala>
+          <froala
+            :tag="'textarea'"
+            v-model="chat"
+            name="chat"
+            :config="replyEditorConfig"
+          ></froala>
         </div>
         <div
           class="tab-pane fade"
@@ -62,7 +86,12 @@
           role="tabpanel"
           aria-labelledby="notes-tab"
         >
-          <froala :tag="'textarea'" v-model="note" name="note" :config="noteEditorConfig"></froala>
+          <froala
+            :tag="'textarea'"
+            v-model="note"
+            name="note"
+            :config="noteEditorConfig"
+          ></froala>
         </div>
         <input
           type="file"
@@ -78,57 +107,62 @@
 </template>
 
 <script>
-  import FroalaEditor from 'froala-editor';
-  // import VueTribute from "vue-tribute";
-  import Tribute from "tributejs";
-  import AttachmentComp from '../../AttachmentComp.vue';
-  // import HcArticles from './modals/HcArticles.vue';
-  import Vue from 'vue';
-  import { bus, triggerPromptNotif } from "../../../main";
-  const axios = require('axios').default;
-  import { firebase_app } from "../../../firebaseInit";
+import FroalaEditor from "froala-editor";
+// import VueTribute from "vue-tribute";
+import Tribute from "tributejs";
+import AttachmentComp from "../../AttachmentComp.vue";
+// import HcArticles from './modals/HcArticles.vue';
+import Vue from "vue";
+import { bus, triggerPromptNotif } from "../../../main";
+const axios = require("axios").default;
+import { firebase_app } from "../../../firebaseInit";
 
-  export default {
-    name: "ChatContentReply",
-    props: ["thread"],
-    components: {
-      // VueTribute,
-      FroalaEditor,
-      // HcArticles
-    },
-    data() {
-      const self = this;
-      return {
-        current: this.thread.data.mailboxType == 'mail' ? 'reply' : 'note',
-        tempData:['a', 'b', 'v'],
-        replyEditorInstance: null,
-        noteEditorInstance: null,
-        replyAttachments: {},
-        notesAttachments: {},
-        note: "",
-        chat: "",
-        typing: {
-          reply: false,
-          notes: false
-        },
-        showHcModal: false,
-        defaultTypingTimer: 1000,
-        typingNotice: "",
-        typingNotesNotice: "",
-        typingTimer: null,
-        typingNotesTimer: null,
-        replyEditorConfig: {
-          events: {
-            initialized: async function() {
-              const replyFroala = this;
-              self.replyEditorInstance = this;
+export default {
+  name: "ChatContentReply",
+  props: ["thread"],
+  components: {
+    // VueTribute,
+    FroalaEditor,
+    // HcArticles
+  },
+  data() {
+    const self = this;
+    return {
+      current: self.thread.data.mailboxType == "mail" ? "note" : "reply" || "reply",
+      tempData: ["a", "b", "v"],
+      replyEditorInstance: null,
+      noteEditorInstance: null,
+      replyAttachments: {},
+      notesAttachments: {},
+      note: "",
+      chat: "",
+      typing: {
+        reply: false,
+        notes: false,
+      },
+      showHcModal: false,
+      defaultTypingTimer: 1000,
+      typingNotice: "",
+      typingNotesNotice: "",
+      typingTimer: null,
+      typingNotesTimer: null,
+      replyEditorConfig: {
+        events: {
+          initialized: async function () {
+            const replyFroala = this;
+            self.replyEditorInstance = this;
 
-              let savedReplyTribute = await self.callApi();
-              savedReplyTribute.attach(replyFroala.el);
+            let savedReplyTribute = await self.callApi();
+            savedReplyTribute.attach(replyFroala.el);
 
-              replyFroala.events.on('keydown', function(e) {
+            replyFroala.events.on(
+              "keydown",
+              function (e) {
                 self.hitFirebase("reply");
-                if (e.which == FroalaEditor.KEYCODE.ENTER && savedReplyTribute.isActive) {
+                if (
+                  e.which == FroalaEditor.KEYCODE.ENTER &&
+                  savedReplyTribute.isActive
+                ) {
                   return false;
                 }
               },
@@ -227,12 +261,17 @@
           initialized: async function () {
             const noteFroala = this;
             self.noteEditorInstance = this;
-            let mentionTribute = await self.callApi1();
+            let mentionTribute = await self.callApi1(noteFroala.el);
             mentionTribute.attach(noteFroala.el);
 
-            noteFroala.events.on("keydown",function (e) {
-              self.hitFirebase("notes");
-                if (e.which == FroalaEditor.KEYCODE.ENTER && mentionTribute.isActive) {
+            noteFroala.events.on(
+              "keydown",
+              function (e) {
+                self.hitFirebase("notes");
+                if (
+                  e.which == FroalaEditor.KEYCODE.ENTER &&
+                  mentionTribute.isActive
+                ) {
                   return false;
                 }
               },
@@ -258,7 +297,7 @@
         charCounterCount: false,
         toolbarBottom: true,
         key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
-        heightMin: 100,
+        heightMin: this.thread.data.mailboxType == 'mail' ? 50 : 100,
         heightMax: 290,
         toolbarButtons: {
           moreText: {
@@ -324,18 +363,30 @@
   },
   methods: {
     async callApi() {
-      const response = await fetch(
-        this.$apiBaseURL +
-          "get-teammates.php?mailboxID=" +
-          this.thread.data.mailbox_id,
-        { credentials: "include" }
-      );
-      const data = await response.json();
-      console.log(data);
-      return this.createTribute(data);
+      // const response = await fetch(
+      //   this.$apiBaseURL +
+      //     "get-teammates.php?mailboxID=" +
+      //     this.thread.data.mailbox_id,
+      //   { credentials: "include" }
+      // );
+      // const data = await response.json();
+      // console.log(data);
+      // return this.createTribute(data);
+
+      let fetchURL = 'https://app.helpwise.io/api/list-saved-replies.php';
+      let inboxID = this.thread.data.mailbox_id;
+      if((inboxID && inboxID!='me') || (this.$store.state.inboxData && this.$store.state.inboxData.id!='me')){
+          let mailboxID = inboxID!='me' ? inboxID : this.$store.state.inboxData.id;
+          fetchURL = `https://app.helpwise.io/api/list-saved-replies.php?mailboxID=${mailboxID}`;
+      }
+      let response = await fetch(fetchURL,{credentials: "include"});
+      response = await response.json();
+      if(response.status == "success"){
+        return this.createTribute(response.data.savedReplies);
+      }
+
     },
-    async callApi1() {
-      console.log("calling api 2");
+    async callApi1(editorEl) {
       const response = await fetch(
         this.$apiBaseURL +
           "get-teammates.php?mailboxID=" +
@@ -343,64 +394,85 @@
         { credentials: "include" }
       );
       const data = await response.json();
-      console.log(data);
-      return this.createTribute1(data.data.teammates);
+      return this.createTribute1(data.data.teammates, editorEl);
     },
     createTribute(data) {
-      console.log("creating tribute 1");
-      //   console.log(this.editorInstance);
       var tribute = new Tribute({
-        trigger: "#",
-        values: data,
-        lookup: "username",
-        fillAttr: "firstname",
-        selectTemplate: function (item) {
-          return (
-            `<span contenteditable="false" class="mention-h fr-deletable fr-tribute">#` +
-            item.original.firstname +
-            "</span>"
-          );
-        },
-        noMatchTemplate: function () {
-          return '<span style:"visibility: hidden;"></span>';
-        },
+        collection: [{
+          trigger: "#",
+          values: data,
+          lookup: function (item, stringText){
+            let name = item.name.toString().toLowerCase();
+            // let snippet = item.snippet.toString().toLowerCase();
+            stringText = stringText && stringText.toString().toLowerCase();
+
+            if(name.toString().includes(stringText)){
+              let customTemplate = `
+                <div class="d-flex flex-column pd-x-10 pd-y-15">
+                  <span class="tx-color-01 tx-14 tx-bold tx-sans">${item.name}</span>
+                  <span class="tx-color-03 tx-12 savedReplyPreviewOverflow tx-sans">${item.snippet}</span>
+                </div>
+              `;
+              return customTemplate;
+            }
+          },
+          // containerClass: "tribute-container76786287167",
+          menuItemTemplate: function (item) {
+            let customTemplate = `
+              <div class="d-flex flex-column pd-x-10 pd-y-15">
+                <span class="tx-color-01 tx-14 tx-bold tx-sans">${item.original.name}</span>
+                <span class="tx-color-03 tx-12 savedReplyPreviewOverflow tx-sans">${item.original.snippet}</span>
+              </div>
+            `;
+            return customTemplate;
+          },
+          selectTemplate: function (item) {
+            console.log(item);
+            return item.original.snippet;
+          },
+          noMatchTemplate: function () {
+            return '<span style:"visibility: hidden;"></span>';
+          },
+        }]
       });
-      console.log(tribute);
       return tribute;
     },
-    createTribute1(data) {
-      console.log("creating tribute 2");
+    createTribute1(data, editorEl) {
+      const d = [];
+      for (let i = 0; i <= data.length - 1; i++) {
+        if (data[i].firstname) {
+          d.push({
+            key: (data[i].firstname + " " + data[i].lastname).trim(),
+            value: "@" + data[i].firstname + " " + data[i].lastname,
+            id: data[i].id,
+          });
+        } else {
+          d.push({
+            key: data[i].email,
+            value: "@" + data[i].email,
+            id: data[i].id,
+          });
+        }
+      }
+
       var tribute = new Tribute({
         collection: [
-          // {
-          //   trigger: "@",
-          //   values: [
-          //     { key: "masood", value: "Masood" },
-          //     { key: "kunal", value: "Kunal Kumar" },
-          //     { key: "gatti", value: "Gatti Ramya" },
-          //     { key: "mayank", value: "Mayank Banga" },
-          //     { key: "ayush", value: "Ayush Rastogi" },
-          //     { key: "vibhor", value: "Vibhor Agarwal" },
-          //   ],
-          //   selectTemplate: function (item) {
-          //     return (
-          //       `<span contenteditable="false" class="mention fr-deletable fr-tribute">@` +
-          //       item.original.value +
-          //       "</span>"
-          //     );
-          //   },
-          //   noMatchTemplate: function () {
-          //     return '<span style:"visibility: hidden;"></span>';
-          //   },
-          // },
           {
             trigger: "@",
             values: data,
             lookup: "username",
-            fillAttr: "firstname",
+            // fillAttr: "firstname",
+            menuItemTemplate: function (item) {
+              let customTemplate = `
+                <div class="d-flex flex-column pd-x-10 pd-y-15">
+                  <span class="tx-color-01 tx-14 tx-bold tx-sans">${item.original.firstname} ${item.original.lastname}</span>
+                </div>
+              `;
+              return customTemplate;
+            },
             selectTemplate: function (item) {
               return (
-                `<span contenteditable="false" class="mention-h fr-deletable fr-tribute">@` +
+                `<span contenteditable="false" class="mention-highlight fr-deletable fr-tribute" data-id=${item.original.id}>@` +
                 item.original.firstname +
                 "</span>"
               );
@@ -452,7 +524,7 @@
         refreshAfterCallback: true,
         callback: function () {
           this.selection.save();
-          console.log(1);
+
           // $(".saved-replies-btn").click();
           bus.$emit("savedReply", "chatReply");
         },
@@ -471,7 +543,7 @@
           this.selection.save();
           let editor = this;
           vueThis.showHcModal = true;
-          console.log("----");
+
           bus.$emit("hcArticles", "chatReply");
           // vueThis.$bvModal.show('helpcenterArticlesModal');
         },
@@ -504,13 +576,9 @@
             ? vueThis.replyAttachments
             : vueThis.notesAttachments;
 
-        console.log(attachmentObject);
-
         attachmentObject[hash] = attachmentData;
         Vue.delete(attachmentObject, hash);
         attachmentObject[hash] = attachmentData;
-
-        console.log(attachmentObject);
 
         axios
           .request({
@@ -520,7 +588,7 @@
             withCredentials: true,
             onUploadProgress: function (p) {
               let percentage = (p.loaded / p.total) * 100;
-              console.log(percentage);
+
               attachmentObject[hash]["progress"] = percentage;
             },
           })
@@ -540,109 +608,167 @@
             attachmentObject[attachID]["mimeType"] = attachData["mimeType"];
             attachmentObject[attachID]["extension"] = attachData["extension"];
             attachmentObject[attachID]["id"] = attachID;
-          })
-        }
-      },
-    hitFirebase(type){
+          });
+      }
+    },
+    hitFirebase(type) {
       let managerID = this.$store.state.userInfo.accountID;
       let threadID = this.$route.params.threadId;
 
-      console.log(`/Account-${managerID}/ThreadID-${threadID}`);
-      const socket = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
+      // console.log(`/Account-${managerID}/ThreadID-${threadID}`);
+      const socket = firebase_app
+        .database()
+        .ref(`/Account-${managerID}/ThreadID-${threadID}`);
 
-      if(type == "notes"){
-        if(!this.typing.notes){
+      if (type == "notes") {
+        if (!this.typing.notes) {
           this.typing.notes = true;
-          socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).off("value");
-          socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+          socket
+            .child(`/commenting user/user-${this.$store.state.userInfo.id}`)
+            .off("value");
+          socket
+            .child(`/commenting user/user-${this.$store.state.userInfo.id}`)
+            .set(this.$store.state.userInfo);
           this.startNotesTimer(socket);
         }
-        if(this.typing.notes){
+        if (this.typing.notes) {
           this.resetNotesTimer(socket);
         }
       } else {
-        if(!this.typing.reply){
+        if (!this.typing.reply) {
           this.typing.reply = true;
-          socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).off("value");
-          socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).set(this.$store.state.userInfo);
+          socket
+            .child(`/replying user/user-${this.$store.state.userInfo.id}`)
+            .off("value");
+          socket
+            .child(`/replying user/user-${this.$store.state.userInfo.id}`)
+            .set(this.$store.state.userInfo);
           this.startReplyingTimer(socket);
         }
 
-        if(this.typing.reply){
+        if (this.typing.reply) {
           this.resetReplyingTimer(socket);
         }
       }
     },
-    startReplyingTimer(socket){
+    startReplyingTimer(socket) {
       this.typingTimer = setTimeout(() => {
         this.typing.reply = false;
-        socket.child(`/replying user/user-${this.$store.state.userInfo.id}`).remove();
+        socket
+          .child(`/replying user/user-${this.$store.state.userInfo.id}`)
+          .remove();
       }, this.defaultTypingTimer);
     },
-    startNotesTimer(socket){
+    startNotesTimer(socket) {
       this.typingNotesTimer = setTimeout(() => {
         this.typing.notes = false;
-        socket.child(`/commenting user/user-${this.$store.state.userInfo.id}`).remove();
+        socket
+          .child(`/commenting user/user-${this.$store.state.userInfo.id}`)
+          .remove();
       }, this.defaultTypingTimer);
     },
-    resetReplyingTimer(socket){
+    resetReplyingTimer(socket) {
       clearTimeout(this.typingTimer);
       this.startReplyingTimer(socket);
     },
-    resetNotesTimer(socket){
+    resetNotesTimer(socket) {
       clearTimeout(this.typingNotesTimer);
       this.startNotesTimer(socket);
     },
-    makingTypingCard(data, type){
+    makingTypingCard(data, type) {
       let typingType = type == "notes" ? "adding notes" : "replying";
       let noticeElem = "";
-      if(Object.keys(data).length == 0){
+      if (Object.keys(data).length == 0) {
         noticeElem = "";
       }
       for (const key in data) {
         if (Object.hasOwnProperty.call(data, key)) {
           const user = data[key];
           let userID = user.id;
-          let userFName = user.firstname;
-          let userLName = user.lastname;
-          let userName = `${userFName} ${userLName}`;
-          userName = userName.trim();
-          let prefix = "";
-          if(noticeElem.trim().length > 0){
-            prefix = ";";
+          // console.log(this.$store.state.userInfo);
+          if(userID != this.$store.state.userInfo.id){
+            let userFName = user.firstname;
+            let userLName = user.lastname;
+            let userName = `${userFName} ${userLName}`;
+            userName = userName.trim();
+            let prefix = "";
+            if (noticeElem.trim().length > 0) {
+              prefix = ";";
+            }
+            noticeElem += `${prefix} ${userName} is ${typingType}... `;
           }
-          noticeElem += `${prefix} ${userName} is ${typingType}... `;
         }
       }
 
-      type == "notes" ? this.typingNotesNotice = noticeElem : this.typingNotice = noticeElem;
-
+      type == "notes"
+        ? (this.typingNotesNotice = noticeElem)
+        : (this.typingNotice = noticeElem);
     },
     sendMessage() {
-      
+      console.log("this thread ka data",this.thread);
       let attachmentKeys = Object.keys(this.replyAttachments);
       let attachmentIDs = attachmentKeys.filter(
         (attachmentKey) => !attachmentKey.includes("-")
       );
+      let inboxType = this.thread.data.mailboxType;
+      let inboxSubType = this.thread.data.mailboxSubType;
 
       let message = this.chat
-        .replace(/(<p)/gim, "<div")
-        .replace(/<\/p>/gim, "</div>");
+        // .replace(/(<p)/gim, "<div")
+        // .replace(/<\/p>/gim, "</div>");
+
+      let $temp = $(`<div>${this.chat}</div>`);
+      if($temp.text().length == 0 && $temp.find("img").length == 0){
+        return false;
+      }
+      let to_id = this.$route.params.threadId;
+      if(inboxType == 'sms' || inboxType == 'whatsapp'){
+        to_id = this.thread.data.clientNumber; 
+      }
       let messageData = {
         mailboxID: this.thread.data.mailbox_id,
-        to: this.$route.params.threadId,
+        to: to_id,
         type: 1,
         message,
         time: new Date().toISOString(),
-        attachmentIDs
+        attachmentId: attachmentIDs,
+        isUnified: 1
       };
+      let url = "";
+      if(inboxType == "chat"){
+        url = this.$apiBaseURL + "unifiedv2/sendChatInboxMessage.php";
+      } else if(inboxType == "sms"){
+        if(inboxSubType == "justcall"){
+          url = this.$apiBaseURL + "/justcall/sendSmsUnifiedLive.php";
+        } else if(inboxSubType == "dialpad"){
+          url = this.$apiBaseURL + "/dialpad/sendSmsUnifiedLive.php";
+        } else if(inboxSubType == "ringcentral"){
+          url = this.$apiBaseURL + "/ringcentral/sendSmsUnifiedLive.php";
+        } else if(inboxSubType == "plivo"){
+          url = this.$apiBaseURL + "/plivo/sendSmsUnifiedLive.php";
+        } else {
+          url = this.$apiBaseURL + "/sms/sendSmsUnifiedLive.php";
+        }
+      } else if(inboxType == "whatsapp"){
+        if(inboxSubType == "360dialog"){
+          url = this.$apiBaseURL + "/360dialog/sendSmsUnifiedLive.php";
+        } else {
+          url = this.$apiBaseURL + "/whatsapp/sendSmsUnifiedLive.php";
+        }
+      }
+
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(messageData),
         credentials: "include",
       };
-      fetch(this.$apiBaseURL + "chat-widget/sendInboxMessage-unified-v2", requestOptions)
+
+      if(url.trim().length > 0){
+        fetch(
+          url,
+          requestOptions
+        )
         .then(async (response) => {
           const data = await response.json();
           if (data.status !== "success") {
@@ -650,22 +776,23 @@
             return Promise.reject(error);
           }
           // editor.html = "";
+          
           let payload = {
-            "id": data.data.message_id,
-            "text": data.data.body,
-            "sentBy": data.data.sent_by,
-            "attachments": this.replyAttachments,
-            "date": data.data.message_time,
-            "threadId": this.$route.params.threadId,
-            "type": 1,
-            "unixTime": new Date(),
-            "deliveryStatus": data.data.delivery_status
+            id: data.data.message_id,
+            text: data.data.body,
+            sentBy: data.data.sent_by,
+            attachments: this.replyAttachments,
+            date: data.data.message_time,
+            threadId: this.$route.params.threadId,
+            type: 1,
+            unixTime: new Date(),
+            deliveryStatus: data.data.delivery_status,
           };
           let message = {
             message: payload,
-            type: "chat",
+            type: inboxType,
           };
-          console.log(message);
+
           bus.$emit("changeThreadAttrs", message);
           this.chat = "";
           this.replyAttachments = {};
@@ -673,61 +800,76 @@
         .catch((error) => {
           alert(error);
         });
+      } else {
+        triggerPromptNotif("Oops! seems like we have not connected this inbox yet!");
+      }
 
-      console.log(messageData);
     },
     sendNotes() {
-      
-      let attachmentKeys = Object.keys(this.notesAttachments);
-      let attachmentIDs = attachmentKeys.filter(
-        (attachmentKey) => !attachmentKey.includes("-")
-      );
+      console.log("note ka hit",this.note);
+      if (this.note !== "") {
+        let attachmentKeys = Object.keys(this.notesAttachments);
+        let attachmentIDs = attachmentKeys.filter(
+          (attachmentKey) => !attachmentKey.includes("-")
+        );
 
-      let message = this.note
-        .replace(/(<p)/gim, "<div")
-        .replace(/<\/p>/gim, "</div>");
-      let messageData = {
-        mailboxID: this.thread.data.mailbox_id,
-        threadID: this.$route.params.threadId,
-        mentionUserIDs: [],
-        message,
-        attachmentIDs,
-      };
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(messageData),
-        credentials: "include",
-      };
-      fetch(this.$apiBaseURL + "addNote.php", requestOptions)
-        .then(async (response) => {
-          const data = await response.json();
-          if (data.status !== "success") {
-            const error = (data && data.message) || response.status;
-            return Promise.reject(error);
-          }
-          // editor.html = "";
-          let payload = {
-            "id": data.data.comment.id,
-            "body": this.note,
-            "by": this.$store.state.userInfo,
-            "attachments": this.notesAttachments,
-            "at": new Date().toISOString()
-          };
-          let comment = {
-            comment: payload,
-            type: "comment",
-          };
-          console.log(comment);
-          bus.$emit("changeThreadAttrs", comment);
-          this.note = "";
-          this.notesAttachments = {};
-        })
-        .catch((error) => {
-          alert(error);
+        // let message = this.note
+        //   .replace(/(<p)/gim, "<div")
+        //   .replace(/<\/p>/gim, "</div>");
+        let message = this.note;
+
+        let $temp = $(`<div>${this.note}</div>`);
+        let mentionUserIDs = [];
+        $temp.find(".mention-highlight").each(function(){
+          console.log($(this));
+          mentionUserIDs.push($(this).data('id'));
         });
 
-      console.log(messageData);
+        if($temp.text().length == 0 && $temp.find("img").length == 0){
+          return false;
+        }
+        let messageData = {
+          mailboxID: this.thread.data.mailbox_id,
+          threadID: this.$route.params.threadId,
+          mentionUserIDs: mentionUserIDs,
+          message,
+          attachmentIDs,
+          type: this.thread.data.mailboxType
+        };
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(messageData),
+          credentials: "include",
+        };
+        fetch(this.$apiBaseURL + "addNote.php", requestOptions)
+          .then(async (response) => {
+            const data = await response.json();
+            if (data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            // editor.html = "";
+            let payload = {
+              id: data.data.comment.id,
+              body: this.note,
+              by: this.$store.state.userInfo,
+              attachments: this.notesAttachments,
+              at: new Date().toISOString(),
+            };
+            let comment = {
+              comment: payload,
+              type: "comment",
+            };
+            console.log(comment);
+            bus.$emit("changeThreadAttrs", comment);
+            this.note = "";
+            this.notesAttachments = {};
+          })
+          .catch((error) => {
+            alert(error);
+          });
+      }
     },
     getArticleCardEmail(article) {
       let $imgHtml = "";
@@ -790,6 +932,7 @@
           `;
     },
     getArticleCard(article) {
+      
       let $descHtml = "";
       if (article.description) {
         $descHtml = `<p style="margin-top: 0;" class="hw_articleCardText">${article.description}</p>`;
@@ -819,7 +962,6 @@
 
     bus.$off("deleteAttachmentUpload");
     bus.$on("deleteAttachmentUpload", (id) => {
-      console.log("event listened", id);
       if (id) {
         Vue.delete(vueThis.attachments, id);
       }
@@ -827,7 +969,6 @@
 
     // bus.$off("modal.hcArticleInsert.click");
     bus.$on("modal.hcArticleInsert.click", function (data, type) {
-      console.log(type, data);
       if (type == "chatReply") {
         let editorInstance =
           vueThis.current == "reply"
@@ -837,9 +978,8 @@
       }
     });
 
-    // bus.$off("modal.savedReplyInsert.click");
+    bus.$off("modal.savedReplyInsert.click");
     bus.$on("modal.savedReplyInsert.click", function (id, type) {
-      console.log(type, id);
       if (type == "chatReply") {
         let editorInstance =
           vueThis.current == "reply"
@@ -847,60 +987,67 @@
             : vueThis.noteEditorInstance;
 
         triggerPromptNotif("Fetching saved reply data");
+        console.log("FETCHING SAVED REPLY IN CHAT CONTENT REPLY");
         fetch(
-          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vuethis.thread.data.mailbox_id}&savedReplyID=${id}`,
+          `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.thread.data.mailbox_id}&savedReplyID=${id}`,
           {credentials: 'include'}
         ).then(response => response.json())
         .then(response => {
           if(response.status == "success"){
-            editorInstance.html.insert(response.data.savedReply.content);
-            triggerPromptNotif("Saved Reply Inserted", "success");
-          } else {
-            triggerPromptNotif("Unable to insert Saved Reply", "error");
+            
+            if(vueThis.current == 'reply'){
+              // vueThis.chat += response.data.savedReply.content;
+              vueThis.replyEditorInstance.html.insert(response.data.savedReply.content);
+            } else {  
+              // vueThis.note += response.data.savedReply.content;
+              vueThis.noteEditorInstance.html.insert(response.data.savedReply.content);
+            }
           }
-        })
-        }
-      })
+        });
+      }
+    });
 
-      $(document).off("click", "#sendMessage");
-      $(document).on("click", "#sendMessage", function(){
-        vueThis.sendMessage();
-      });
+    $(document).off("click", "#sendMessage");
+    $(document).on("click", "#sendMessage", function () {
+      vueThis.sendMessage();
+    });
 
-      $(document).off("click", "#sendNotes");
-      $(document).on("click", "#sendNotes", function(){
-        vueThis.sendNotes();
-      });
+    $(document).off("click", "#sendNotes");
+    $(document).on("click", "#sendNotes", function () {
+      vueThis.sendNotes();
+    });
 
-      $(document).off("click", "#removeHCArticleCard");
-      $(document).on("click", "#removeHCArticleCard", function(){
-        $(this).parents(".hw_articleCard").remove();
-      })
-    },
-    mounted(){
-      let managerID = this.$store.state.userInfo.accountID;
-      let threadID = this.$route.params.threadId;
-      const vueThis = this;
-      
-      const socket2 = firebase_app.database().ref(`/Account-${managerID}/ThreadID-${threadID}`);
+    $(document).off("click", "#removeHCArticleCard");
+    $(document).on("click", "#removeHCArticleCard", function () {
+      $(this).parents(".hw_articleCard").remove();
+    });
+  },
+  mounted() {
+    let managerID = this.$store.state.userInfo.accountID;
+    let threadID = this.$route.params.threadId;
+    const vueThis = this;
 
-      socket2.child(`/commenting user`).on('value', function(data){
-        if(data.val()){
-          vueThis.makingTypingCard(data.val(), "notes");
-        } else {
-          vueThis.makingTypingCard({}, "notes");
-        }
-      });
+    const socket2 = firebase_app
+      .database()
+      .ref(`/Account-${managerID}/ThreadID-${threadID}`);
 
-      socket2.child(`/replying user`).on('value', function(data){
-        if(data.val()){
-          vueThis.makingTypingCard(data.val(), "reply");
-        } else {
-          vueThis.makingTypingCard({}, "reply");
-        }
-      });
-    }
-  };
+    socket2.child(`/commenting user`).on("value", function (data) {
+      if (data.val()) {
+        vueThis.makingTypingCard(data.val(), "notes");
+      } else {
+        vueThis.makingTypingCard({}, "notes");
+      }
+    });
+
+    socket2.child(`/replying user`).on("value", function (data) {
+      if (data.val()) {
+        vueThis.makingTypingCard(data.val(), "reply");
+      } else {
+        vueThis.makingTypingCard({}, "reply");
+      }
+    });
+  },
+};
 </script>
 
 <style scoped>
@@ -937,7 +1084,7 @@
     color: #0168fa;
   }
 
-  .editorContainer{
+  .editorContainer {
     margin: 10px 20px;
     background-color: white;
     border-radius: 10px;
@@ -945,23 +1092,22 @@
     border: 1px solid #0168fa;
   }
 
-  .editorContainer.noteMode{
+  .editorContainer.noteMode {
     background: #fef6d8;
   }
 
   .editorContainer:hover {
-    box-shadow: 0 0 10px 2px rgba(0,0,0,0.16);
+    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.16);
   }
 
-  #removeHCArticleCard{
+  #removeHCArticleCard {
     visibility: hidden;
   }
-  .hw_removeArticle:hover{
+  .hw_removeArticle:hover {
     visibility: visible;
   }
 
-  .typingMessageNotice{
+  .typingMessageNotice {
     margin: 5px 20px;
   }
-
 </style>

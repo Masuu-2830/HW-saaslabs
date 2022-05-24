@@ -53,9 +53,9 @@
                     {{isCreating == true ? "Creating..." : "Create"}}
                 </button>
             </div>
-            <div class="d-flex flex-row justify-content-start" v-else>
+            <!-- <div class="d-flex flex-row justify-content-start" v-else>
                 <button class="btn btn-outline-primary" @click="addNewSavedReply">Add New</button>
-            </div>
+            </div> -->
         </template>
     </b-modal>
 </template>
