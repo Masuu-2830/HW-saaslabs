@@ -1021,7 +1021,7 @@ export default {
       message:
         self.composer.type == "mail" || self.composer.type == "universalMail"
           ? "New Message"
-          : "New Tweet",
+          : self.composer.type == "twitter" ? "New Tweet" : self.composer.type == 'sms' ? "New SMS" : "New Message",
       undoMessage: "Email Sent.",
       fromOptions: this.aliases(),
       fromSelected: this.defaultAlias(),
