@@ -71,6 +71,7 @@
 </template>
 
 <script>
+import { bus, triggerPromptNotif } from "../../../main";
 import MailContentComment from "../MailContentBody/MailContentComment.vue";
 import MailContentLog from "../MailContentBody/MailContentLog.vue";
 import ChatContentCard from "./ChatContentCard.vue";
