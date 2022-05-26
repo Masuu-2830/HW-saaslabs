@@ -794,6 +794,7 @@ export default {
           };
 
           bus.$emit("changeThreadAttrs", message);
+          bus.$emit("scrollToBottom");
           this.chat = "";
           this.replyAttachments = {};
         })
