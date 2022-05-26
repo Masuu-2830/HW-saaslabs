@@ -1561,7 +1561,7 @@ export default {
           //       "hcArticleC",
           //       "clear",
           //     ]
-          ["attachSMSCompose", "clear"],
+          ["attachSMSCompose"],
       },
       config: {
         enter: FroalaEditor.ENTER_DIV,
