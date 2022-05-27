@@ -1,0 +1,11 @@
+version: 0.0
+os: linux
+files:
+  - source: dist/
+    destination: /var/www/html
+runas: root
+hooks:
+  BeforeInstall:
+    - location: beforeInstall.sh
+      timeout: 700
+      runas: root
