@@ -129,9 +129,9 @@ export function addNote(data) { // hello
 
     if(addThreadFlag){
         if (objIndex !== -1) {
-            // console.log("store.state.threads[objIndex]", store.state.threads[objIndex]);
+            console.log("store.state.threads[objIndex]", store.state.threads[objIndex]);
             store.state.threads[objIndex].date = data.noteData.time;
-            store.state.threads[objIndex].humanFriendlyDate = moment((data.noteData.time*1000).toISOString()).format("HH:mm");
+            store.state.threads[objIndex].humanFriendlyDate = moment((new Date(data.noteData.time*1000)).toISOString()).format("HH:mm");
             store.state.threads[objIndex].snippet = data.noteData.snippet;
             var a = store.state.threads.splice(objIndex, 1);
             store.state.threads.unshift(a[0]);
@@ -404,7 +404,7 @@ export function assignThread(data) {
             }else{
                 body = data.assigner.firstname + " " + data.assigner.lastname + ' unassigned the conversation';
             }
-            if(data.assigner.id != store.state.userInfo.id){
+            // if(data.assigner.id != store.state.userInfo.id){
                 let log = {
                     'type': 'log',
                     'data': {
@@ -415,7 +415,7 @@ export function assignThread(data) {
                     'timestamp': Date.now()
                 };
                 store.state.threadData[thread].data.items.push(log);
-            }
+            // }
         }
     });
     // }

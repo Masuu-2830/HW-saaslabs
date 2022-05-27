@@ -71,9 +71,9 @@ export default {
     $route(to, from) {
       if (
         to.params.mailboxId &&
-        to.params.mailboxId !== from.params.mailboxId
+        to.params.mailboxId !== this.$store.state.mailboxId
       ) {
-        // this.fetchMailBoxData();
+        this.fetchMailBoxData();
         // this.fetchSidebarStats();
         // this.fetchAliases();
       }

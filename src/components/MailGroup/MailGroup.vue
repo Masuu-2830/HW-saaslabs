@@ -1201,7 +1201,7 @@ export default {
               type: "log",
             };
             let payload = {
-              log: data1,
+              // log: data1,
               teammate,
               type: "assignment",
             };
@@ -1623,7 +1623,7 @@ export default {
                 });
               }
               let payload = {
-                logs,
+                // logs,
                 toRemove: removeTags,
                 toAdd,
                 type: "tag",
