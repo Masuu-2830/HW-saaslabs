@@ -71,7 +71,6 @@
                 ></span>
               </div>
             </div>
-            <br />
             <div
               v-if="
                 item.data.attachment !== undefined &&

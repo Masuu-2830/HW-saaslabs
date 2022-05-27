@@ -9,7 +9,7 @@
     >
       <span class="sr-only">Loading...</span>
     </div>
-    <NavBar :mailboxes="mailboxes" />
+    <NavBar :mailboxes="mailboxes" :notifData="notifData" />
     <div v-if="dataLoaded && loaded" class="mail-wrapper">
       <SideBarHW :mailbox="mailbox" />
       <MailGroup :mailbox="mailbox" />
@@ -57,6 +57,7 @@ export default {
     return {
       mailbox: {},
       mailboxes: [],
+      notifData: {},
       dataLoaded: false,
       loaded: false,
     };
@@ -112,13 +113,17 @@ export default {
       });
       const data = await response.json();
       this.mailboxes = data.data.mailboxes;
+      const response1 = await fetch(this.$apiBaseURL + "get-notifications.php", {
+        credentials: "include",
+      });
+      const data1 = await response1.json();
+      this.notifData = data1.data;
     },
     async fetchContacts() {
       const response = await fetch(this.$apiBaseURL + "contacts.php", {
         credentials: "include",
       });
       const data = await response.json();
-      // this.mailboxes = data.data.mailboxes;
     },
     async fetchMailBoxData() {
       // let inboxID = this.$route.params.mailboxId;
@@ -127,7 +132,8 @@ export default {
       // }
       // let url =
       //   "https://app.helpwise.io/api/ping.php?mailboxID=" + inboxID || (this.$store.inboxData && this.$store.inboxData.id) || "me";
-      const response = await fetch("https://app.helpwise.io/api/pingv2.php", {
+      let mailboxID = this.$route.params.mailboxId || this.$store.state.mailboxId;
+      const response = await fetch("https://app.helpwise.io/api/pingv2.php?mailboxID=" + mailboxID, {
         credentials: "include",
       });
       const data = await response.json();
@@ -205,17 +211,11 @@ export default {
           alert(error);
         });
     },
-    async fetchContacts() {
-      const response = await fetch(this.$apiBaseURL + "contacts.php", {
-        credentials: "include",
-      });
-      const data = await response.json();
-      // this.mailboxes = data.data.mailboxes;
-    },
   },
   async beforeMount() {
     await this.fetchSidebarStats();
-    const response = await fetch("https://app.helpwise.io/api/pingv2.php", {
+    let mailboxID = this.$route.params.mailboxId || this.$store.state.mailboxId || 'me';
+    const response = await fetch("https://app.helpwise.io/api/pingv2.php?mailboxID=" + mailboxID, {
       credentials: "include",
     });
     const data = await response.json();

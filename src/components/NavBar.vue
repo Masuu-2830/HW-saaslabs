@@ -629,7 +629,7 @@
               d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"
             ></path>
           </svg>
-          <span id="unread-notifications-count" style="">4</span>
+          <span v-if="notifData.unreadNotificationsCount > 0" id="unread-notifications-count" style="">{{notifData.unreadNotificationsCount}}</span>
         </a>
         <div class="dropdown-menu dropdown-menu-right">
           <!--                <div class="dropdown-header">Notifications</div>-->
@@ -656,7 +656,7 @@
             id="notifications-list"
             style="max-height: 450px; overflow-y: auto"
           >
-            <a href="/mail/214204/all/13469895" class="dropdown-item">
+            <a v-for="(notif,index) in notifData.notifications" :key="index" :href="'/conversations/'+notif.threadID" class="dropdown-item">
               <div class="media">
                 <div class="media-body" style="max-width: 100%">
                   <div class="justify-content-between">
@@ -669,9 +669,9 @@
                         font-size: 9px;
                       "
                       class="badge badge-pill"
-                      >Gmail Inbox</span
+                      >{{ $store.state.inboxes[notif.mailboxID].name }}</span
                     >
-                    <div class="text-truncate tx-bold">@Tushar test again</div>
+                    <div class="text-truncate tx-bold">{{notif.text}}</div>
                   </div>
                   <p
                     class="tx-12 tx-color-03"
@@ -681,116 +681,14 @@
                       text-overflow: ellipsis;
                     "
                   >
-                    Tushar added a note on conversation assigned to your team
-                    member
+                    {{notif.title}}
                   </p>
-                  <span>Aug 5 01:41am</span>
+                  <span>{{ notif.time | moment("MMM D, YYYY hh:mm a") }}</span>
                 </div>
                 <!-- media-body -->
               </div>
               <!-- media --> </a
-            ><a href="/mail/214204/all/13469895" class="dropdown-item">
-              <div class="media">
-                <div class="media-body" style="max-width: 100%">
-                  <div class="justify-content-between">
-                    <span
-                      style="
-                        background-color: hsl(-100, 32%, 64%);
-                        color: white;
-                        margin-left: 0.125rem;
-                        margin-right: 0.125rem;
-                        font-size: 9px;
-                      "
-                      class="badge badge-pill"
-                      >Gmail Inbox</span
-                    >
-                    <div class="text-truncate tx-bold">@Tushar test</div>
-                  </div>
-                  <p
-                    class="tx-12 tx-color-03"
-                    style="
-                      whitespace: nowrap;
-                      overflow: hidden;
-                      text-overflow: ellipsis;
-                    "
-                  >
-                    Tushar added a note on conversation assigned to your team
-                    member
-                  </p>
-                  <span>Aug 5 01:39am</span>
-                </div>
-                <!-- media-body -->
-              </div>
-              <!-- media --> </a
-            ><a href="/mail/204420/all/12074902" class="dropdown-item">
-              <div class="media">
-                <div class="media-body" style="max-width: 100%">
-                  <div class="justify-content-between">
-                    <span
-                      style="
-                        background-color: hsl(-272, 32%, 64%);
-                        color: white;
-                        margin-left: 0.125rem;
-                        margin-right: 0.125rem;
-                        font-size: 9px;
-                      "
-                      class="badge badge-pill"
-                      >Helpwise Support</span
-                    >
-                    <div class="text-truncate tx-bold">
-                      Your Wednesday update - saaslabs.co
-                    </div>
-                  </div>
-                  <p
-                    class="tx-12 tx-color-03"
-                    style="
-                      whitespace: nowrap;
-                      overflow: hidden;
-                      text-overflow: ellipsis;
-                    "
-                  >
-                    unsnoozed a conversation.
-                  </p>
-                  <span>Jul 31 05:00am</span>
-                </div>
-                <!-- media-body -->
-              </div>
-              <!-- media --> </a
-            ><a href="/mail/204420/all/12074902" class="dropdown-item">
-              <div class="media">
-                <div class="media-body" style="max-width: 100%">
-                  <div class="justify-content-between">
-                    <span
-                      style="
-                        background-color: hsl(-272, 32%, 64%);
-                        color: white;
-                        margin-left: 0.125rem;
-                        margin-right: 0.125rem;
-                        font-size: 9px;
-                      "
-                      class="badge badge-pill"
-                      >Helpwise Support</span
-                    >
-                    <div class="text-truncate tx-bold">
-                      Your Wednesday update - saaslabs.co
-                    </div>
-                  </div>
-                  <p
-                    class="tx-12 tx-color-03"
-                    style="
-                      whitespace: nowrap;
-                      overflow: hidden;
-                      text-overflow: ellipsis;
-                    "
-                  >
-                    Harit snoozed a conversation.
-                  </p>
-                  <span>Jul 31 02:01am</span>
-                </div>
-                <!-- media-body -->
-              </div>
-              <!-- media -->
-            </a>
+            >
           </div>
           <div class="dropdown-footer d-none">
             <a href="https://app.helpwise.io/notifications"
@@ -920,6 +818,7 @@ export default {
   name: "NavBar",
   props: {
     mailboxes: Array,
+    notifData: Object
   },
   data() {
     return {

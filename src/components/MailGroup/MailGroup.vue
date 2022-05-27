@@ -755,7 +755,11 @@ export default {
             triggerPromptNotif("Conversations marked spam", "success", 1000);
           }
           for (let i = 0; i < threadIDs.length; i++) {
+            console.log(this.perPageMails, threadIDs[i])
             this.perPageMails = this.perPageMails.filter(
+              (item) => item.id !== threadIDs[i]
+            );
+            this.$store.state.threads = this.$store.state.threads.filter(
               (item) => item.id !== threadIDs[i]
             );
           }
@@ -1444,9 +1448,9 @@ export default {
               toRemove,
               type: "tag",
             };
-            if (this.isCompact) {
+            // if (this.isCompact) {
               bus.$emit("changeThreadAttrs", payload);
-            }
+            // }
             // for (var i = 0; i < addtags.length; i++) {
             //   let tag;
             //   if (!this.tagsInAll.some((tag) => tag == addtags[i])) {
