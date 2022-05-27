@@ -870,7 +870,7 @@
         <!-- mail-compose-header -->
         <div
           class="mail-compose-body"
-          style="padding-top: 0px; padding-bottom: 10px"
+          style="padding-top: 10px; padding-bottom: 10px"
         >
           <div
             v-if="composer.type == 'universalSms'"
