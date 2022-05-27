@@ -575,6 +575,37 @@
     </div>
     <!-- navbar-menu-wrapper -->
     <div class="navbar-right">
+
+      <div class="dropdown dropdown-help">
+        <a
+          href=""
+          class="dropdown-link new-indicator"
+          data-toggle="dropdown"
+          aria-expanded="false"
+        >
+            <!-- <a href="javaScript:void(0)" style="color:#1b2e4b" class="nav-icon nav-help nav-link"> -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-help-circle"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12" y2="17"></line></svg>
+          </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <a href="#" @click="openHelpwiseChat" class="dropdown-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Chat with us
+            </a>
+            <a href="https://helpwise.io/support-call" target="_blank" class="dropdown-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Support call
+            </a>
+            <a href="https://docs.helpwise.io" target="_blank" class="dropdown-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                Help Guides
+            </a>
+            <a href="https://helpwise.io/updates" target="_blank" class="dropdown-item">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                Product Updates
+            </a>
+          </div>
+      </div>
+
       <div class="dropdown dropdown-notification">
         <a
           href=""
@@ -903,6 +934,10 @@ export default {
   methods: {
     hideNavSub() {
       this.show = false;
+    },
+    openHelpwiseChat() {
+      console.log("------ OPEN HELPWISE CHAT ----");
+      Helpwise('showWithoutIcon');
     },
   },
 };

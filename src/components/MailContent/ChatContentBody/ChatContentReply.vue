@@ -834,7 +834,8 @@ export default {
           mentionUserIDs: mentionUserIDs,
           message,
           attachmentIDs,
-          type: this.thread.data.mailboxType
+          type: this.thread.data.mailboxType,
+          threadVersion: 1
         };
         const requestOptions = {
           method: "POST",

@@ -1676,6 +1676,7 @@ export default {
             this.labelId = 15;
           } else if (to.params.type == "unassigned") {
             this.labelId = 10;
+            this.showMailTypeFilters = false;
           } else if (to.params.type == "starred") {
             this.labelId = 11;
             addFilterFlag = true;
