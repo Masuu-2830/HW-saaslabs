@@ -243,6 +243,29 @@ export default {
     } else {
       document.title = "Helpwise (" + this.mailbox.stats.mine + ")";
     }
+
+    let userInfo = this.$store.state.userInfo;
+    console.log("---------- userInfo ----------", userInfo);
+    let HSScript = document.createElement("script");
+    let inlineScript = document.createTextNode(`
+          helpwiseSettings = {
+            'widget_id': '5f7d595005e7a',
+            'align': 'right',
+            "user_id": "${userInfo.id}",
+            "email": "${userInfo.email}",
+            "firstname": "${userInfo.firstname}",
+            "lastname": "${userInfo.lastname}",
+            "manager_id": "${userInfo.accountID}"
+          };
+          console.log("HELPWISE SETTINGS OBJECT", helpwiseSettings);
+    `);
+    HSScript.appendChild(inlineScript);
+    document.body.append(HSScript);
+    let HelpwiseSettingsScript = document.createElement("script");
+    HelpwiseSettingsScript.src = "https://cdn.helpwise.io/assets/js/livechat.js";
+    document.body.append(HelpwiseSettingsScript);
+
+    
   },
   async beforeCreate() {
     // let url =
