@@ -39,6 +39,7 @@ export function addThread(data) {
     if(addThreadFlag) {
         let objIndex = store.state.threads.findIndex((obj) => obj.id == data.threadID);
         if (objIndex !== -1) {
+            console.log("store.state.threads[objIndex]", store.state.threads[objIndex], data, Object.keys(store.state.threadData).includes(data.threadID.toString()), Object.keys(store.state.threadData));
             if(data.inboxType == 'mail') {
                 store.state.threads[objIndex].date = data.messageData.time;
                 store.state.threads[objIndex].subject = data.subject;
@@ -55,10 +56,10 @@ export function addThread(data) {
         }
     }
 
-    if (store.state.openThread == data.threadID) {
+    if (Object.keys(store.state.threadData).includes(data.threadID.toString())) {
         if (data.inboxType == 'mail') {
-            let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
-            if(data.messageData.sentBy.id != store.state.userInfo.id){
+            let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.data.id == data.messageData.id);
+            // if(data.messageData.sentBy.id != store.state.userInfo.id){
                 if (itemIndex == -1) {
                     fetch("https://app.helpwise.io/api/getEmail.php?emailID=" + data.messageData.id + "&mailboxID=" + data.mailboxID, {credentials: "include"}).then(async (response) => {
                         const data1 = await response.json();
@@ -80,7 +81,7 @@ export function addThread(data) {
                         }
                     });
                 }
-            }
+            // }
         } else if (data.inboxType == 'chat' || data.inboxType == 'facebook' || data.inboxType == 'sms' || data.inboxType == 'whatsapp') {
             let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
             if(data.messageData.sentBy.id != store.state.userInfo.id){
@@ -129,7 +130,7 @@ export function addNote(data) { // hello
 
     if(addThreadFlag){
         if (objIndex !== -1) {
-            console.log("store.state.threads[objIndex]", store.state.threads[objIndex]);
+            console.log("store.state.threads[objIndex]", store.state.threads[objIndex], data);
             store.state.threads[objIndex].date = data.noteData.time;
             store.state.threads[objIndex].humanFriendlyDate = moment((new Date(data.noteData.time*1000)).toISOString()).format("HH:mm");
             store.state.threads[objIndex].snippet = data.noteData.snippet;
@@ -140,8 +141,9 @@ export function addNote(data) { // hello
             store.state.threads.unshift(createThread(data));
         }
     }
-    if (store.state.openThread == data.threadID) {
-        let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.noteData.id);
+    if (Object.keys(store.state.threadData).includes(data.threadID.toString())) {
+        let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.data.id == data.noteData.id);
+        console.log(itemIndex);
         if (itemIndex == -1) {
             let comment = {
                 'type': 'comment',
@@ -155,13 +157,13 @@ export function addNote(data) { // hello
                 },
                 'timestamp': Date.now()
             };
-            if(data.noteData.sentBy.id != store.state.userInfo.id){
+            // if(data.noteData.sentBy.id !== store.state.userInfo.id){
                 if (store.state.userSettings.orderThread == "asc") {
                     store.state.threadData[data.threadID].data.items.push(comment);
                 } else {
                     store.state.threadData[data.threadID].data.items.unshift(comment);
                 }
-            }
+            // }
         }
     }
     // }
