@@ -114,29 +114,29 @@
                 <!-- <router-link
                   :to="{ name: 'mailbox', params: { mailboxId: mailbox.id } }"
                 > -->
-                  <a
-                    :id="'mailbox-' + mailbox.id"
-                    style="text-decoration: none; color: black"
-                    class="nav-sub-link flex-column align-items-start p-1"
-                    :href="`https://app.helpwise.io/${mailbox.type}/${mailbox.id}/mine`"
-                    target="_blank"
+                <a
+                  :id="'mailbox-' + mailbox.id"
+                  style="text-decoration: none; color: black"
+                  class="nav-sub-link flex-column align-items-start p-1"
+                  :href="`https://app.helpwise.io/${mailbox.type}/${mailbox.id}/mine`"
+                  target="_blank"
+                >
+                  <div
+                    class="
+                      d-flex
+                      hover_change
+                      align-items-center
+                      justify-content-between
+                      w-100
+                    "
                   >
-                    <div
-                      class="
-                        d-flex
-                        hover_change
-                        align-items-center
-                        justify-content-between
-                        w-100
-                      "
-                    >
-                      <div>
-                        <div class="d-flex mg-2" style="font-weight: 550">
-                          <div
-                            class="mg-t-3 inbox-list-svg"
-                            style="color: #566476"
-                          >
-                            <!-- <svg
+                    <div>
+                      <div class="d-flex mg-2" style="font-weight: 550">
+                        <div
+                          class="mg-t-3 inbox-list-svg"
+                          style="color: #566476"
+                        >
+                          <!-- <svg
                               style="margin-right: 5px"
                               xmlns="http://www.w3.org/2000/svg"
                               width="24"
@@ -167,162 +167,187 @@
                               ></path>
                               <polyline points="22,6 12,13 2,6"></polyline>
                             </svg> -->
-                            <svg
-                              style="
-                                width: 13px !important;
-                                height: 13px !important;
-                                margin-left: calc(30% - 6px) !important;
-                                margin-right: 5px;
-                                stroke: #566476;
-                                color: #566476;
-                                stroke-width: 2;
-                              "
-                              v-if="
-                                mailbox.type == 'mail' || mailbox.type == 'custom'
-                              "
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="#0168fa"
-                              stroke-width="3"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              class="feather feather-mail"
-                            >
-                              <path
-                                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-                              ></path>
-                              <polyline points="22,6 12,13 2,6"></polyline>
-                            </svg>
-                            <svg
-                              style="
-                                width: 13px !important;
-                                height: 13px !important;
-                                margin-left: calc(30% - 6px) !important;
-                                margin-right: 5px;
-                                stroke: #566476;
-                                color: #566476;
-                                stroke-width: 2;
-                              "
-                              v-else-if="mailbox.type == 'sms'"
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="#8a2be2"
-                              stroke-width="3"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              class="feather feather-message-circle"
-                            >
-                              <path
-                                d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
-                              ></path>
-                            </svg>
-                            <svg
-                              style="
-                                width: 13px !important;
-                                height: 13px !important;
-                                margin-left: calc(30% - 6px) !important;
-                                margin-right: 5px;
-                                stroke: #566476;
-                                color: #566476;
-                                stroke-width: 2;
-                              "
-                              v-else-if="mailbox.type == 'chat'"
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="#347bfb"
-                              stroke-width="3"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              class="feather feather-message-square"
-                            >
-                              <path
-                                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                              ></path>
-                            </svg>
-                            <svg
-                              style="
-                                width: 13px !important;
-                                height: 13px !important;
-                                margin-left: calc(30% - 6px) !important;
-                                margin-right: 5px;
-                                stroke: #566476;
-                                color: #566476;
-                                stroke-width: 2;
-                              "
-                              v-else-if="mailbox.type == 'twitter' || mailbox.type == 'twitterdm'"
-                              class="customInboxIconSvg"
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                            >
-                              <path
-                                d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"
-                              ></path>
-                            </svg>
-                            <svg
-                              style="
-                                width: 13px !important;
-                                height: 13px !important;
-                                margin-left: calc(30% - 6px) !important;
-                                margin-right: 5px;
-                                stroke: #566476;
-                                color: #566476;
-                                stroke-width: 2;
-                              "
-                              v-else-if="
-                                mailbox.type == 'fb-feed' ||
-                                mailbox.type == 'facebook'
-                              "
-                              xmlns="http://www.w3.org/2000/svg"
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              stroke-width="2"
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              class="feather feather-facebook"
-                            >
-                              <path
-                                d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
-                              ></path>
-                            </svg>
-                            <i
-                              style="
-                                width: 13px !important;
-                                height: 13px !important;
-                                margin-left: calc(30% - 6px) !important;
-                                margin-right: 5px;
-                                stroke: #566476;
-                                color: #566476;
-                                stroke-width: 2;
-                              "
-                              v-else-if="mailbox.type == 'instagram' || mailbox.type == 'instagram-dm'"
-                              class="mg-r-5 fab fa-instagram"
-                            ></i>
-                          </div>
-                          {{ mailbox.displayName }}
+                          <svg
+                            style="
+                              width: 13px !important;
+                              height: 13px !important;
+                              margin-left: calc(30% - 6px) !important;
+                              margin-right: 5px;
+                              stroke: #566476;
+                              color: #566476;
+                              stroke-width: 2;
+                            "
+                            v-if="
+                              mailbox.type == 'mail' || mailbox.type == 'custom'
+                            "
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#0168fa"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="feather feather-mail"
+                          >
+                            <path
+                              d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+                            ></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                          </svg>
+                          <svg
+                            style="
+                              width: 13px !important;
+                              height: 13px !important;
+                              margin-left: calc(30% - 6px) !important;
+                              margin-right: 5px;
+                              stroke: #566476;
+                              color: #566476;
+                              stroke-width: 2;
+                            "
+                            v-else-if="mailbox.type == 'sms'"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#8a2be2"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="feather feather-message-circle"
+                          >
+                            <path
+                              d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
+                            ></path>
+                          </svg>
+                          <svg
+                            style="
+                              width: 13px !important;
+                              height: 13px !important;
+                              margin-left: calc(30% - 6px) !important;
+                              margin-right: 5px;
+                              stroke: #566476;
+                              color: #566476;
+                              stroke-width: 2;
+                            "
+                            v-else-if="mailbox.type == 'chat'"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#347bfb"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="feather feather-message-square"
+                          >
+                            <path
+                              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                            ></path>
+                          </svg>
+                          <svg
+                            style="
+                              width: 13px !important;
+                              height: 13px !important;
+                              margin-left: calc(30% - 6px) !important;
+                              margin-right: 5px;
+                              stroke: #566476;
+                              color: #566476;
+                              stroke-width: 2;
+                            "
+                            v-else-if="
+                              mailbox.type == 'twitter' ||
+                              mailbox.type == 'twitterdm'
+                            "
+                            class="customInboxIconSvg"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <path
+                              d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"
+                            ></path>
+                          </svg>
+                          <svg
+                            v-else-if="mailbox.type == 'whatsapp'"
+                            style="width: 13px !important;
+                              height: 13px !important;
+                              margin-left: calc(30% - 6px) !important;
+                              margin-right: 5px;
+                              stroke: #566476;
+                              color: #566476;
+                              stroke-width: 2;"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            stroke="#566476"
+                          >
+                            <path
+                              d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"
+                            ></path>
+                          </svg>
+                          <svg
+                            style="
+                              width: 13px !important;
+                              height: 13px !important;
+                              margin-left: calc(30% - 6px) !important;
+                              margin-right: 5px;
+                              stroke: #566476;
+                              color: #566476;
+                              stroke-width: 2;
+                            "
+                            v-else-if="
+                              mailbox.type == 'fb-feed' ||
+                              mailbox.type == 'facebook'
+                            "
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="feather feather-facebook"
+                          >
+                            <path
+                              d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
+                            ></path>
+                          </svg>
+                          <i
+                            style="
+                              width: 13px !important;
+                              height: 13px !important;
+                              margin-left: calc(30% - 6px) !important;
+                              margin-right: 5px;
+                              stroke: #566476;
+                              color: #566476;
+                              stroke-width: 2;
+                            "
+                            v-else-if="
+                              mailbox.type == 'instagram' ||
+                              mailbox.type == 'instagram-dm'
+                            "
+                            class="mg-r-5 fab fa-instagram"
+                          ></i>
                         </div>
-                        <div class="mg-l-20">{{ mailbox.externalAddress }}</div>
+                        {{ mailbox.displayName }}
                       </div>
+                      <div class="mg-l-20">{{ mailbox.externalAddress }}</div>
                     </div>
-                  </a>
+                  </div>
+                </a>
                 <!-- </router-link> -->
               </li>
             </div>
@@ -575,7 +600,6 @@
     </div>
     <!-- navbar-menu-wrapper -->
     <div class="navbar-right">
-
       <div class="dropdown dropdown-help">
         <a
           href=""
@@ -583,27 +607,113 @@
           data-toggle="dropdown"
           aria-expanded="false"
         >
-            <!-- <a href="javaScript:void(0)" style="color:#1b2e4b" class="nav-icon nav-help nav-link"> -->
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-help-circle"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12" y2="17"></line></svg>
+          <!-- <a href="javaScript:void(0)" style="color:#1b2e4b" class="nav-icon nav-help nav-link"> -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="feather feather-help-circle"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+            <line x1="12" y1="17" x2="12" y2="17"></line>
+          </svg>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right">
+          <a href="#" @click="openHelpwiseChat" class="dropdown-item">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="feather feather-message-square"
+            >
+              <path
+                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+              ></path>
+            </svg>
+            Chat with us
           </a>
-          <div class="dropdown-menu dropdown-menu-right">
-            <a href="#" @click="openHelpwiseChat" class="dropdown-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-message-square"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                Chat with us
-            </a>
-            <a href="https://helpwise.io/support-call" target="_blank" class="dropdown-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                Support call
-            </a>
-            <a href="https://docs.helpwise.io" target="_blank" class="dropdown-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                Help Guides
-            </a>
-            <a href="https://helpwise.io/updates" target="_blank" class="dropdown-item">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                Product Updates
-            </a>
-          </div>
+          <a
+            href="https://helpwise.io/support-call"
+            target="_blank"
+            class="dropdown-item"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="feather feather-calendar"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            Support call
+          </a>
+          <a
+            href="https://docs.helpwise.io"
+            target="_blank"
+            class="dropdown-item"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="feather feather-book-open"
+            >
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+            Help Guides
+          </a>
+          <a
+            href="https://helpwise.io/updates"
+            target="_blank"
+            class="dropdown-item"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="feather feather-send"
+            >
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            Product Updates
+          </a>
+        </div>
       </div>
 
       <div class="dropdown dropdown-notification">
@@ -629,7 +739,12 @@
               d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"
             ></path>
           </svg>
-          <span v-if="notifData.unreadNotificationsCount > 0" id="unread-notifications-count" style="">{{notifData.unreadNotificationsCount}}</span>
+          <span
+            v-if="notifData.unreadNotificationsCount > 0"
+            id="unread-notifications-count"
+            style=""
+            >{{ notifData.unreadNotificationsCount }}</span
+          >
         </a>
         <div class="dropdown-menu dropdown-menu-right">
           <!--                <div class="dropdown-header">Notifications</div>-->
@@ -656,7 +771,12 @@
             id="notifications-list"
             style="max-height: 450px; overflow-y: auto"
           >
-            <a v-for="(notif,index) in notifData.notifications" :key="index" :href="'/conversations/'+notif.threadID" class="dropdown-item">
+            <a
+              v-for="(notif, index) in notifData.notifications"
+              :key="index"
+              :href="'/conversations/' + notif.threadID"
+              class="dropdown-item"
+            >
               <div class="media">
                 <div class="media-body" style="max-width: 100%">
                   <div class="justify-content-between">
@@ -671,7 +791,7 @@
                       class="badge badge-pill"
                       >{{ $store.state.inboxes[notif.mailboxID].name }}</span
                     >
-                    <div class="text-truncate tx-bold">{{notif.text}}</div>
+                    <div class="text-truncate tx-bold">{{ notif.text }}</div>
                   </div>
                   <p
                     class="tx-12 tx-color-03"
@@ -681,14 +801,14 @@
                       text-overflow: ellipsis;
                     "
                   >
-                    {{notif.title}}
+                    {{ notif.title }}
                   </p>
                   <span>{{ notif.time | moment("MMM D, YYYY hh:mm a") }}</span>
                 </div>
                 <!-- media-body -->
               </div>
-              <!-- media --> </a
-            >
+              <!-- media -->
+            </a>
           </div>
           <div class="dropdown-footer d-none">
             <a href="https://app.helpwise.io/notifications"
@@ -818,7 +938,7 @@ export default {
   name: "NavBar",
   props: {
     mailboxes: Array,
-    notifData: Object
+    notifData: Object,
   },
   data() {
     return {
@@ -836,7 +956,7 @@ export default {
     },
     openHelpwiseChat() {
       console.log("------ OPEN HELPWISE CHAT ----");
-      Helpwise('showWithoutIcon');
+      Helpwise("showWithoutIcon");
     },
   },
 };

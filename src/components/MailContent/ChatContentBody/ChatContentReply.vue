@@ -778,7 +778,7 @@ export default {
           // editor.html = "";
           
           let payload = {
-            id: data.data.message_id,
+            id: data.data.id,
             text: data.data.body,
             sentBy: data.data.sent_by,
             attachments: this.replyAttachments,
@@ -865,6 +865,7 @@ export default {
             };
             console.log(comment);
             bus.$emit("changeThreadAttrs", comment);
+            bus.$emit("scrollToBottom");
             this.note = "";
             this.notesAttachments = {};
           })

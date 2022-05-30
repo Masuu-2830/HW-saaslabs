@@ -23,6 +23,7 @@ function createThread(data, id) {
 }
 export function addThread(data) {
     // var inbox = data.mailboxID == store.state.inboxData.id ? true : false;
+    console.log(data);
     var all = store.state.type == 'all';
     var assigned = (data.assignedTo ? true : false) && (store.state.type == 'assigned');
     var mine = (assigned && data.assignedTo.id == store.state.userInfo.id ? true : false) && (store.state.type == 'mine');
@@ -83,8 +84,10 @@ export function addThread(data) {
                 }
             // }
         } else if (data.inboxType == 'chat' || data.inboxType == 'facebook' || data.inboxType == 'sms' || data.inboxType == 'whatsapp') {
-            let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.id == data.messageData.id);
-            if(data.messageData.sentBy.id != store.state.userInfo.id){
+            console.log(store.state.threadData[data.threadID].data.items, data.messageData.id);
+            let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.data.id == data.messageData.id);
+            console.log(itemIndex)
+            // if(data.messageData.sentBy.id != store.state.userInfo.id){
                 if (itemIndex == -1) {
                     let message = {
                         'type': data.inboxType,
@@ -106,7 +109,7 @@ export function addThread(data) {
                         store.state.threadData[data.threadID].data.items.unshift(message);
                     }
                 }
-            }
+            // }
         }
     }
     // }
@@ -142,6 +145,7 @@ export function addNote(data) { // hello
         }
     }
     if (Object.keys(store.state.threadData).includes(data.threadID.toString())) {
+        console.log(store.state.threadData[data.threadID].data.items, data.noteData.id);
         let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.data.id == data.noteData.id);
         console.log(itemIndex);
         if (itemIndex == -1) {
