@@ -392,9 +392,9 @@ export default {
     bus.$off("changeRead");
     bus.$on("changeRead", (id, read) => {
       let mailboxThreadMap = {};
-      let objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
-      mailboxThreadMap[this.perPageMails[objIndex].mailboxId] = new Array();
-      mailboxThreadMap[this.perPageMails[objIndex].mailboxId].push(id);
+      let objIndex = this.$store.state.threads.findIndex((obj) => obj.id == id);
+      mailboxThreadMap[this.$store.state.threads[objIndex].mailboxId] = new Array();
+      mailboxThreadMap[this.$store.state.threads[objIndex].mailboxId].push(id);
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -404,7 +404,7 @@ export default {
         credentials: "include",
       };
       let url;
-      if (this.perPageMails[objIndex].isRead && read !== 1) {
+      if (this.$store.state.threads[objIndex].isRead && read !== 1) {
         url = this.$apiBaseURL + "unifiedv2/unreadThreads.php";
       } else {
         url = this.$apiBaseURL + "unifiedv2/readThreads.php";
@@ -418,15 +418,15 @@ export default {
             return Promise.reject(error);
           }
           if (read == 1) {
-            this.perPageMails[objIndex].isRead = true;
+            this.$store.state.threads[objIndex].isRead = true;
           } else {
-            this.perPageMails[objIndex].isRead =
-              !this.perPageMails[objIndex].isRead;
+            this.$store.state.threads[objIndex].isRead =
+              !this.$store.state.threads[objIndex].isRead;
           }
-          if (!this.perPageMails[objIndex].isRead && read !== 1) {
+          if (!this.$store.state.threads[objIndex].isRead && read !== 1) {
             triggerPromptNotif("Conversation marked unread", "success", 1000);
           }
-          if (this.perPageMails[objIndex].isRead && !this.isCompact) {
+          if (this.$store.state.threads[objIndex].isRead && !this.isCompact) {
             triggerPromptNotif("Conversation marked read", "success", 1000);
           }
         })
@@ -2151,7 +2151,7 @@ export default {
         });
     },
     async clickThread(id, type, subtype, ticketNumber, mailboxId) {
-      console.log("!!!!! clickThread !!!!!", id, type, subtype, ticketNumber, mailboxId);
+      // console.log("!!!!! clickThread !!!!!", id, type, subtype, ticketNumber, mailboxId);
       var objIndex = this.perPageMails.findIndex((obj) => obj.id == id);
       if (
         this.route == "drafts" &&

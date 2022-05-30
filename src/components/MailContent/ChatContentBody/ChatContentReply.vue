@@ -792,7 +792,7 @@ export default {
             message: payload,
             type: inboxType,
           };
-
+          console.log("from chat", message);
           bus.$emit("changeThreadAttrs", message);
           bus.$emit("scrollToBottom");
           this.chat = "";
