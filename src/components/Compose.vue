@@ -1447,7 +1447,7 @@ export default {
             : ["attachSMSCompose", "clear"],
       },
       configSms: {
-        enter: FroalaEditor.ENTER_DIV,
+        enter: FroalaEditor.ENTER_BR,
         placeholderText: "Type something",
         charCounterCount: false,
         toolbarBottom: true,
@@ -2852,10 +2852,10 @@ export default {
     createBodySMS(prop) {
       let to = this.toNumber2;
       let html = this.sms_compose_body;
-      var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
-      html = html.replace(re1, "");
+      // var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
+      html = html.replace(/(<br>)/g, "\n");
 
-      html = html.replace(/(<([^>]+)>)/gi, "");
+      // html = html.replace(/(<([^>]+)>)/gi, "");
 
       let mailboxID;
       if (
