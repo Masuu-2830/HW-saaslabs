@@ -187,6 +187,8 @@ export default {
         placeholderText:
           "Enter your reply here.... You can use # to insert saved replies",
         charCounterCount: false,
+        enter: FroalaEditor.ENTER_BR,
+        iframeDefaultStyle: 'body{position:relative;z-index:2;}pre{white-space:pre-wrap;word-wrap:break-word;}',
         toolbarBottom: true,
         key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
         heightMin: 100,
@@ -295,6 +297,7 @@ export default {
         placeholderText:
           "Add your notes here.. You can use @ to mention your teammates",
         charCounterCount: false,
+        enter: FroalaEditor.ENTER_BR,
         toolbarBottom: true,
         key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
         heightMin: this.thread.data.mailboxType == 'mail' ? 50 : 100,
@@ -705,7 +708,6 @@ export default {
         : (this.typingNotice = noticeElem);
     },
     sendMessage() {
-      console.log("this thread ka data",this.thread);
       let attachmentKeys = Object.keys(this.replyAttachments);
       let attachmentIDs = attachmentKeys.filter(
         (attachmentKey) => !attachmentKey.includes("-")
@@ -714,8 +716,11 @@ export default {
       let inboxSubType = this.thread.data.mailboxSubType;
 
       let message = this.chat
-        // .replace(/(<p)/gim, "<div")
-        // .replace(/<\/p>/gim, "</div>");
+        // .replace(/(<p>)/gim, "")
+        // .replace(/(<\/p><p>)/gim, "\\n")
+        // .replace(/<\/p>/gim, "")
+        .replace(/(<br>)/g, '\n');
+        console.log("this thread ka data", this.chat, message);
 
       let $temp = $(`<div>${this.chat}</div>`);
       if($temp.text().length == 0 && $temp.find("img").length == 0){
@@ -778,8 +783,8 @@ export default {
           // editor.html = "";
           
           let payload = {
-            id: data.data.message_id,
-            text: data.data.body,
+            id: data.data.id,
+            text: data.data.body.replace(/\n/g, '<br>'),
             sentBy: data.data.sent_by,
             attachments: this.replyAttachments,
             date: data.data.message_time,
@@ -792,7 +797,7 @@ export default {
             message: payload,
             type: inboxType,
           };
-
+          console.log("from chat", message);
           bus.$emit("changeThreadAttrs", message);
           bus.$emit("scrollToBottom");
           this.chat = "";
@@ -817,7 +822,7 @@ export default {
         // let message = this.note
         //   .replace(/(<p)/gim, "<div")
         //   .replace(/<\/p>/gim, "</div>");
-        let message = this.note;
+        let message = this.note.replace(/(<br>)/g, '\n');
 
         let $temp = $(`<div>${this.note}</div>`);
         let mentionUserIDs = [];
@@ -865,6 +870,7 @@ export default {
             };
             console.log(comment);
             bus.$emit("changeThreadAttrs", comment);
+            bus.$emit("scrollToBottom");
             this.note = "";
             this.notesAttachments = {};
           })

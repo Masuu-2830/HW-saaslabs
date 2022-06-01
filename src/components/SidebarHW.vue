@@ -63,7 +63,7 @@
             Tweet
           </button>
           <button
-            v-if="$store.state.inboxData.type == 'sms'"
+            v-if="$store.state.inboxData.type == 'sms' || $store.state.inboxData.type == 'whatsapp'"
             @click="openCompose('sms')"
             id="mailComposeBtn"
             class="

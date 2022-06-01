@@ -1021,7 +1021,11 @@ export default {
       message:
         self.composer.type == "mail" || self.composer.type == "universalMail"
           ? "New Message"
-          : self.composer.type == "twitter" ? "New Tweet" : self.composer.type == 'sms' ? "New SMS" : "New Message",
+          : self.composer.type == "twitter"
+          ? "New Tweet"
+          : self.composer.type == "sms"
+          ? "New SMS"
+          : "New Message",
       undoMessage: "Email Sent.",
       fromOptions: this.aliases(),
       fromSelected: this.defaultAlias(),
@@ -1443,7 +1447,7 @@ export default {
             : ["attachSMSCompose", "clear"],
       },
       configSms: {
-        enter: FroalaEditor.ENTER_DIV,
+        enter: FroalaEditor.ENTER_BR,
         placeholderText: "Type something",
         charCounterCount: false,
         toolbarBottom: true,
@@ -2517,11 +2521,11 @@ export default {
         //     }
         //   }
         // } else {
-          for (let i = 0; i < aliases.length; i++) {
-            if (aliases[i].isDefault) {
-              return aliases[i];
-            }
+        for (let i = 0; i < aliases.length; i++) {
+          if (aliases[i].isDefault) {
+            return aliases[i];
           }
+        }
         // }
       }
       return {};
@@ -2848,10 +2852,10 @@ export default {
     createBodySMS(prop) {
       let to = this.toNumber2;
       let html = this.sms_compose_body;
-      var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
-      html = html.replace(re1, "");
+      // var re1 = new RegExp('<p data-f-id="pbf".+?</p>', "g");
+      html = html.replace(/(<br>)/g, "\n");
 
-      html = html.replace(/(<([^>]+)>)/gi, "");
+      // html = html.replace(/(<([^>]+)>)/gi, "");
 
       let mailboxID;
       if (
@@ -2904,10 +2908,7 @@ export default {
         this.composer.type == "universalSms"
       ) {
         this.editorInstance.mailboxID = this.fromSelected.mailboxId;
-        if (
-          this.composer.type == "universalMail" &&
-          typeOfInbox == "sms"
-        ) {
+        if (this.composer.type == "universalMail" && typeOfInbox == "sms") {
           this.composer.type = "universalSms";
         } else if (
           this.composer.type == "universalSms" &&
@@ -3135,17 +3136,28 @@ export default {
 
         let url;
         let inboxes = this.$store.state.inboxes;
-        let subtypeOfInbox = inboxes[this.fromSelected.mailboxId].subtype;
-        if (subtypeOfInbox == "sms") {
-          url = this.$apiBaseURL + "sms/sendSmsUnifiedLive.php";
-        } else if (subtypeOfInbox == "plivo") {
-          url = this.$apiBaseURL + "plivo/sendSmsUnifiedLive.php";
-        } else if (subtypeOfInbox == "ringcentral") {
-          url = this.$apiBaseURL + "ringcentral/sendSmsUnifiedLive.php";
-        } else if (subtypeOfInbox == "justcall") {
-          url = this.$apiBaseURL + "justcall/sendSmsUnifiedLive.php";
-        } else if (subtypeOfInbox == "dialpad") {
-          url = this.$apiBaseURL + "dialpad/sendSmsUnifiedLive.php";
+        let inboxType = inboxes[this.fromSelected.mailboxId].type;
+        let inboxSubType = inboxes[this.fromSelected.mailboxId].subtype;
+        if (inboxType == "chat") {
+          url = this.$apiBaseURL + "unifiedv2/sendChatInboxMessage.php";
+        } else if (inboxType == "sms") {
+          if (inboxSubType == "justcall") {
+            url = this.$apiBaseURL + "/justcall/sendSmsUnifiedLive.php";
+          } else if (inboxSubType == "dialpad") {
+            url = this.$apiBaseURL + "/dialpad/sendSmsUnifiedLive.php";
+          } else if (inboxSubType == "ringcentral") {
+            url = this.$apiBaseURL + "/ringcentral/sendSmsUnifiedLive.php";
+          } else if (inboxSubType == "plivo") {
+            url = this.$apiBaseURL + "/plivo/sendSmsUnifiedLive.php";
+          } else {
+            url = this.$apiBaseURL + "/sms/sendSmsUnifiedLive.php";
+          }
+        } else if (inboxType == "whatsapp") {
+          if (inboxSubType == "360dialog") {
+            url = this.$apiBaseURL + "/360dialog/sendSmsUnifiedLive.php";
+          } else {
+            url = this.$apiBaseURL + "/whatsapp/sendSmsUnifiedLive.php";
+          }
         }
         fetch(url, requestOptions)
           .then(async (response) => {
