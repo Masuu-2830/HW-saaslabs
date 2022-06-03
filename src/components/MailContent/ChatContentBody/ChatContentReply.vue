@@ -33,7 +33,6 @@
           margin-top: 5px;
           margin-bottom: 5px;
         "
-        
       >
         <li class="nav-item">
           <a
@@ -128,7 +127,8 @@ export default {
   data() {
     const self = this;
     return {
-      current: self.thread.data.mailboxType == "mail" ? "note" : "reply" || "reply",
+      current:
+        self.thread.data.mailboxType == "mail" ? "note" : "reply" || "reply",
       tempData: ["a", "b", "v"],
       replyEditorInstance: null,
       noteEditorInstance: null,
@@ -188,7 +188,8 @@ export default {
           "Enter your reply here.... You can use # to insert saved replies",
         charCounterCount: false,
         enter: FroalaEditor.ENTER_BR,
-        iframeDefaultStyle: 'body{position:relative;z-index:2;}pre{white-space:pre-wrap;word-wrap:break-word;}',
+        iframeDefaultStyle:
+          "body{position:relative;z-index:2;}pre{white-space:pre-wrap;word-wrap:break-word;}",
         toolbarBottom: true,
         key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
         heightMin: 100,
@@ -300,7 +301,7 @@ export default {
         enter: FroalaEditor.ENTER_BR,
         toolbarBottom: true,
         key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
-        heightMin: this.thread.data.mailboxType == 'mail' ? 50 : 100,
+        heightMin: this.thread.data.mailboxType == "mail" ? 50 : 100,
         heightMax: 290,
         toolbarButtons: {
           moreText: {
@@ -376,18 +377,21 @@ export default {
       // console.log(data);
       // return this.createTribute(data);
 
-      let fetchURL = 'https://app.helpwise.io/api/list-saved-replies.php';
+      let fetchURL = "https://app.helpwise.io/api/list-saved-replies.php";
       let inboxID = this.thread.data.mailbox_id;
-      if((inboxID && inboxID!='me') || (this.$store.state.inboxData && this.$store.state.inboxData.id!='me')){
-          let mailboxID = inboxID!='me' ? inboxID : this.$store.state.inboxData.id;
-          fetchURL = `https://app.helpwise.io/api/list-saved-replies.php?mailboxID=${mailboxID}`;
+      if (
+        (inboxID && inboxID != "me") ||
+        (this.$store.state.inboxData && this.$store.state.inboxData.id != "me")
+      ) {
+        let mailboxID =
+          inboxID != "me" ? inboxID : this.$store.state.inboxData.id;
+        fetchURL = `https://app.helpwise.io/api/list-saved-replies.php?mailboxID=${mailboxID}`;
       }
-      let response = await fetch(fetchURL,{credentials: "include"});
+      let response = await fetch(fetchURL, { credentials: "include" });
       response = await response.json();
-      if(response.status == "success"){
+      if (response.status == "success") {
         return this.createTribute(response.data.savedReplies);
       }
-
     },
     async callApi1(editorEl) {
       const response = await fetch(
@@ -401,42 +405,44 @@ export default {
     },
     createTribute(data) {
       var tribute = new Tribute({
-        collection: [{
-          trigger: "#",
-          values: data,
-          lookup: function (item, stringText){
-            let name = item.name.toString().toLowerCase();
-            // let snippet = item.snippet.toString().toLowerCase();
-            stringText = stringText && stringText.toString().toLowerCase();
+        collection: [
+          {
+            trigger: "#",
+            values: data,
+            lookup: function (item, stringText) {
+              let name = item.name.toString().toLowerCase();
+              // let snippet = item.snippet.toString().toLowerCase();
+              stringText = stringText && stringText.toString().toLowerCase();
 
-            if(name.toString().includes(stringText)){
-              let customTemplate = `
+              if (name.toString().includes(stringText)) {
+                let customTemplate = `
                 <div class="d-flex flex-column pd-x-10 pd-y-15">
                   <span class="tx-color-01 tx-14 tx-bold tx-sans">${item.name}</span>
                   <span class="tx-color-03 tx-12 savedReplyPreviewOverflow tx-sans">${item.snippet}</span>
                 </div>
               `;
-              return customTemplate;
-            }
-          },
-          // containerClass: "tribute-container76786287167",
-          menuItemTemplate: function (item) {
-            let customTemplate = `
+                return customTemplate;
+              }
+            },
+            // containerClass: "tribute-container76786287167",
+            menuItemTemplate: function (item) {
+              let customTemplate = `
               <div class="d-flex flex-column pd-x-10 pd-y-15">
                 <span class="tx-color-01 tx-14 tx-bold tx-sans">${item.original.name}</span>
                 <span class="tx-color-03 tx-12 savedReplyPreviewOverflow tx-sans">${item.original.snippet}</span>
               </div>
             `;
-            return customTemplate;
+              return customTemplate;
+            },
+            selectTemplate: function (item) {
+              console.log(item);
+              return item.original.snippet;
+            },
+            noMatchTemplate: function () {
+              return '<span style:"visibility: hidden;"></span>';
+            },
           },
-          selectTemplate: function (item) {
-            console.log(item);
-            return item.original.snippet;
-          },
-          noMatchTemplate: function () {
-            return '<span style:"visibility: hidden;"></span>';
-          },
-        }]
+        ],
       });
       return tribute;
     },
@@ -689,7 +695,7 @@ export default {
           const user = data[key];
           let userID = user.id;
           // console.log(this.$store.state.userInfo);
-          if(userID != this.$store.state.userInfo.id){
+          if (userID != this.$store.state.userInfo.id) {
             let userFName = user.firstname;
             let userLName = user.lastname;
             let userName = `${userFName} ${userLName}`;
@@ -719,16 +725,16 @@ export default {
         // .replace(/(<p>)/gim, "")
         // .replace(/(<\/p><p>)/gim, "\\n")
         // .replace(/<\/p>/gim, "")
-        .replace(/(<br>)/g, '\n');
-        console.log("this thread ka data", this.chat, message);
+        .replace(/(<br>)/g, "\n");
+      console.log("this thread ka data", this.chat, message);
 
       let $temp = $(`<div>${this.chat}</div>`);
-      if($temp.text().length == 0 && $temp.find("img").length == 0){
+      if ($temp.text().length == 0 && $temp.find("img").length == 0) {
         return false;
       }
       let to_id = this.$route.params.threadId;
-      if(inboxType == 'sms' || inboxType == 'whatsapp'){
-        to_id = this.thread.data.clientNumber; 
+      if (inboxType == "sms" || inboxType == "whatsapp") {
+        to_id = this.thread.data.clientNumber;
       }
       let messageData = {
         mailboxID: this.thread.data.mailbox_id,
@@ -737,25 +743,25 @@ export default {
         message,
         time: new Date().toISOString(),
         attachmentId: attachmentIDs,
-        isUnified: 1
+        isUnified: 1,
       };
       let url = "";
-      if(inboxType == "chat"){
+      if (inboxType == "chat") {
         url = this.$apiBaseURL + "unifiedv2/sendChatInboxMessage.php";
-      } else if(inboxType == "sms"){
-        if(inboxSubType == "justcall"){
+      } else if (inboxType == "sms") {
+        if (inboxSubType == "justcall") {
           url = this.$apiBaseURL + "/justcall/sendSmsUnifiedLive.php";
-        } else if(inboxSubType == "dialpad"){
+        } else if (inboxSubType == "dialpad") {
           url = this.$apiBaseURL + "/dialpad/sendSmsUnifiedLive.php";
-        } else if(inboxSubType == "ringcentral"){
+        } else if (inboxSubType == "ringcentral") {
           url = this.$apiBaseURL + "/ringcentral/sendSmsUnifiedLive.php";
-        } else if(inboxSubType == "plivo"){
+        } else if (inboxSubType == "plivo") {
           url = this.$apiBaseURL + "/plivo/sendSmsUnifiedLive.php";
         } else {
           url = this.$apiBaseURL + "/sms/sendSmsUnifiedLive.php";
         }
-      } else if(inboxType == "whatsapp"){
-        if(inboxSubType == "360dialog"){
+      } else if (inboxType == "whatsapp") {
+        if (inboxSubType == "360dialog") {
           url = this.$apiBaseURL + "/360dialog/sendSmsUnifiedLive.php";
         } else {
           url = this.$apiBaseURL + "/whatsapp/sendSmsUnifiedLive.php";
@@ -769,50 +775,48 @@ export default {
         credentials: "include",
       };
 
-      if(url.trim().length > 0){
-        fetch(
-          url,
-          requestOptions
-        )
-        .then(async (response) => {
-          const data = await response.json();
-          if (data.status !== "success") {
-            const error = (data && data.message) || response.status;
-            return Promise.reject(error);
-          }
-          // editor.html = "";
-          
-          let payload = {
-            id: data.data.id,
-            text: data.data.body.replace(/\n/g, '<br>'),
-            sentBy: data.data.sent_by,
-            attachments: this.replyAttachments,
-            date: data.data.message_time,
-            threadId: this.$route.params.threadId,
-            type: 1,
-            unixTime: new Date(),
-            deliveryStatus: data.data.delivery_status,
-          };
-          let message = {
-            message: payload,
-            type: inboxType,
-          };
-          console.log("from chat", message);
-          bus.$emit("changeThreadAttrs", message);
-          bus.$emit("scrollToBottom");
-          this.chat = "";
-          this.replyAttachments = {};
-        })
-        .catch((error) => {
-          alert(error);
-        });
-      } else {
-        triggerPromptNotif("Oops! seems like we have not connected this inbox yet!");
-      }
+      if (url.trim().length > 0) {
+        fetch(url, requestOptions)
+          .then(async (response) => {
+            const data = await response.json();
+            if (data.status !== "success") {
+              const error = (data && data.message) || response.status;
+              return Promise.reject(error);
+            }
+            // editor.html = "";
 
+            let payload = {
+              id: data.data.id,
+              text: this.chat,
+              sentBy: data.data.sent_by,
+              attachments: this.replyAttachments,
+              date: data.data.message_time,
+              threadId: this.$route.params.threadId,
+              type: 1,
+              unixTime: new Date(),
+              deliveryStatus: data.data.delivery_status,
+            };
+            let message = {
+              message: payload,
+              type: inboxType,
+            };
+            console.log("from chat", message);
+            bus.$emit("changeThreadAttrs", message);
+            bus.$emit("scrollToBottom");
+            this.chat = "";
+            this.replyAttachments = {};
+          })
+          .catch((error) => {
+            alert(error);
+          });
+      } else {
+        triggerPromptNotif(
+          "Oops! seems like we have not connected this inbox yet!"
+        );
+      }
     },
     sendNotes() {
-      console.log("note ka hit",this.note);
+      console.log("note ka hit", this.note);
       if (this.note !== "") {
         let attachmentKeys = Object.keys(this.notesAttachments);
         let attachmentIDs = attachmentKeys.filter(
@@ -822,16 +826,16 @@ export default {
         // let message = this.note
         //   .replace(/(<p)/gim, "<div")
         //   .replace(/<\/p>/gim, "</div>");
-        let message = this.note.replace(/(<br>)/g, '\n');
+        let message = this.note.replace(/(<br>)/g, "\n");
 
         let $temp = $(`<div>${this.note}</div>`);
         let mentionUserIDs = [];
-        $temp.find(".mention-highlight").each(function(){
+        $temp.find(".mention-highlight").each(function () {
           console.log($(this));
-          mentionUserIDs.push($(this).data('id'));
+          mentionUserIDs.push($(this).data("id"));
         });
 
-        if($temp.text().length == 0 && $temp.find("img").length == 0){
+        if ($temp.text().length == 0 && $temp.find("img").length == 0) {
           return false;
         }
         let messageData = {
@@ -841,7 +845,7 @@ export default {
           message,
           attachmentIDs,
           type: this.thread.data.mailboxType,
-          threadVersion: 1
+          threadVersion: 1,
         };
         const requestOptions = {
           method: "POST",
@@ -940,7 +944,6 @@ export default {
           `;
     },
     getArticleCard(article) {
-      
       let $descHtml = "";
       if (article.description) {
         $descHtml = `<p style="margin-top: 0;" class="hw_articleCardText">${article.description}</p>`;
@@ -998,20 +1001,24 @@ export default {
         console.log("FETCHING SAVED REPLY IN CHAT CONTENT REPLY");
         fetch(
           `https://app.helpwise.io/api/savedReplies/get?mailboxID=${vueThis.thread.data.mailbox_id}&savedReplyID=${id}`,
-          {credentials: 'include'}
-        ).then(response => response.json())
-        .then(response => {
-          if(response.status == "success"){
-            
-            if(vueThis.current == 'reply'){
-              // vueThis.chat += response.data.savedReply.content;
-              vueThis.replyEditorInstance.html.insert(response.data.savedReply.content);
-            } else {  
-              // vueThis.note += response.data.savedReply.content;
-              vueThis.noteEditorInstance.html.insert(response.data.savedReply.content);
+          { credentials: "include" }
+        )
+          .then((response) => response.json())
+          .then((response) => {
+            if (response.status == "success") {
+              if (vueThis.current == "reply") {
+                // vueThis.chat += response.data.savedReply.content;
+                vueThis.replyEditorInstance.html.insert(
+                  response.data.savedReply.content
+                );
+              } else {
+                // vueThis.note += response.data.savedReply.content;
+                vueThis.noteEditorInstance.html.insert(
+                  response.data.savedReply.content
+                );
+              }
             }
-          }
-        });
+          });
       }
     });
 
@@ -1059,63 +1066,63 @@ export default {
 </script>
 
 <style scoped>
-  .form {
-    bottom: 0%;
-  }
+.form {
+  bottom: 0%;
+}
 
-  .mention {
-    color: #009be5 !important;
-    background-color: #dbf2ff !important;
-    padding: 0 4px;
-  }
+.mention {
+  color: #009be5 !important;
+  background-color: #dbf2ff !important;
+  padding: 0 4px;
+}
 
-  .mention-h {
-    color: blue !important;
-    background-color: #dbf2ff !important;
-    padding: 0 4px;
-  }
-  .btnn {
-    font-size: 14px;
-    color: white;
-    /* padding: 7px; */
-    width: 70px;
-    border-radius: 5px;
-    cursor: pointer;
+.mention-h {
+  color: blue !important;
+  background-color: #dbf2ff !important;
+  padding: 0 4px;
+}
+.btnn {
+  font-size: 14px;
+  color: white;
+  /* padding: 7px; */
+  width: 70px;
+  border-radius: 5px;
+  cursor: pointer;
 
-    float: right;
-    bottom: 17px;
-    position: absolute;
-    right: 100px;
-  }
+  float: right;
+  bottom: 17px;
+  position: absolute;
+  right: 100px;
+}
 
-  .nav-link.active {
-    color: #0168fa;
-  }
+.nav-link.active {
+  color: #0168fa;
+}
 
-  .editorContainer {
-    margin: 10px 20px;
-    background-color: white;
-    border-radius: 10px;
-    /* overflow: hidden; */
-    border: 1px solid #0168fa;
-  }
+.editorContainer {
+  margin: 10px 20px;
+  background-color: white;
+  border-radius: 10px;
+  /* overflow: hidden; */
+  border: 1px solid #0168fa;
+}
 
-  .editorContainer.noteMode {
-    background: #fef6d8;
-  }
+.editorContainer.noteMode {
+  background: #fef6d8;
+}
 
-  .editorContainer:hover {
-    box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.16);
-  }
+.editorContainer:hover {
+  box-shadow: 0 0 10px 2px rgba(0, 0, 0, 0.16);
+}
 
-  #removeHCArticleCard {
-    visibility: hidden;
-  }
-  .hw_removeArticle:hover {
-    visibility: visible;
-  }
+#removeHCArticleCard {
+  visibility: hidden;
+}
+.hw_removeArticle:hover {
+  visibility: visible;
+}
 
-  .typingMessageNotice {
-    margin: 5px 20px;
-  }
+.typingMessageNotice {
+  margin: 5px 20px;
+}
 </style>

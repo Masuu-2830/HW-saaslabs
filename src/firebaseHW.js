@@ -17,7 +17,7 @@ function createThread(data, id) {
         'attachments': (data.action == 'incoming' || data.action == 'outgoing') ? data.messageData.attachments : null,
         'date': (data.action == 'incoming' || data.action == 'outgoing') ? data.messageData.time : data.time,
         'humanFriendlyDate': data.humanFriendlyDate || data.time,
-        'displayContact': (data.inboxType == 'mail' ? data.displayContact : data.clientNumber) || 'Unknown Sender'
+        'displayContact': ((data.inboxType == 'mail' || data.inboxType == 'chat') ? data.displayContact : data.clientNumber) || 'Unknown Sender'
     }
     return thread;
 }
@@ -45,7 +45,7 @@ export function addThread(data) {
                 store.state.threads[objIndex].date = data.messageData.time;
                 store.state.threads[objIndex].subject = data.subject;
                 store.state.threads[objIndex].snippet = data.snippet;
-            } else if(data.inboxType == 'sms' || data.inboxType == 'whatsapp') {
+            } else if(data.inboxType == 'sms' || data.inboxType == 'chat' || data.inboxType == 'whatsapp') {
                 store.state.threads[objIndex].date = data.date;
                 store.state.threads[objIndex].humanFriendlyDate = moment(data.date).format("HH:mm");
                 store.state.threads[objIndex].snippet = data.snippet;

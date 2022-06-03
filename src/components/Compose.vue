@@ -2908,7 +2908,7 @@ export default {
         this.composer.type == "universalSms"
       ) {
         this.editorInstance.mailboxID = this.fromSelected.mailboxId;
-        if (this.composer.type == "universalMail" && typeOfInbox == "sms") {
+        if (this.composer.type == "universalMail" && (typeOfInbox == "sms" || typeOfInbox == "chat" || typeOfInbox == "whatsapp")) {
           this.composer.type = "universalSms";
         } else if (
           this.composer.type == "universalSms" &&
