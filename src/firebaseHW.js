@@ -94,7 +94,7 @@ export function addThread(data) {
                         'data': {
                             'id': data.messageData.id,
                             'threadId': data.threadID,
-                            'text': data.messageData.body.replace(/\\n/g, '<br>'),
+                            'text': data.messageData.body.replace(/\n/g, '<br>'),
                             'sentBy': data.messageData.sentBy,
                             'attachments': data.messageData.attachments,
                             'type': data.action == 'incoming' ? 0 : 1,

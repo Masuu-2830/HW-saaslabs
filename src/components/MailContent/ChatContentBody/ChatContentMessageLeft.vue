@@ -67,7 +67,7 @@
                     font-family: inherit;
                     margin-bottom: 0;
                   "
-                  v-html="item.data.text"
+                  v-html="item.data.text.replace(/\n/g, '<br>')"
                 ></span>
               </div>
             </div>

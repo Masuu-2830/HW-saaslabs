@@ -131,7 +131,7 @@
                       margin-bottom: 0;
                       width: 100%;
                     "
-                    v-html="item.data.text"
+                    v-html="item.data.text.replace(/\n/g, '<br>')"
                   ></span>
                 </div>
                 <!-- <br /> -->
