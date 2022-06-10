@@ -32,11 +32,14 @@
           <h6 v-if="thread.data.subject != ''" class="tx-15 mb-1 mt-2" id="thread-subject" style="width: 100%">
             {{ thread.data.subject }}
           </h6>
-          <h6 v-else-if="thread.data.contact.firstname != ''" class="tx-15 mb-1 mt-2" id="thread-subject" style="width: 100%">
+          <h6 v-else-if="thread.data.contact.firstname != '' && thread.data.contact.firstname != undefined" class="tx-15 mb-1 mt-2" id="thread-subject" style="width: 100%">
             {{ thread.data.contact.firstname + " " + thread.data.contact.lastname }}
           </h6>
-          <h6 v-else class="tx-15 mb-1 mt-2" id="thread-subject" style="width: 100%">
+          <h6 v-else-if="thread.data.contact.emails" class="tx-15 mb-1 mt-2" id="thread-subject" style="width: 100%">
             {{ thread.data.contact.emails[0] }}
+          </h6>
+          <h6 v-else class="tx-15 mb-1 mt-2" id="thread-subject" style="width: 100%">
+            No Subject
           </h6>
           <span
             id="tagsTicketContainer"

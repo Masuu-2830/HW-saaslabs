@@ -200,7 +200,7 @@ export default {
         console.log(this.thread.data.items);
         this.thread.data.items.push(mail);
         console.log(this.thread.data.items);
-      } else if (data.type == "chat" || data.type == "sms" || data.type == "whatsapp") {
+      } else if (data.type == "chat" || data.type == "sms" || data.type == "whatsapp" || data.type == "facebook") {
         let chat = {};
         chat["data"] = data.message;
         chat["type"] = data.type;

@@ -3142,21 +3142,21 @@ export default {
           url = this.$apiBaseURL + "unifiedv2/sendChatInboxMessage.php";
         } else if (inboxType == "sms") {
           if (inboxSubType == "justcall") {
-            url = this.$apiBaseURL + "/justcall/sendSmsUnifiedLive.php";
+            url = this.$apiBaseURL + "justcall/sendSmsUnifiedLive.php";
           } else if (inboxSubType == "dialpad") {
-            url = this.$apiBaseURL + "/dialpad/sendSmsUnifiedLive.php";
+            url = this.$apiBaseURL + "dialpad/sendSmsUnifiedLive.php";
           } else if (inboxSubType == "ringcentral") {
-            url = this.$apiBaseURL + "/ringcentral/sendSmsUnifiedLive.php";
+            url = this.$apiBaseURL + "ringcentral/sendSmsUnifiedLive.php";
           } else if (inboxSubType == "plivo") {
-            url = this.$apiBaseURL + "/plivo/sendSmsUnifiedLive.php";
+            url = this.$apiBaseURL + "plivo/sendSmsUnifiedLive.php";
           } else {
-            url = this.$apiBaseURL + "/sms/sendSmsUnifiedLive.php";
+            url = this.$apiBaseURL + "sms/sendSmsUnifiedLive.php";
           }
         } else if (inboxType == "whatsapp") {
           if (inboxSubType == "360dialog") {
-            url = this.$apiBaseURL + "/360dialog/sendSmsUnifiedLive.php";
+            url = this.$apiBaseURL + "360dialog/sendSmsUnifiedLive.php";
           } else {
-            url = this.$apiBaseURL + "/whatsapp/sendSmsUnifiedLive.php";
+            url = this.$apiBaseURL + "whatsapp/sendSmsUnifiedLive.php";
           }
         }
         fetch(url, requestOptions)

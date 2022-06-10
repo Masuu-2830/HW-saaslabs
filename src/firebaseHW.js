@@ -17,7 +17,7 @@ function createThread(data, id) {
         'attachments': (data.action == 'incoming' || data.action == 'outgoing') ? data.messageData.attachments : null,
         'date': (data.action == 'incoming' || data.action == 'outgoing') ? data.messageData.time : data.time,
         'humanFriendlyDate': data.humanFriendlyDate || data.time,
-        'displayContact': ((data.inboxType == 'mail' || data.inboxType == 'chat') ? data.displayContact : data.clientNumber) || 'Unknown Sender'
+        'displayContact': ((data.inboxType == 'mail' || data.inboxType == 'chat' || data.inboxType == '4') ? data.displayContact : data.clientNumber) || 'Unknown Sender'
     }
     return thread;
 }
@@ -45,9 +45,9 @@ export function addThread(data) {
                 store.state.threads[objIndex].date = data.messageData.time;
                 store.state.threads[objIndex].subject = data.subject;
                 store.state.threads[objIndex].snippet = data.snippet;
-            } else if(data.inboxType == 'sms' || data.inboxType == 'chat' || data.inboxType == 'whatsapp') {
+            } else if(data.inboxType == 'sms' || data.inboxType == 'chat' || data.inboxType == 'whatsapp' || data.inboxType == '4') {
                 store.state.threads[objIndex].date = data.date;
-                store.state.threads[objIndex].humanFriendlyDate = moment(data.date).format("HH:mm");
+                store.state.threads[objIndex].humanFriendlyDate = moment(data.date).format("hh:mm A");
                 store.state.threads[objIndex].snippet = data.snippet;
             }
             var a = store.state.threads.splice(objIndex, 1);
@@ -83,7 +83,7 @@ export function addThread(data) {
                     });
                 }
             }
-        } else if (data.inboxType == 'chat' || data.inboxType == 'facebook' || data.inboxType == 'sms' || data.inboxType == 'whatsapp') {
+        } else if (data.inboxType == 'chat' || data.inboxType == '4' || data.inboxType == 'sms' || data.inboxType == 'whatsapp') {
             console.log(store.state.threadData[data.threadID].data.items, data.messageData.id);
             let itemIndex = store.state.threadData[data.threadID].data.items.findIndex((obj) => obj.data.id == data.messageData.id);
             console.log(itemIndex)
@@ -108,6 +108,7 @@ export function addThread(data) {
                     } else {
                         store.state.threadData[data.threadID].data.items.unshift(message);
                     }
+                    bus.$emit("scrollToBottom");
                 }
             }
         }
@@ -179,7 +180,7 @@ export function closeThread(data) {
         let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
         if (objIndex !== -1 && store.state.filterSection !== 'closed') {
             store.state.threads.splice(objIndex, 1);
-        } else if (objIndex == -1 && store.state.filterSection == 'closed') {
+        } else if (objIndex == -1 && store.state.filterSection == 'closed' && (store.state.mailboxId == 'me' || Object.keys(data.inboxThreadMap).includes(store.state.mailboxId))) {
             if(data.threadData) {
                 store.state.threads.unshift(createThread(data, thread));
             }
@@ -214,7 +215,7 @@ export function snoozeThread(data) {
         let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
         if (objIndex !== -1 && store.state.filterSection !== 'snoozed') {
             store.state.threads.splice(objIndex, 1);
-        } else if (objIndex == -1 && store.state.filterSection == 'snoozed') {
+        } else if (objIndex == -1 && store.state.filterSection == 'snoozed' && (store.state.mailboxId == 'me' || Object.keys(data.inboxThreadMap).includes(store.state.mailboxId))) {
             if(data.threadData) {
                 store.state.threads.unshift(createThread(data, thread));
             }
@@ -249,7 +250,7 @@ export function deleteThread(data) {
         let objIndex = store.state.threads.findIndex((obj) => obj.id == thread);
         if (objIndex !== -1 && store.state.filterSection !== 'trash') {
             store.state.threads.splice(objIndex, 1);
-        } else if (objIndex == -1 && store.state.filterSection == 'trash') {
+        } else if (objIndex == -1 && store.state.filterSection == 'trash' && (store.state.mailboxId == 'me' || Object.keys(data.inboxThreadMap).includes(store.state.mailboxId))) {
             if(data.threadData) {
                 store.state.threads.unshift(createThread(data, thread));
             }

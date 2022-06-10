@@ -98,6 +98,7 @@
                 </div>
               </div>
               <span
+                v-html="item.data.text.replace(/amp;/g,'').replace(/\n/g, '<br>')"
                 class="tx-14"
                 style="
                   font-weight: 300;
@@ -105,7 +106,7 @@
                   font-family: system-ui, -apple-system, BlinkMacSystemFont;
                 "
               >
-                {{ item.data.text }}
+                <!-- {{ item.data.text }} -->
               </span>
             </div>
           </div>

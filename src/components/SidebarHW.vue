@@ -16,8 +16,8 @@
       </div>
       <div class="pd-x-20 pd-y-10">
         <div class="justify-content-between align-items-start">
-          <h5 id="mailbox-title" v-if="this.mailbox.displayName">
-            {{ this.mailbox.displayName }}
+          <h5 id="mailbox-title" v-if="$store.state.inboxData.name">
+            {{ $store.state.inboxData.name }}
           </h5>
         </div>
         <div role="group" class="btn-group btn-block">

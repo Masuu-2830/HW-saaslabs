@@ -16,6 +16,7 @@ import "froala-editor/css/froala_style.min.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
 import "froala-editor/js/froala_editor.pkgd.min.js";
 import 'froala-editor/js/plugins.pkgd.min' // all plugins
+import "froala-editor/js/plugins/entities.min.js"
 import 'tributejs/dist/tribute.css';
 import Toast from "vue-toastification";
 import "vue-toastification/dist/index.css";

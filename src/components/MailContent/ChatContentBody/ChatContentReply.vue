@@ -191,6 +191,7 @@ export default {
         iframeDefaultStyle:
           "body{position:relative;z-index:2;}pre{white-space:pre-wrap;word-wrap:break-word;}",
         toolbarBottom: true,
+        entities: '&quot;&#39;&iexcl;&cent;&pound;&curren;&yen;&brvbar;',
         key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
         heightMin: 100,
         heightMax: 290,
@@ -299,6 +300,7 @@ export default {
           "Add your notes here.. You can use @ to mention your teammates",
         charCounterCount: false,
         enter: FroalaEditor.ENTER_BR,
+        entities: '&quot;&#39;&iexcl;&cent;&pound;&curren;&yen;&brvbar;',
         toolbarBottom: true,
         key: "fIE3A-9E2D1G1A4C4D4td1CGHNOa1TNSPH1e1J1VLPUUCVd1FC-22C4A3C3C2D4F2B2C3B3A1==",
         heightMin: this.thread.data.mailboxType == "mail" ? 50 : 100,
@@ -720,13 +722,13 @@ export default {
       );
       let inboxType = this.thread.data.mailboxType;
       let inboxSubType = this.thread.data.mailboxSubType;
-
+      let mes = this.chat.toString();
       let message = this.chat
         // .replace(/(<p>)/gim, "")
         // .replace(/(<\/p><p>)/gim, "\\n")
         // .replace(/<\/p>/gim, "")
-        .replace(/(<br>)/g, "\n");
-      console.log("this thread ka data", this.chat, message);
+        .replace(/(<br>)/g, "\n").toString();
+      console.log("this thread ka data", this.chat, mes, message);
 
       let $temp = $(`<div>${this.chat}</div>`);
       if ($temp.text().length == 0 && $temp.find("img").length == 0) {
@@ -736,35 +738,50 @@ export default {
       if (inboxType == "sms" || inboxType == "whatsapp") {
         to_id = this.thread.data.clientNumber;
       }
-      let messageData = {
-        mailboxID: this.thread.data.mailbox_id,
-        to: to_id,
-        type: 1,
-        message,
-        time: new Date().toISOString(),
-        attachmentId: attachmentIDs,
-        isUnified: 1,
-      };
+      let messageData;
+      if(inboxType == "sms" || inboxType == "whatsapp" || inboxType == "chat") {
+        messageData = {
+          mailboxID: this.thread.data.mailbox_id,
+          to: to_id,
+          type: 1,
+          message,
+          time: new Date().toISOString(),
+          attachmentId: attachmentIDs,
+          isUnified: 1,
+        };
+      } else if(inboxType == "facebook") {
+        messageData = {
+          attachmentId: attachmentIDs,
+          mailboxID: this.thread.data.mailbox_id,
+          threadID: this.$route.params.threadId,
+          message,
+          random_id: Math.floor(Date.now() / 1000)
+        }
+      }
       let url = "";
       if (inboxType == "chat") {
         url = this.$apiBaseURL + "unifiedv2/sendChatInboxMessage.php";
       } else if (inboxType == "sms") {
         if (inboxSubType == "justcall") {
-          url = this.$apiBaseURL + "/justcall/sendSmsUnifiedLive.php";
+          url = this.$apiBaseURL + "justcall/sendSmsUnifiedLive.php";
         } else if (inboxSubType == "dialpad") {
-          url = this.$apiBaseURL + "/dialpad/sendSmsUnifiedLive.php";
+          url = this.$apiBaseURL + "dialpad/sendSmsUnifiedLive.php";
         } else if (inboxSubType == "ringcentral") {
-          url = this.$apiBaseURL + "/ringcentral/sendSmsUnifiedLive.php";
+          url = this.$apiBaseURL + "ringcentral/sendSmsUnifiedLive.php";
         } else if (inboxSubType == "plivo") {
-          url = this.$apiBaseURL + "/plivo/sendSmsUnifiedLive.php";
+          url = this.$apiBaseURL + "plivo/sendSmsUnifiedLive.php";
         } else {
-          url = this.$apiBaseURL + "/sms/sendSmsUnifiedLive.php";
+          url = this.$apiBaseURL + "sms/sendSmsUnifiedLive.php";
         }
       } else if (inboxType == "whatsapp") {
         if (inboxSubType == "360dialog") {
-          url = this.$apiBaseURL + "/360dialog/sendSmsUnifiedLive.php";
+          url = this.$apiBaseURL + "360dialog/sendSmsUnifiedLive.php";
         } else {
-          url = this.$apiBaseURL + "/whatsapp/sendSmsUnifiedLive.php";
+          url = this.$apiBaseURL + "whatsapp/sendSmsUnifiedLive.php";
+        }
+      } else if (inboxType == "facebook") {
+        if (inboxSubType == "facebook") {
+          url = "https://app.helpwise.io/facebook-integration/api/sendMessage.php"
         }
       }
 
@@ -790,7 +807,7 @@ export default {
               text: this.chat,
               sentBy: data.data.sent_by,
               attachments: this.replyAttachments,
-              date: data.data.message_time,
+              date: data.data.message_time || new Date(),
               threadId: this.$route.params.threadId,
               type: 1,
               unixTime: new Date(),

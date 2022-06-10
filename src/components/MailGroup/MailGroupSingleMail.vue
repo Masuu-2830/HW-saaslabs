@@ -361,7 +361,7 @@
               <!-- <span v-if="mail.email !== undefined" class="tx-14 tx-color-03">
                 {{ mail.email.snippet }}
               </span> -->
-              <span v-html="mail.snippet.replace(/\n/g, ' ')" class="tx-14 tx-color-03">
+              <span v-html="mail.snippet.replace(/amp;/g,'').replace(/\n/g, ' ')" class="tx-14 tx-color-03">
                 <!-- {{ mail.snippet }} -->
               </span>
             </div>
@@ -960,7 +960,7 @@
           {{ mail.email.snippet }}
         </p> -->
         <p
-          v-html="mail.snippet.replace(/\n/g, ' ')"
+          v-html="mail.snippet.replace(/amp;/g,'').replace(/\n/g, ' ')"
           class="tx-12 tx-color-03 mg-b-0"
           style="
             width: 90%;
